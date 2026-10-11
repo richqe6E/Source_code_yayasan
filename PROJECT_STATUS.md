@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 11 Oktober 2026 — Sesi 23 (Inisialisasi Git, Proteksi Keamanan, Push Resmi ke GitHub & Kesiapan Multi-Device) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 11 Oktober 2026 — Sesi 24 (Audit Sistem, CMS Mutual Exclusion, Backup Snapshot, Rekap Excel & Cetak Dinas) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -806,6 +806,40 @@ Total checks: 171 OK: 171 BAD: 0
 - **Verifikasi Menyeluruh:**
   - Seluruh rute publik dan portal teruji 100% (HTTP 200 OK untuk rute aktif, HTTP 302 Redirect untuk rute legacy).
   - Dev server aktif berjalan di background port 3000 (`http://localhost:3000`).
+
+---
+
+### 🗓️ Sesi 24 — Audit Komprehensif Sistem, Perbaikan CMS Banner Mutual-Exclusion, Backup & Restore Interaktif, Import Excel Rekap, dan Standarisasi Cetak & Ekspor Excel (.xls) Berstandar Pendidikan (11 Oktober 2026, Malam)
+- **Audit Menyeluruh & Uji End-to-End Otomatis (100% Pass):**
+  - Mengaudit dan menguji seluruh fitur operasional yayasan: upload berkas pendaftaran & dokumen, upload foto galeri & banner, pembaruan PPDB (alur pendaftaran -> approve -> konversi terbit NIS otomatis), alur keuangan SPP (unggah bukti bayar -> antrean verifikasi kasir/TU -> status lunas), dan login portal (Siswa & Admin).
+  - Menjalankan 3 automated test suite: `test-cms-e2e.js` (17/17 PASS), `test-ppdb-e2e.js` (11/11 PASS), `test-spp-e2e.js` (13/13 PASS).
+- **Perbaikan CMS Banner & Web (`cms_setting.html` & `content.html`):**
+  - Menghilangkan ambiguitas upload: Diterapkan **segmented toggle selector** antara "Unggah Berkas Gambar" vs "Gunakan Link URL Gambar".
+  - Mekanisme *Mutual Exclusion*: Jika memilih link, upload file dikosongkan/di-reset; jika memilih upload file, input link dibersihkan/dikosongkan. Dilengkapi validasi ukuran/tipe berkas dan live image preview.
+- **Pembaruan Sistem Backup & Restore (`backup.html` & `local-api.js`):**
+  - Fitur dibuat sepenuhnya fungsional dan interaktif:
+    - Tombol "Buat Backup Baru Sekarang" mengompilasi snapshot database lengkap (Siswa, Kelas, Guru, Tagihan SPP, PPDB, Berita, Galeri, Pengaturan Sekolah).
+    - Aksi per item cadangan: Unduh file `.json` snapshot ke komputer lokal, Pulihkan (Restore) dengan modal konfirmasi keamanan, dan Hapus cadangan lama.
+    - Menambahkan fitur Unggah Berkas Backup Eksternal (`.json`) dari komputer untuk merestorasi database.
+- **Penambahan Fitur Unggah / Import Rekap Data Spreadsheet (`reports.html`):**
+  - Menyediakan modal import CSV langsung ke database untuk data Tagihan SPP Massal dan Siswa Baru Massal.
+  - Dilengkapi template helper unduh contoh format CSV yang valid, parsing baris real-time, validasi, dan pratinjau tabel sebelum simpan.
+- **Restorasi Desain UI/UX Laporan & Rekapitulasi (`reports.html`):**
+  - Mengembalikan desain kartu parameter laporan ke standar profesional human-crafted tanpa elemen "AI Slop" (kontras warna tajam berlebihan/badges multi-warna dibersihkan).
+  - Tampilan seragam dengan border abu-abu bersih, tombol biru yayasan `bg-primary-600`, dan filter parameter Bulan, Semester, dan Tahun Ajaran.
+- **Peningkatan Layout Cetak Dokumen Resmi Berstandar Pendidikan:**
+  - `@media print` diperbarui untuk mencetak khusus data rekapan.
+  - Menampilkan Kop Surat Resmi Yayasan (Nama Yayasan, Unit PAUD & TK Terpadu - TPQ Ulinnuha, Alamat, Kontak, Email, Logo), garis ganda dinas pembatas kop, metadata waktu cetak WITA, dan lembar pengesahan tanda tangan (Ketua Yayasan & Petugas TU/Bendahara dinamis).
+- **Peningkatan Format Ekspor Excel (.xls Spreadsheet Rapi):**
+  - Menggantikan ekspor CSV polos menjadi format native Microsoft Excel Spreadsheet (`.xls`):
+    - Tag XML `<x:DisplayGridlines/>` diaktifkan untuk menampilkan garis tabel yang tegas dan bersih.
+    - Kop Surat resmi di baris atas spreadsheet (*merged cells*).
+    - Header kolom biru formal `#0284C7` dengan font putih tebal.
+    - Format teks string `mso-number-format: "\@"` untuk melindungi kolom NIS dan Nomor HP agar angka `0` di awal (`0812...` atau `0012`) tidak hilang dan tidak berubah menjadi notasi eksponensial ilmiah.
+    - Penataan rata kanan untuk angka uang dan badge warna lembut untuk status.
+    - Baris ringkasan total (Total Data / Total Nominal).
+    - Lembar tanda tangan resmi di bagian bawah spreadsheet.
+    - Opsi CSV tetap tersedia dengan UTF-8 BOM dan header `sep=,`.
 
 ---
 

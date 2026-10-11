@@ -149,28 +149,28 @@
 
         <!-- 3 Quick Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <!-- Card 1: Kelas & Semester -->
+          <!-- Card 1: Kelas & Jenjang -->
           <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Kelas & Semester</span>
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Kelas &amp; Jenjang</span>
               <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
               </div>
             </div>
-            <div class="text-lg font-extrabold text-slate-900" id="card-kelas">TK B Terpadu</div>
-            <div class="text-xs text-slate-500 mt-1" id="card-semester">Tahun Ajaran 2026/2027 • Semester 1</div>
+            <div class="text-lg font-extrabold text-slate-900" id="card-kelas">PAUD / TK Terpadu</div>
+            <div class="text-xs text-slate-500 mt-1" id="card-semester">Tahun Ajaran 2026/2027</div>
           </div>
 
-          <!-- Card 2: Status Kenaikan / Kelulusan -->
+          <!-- Card 2: Status Siswa -->
           <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Kenaikan / Lulus</span>
-              <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Siswa</span>
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
             </div>
-            <div class="text-lg font-extrabold text-slate-900" id="card-kenaikan">Status Aktif</div>
-            <div class="text-xs text-primary-700 font-medium mt-1" id="card-kenaikan-desc">Mengikuti pembelajaran reguler</div>
+            <div class="text-lg font-extrabold text-slate-900" id="card-status-siswa">Siswa Aktif</div>
+            <div class="text-xs text-emerald-700 font-medium mt-1">Terdaftar Resmi di Yayasan</div>
           </div>
 
           <!-- Card 3: Tagihan SPP -->
@@ -183,76 +183,124 @@
             </div>
             <div class="text-lg font-extrabold text-slate-900" id="card-spp">Rp 0</div>
             <div class="text-xs text-slate-500 mt-1 flex items-center justify-between">
-              <span id="card-spp-desc">Tidak ada tunggakan</span>
+              <span id="card-spp-desc">Memuat status...</span>
               <a href="spp.html" class="inline-flex items-center gap-1 text-xs text-brand-700 font-bold hover:underline"><span>Rincian SPP</span><i class="fi fi-rr-arrow-right text-[10px]"></i></a>
             </div>
           </div>
         </div>
 
-        <!-- Academic & Announcement Section -->
+        <!-- SPP & Announcements Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <!-- Col 1 & 2: Preview Perkembangan Rapor -->
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
+          <!-- Col 1 & 2: Status SPP & Identitas Siswa -->
+          <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Box SPP Bulan Ini -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">Informasi Pembayaran SPP</h3>
+                  <p class="text-xs text-slate-500">Kewajiban iuran bulanan pendidikan ananda</p>
+                </div>
+                <a href="spp.html" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                  <span>Lihat Semua Tagihan &amp; Bayar</span>
+                  <i class="fi fi-rr-arrow-right text-[10px]"></i>
+                </a>
+              </div>
+
+              <!-- Rincian Status Cepat -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <span class="text-[11px] font-semibold text-slate-500 block mb-1">Besaran SPP</span>
+                  <span class="text-base font-bold text-slate-900">Rp 150.000</span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Per bulan</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <span class="text-[11px] font-semibold text-slate-500 block mb-1">Jatuh Tempo</span>
+                  <span class="text-base font-bold text-slate-900">Tgl 10</span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Setiap bulan berjalan</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <span class="text-[11px] font-semibold text-slate-500 block mb-1">Metode Bayar</span>
+                  <span class="text-xs font-bold text-primary-700">Transfer &amp; Tunai</span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Konfirmasi via portal</span>
+                </div>
+              </div>
+
+              <!-- Daftar Ringkas Tagihan Terakhir -->
               <div>
-                <h3 class="text-base font-bold text-slate-900">Ringkasan Perkembangan Siswa</h3>
-                <p class="text-xs text-slate-500">6 Aspek Perkembangan Standar PAUD/TK</p>
-              </div>
-              <a href="akademik.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 hover:text-brand-800 hover:underline">
-                <span>Lihat Rapor Lengkap</span>
-                <i class="fi fi-rr-arrow-right text-[10px]"></i>
-              </a>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="aspects-grid">
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-[11px] font-semibold text-slate-600">Nilai Agama & Moral</div>
-                <div class="text-sm font-extrabold text-brand-700 mt-1" id="asp-nam">BSH</div>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-[11px] font-semibold text-slate-600">Fisik Motorik</div>
-                <div class="text-sm font-extrabold text-brand-700 mt-1" id="asp-motorik">BSH</div>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-[11px] font-semibold text-slate-600">Kognitif</div>
-                <div class="text-sm font-extrabold text-brand-700 mt-1" id="asp-kognitif">BSH</div>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-[11px] font-semibold text-slate-600">Bahasa</div>
-                <div class="text-sm font-extrabold text-brand-700 mt-1" id="asp-bahasa">BSH</div>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-[11px] font-semibold text-slate-600">Sosial Emosional</div>
-                <div class="text-sm font-extrabold text-brand-700 mt-1" id="asp-sosial">BSH</div>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-[11px] font-semibold text-slate-600">Seni Kreativitas</div>
-                <div class="text-sm font-extrabold text-brand-700 mt-1" id="asp-seni">BSH</div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Tagihan Terbaru:</h4>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead>
+                      <tr class="border-b border-slate-100 text-slate-400 uppercase tracking-wider">
+                        <th class="py-2.5 px-3 font-semibold">Periode</th>
+                        <th class="py-2.5 px-3 font-semibold">Nominal</th>
+                        <th class="py-2.5 px-3 font-semibold">Jatuh Tempo</th>
+                        <th class="py-2.5 px-3 font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-spp-list" class="divide-y divide-slate-100">
+                      <tr>
+                        <td colspan="4" class="py-4 text-center text-slate-400">Memuat data tagihan...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            <div class="mt-4 p-3.5 rounded-xl bg-primary-50/50 border border-primary-100 text-xs text-slate-700">
-              <span class="font-bold text-primary-900 block mb-1">Catatan Wali Kelas:</span>
-              <p id="teacher-notes" class="italic text-slate-600">"Ananda menunjukkan perkembangan motorik dan sosialisasi yang sangat baik selama kegiatan bermain bersama."</p>
+            <!-- Box Identitas Pokok Siswa -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <h3 class="text-base font-bold text-slate-900">Data Pokok Siswa</h3>
+                <a href="biodata.html" class="text-xs font-semibold text-primary-600 hover:text-primary-700">Lihat Biodata Lengkap &rarr;</a>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span class="text-slate-400 block">Nama Lengkap</span>
+                  <span class="font-bold text-slate-900 text-sm" id="info-nama">-</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Nomor Induk Siswa (NIS)</span>
+                  <span class="font-mono font-bold text-primary-700 text-sm" id="info-nis">-</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Kelas / Rombel</span>
+                  <span class="font-semibold text-slate-800" id="info-kelas">-</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Nama Orang Tua / Wali</span>
+                  <span class="font-semibold text-slate-800" id="info-wali">-</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Tempat, Tanggal Lahir</span>
+                  <span class="font-semibold text-slate-800" id="info-ttl">-</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Kontak Orang Tua</span>
+                  <span class="font-mono font-semibold text-slate-800" id="info-kontak">-</span>
+                </div>
+              </div>
             </div>
+
           </div>
 
           <!-- Col 3: Pengumuman Sekolah -->
           <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <h3 class="text-base font-bold text-slate-900 mb-1">Pengumuman Terkini</h3>
-            <p class="text-xs text-slate-500 mb-4">Informasi kegiatan dan kalender akademik</p>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Pengumuman Sekolah</h3>
+            <p class="text-xs text-slate-500 mb-4">Warta &amp; agenda resmi dari Yayasan Samarinda</p>
 
             <div class="space-y-3" id="announcements-list">
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-brand-100 text-brand-800 mb-1.5">Akademik</span>
-                <h4 class="text-xs font-bold text-slate-900">Jadwal Penilaian Akhir Semester</h4>
-                <p class="text-[11px] text-slate-600 mt-1">Penilaian aspek perkembangan semester genap akan dilaksanakan pekan depan.</p>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-primary-100 text-primary-800 mb-1.5">Informasi SPP</span>
+                <h4 class="text-xs font-bold text-slate-900">Pembayaran SPP Bulanan</h4>
+                <p class="text-[11px] text-slate-600 mt-1">Pembayaran SPP diharapkan sebelum tanggal 10 setiap bulannya melalui transfer rekening yayasan atau tunai di TU.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 mb-1.5">Kegiatan</span>
-                <h4 class="text-xs font-bold text-slate-900">Kunjungan Edukasi (Field Trip)</h4>
-                <p class="text-[11px] text-slate-600 mt-1">Kegiatan field trip pengenalan alam untuk santri PAUD dan TK.</p>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5">PPDB Online</span>
+                <h4 class="text-xs font-bold text-slate-900">Penerimaan Siswa Baru Dibuka</h4>
+                <p class="text-[11px] text-slate-600 mt-1">Pendaftaran calon santri PAUD, TK, dan TPQ telah dibuka. Bagikan informasi ini kepada keluarga &amp; kerabat.</p>
               </div>
             </div>
           </div>
@@ -275,16 +323,19 @@
       // Handled inside requireAuth
     }
 
+    function formatIDR(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
     async function initDashboard() {
       const user = getCurrentUser() || {};
       const rawRole = (user.role && user.role.code ? user.role.code : user.role) || 'calon_siswa';
       const isSiswaAktif = rawRole === 'siswa_aktif' || rawRole === 'siswa';
 
-      // Setup Shell Nav
+      // Setup Shell Nav (Tanpa Rapor/Akademik sesuai batasan sistem lean)
       const studentMenu = isSiswaAktif ? [
         { href: 'dashboard.html', label: '📊 Dashboard' },
         { href: 'biodata.html', label: '👤 Biodata Siswa' },
-        { href: 'akademik.html', label: '🎓 Rapor & Akademik' },
         { href: 'spp.html', label: '💳 Tagihan SPP' },
         { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
       ] : [
@@ -298,7 +349,7 @@
         active: 'dashboard.html',
         portalLabel: isSiswaAktif ? 'Portal Siswa Aktif' : 'Portal Calon Siswa (PPDB)',
         title: isSiswaAktif ? 'Dashboard Siswa' : 'Status Pendaftaran PPDB',
-        subtitle: 'Selamat datang kembali di Yayasan Samarinda',
+        subtitle: 'Selamat datang di Yayasan Samarinda',
         showRefresh: true,
         onRefresh: () => loadData(isSiswaAktif)
       });
@@ -316,18 +367,18 @@
         const student = (res.success && res.data) ? res.data : {};
 
         // Render Welcome Info
-        const studentName = student.full_name || student.name || user.full_name || 'Santri Baru';
+        const studentName = student.full_name || student.name || user.full_name || 'Santri';
         document.getElementById('student-name').textContent = studentName;
         document.getElementById('badge-role-text').textContent = isSiswaAktif ? 'Siswa Aktif' : 'Calon Siswa PPDB';
 
         if (isSiswaAktif) {
           const nis = student.nis || user.nis || '-';
-          document.getElementById('student-meta').textContent = `NIS: ${nis} • ${student.kelas_sekarang || 'PAUD / TK Terpadu'}`;
+          document.getElementById('student-meta').textContent = `NIS: ${nis} • ${student.kelas_sekarang || student.class_name || 'PAUD / TK Terpadu'}`;
           document.getElementById('section-siswa-aktif').classList.remove('hidden');
           document.getElementById('section-calon-siswa').classList.add('hidden');
 
-          // Load SPP & Academic
-          loadSiswaAktifData(student);
+          // Load SPP & Info
+          await loadSiswaAktifData(student, user);
         } else {
           document.getElementById('student-meta').textContent = `Nomor Pendaftaran: ${student.id || 'REG-' + Date.now().toString().slice(-6)} • Status: Menunggu Berkas`;
           document.getElementById('section-calon-siswa').classList.remove('hidden');
@@ -345,16 +396,22 @@
       }
     }
 
-    async function loadSiswaAktifData(student) {
-      document.getElementById('card-kelas').textContent = student.kelas_sekarang || 'TK B Terpadu';
-      document.getElementById('card-semester').textContent = student.semester_sekarang || 'Semester 1 • TA 2026/2027';
-      document.getElementById('card-kenaikan').textContent = student.status_kenaikan || 'Aktif';
+    async function loadSiswaAktifData(student, user) {
+      document.getElementById('card-kelas').textContent = student.kelas_sekarang || student.class_name || 'PAUD / TK Terpadu';
+      document.getElementById('card-semester').textContent = student.semester_sekarang || 'Tahun Ajaran 2026/2027';
+      
+      // Populate Identitas
+      document.getElementById('info-nama').textContent = student.full_name || student.name || user.full_name || '-';
+      document.getElementById('info-nis').textContent = student.nis || user.nis || '-';
+      document.getElementById('info-kelas').textContent = student.kelas_sekarang || student.class_name || '-';
+      document.getElementById('info-wali').textContent = student.parent_name || student.father_name || user.parent_name || '-';
+      const ttl = [student.birth_place, student.birth_date].filter(Boolean).join(', ');
+      document.getElementById('info-ttl').textContent = ttl || '-';
+      document.getElementById('info-kontak').textContent = student.parent_phone || student.phone || '-';
 
       try {
-        const [sppRes, acadRes] = await Promise.all([
-          apiCall('siswa', 'get_spp'),
-          apiCall('siswa', 'get_academic')
-        ]);
+        const sppRes = await apiCall('siswa', 'get_spp');
+        const listTbody = document.getElementById('dash-spp-list');
 
         if (sppRes.success && sppRes.data) {
           const invoices = sppRes.data.invoices || [];
@@ -363,27 +420,51 @@
 
           if (totalUnpaid > 0) {
             document.getElementById('card-spp').textContent = formatIDR(totalUnpaid);
-            document.getElementById('card-spp-desc').textContent = `${unpaid.length} bulan belum lunas`;
-            document.getElementById('card-spp-desc').className = 'text-xs text-red-600 font-semibold';
+            document.getElementById('card-spp-desc').textContent = `${unpaid.length} tagihan belum lunas`;
+            document.getElementById('card-spp-desc').className = 'text-xs text-rose-600 font-semibold';
           } else {
             document.getElementById('card-spp').textContent = 'Rp 0';
             document.getElementById('card-spp-desc').textContent = 'Semua tagihan lunas';
-            document.getElementById('card-spp-desc').className = 'text-xs text-primary-700 font-medium';
+            document.getElementById('card-spp-desc').className = 'text-xs text-emerald-600 font-medium';
           }
-        }
 
-        if (acadRes.success && acadRes.data) {
-          const dev = (acadRes.data.developments && acadRes.data.developments[0]) || {};
-          if (dev.aspect_nam) document.getElementById('asp-nam').textContent = dev.aspect_nam;
-          if (dev.aspect_fisik_motorik) document.getElementById('asp-motorik').textContent = dev.aspect_fisik_motorik;
-          if (dev.aspect_kognitif) document.getElementById('asp-kognitif').textContent = dev.aspect_kognitif;
-          if (dev.aspect_bahasa) document.getElementById('asp-bahasa').textContent = dev.aspect_bahasa;
-          if (dev.aspect_sosial_emosional) document.getElementById('asp-sosial').textContent = dev.aspect_sosial_emosional;
-          if (dev.aspect_seni) document.getElementById('asp-seni').textContent = dev.aspect_seni;
-          if (dev.teacher_notes) document.getElementById('teacher-notes').textContent = `"${dev.teacher_notes}"`;
+          if (invoices.length === 0) {
+            listTbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Belum ada tagihan diterbitkan.</td></tr>';
+          } else {
+            // Tampilkan maksimal 4 tagihan terbaru
+            const recent = invoices.slice(0, 4);
+            listTbody.innerHTML = recent.map(inv => {
+              const isPaid = inv.status === 'paid';
+              const isWaiting = inv.status === 'menunggu_verifikasi';
+              let badgeCls = 'bg-rose-50 text-rose-700 border-rose-200';
+              let badgeText = 'Belum Lunas';
+              if (isPaid) {
+                badgeCls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                badgeText = 'Lunas';
+              } else if (isWaiting) {
+                badgeCls = 'bg-amber-50 text-amber-700 border-amber-200';
+                badgeText = 'Menunggu Verifikasi';
+              }
+
+              return `
+                <tr class="hover:bg-slate-50/50">
+                  <td class="py-2.5 px-3 font-semibold text-slate-800">${inv.period || inv.item_name || 'SPP'}</td>
+                  <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${formatIDR(inv.amount)}</td>
+                  <td class="py-2.5 px-3 text-slate-500">${inv.due_date || '-'}</td>
+                  <td class="py-2.5 px-3">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeCls}">
+                      ${badgeText}
+                    </span>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+        } else {
+          listTbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Data tagihan tidak tersedia.</td></tr>';
         }
       } catch (e) {
-        console.warn('Academic data fallback:', e);
+        console.warn('SPP data fallback error:', e);
       }
     }
 

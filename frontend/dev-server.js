@@ -47,6 +47,20 @@ function resolveFilePath(reqPath) {
     return { file: path.join(BASE_DIR, p) };
   }
 
+  // Public assets (Direct & Subpath fallback for relative URL resolutions)
+  if (p.includes('/images/')) {
+    return { file: path.join(BASE_DIR, 'public', p.substring(p.indexOf('/images/'))) };
+  }
+  if (p.includes('/css/')) {
+    return { file: path.join(BASE_DIR, 'public', p.substring(p.indexOf('/css/'))) };
+  }
+  if (p.includes('/js/')) {
+    return { file: path.join(BASE_DIR, 'public', p.substring(p.indexOf('/js/'))) };
+  }
+  if (p.startsWith('/videos/') || p.startsWith('/assets/')) {
+    return { file: path.join(BASE_DIR, 'public', p) };
+  }
+
   // Portals (Admin & Siswa Saja)
   if (p.startsWith('/portal/admin/')) {
     return { file: path.join(BASE_DIR, 'portal/admin', p.replace(/^\/portal\/admin\//, '')) };
@@ -60,11 +74,6 @@ function resolveFilePath(reqPath) {
   }
   if (p.startsWith('/siswa/')) {
     return { file: path.join(BASE_DIR, 'portal/siswa', p.replace(/^\/siswa\//, '')) };
-  }
-
-  // Public assets
-  if (p.startsWith('/css/') || p.startsWith('/js/') || p.startsWith('/images/') || p.startsWith('/videos/') || p.startsWith('/assets/')) {
-    return { file: path.join(BASE_DIR, 'public', p) };
   }
 
   // PPDB and Berita
@@ -125,7 +134,7 @@ const server = http.createServer((req, res) => {
   };
 
   // Handle /exec or /api/v1/ via localApi
-  if (localApi && (parsed.pathname === '/exec' || parsed.pathname.startsWith('/api/v1/'))) {
+  if (localApi && (parsed.pathname === '/exec' || parsed.pathname === '/api/v1' || parsed.pathname.startsWith('/api/v1/'))) {
     let apiPath = parsed.query.path || parsed.pathname;
 
     let bodyStr = '';

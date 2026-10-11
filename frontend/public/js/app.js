@@ -297,7 +297,8 @@
     if (!container) return;
 
     const res = await apiCall('news', 'list', { status: 'published' });
-    const items = Array.isArray(res.data) ? res.data.slice(0, 3) : [];
+    const rawItems = Array.isArray(res.data) ? res.data : ((res.data && res.data.items) || res.items || []);
+    const items = rawItems.slice(0, 3);
     if (!res.success || items.length === 0) {
       container.innerHTML = '<p class="col-span-3 text-center text-gray-500">Belum ada berita.</p>';
       return;

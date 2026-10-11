@@ -3,74 +3,372 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laporan - Yayasan Samarinda</title>
+  <title>Rekap Data &amp; Laporan - Yayasan Samarinda</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
-    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+          colors: { primary: { 50:'#F0F9FF',100:'#E0F2FE',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } }
+        }
+      }
+    };
   </script>
   <link rel="stylesheet" href="../../public/css/style.css">
+  <style>
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 15mm 15mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 10pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* Sembunyikan seluruh shell portal dan komponen interaktif web */
+      #app-shell,
+      #siy-mobile-nav,
+      header,
+      aside,
+      nav,
+      #header-section,
+      #report-filter-cards,
+      #report-actions,
+      #report-title-bar,
+      #import-modal,
+      .no-print,
+      button {
+        display: none !important;
+      }
+
+      main {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      #report-card-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+      }
+
+      /* Tampilkan Kop Surat Resmi & Lembar Pengesahan */
+      #print-letterhead {
+        display: block !important;
+      }
+      #print-signature-section {
+        display: flex !important;
+      }
+
+      /* Desain tabel berstandar cetak formal */
+      table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        font-size: 9pt !important;
+        margin-top: 6px !important;
+      }
+      th {
+        background-color: #f3f4f6 !important;
+        border: 1px solid #111827 !important;
+        padding: 6px 8px !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        font-size: 8.5pt !important;
+        text-transform: uppercase !important;
+      }
+      td {
+        border: 1px solid #111827 !important;
+        padding: 5px 8px !important;
+        color: #000000 !important;
+        font-size: 8.5pt !important;
+      }
+      thead {
+        display: table-header-group !important;
+      }
+      tr {
+        page-break-inside: avoid !important;
+      }
+      .page-break-inside-avoid {
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
 </head>
-<body class="font-sans bg-gray-50 text-gray-800">
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
   <div id="app-shell"></div>
 
-  <main class="p-4 sm:p-6 lg:p-8">
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
-        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Presensi Bulanan</div>
-        <p class="text-xs text-gray-600 mb-3">Rekap kehadiran siswa per bulan.</p>
-        <div class="flex gap-2">
-          <input type="month" id="rep-att-month" class="px-2 py-1 border border-gray-300 rounded text-sm min-w-0 flex-1">
-          <button onclick="downloadReport('attendance')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 shrink-0">Buat</button>
+  <main class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+
+    <!-- Header Section (Screen Only) -->
+    <div id="header-section" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-lg border border-gray-200">
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-gray-900">Rekapitulasi Data &amp; Laporan</h1>
+        <p class="text-xs text-gray-500 mt-1">Cetak laporan resmi, ekspor rekapan ke Excel, dan unggah (import) berkas spreadsheet.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openImportModal()" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg text-xs font-medium flex items-center gap-2 transition shadow-sm">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <span>Unggah / Import Excel</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards Grid Rekapitulasi (Clean, Uniform & Professional) -->
+    <div id="report-filter-cards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <!-- 1. Data Siswa -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Data &amp; Statistik Siswa</h2>
+          <p class="text-xs text-gray-500">Daftar siswa aktif, rombel kelas, kontak wali santri, dan status.</p>
+        </div>
+        <div class="pt-2 border-t border-gray-100">
+          <button onclick="generateReport('students')" class="w-full px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition">
+            Tampilkan Rekap
+          </button>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
-        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Pembayaran SPP</div>
-        <p class="text-xs text-gray-600 mb-3">Rekap tagihan & pembayaran.</p>
-        <div class="flex gap-2">
-          <input type="month" id="rep-pay-month" class="px-2 py-1 border border-gray-300 rounded text-sm min-w-0 flex-1">
-          <button onclick="downloadReport('payments')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 shrink-0">Buat</button>
+      <!-- 2. Pembayaran SPP -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Pembayaran SPP &amp; Keuangan</h2>
+          <p class="text-xs text-gray-500">Rekapitulasi tagihan SPP bulanan, status pelunasan, dan kas.</p>
+        </div>
+        <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+          <input type="month" id="rep-pay-month" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs min-w-0 flex-1 focus:ring-1 focus:ring-primary-500">
+          <button onclick="generateReport('payments')" class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition shrink-0">
+            Tampilkan
+          </button>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
-        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Catatan Perkembangan</div>
-        <p class="text-xs text-gray-600 mb-3">Rekap rapor semester siswa.</p>
-        <div class="flex gap-2 flex-wrap">
-          <select id="rep-dev-semester" class="px-2 py-1 border border-gray-300 rounded text-sm">
-            <option value="1">Ganjil</option><option value="2">Genap</option>
+      <!-- 3. PPDB -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Pendaftaran PPDB Baru</h2>
+          <p class="text-xs text-gray-500">Rekap data pendaftar baru PAUD, TK, TPQ per tahun ajaran.</p>
+        </div>
+        <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+          <input type="text" id="rep-ppdb-year" placeholder="2026/2027" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs min-w-0 flex-1 focus:ring-1 focus:ring-primary-500">
+          <button onclick="generateReport('ppdb')" class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition shrink-0">
+            Tampilkan
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Presensi Kehadiran -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Presensi &amp; Kehadiran</h2>
+          <p class="text-xs text-gray-500">Rekap kehadiran siswa di kelas bulanan (hadir, izin, sakit, alpa).</p>
+        </div>
+        <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+          <input type="month" id="rep-att-month" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs min-w-0 flex-1 focus:ring-1 focus:ring-primary-500">
+          <button onclick="generateReport('attendance')" class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition shrink-0">
+            Tampilkan
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. Catatan Perkembangan (Rapor) -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Catatan Perkembangan (Rapor)</h2>
+          <p class="text-xs text-gray-500">Rekap 6 aspek capaian perkembangan santri per semester.</p>
+        </div>
+        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 flex-wrap">
+          <select id="rep-dev-semester" class="px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-1 focus:ring-primary-500">
+            <option value="1">Sem. 1 (Ganjil)</option>
+            <option value="2">Sem. 2 (Genap)</option>
           </select>
-          <input type="text" id="rep-dev-year" placeholder="2026" class="px-2 py-1 border border-gray-300 rounded text-sm w-20">
-          <button onclick="downloadReport('development')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
+          <input type="text" id="rep-dev-year" placeholder="2026" class="px-2 py-1.5 border border-gray-300 rounded-lg text-xs w-16 focus:ring-1 focus:ring-primary-500">
+          <button onclick="generateReport('development')" class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition shrink-0">
+            Tampilkan
+          </button>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
-        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Statistik Siswa</div>
-        <p class="text-xs text-gray-600 mb-3">Total siswa, kelas, jenis kelamin.</p>
-        <button onclick="downloadReport('students')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
+      <!-- 6. Ringkasan Eksekutif Yayasan -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Ringkasan Eksekutif Yayasan</h2>
+          <p class="text-xs text-gray-500">Kompilasi seluruh unit yayasan untuk evaluasi rapat pimpinan.</p>
+        </div>
+        <div class="pt-2 border-t border-gray-100">
+          <button onclick="generateReport('all')" class="w-full px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition">
+            Tampilkan Rekap
+          </button>
+        </div>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
-        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">PPDB per Tahun</div>
-        <p class="text-xs text-gray-600 mb-3">Rekap pendaftar PPDB per tahun ajaran.</p>
-        <input type="text" id="rep-ppdb-year" placeholder="2026/2027" class="px-2 py-1 border border-gray-300 rounded text-sm mb-2 w-full">
-          <button onclick="downloadReport('ppdb')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
-      </div>
-
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
-        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Rekap Lengkap</div>
-        <p class="text-xs text-gray-600 mb-3">Bundle semua laporan (untuk yayasan).</p>
-        <button onclick="downloadReport('all')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
-      </div>
     </div>
 
-    <div class="mt-6 bg-white border border-gray-200 rounded-lg p-5">
-      <h3 class="text-sm font-semibold text-gray-900 mb-3">Hasil Rekap</h3>
-      <div id="report-result" class="text-sm text-gray-600">Klik "Buat" pada salah satu laporan di atas.</div>
+    <!-- Container Hasil Rekapitulasi & Area Cetak -->
+    <div id="report-card-container" class="bg-white border border-gray-200 rounded-lg p-5 sm:p-6 space-y-4">
+
+      <!-- Web-Only Header Title & Action Buttons -->
+      <div id="report-title-bar" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+        <div>
+          <h2 id="report-title" class="text-sm sm:text-base font-bold text-gray-900">Hasil Rekapitulasi Data</h2>
+          <p id="report-subtitle" class="text-xs text-gray-500 mt-0.5">Pilih salah satu menu rekapitulasi di atas untuk memuat data.</p>
+        </div>
+
+        <div id="report-actions" class="hidden flex items-center flex-wrap gap-2">
+          <button onclick="exportCurrentReportToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Unduh berkas Excel rapi berformat Kop & Grid">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Unduh Excel (.xls)</span>
+          </button>
+          <button onclick="exportCurrentReportToCSV()" class="px-2.5 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm" title="Unduh berkas teks mentah format CSV">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>CSV (.csv)</span>
+          </button>
+          <button onclick="printEducationalReport()" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Cetak Dokumen Resmi</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Print-Only: Kop Surat & Metadata Dokumen Berstandar Pendidikan -->
+      <div id="print-letterhead" class="hidden pb-2 mb-3">
+        <div class="flex items-center justify-between gap-4 border-b-[2.5px] border-black pb-2">
+          <div class="w-20 shrink-0 text-center">
+            <img src="/images/logo.png" onerror="this.src='../../public/images/logo.png'" alt="Logo Yayasan" class="w-16 h-16 object-contain mx-auto">
+          </div>
+          <div class="flex-1 text-center font-serif text-black leading-tight">
+            <div class="text-base sm:text-lg font-bold tracking-wider uppercase" id="print-school-name">YAYASAN SAMARINDA</div>
+            <div class="text-xs sm:text-sm font-bold tracking-wide uppercase mt-0.5">PENDIDIKAN ANAK USIA DINI (PAUD) &amp; TK TERPADU - TPQ ULINNUHA</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-800 mt-1" id="print-school-address">Alamat: Jl. Samratulangi, Sungai Keledang, Samarinda, Kalimantan Timur</div>
+            <div class="text-[10px] text-gray-700 mt-0.5" id="print-school-contact">Telepon: (0541) 234-5678 | WhatsApp: 081234567890 | Email: info@yayasan.sch.id</div>
+          </div>
+          <div class="w-20 shrink-0 hidden sm:block"></div>
+        </div>
+        <!-- Garis Tipis Kedua Kop Khas Surat Dinas -->
+        <div class="border-b border-black mt-0.5 mb-3"></div>
+
+        <!-- Judul Laporan Cetak Resmi -->
+        <div class="text-center my-3 font-serif">
+          <h2 id="print-doc-title" class="text-sm sm:text-base font-bold uppercase tracking-wide text-black underline">LAPORAN REKAPITULASI DATA SISWA</h2>
+          <p id="print-doc-subtitle" class="text-xs text-gray-800 font-medium mt-0.5">Tahun Ajaran 2026/2027</p>
+        </div>
+
+        <!-- Baris Metadata Informasi Cetak -->
+        <div class="flex justify-between items-center text-[10px] text-gray-700 border-b border-gray-300 pb-1 mb-2">
+          <div>Tanggal Cetak: <span id="print-timestamp" class="font-semibold text-black">-</span></div>
+          <div>Sifat: <span class="font-semibold text-black">Dokumen Resmi Administrasi Sekolah</span></div>
+        </div>
+      </div>
+
+      <!-- Area Tabel Data -->
+      <div id="report-result-area" class="py-8 text-center text-xs text-gray-400">
+        Belum ada laporan yang dipilih. Silakan pilih salah satu rekapitulasi di atas.
+      </div>
+
+      <!-- Print-Only: Lembar Pengesahan & Tanda Tangan -->
+      <div id="print-signature-section" class="hidden justify-between items-start pt-8 mt-6 text-xs font-serif text-black page-break-inside-avoid">
+        <div class="text-center w-56">
+          <p class="font-normal text-gray-800">Mengetahui,</p>
+          <p class="font-bold text-black mt-0.5">Ketua Yayasan / Kepala Sekolah</p>
+          <div class="h-20"></div>
+          <p class="font-bold underline uppercase text-black">( ............................................ )</p>
+          <p class="text-[10px] text-gray-600 mt-0.5">NIY. 202601001</p>
+        </div>
+
+        <div class="text-center w-56">
+          <p class="font-normal text-gray-800" id="print-sign-place-date">Samarinda, 11 Oktober 2026</p>
+          <p class="font-bold text-black mt-0.5">Petugas Tata Usaha / Bendahara</p>
+          <div class="h-20"></div>
+          <p class="font-bold underline uppercase text-black" id="print-sign-admin-name">( Super Administrator )</p>
+          <p class="text-[10px] text-gray-600 mt-0.5">Petugas Administrasi</p>
+        </div>
+      </div>
+
     </div>
+
   </main>
+
+  <!-- Modal Unggah / Import Rekap Data Excel/CSV -->
+  <div id="import-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl border border-gray-200 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Unggah / Import Rekap Data Excel (CSV)</h3>
+          <p class="text-xs text-gray-500">Unggah berkas spreadsheet secara langsung ke database yayasan.</p>
+        </div>
+        <button type="button" onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+
+      <!-- Pilih Jenis Data yang Diimpor -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 uppercase mb-2">Pilih Jenis Data yang Akan Diimpor</label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
+            <input type="radio" name="import-type" value="invoices" checked onchange="onImportTypeChanged()" class="text-primary-600">
+            <div>
+              <div class="text-xs font-bold text-gray-900">Tagihan SPP Massal</div>
+              <div class="text-[11px] text-gray-500">NIS, Nama Siswa, Keterangan, Nominal, Jatuh Tempo</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
+            <input type="radio" name="import-type" value="students" onchange="onImportTypeChanged()" class="text-primary-600">
+            <div>
+              <div class="text-xs font-bold text-gray-900">Data Siswa / Santri Baru</div>
+              <div class="text-[11px] text-gray-500">NIS, Nama, Kelas, Jenis Kelamin, Nama Wali, No HP</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Template Helper -->
+      <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-700">
+        <span>Contoh format susunan kolom berkas spreadsheet:</span>
+        <button type="button" onclick="downloadImportTemplate()" class="text-primary-700 font-semibold underline hover:text-primary-800">
+          Unduh Contoh Format CSV
+        </button>
+      </div>
+
+      <!-- Area Upload File CSV -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-gray-700 uppercase">Pilih Berkas Spreadsheet (.CSV)</label>
+        <div class="border-2 border-dashed border-gray-200 hover:border-primary-400 rounded-lg p-4 text-center cursor-pointer transition bg-gray-50/50" onclick="document.getElementById('import-file-input').click()">
+          <input type="file" id="import-file-input" accept=".csv,text/csv" class="hidden" onchange="handleImportFileSelected(event)">
+          <svg class="w-7 h-7 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <div id="import-file-label" class="text-xs font-semibold text-gray-800">Klik untuk mencari file .CSV dari komputer</div>
+          <div class="text-[11px] text-gray-400 mt-0.5">Format file yang didukung: Comma Separated Values (.csv)</div>
+        </div>
+      </div>
+
+      <!-- Area Pratinjau Baris Data Terbaca -->
+      <div id="import-preview-wrap" class="hidden space-y-2">
+        <div class="flex items-center justify-between text-xs font-semibold text-gray-700">
+          <span id="import-preview-count">0 baris data terdeteksi</span>
+          <span class="text-emerald-600 font-bold">Siap diimpor</span>
+        </div>
+        <div class="max-h-36 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50 p-2">
+          <table class="min-w-full text-[11px] divide-y divide-gray-200" id="import-preview-table"></table>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2.5 pt-3 border-t border-gray-100">
+        <button type="button" onclick="closeImportModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
+        <button type="button" id="btn-submit-import" onclick="executeDataImport()" disabled class="px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed rounded-lg shadow-sm transition">
+          Simpan ke Database
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
@@ -84,51 +382,677 @@
       menu: MENU,
       active: 'reports.html',
       portalLabel: 'Portal Admin',
-      title: 'Laporan',
-      subtitle: 'Rekap data & cetak laporan',
-      showRefresh: false,
-      onRefresh: null
+      title: 'Laporan & Rekapitulasi Data',
+      subtitle: 'Rekapitulasi Keuangan, PPDB, Siswa & Cetak Dokumen',
+      showRefresh: false
     });
 
-    async function downloadReport(type) {
-      const params = { report_type: type };
-      if (type === 'attendance') params.month = document.getElementById('rep-att-month').value;
-      if (type === 'payments') params.month = document.getElementById('rep-pay-month').value;
-      if (type === 'development') {
-        params.semester = document.getElementById('rep-dev-semester').value;
-        params.year = document.getElementById('rep-dev-year').value;
-      }
-      if (type === 'ppdb') params.academic_year = document.getElementById('rep-ppdb-year').value;
+    let currentReportData = null;
+    let parsedImportRows = [];
+    let currentReportType = 'students';
 
-      const result = document.getElementById('report-result');
-      Shell.hideError();
-      result.innerHTML = `
-        <div class="space-y-3 py-2">
-          <div class="skeleton h-4 w-48 rounded"></div>
-          <div class="skeleton h-4 w-full rounded"></div>
-          <div class="skeleton h-4 w-3/4 rounded"></div>
-        </div>
-      `;
+    // 1. Generate & Tampilkan Rekap Data
+    async function generateReport(type) {
+      currentReportType = type;
+      const area = document.getElementById('report-result-area');
+      const title = document.getElementById('report-title');
+      const subtitle = document.getElementById('report-subtitle');
+      const actions = document.getElementById('report-actions');
+
+      const params = { report_type: type };
+      if (type === 'attendance') {
+        const m = document.getElementById('rep-att-month')?.value;
+        if (m) params.month = m;
+      } else if (type === 'payments') {
+        const m = document.getElementById('rep-pay-month')?.value;
+        if (m) params.month = m;
+      } else if (type === 'development') {
+        const s = document.getElementById('rep-dev-semester')?.value;
+        const y = document.getElementById('rep-dev-year')?.value;
+        if (s) params.semester = s;
+        if (y) params.year = y;
+      } else if (type === 'ppdb') {
+        const y = document.getElementById('rep-ppdb-year')?.value;
+        if (y) params.academic_year = y;
+      }
+
+      const titlesMap = {
+        students: 'Rekapitulasi Data Siswa Aktif Yayasan',
+        payments: 'Rekapitulasi Keuangan & Tagihan SPP Santri',
+        ppdb: 'Rekapitulasi Pendaftaran Santri Baru (PPDB Online)',
+        attendance: 'Rekapitulasi Kehadiran & Presensi Santri',
+        development: 'Rekapitulasi Catatan Perkembangan Anak (Rapor)',
+        all: 'Ringkasan Eksekutif & Statistik Seluruh Unit Yayasan'
+      };
+
+      title.textContent = titlesMap[type] || 'Hasil Rekapitulasi';
+      subtitle.textContent = `Diekspor pada: ${new Date().toLocaleString('id-ID')}`;
+      area.innerHTML = Shell.skeletonRows(6, 4);
+      actions.classList.add('hidden');
+
       try {
         const res = await apiCall('reports', 'generate', params);
         if (!res.success) {
-          Shell.showError(res.message || 'Gagal membuat laporan');
-          result.innerHTML = `<div class="text-sm text-red-600 font-medium">${res.message || 'Gagal membuat laporan'}</div>`;
+          area.innerHTML = `<div class="p-6 text-center text-xs text-rose-600 font-semibold">${res.message || 'Gagal memuat rekapan'}</div>`;
           return;
         }
 
-        if (res.data.file_url) {
-          result.innerHTML = `<div>Laporan siap: <a href="${res.data.file_url}" target="_blank" class="text-primary-700 font-medium underline">Download / Cetak</a></div>`;
-        } else if (res.data.rows) {
-          const rows = res.data.rows;
-          result.innerHTML = `<div class="overflow-x-auto"><table class="min-w-full text-xs divide-y divide-gray-200"><thead class="bg-gray-50">${(res.data.headers || []).map(h=>`<th class="px-3 py-2 text-left font-semibold text-gray-700 uppercase">${h}</th>`).join('')}</thead><tbody class="divide-y divide-gray-100">${rows.slice(0,50).map(r=>`<tr>${r.map(c=>`<td class="px-3 py-2 tabular-nums text-gray-800">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length>50?`<div class="text-xs text-gray-500 mt-2 tabular-nums">Menampilkan 50 dari ${rows.length} baris.</div>`:''}</div>`;
-        } else {
-          result.innerHTML = '<div class="text-green-700 font-medium">Laporan berhasil dibuat.</div>';
+        const data = res.data || {};
+        currentReportData = data;
+        const headers = data.headers || [];
+        const rows = data.rows || [];
+
+        if (rows.length === 0) {
+          area.innerHTML = '<div class="py-12 text-center text-xs text-gray-500">Tidak ada data untuk kategori laporan ini.</div>';
+          return;
         }
-      } catch (e) {
-        Shell.showError('Tidak dapat terhubung ke server.');
-        result.innerHTML = '<div class="text-sm text-red-600">Gagal terhubung ke server.</div>';
+
+        area.innerHTML = `
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  ${headers.map((h, i) => `<th class="px-3.5 py-2.5 text-xs font-semibold text-gray-700 ${i === 0 ? 'text-center w-12' : 'text-left'}">${h}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 bg-white">
+                ${rows.map(r => `
+                  <tr class="hover:bg-gray-50/70 transition">
+                    ${r.map((cell, idx) => `<td class="px-3.5 py-2.5 text-xs text-gray-800 ${idx === 0 ? 'text-center font-medium tabular-nums' : ''}">${cell}</td>`).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div class="pt-3 text-[11px] text-gray-400 text-right no-print">Total: ${rows.length} baris data</div>
+        `;
+
+        actions.classList.remove('hidden');
+      } catch (err) {
+        area.innerHTML = '<div class="p-6 text-center text-xs text-rose-600">Gagal terhubung ke server saat memuat laporan.</div>';
       }
+    }
+
+    // 2. Ekspor ke Excel Berformat Rapi (.XLS Spreadsheet)
+    async function exportCurrentReportToExcel() {
+      if (!currentReportData || !currentReportData.rows || currentReportData.rows.length === 0) {
+        alert('Tampilkan rekap data terlebih dahulu sebelum mengunduh!');
+        return;
+      }
+
+      // Ambil profil sekolah dinamis
+      let school = null;
+      try {
+        const cached = sessionStorage.getItem('siyayasan_school_profile');
+        if (cached) school = JSON.parse(cached);
+      } catch (_) {}
+
+      if (!school) {
+        try {
+          const res = await apiCall('web_settings', 'get');
+          if (res && res.success && res.data) school = res.data;
+        } catch (_) {}
+      }
+
+      const schoolName = (school?.school_name || school?.name || 'YAYASAN SAMARINDA').toUpperCase();
+      const schoolUnits = 'PENDIDIKAN ANAK USIA DINI (PAUD) & TK TERPADU - TPQ ULINNUHA';
+      const schoolAddress = school?.address || 'Jl. Samratulangi, Sungai Keledang, Samarinda, Kalimantan Timur';
+      const schoolPhone = school?.phone || '(0541) 234-5678';
+      const schoolWa = school?.whatsapp || school?.whatsapp_number || '081234567890';
+      const schoolEmail = school?.email || 'info@yayasan.sch.id';
+
+      const titlesMap = {
+        students: 'LAPORAN REKAPITULASI DATA SISWA AKTIF',
+        payments: 'LAPORAN REKAPITULASI KEUANGAN & PEMBAYARAN SPP SANTRI',
+        ppdb: 'LAPORAN REKAPITULASI PENDAFTARAN SISWA BARU (PPDB)',
+        attendance: 'LAPORAN REKAPITULASI PRESENSI & KEHADIRAN SISWA',
+        development: 'LAPORAN CATATAN PERKEMBANGAN SANTRI (RAPOR)',
+        all: 'RINGKASAN EKSEKUTIF SELURUH UNIT YAYASAN'
+      };
+
+      const docTitle = titlesMap[currentReportType] || 'LAPORAN REKAPITULASI DATA YAYASAN';
+      const now = new Date();
+      const dateFormatted = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const timeFormatted = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+      let periodDesc = 'Tahun Ajaran 2026/2027';
+      if (currentReportType === 'payments' && document.getElementById('rep-pay-month')?.value) {
+        periodDesc = `Periode Bulan: ${document.getElementById('rep-pay-month').value}`;
+      } else if (currentReportType === 'attendance' && document.getElementById('rep-att-month')?.value) {
+        periodDesc = `Periode Bulan: ${document.getElementById('rep-att-month').value}`;
+      } else if (currentReportType === 'development') {
+        const sem = document.getElementById('rep-dev-semester')?.value === '2' ? 'Semester 2 (Genap)' : 'Semester 1 (Ganjil)';
+        const yr = document.getElementById('rep-dev-year')?.value || '2026';
+        periodDesc = `${sem} • Tahun Ajaran ${yr}/${Number(yr)+1}`;
+      } else if (currentReportType === 'ppdb' && document.getElementById('rep-ppdb-year')?.value) {
+        periodDesc = `Tahun Ajaran: ${document.getElementById('rep-ppdb-year').value}`;
+      }
+
+      const headers = currentReportData.headers || [];
+      const rows = currentReportData.rows || [];
+      const colSpan = Math.max(headers.length, 5);
+
+      // Hitung kolom tanda tangan
+      const leftSpan = Math.max(2, Math.floor(colSpan * 0.35));
+      const rightSpan = Math.max(2, Math.floor(colSpan * 0.35));
+      const midSpan = colSpan - leftSpan - rightSpan;
+
+      const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
+      const adminName = (user && user.full_name) ? user.full_name : 'Super Administrator';
+
+      // Ringkasan total
+      let summaryText = `${rows.length} Baris Data Terverifikasi`;
+      if (currentReportType === 'payments') {
+        const totalAmount = rows.reduce((acc, r) => {
+          const raw = String(r[4] || '0').replace(/[^0-9]/g, '');
+          return acc + (Number(raw) || 0);
+        }, 0);
+        summaryText = `Total: ${rows.length} Data Tagihan | Total Nominal: Rp ${totalAmount.toLocaleString('id-ID')}`;
+      }
+
+      // XML & HTML Spreadsheet Template untuk Microsoft Excel
+      let excelHtml = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!--[if gte mso 9]>
+  <xml>
+    <x:ExcelWorkbook>
+      <x:ExcelWorksheets>
+        <x:ExcelWorksheet>
+          <x:Name>${(currentReportType || 'Rekap').toUpperCase()}</x:Name>
+          <x:WorksheetOptions>
+            <x:DisplayGridlines/>
+            <x:Print>
+              <x:ValidPrinterInfo/>
+              <x:PaperSizeIndex>9</x:PaperSizeIndex>
+            </x:Print>
+          </x:WorksheetOptions>
+        </x:ExcelWorksheet>
+      </x:ExcelWorksheets>
+    </x:ExcelWorkbook>
+  </xml>
+  <![endif]-->
+  <style>
+    body { font-family: 'Calibri', 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #111827; }
+    table { border-collapse: collapse; width: 100%; }
+    .str { mso-number-format: "\\@"; text-align: center; }
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .left { text-align: left; }
+    .bold { font-weight: bold; }
+    
+    /* Kop Surat */
+    .kop-title { font-size: 14pt; font-weight: bold; color: #0C4A6E; text-align: center; }
+    .kop-sub { font-size: 11pt; font-weight: bold; color: #1E293B; text-align: center; }
+    .kop-contact { font-size: 9pt; color: #475569; font-style: italic; text-align: center; }
+    
+    /* Document Banner */
+    .doc-banner {
+      background-color: #E0F2FE;
+      color: #0369A1;
+      font-size: 12pt;
+      font-weight: bold;
+      text-align: center;
+      border: 1pt solid #0284C7;
+      padding: 6px;
+    }
+    .meta-bar { font-size: 9pt; color: #64748B; text-align: center; }
+    
+    /* Table Headers */
+    th.th-cell {
+      background-color: #0284C7;
+      color: #FFFFFF;
+      font-weight: bold;
+      font-size: 10pt;
+      border: 1pt solid #0369A1;
+      padding: 8px 6px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    
+    /* Data Cells */
+    td.data-cell {
+      border: 0.5pt solid #94A3B8;
+      padding: 6px 8px;
+      font-size: 10pt;
+      color: #0F172A;
+      vertical-align: middle;
+    }
+    tr.zebra-row td.data-cell {
+      background-color: #F8FAFC;
+    }
+    
+    /* Summary Row */
+    td.summary-cell {
+      background-color: #F1F5F9;
+      font-weight: bold;
+      font-size: 10pt;
+      border: 1pt solid #64748B;
+      padding: 6px 8px;
+    }
+
+    /* Status Tags */
+    .status-paid { color: #047857; font-weight: bold; background-color: #D1FAE5; }
+    .status-unpaid { color: #B91C1C; font-weight: bold; background-color: #FEE2E2; }
+    .status-pending { color: #B45309; font-weight: bold; background-color: #FEF3C7; }
+
+    /* Signatures */
+    .sign-title { font-size: 10pt; color: #334155; }
+    .sign-name { font-size: 10pt; font-weight: bold; text-decoration: underline; color: #0F172A; }
+    .sign-role { font-size: 9pt; color: #64748B; }
+  </style>
+</head>
+<body>
+  <table>
+    <!-- Kop Surat Resmi -->
+    <tr>
+      <td colspan="${colSpan}" class="kop-title">${schoolName}</td>
+    </tr>
+    <tr>
+      <td colspan="${colSpan}" class="kop-sub">${schoolUnits}</td>
+    </tr>
+    <tr>
+      <td colspan="${colSpan}" class="kop-contact">Alamat: ${schoolAddress} | Telepon: ${schoolPhone} | WhatsApp: ${schoolWa} | Email: ${schoolEmail}</td>
+    </tr>
+    <tr><td colspan="${colSpan}" style="border-bottom: 2pt solid #0284C7; height: 3px;"></td></tr>
+    <tr><td colspan="${colSpan}" style="border-bottom: 0.5pt solid #0284C7; height: 1px;"></td></tr>
+    <tr><td colspan="${colSpan}" style="height: 10px;"></td></tr>
+
+    <!-- Judul Dokumen Laporan -->
+    <tr>
+      <td colspan="${colSpan}" class="doc-banner">${docTitle}</td>
+    </tr>
+    <tr>
+      <td colspan="${colSpan}" class="meta-bar">Periode: ${periodDesc} &bull; Dicetak Pada: ${dateFormatted} pk ${timeFormatted} WITA &bull; Sifat: Dokumen Resmi Administrasi Sekolah</td>
+    </tr>
+    <tr><td colspan="${colSpan}" style="height: 10px;"></td></tr>
+
+    <!-- Header Kolom -->
+    <tr>
+      ${headers.map((h, i) => `
+        <th class="th-cell" ${i === 0 ? 'style="width: 45px;"' : ''}>${h}</th>
+      `).join('')}
+    </tr>
+
+    <!-- Baris Data Rekapan -->
+    ${rows.map((row, rIdx) => {
+      const isZebra = rIdx % 2 === 1;
+      return `
+        <tr class="${isZebra ? 'zebra-row' : ''}">
+          ${row.map((cell, cIdx) => {
+            const val = String(cell ?? '');
+            const headerName = String(headers[cIdx] || '').toLowerCase();
+            
+            let cellClass = 'data-cell left';
+            if (cIdx === 0 || headerName === 'no') {
+              cellClass = 'data-cell center bold tabular-nums';
+            } else if (headerName.includes('nis') || headerName.includes('pendaftaran') || headerName.includes('tagihan')) {
+              cellClass = 'data-cell str bold';
+            } else if (headerName.includes('hp') || headerName.includes('telepon') || headerName.includes('wa')) {
+              cellClass = 'data-cell str';
+            } else if (headerName.includes('nominal') || headerName.includes('jumlah') || headerName.includes('biaya')) {
+              cellClass = 'data-cell right bold';
+            } else if (headerName.includes('status') || headerName.includes('kehadiran') || headerName.includes('jalur') || headerName.includes('semester')) {
+              cellClass = 'data-cell center';
+              if (val === 'LUNAS' || val === 'HADIR' || val === 'DITERIMA' || val === 'AKTIF') {
+                cellClass += ' status-paid';
+              } else if (val === 'BELUM LUNAS' || val === 'ALPA' || val === 'DITOLAK') {
+                cellClass += ' status-unpaid';
+              } else if (val.includes('VERIFIKASI') || val === 'IZIN' || val === 'PENDING') {
+                cellClass += ' status-pending';
+              }
+            } else if (headerName.includes('tanggal') || headerName.includes('tgl') || headerName.includes('tempo')) {
+              cellClass = 'data-cell center';
+            }
+
+            return `<td class="${cellClass}">${val}</td>`;
+          }).join('')}
+        </tr>
+      `;
+    }).join('')}
+
+    <!-- Baris Total / Ringkasan -->
+    <tr>
+      <td colspan="2" class="summary-cell center">TOTAL</td>
+      <td colspan="${colSpan - 2}" class="summary-cell left">${summaryText}</td>
+    </tr>
+
+    <tr><td colspan="${colSpan}" style="height: 18px;"></td></tr>
+
+    <!-- Lembar Pengesahan Resmi -->
+    <tr>
+      <td colspan="${leftSpan}" class="sign-title center">Mengetahui,</td>
+      ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
+      <td colspan="${rightSpan}" class="sign-title center">Samarinda, ${dateFormatted}</td>
+    </tr>
+    <tr>
+      <td colspan="${leftSpan}" class="bold center" style="font-size:10pt;">Ketua Yayasan / Kepala Sekolah</td>
+      ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
+      <td colspan="${rightSpan}" class="bold center" style="font-size:10pt;">Petugas Tata Usaha / Bendahara</td>
+    </tr>
+    <tr><td colspan="${colSpan}" style="height: 48px;"></td></tr>
+    <tr>
+      <td colspan="${leftSpan}" class="sign-name center">( ............................................ )</td>
+      ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
+      <td colspan="${rightSpan}" class="sign-name center">( ${adminName} )</td>
+    </tr>
+    <tr>
+      <td colspan="${leftSpan}" class="sign-role center">NIY. 202601001</td>
+      ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
+      <td colspan="${rightSpan}" class="sign-role center">Petugas Administrasi Yayasan</td>
+    </tr>
+  </table>
+</body>
+</html>
+      `.trim();
+
+      const filename = `rekap_${currentReportType || 'yayasan'}_${now.toISOString().slice(0, 10)}.xls`;
+      const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast(`Berkas Excel rapi berhasil diunduh: ${filename}`, 'success');
+    }
+
+    // 2b. Ekspor ke CSV Mentah (.CSV dengan UTF-8 BOM & pemisah Windows Excel)
+    function exportCurrentReportToCSV() {
+      if (!currentReportData || !currentReportData.rows || currentReportData.rows.length === 0) {
+        alert('Tampilkan rekap data terlebih dahulu sebelum mengunduh!');
+        return;
+      }
+
+      const headers = currentReportData.headers || [];
+      const rows = currentReportData.rows || [];
+
+      // Susun CSV dengan UTF-8 BOM dan header sep=, agar Excel Windows otomatis mengenali pemisah kolom
+      let csvContent = '\uFEFFsep=,\r\n';
+      csvContent += headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(',') + '\r\n';
+
+      rows.forEach(r => {
+        csvContent += r.map(c => {
+          const s = String(c ?? '');
+          // Bungkus string nomor HP atau diawali 0 dengan formula text agar tidak hilang nol depannya di Excel
+          if (s.startsWith('0') && s.length > 1) {
+            return `="${s}"`;
+          }
+          return `"${s.replace(/"/g, '""')}"`;
+        }).join(',') + '\r\n';
+      });
+
+      const filename = `rekap_${currentReportData.report_type || 'yayasan'}_${new Date().toISOString().slice(0, 10)}.csv`;
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast(`Berkas CSV berhasil diunduh: ${filename}`, 'success');
+    }
+
+    // 3. Fungsi Cetak Dokumen Resmi Berstandar Pendidikan
+    async function printEducationalReport() {
+      if (!currentReportData || !currentReportData.rows || currentReportData.rows.length === 0) {
+        alert('Tampilkan rekap data terlebih dahulu sebelum mencetak!');
+        return;
+      }
+
+      // Ambil profil sekolah terbaru secara dinamis
+      let school = null;
+      try {
+        const cached = sessionStorage.getItem('siyayasan_school_profile');
+        if (cached) school = JSON.parse(cached);
+      } catch (_) {}
+
+      if (!school) {
+        try {
+          const res = await apiCall('web_settings', 'get');
+          if (res && res.success && res.data) school = res.data;
+        } catch (_) {}
+      }
+
+      if (school) {
+        const schName = school.school_name || school.name || 'YAYASAN SAMARINDA';
+        const schAddress = school.address || 'Jl. Samratulangi, Sungai Keledang, Samarinda, Kalimantan Timur';
+        const schPhone = school.phone || '(0541) 234-5678';
+        const schWa = school.whatsapp || school.whatsapp_number || '081234567890';
+        const schEmail = school.email || 'info@yayasan.sch.id';
+
+        const nameEl = document.getElementById('print-school-name');
+        if (nameEl) nameEl.textContent = schName.toUpperCase();
+        const addrEl = document.getElementById('print-school-address');
+        if (addrEl) addrEl.textContent = `Alamat: ${schAddress}`;
+        const contEl = document.getElementById('print-school-contact');
+        if (contEl) contEl.textContent = `Telepon: ${schPhone} | WhatsApp: ${schWa} | Email: ${schEmail}`;
+      }
+
+      const titlesMap = {
+        students: 'LAPORAN REKAPITULASI DATA SISWA AKTIF',
+        payments: 'LAPORAN REKAPITULASI KEUANGAN & PEMBAYARAN SPP',
+        ppdb: 'LAPORAN REKAPITULASI PENDAFTARAN SISWA BARU (PPDB)',
+        attendance: 'LAPORAN REKAPITULASI PRESENSI & KEHADIRAN SISWA',
+        development: 'LAPORAN CATATAN PERKEMBANGAN SANTRI (RAPOR)',
+        all: 'RINGKASAN EKSEKUTIF SELURUH UNIT YAYASAN'
+      };
+
+      const docTitle = titlesMap[currentReportType] || 'LAPORAN REKAPITULASI DATA SEKOLAH';
+      const docTitleEl = document.getElementById('print-doc-title');
+      if (docTitleEl) docTitleEl.textContent = docTitle;
+
+      const now = new Date();
+      const dateFormatted = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      let periodDesc = 'Tahun Ajaran 2026/2027';
+      if (currentReportType === 'payments' && document.getElementById('rep-pay-month')?.value) {
+        periodDesc = `Periode Bulan: ${document.getElementById('rep-pay-month').value}`;
+      } else if (currentReportType === 'attendance' && document.getElementById('rep-att-month')?.value) {
+        periodDesc = `Periode Bulan: ${document.getElementById('rep-att-month').value}`;
+      } else if (currentReportType === 'development') {
+        const sem = document.getElementById('rep-dev-semester')?.value === '2' ? 'Semester 2 (Genap)' : 'Semester 1 (Ganjil)';
+        const yr = document.getElementById('rep-dev-year')?.value || '2026';
+        periodDesc = `${sem} • Tahun Ajaran ${yr}/${Number(yr)+1}`;
+      }
+
+      const subTitleEl = document.getElementById('print-doc-subtitle');
+      if (subTitleEl) subTitleEl.textContent = `${periodDesc} • Tanggal Terbit: ${dateFormatted}`;
+
+      const timeEl = document.getElementById('print-timestamp');
+      if (timeEl) timeEl.textContent = `${dateFormatted} pk ${now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WITA`;
+
+      const signDateEl = document.getElementById('print-sign-place-date');
+      if (signDateEl) signDateEl.textContent = `Samarinda, ${dateFormatted}`;
+
+      const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
+      const adminName = (user && user.full_name) ? user.full_name : 'Super Administrator';
+      const adminSignEl = document.getElementById('print-sign-admin-name');
+      if (adminSignEl) adminSignEl.textContent = `( ${adminName} )`;
+
+      // Simpan document.title dan ganti sementara untuk judul PDF
+      const prevTitle = document.title;
+      document.title = `${docTitle} - ${now.toISOString().slice(0, 10)}`;
+
+      window.print();
+
+      setTimeout(() => { document.title = prevTitle; }, 1000);
+    }
+
+    // 4. Modal Import Excel
+    function openImportModal() {
+      document.getElementById('import-modal').classList.remove('hidden');
+      resetImportForm();
+    }
+
+    function closeImportModal() {
+      document.getElementById('import-modal').classList.add('hidden');
+      resetImportForm();
+    }
+
+    function resetImportForm() {
+      document.getElementById('import-file-input').value = '';
+      document.getElementById('import-file-label').textContent = 'Klik untuk mencari file .CSV dari komputer';
+      document.getElementById('import-preview-wrap').classList.add('hidden');
+      document.getElementById('btn-submit-import').disabled = true;
+      parsedImportRows = [];
+    }
+
+    function onImportTypeChanged() {
+      resetImportForm();
+    }
+
+    // Unduh Contoh Template CSV
+    function downloadImportTemplate() {
+      const type = document.querySelector('input[name="import-type"]:checked').value;
+      let csv = '\uFEFF';
+      let filename = 'template_rekap_yayasan.csv';
+
+      if (type === 'invoices') {
+        filename = 'template_import_tagihan_spp.csv';
+        csv += 'nis,student_name,item_name,amount,due_date\r\n';
+        csv += '1001,Ahmad Fadil,SPP Oktober 2026,150000,2026-10-25\r\n';
+        csv += '1002,Nur Aisyah,SPP Oktober 2026,150000,2026-10-25\r\n';
+      } else {
+        filename = 'template_import_data_siswa.csv';
+        csv += 'nis,full_name,gender,class_name,parent_name,phone\r\n';
+        csv += '1050,Muhammad Rizky,L,PAUD A,Bapak Ridwan,081234567890\r\n';
+        csv += '1051,Siti Aminah,P,TK B,Ibu Fatimah,081234567891\r\n';
+      }
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Mengunduh berkas template: ${filename}`, 'info');
+    }
+
+    // Parsing CSV
+    function handleImportFileSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('import-file-label').textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+        if (lines.length < 2) {
+          alert('Berkas CSV kosong atau tidak memiliki baris data.');
+          resetImportForm();
+          return;
+        }
+
+        const rawHeaders = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        const rows = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const cells = lines[i].split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
+          if (cells.length === 0 || !cells[0]) continue;
+          const obj = {};
+          rawHeaders.forEach((h, idx) => {
+            obj[h] = cells[idx] || '';
+          });
+          rows.push(obj);
+        }
+
+        if (rows.length === 0) {
+          alert('Tidak ditemukan baris data yang valid pada berkas ini.');
+          resetImportForm();
+          return;
+        }
+
+        parsedImportRows = rows;
+        showImportPreview(rawHeaders, rows);
+      };
+      reader.readAsText(file);
+    }
+
+    function showImportPreview(headers, rows) {
+      const wrap = document.getElementById('import-preview-wrap');
+      const countLbl = document.getElementById('import-preview-count');
+      const table = document.getElementById('import-preview-table');
+      const submitBtn = document.getElementById('btn-submit-import');
+
+      countLbl.textContent = `${rows.length} baris data ditemukan`;
+      table.innerHTML = `
+        <thead class="bg-gray-100 font-bold text-gray-700">
+          <tr>${headers.slice(0, 5).map(h => `<th class="p-1.5 text-left">${h}</th>`).join('')}</tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          ${rows.slice(0, 5).map(r => `
+            <tr>${headers.slice(0, 5).map(h => `<td class="p-1.5 text-gray-800">${r[h] || '-'}</td>`).join('')}</tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      wrap.classList.remove('hidden');
+      submitBtn.disabled = false;
+    }
+
+    // Eksekusi Simpan Data Import ke Database
+    async function executeDataImport() {
+      if (parsedImportRows.length === 0) {
+        alert('Tidak ada data untuk diimpor.');
+        return;
+      }
+
+      const type = document.querySelector('input[name="import-type"]:checked').value;
+      const btn = document.getElementById('btn-submit-import');
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan ke Database...';
+
+      const action = type === 'invoices' ? 'import_invoices' : 'import_students';
+
+      try {
+        const res = await apiCall('reports', action, { items: parsedImportRows });
+        if (res.success) {
+          alert(`✓ SUKSES:\n\n${res.message || 'Data berhasil diimpor ke sistem yayasan!'}`);
+          showToast(res.message, 'success');
+          closeImportModal();
+          generateReport(type === 'invoices' ? 'payments' : 'students');
+        } else {
+          showToast(res.message || 'Gagal mengimpor data', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan jaringan saat mengimpor data', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Simpan ke Database';
+      }
+    }
+
+    // Expose all functions to window
+    window.generateReport = generateReport;
+    window.exportCurrentReportToCSV = exportCurrentReportToCSV;
+    window.printEducationalReport = printEducationalReport;
+    window.openImportModal = openImportModal;
+    window.closeImportModal = closeImportModal;
+    window.onImportTypeChanged = onImportTypeChanged;
+    window.downloadImportTemplate = downloadImportTemplate;
+    window.handleImportFileSelected = handleImportFileSelected;
+    window.executeDataImport = executeDataImport;
+
+    // Default load data rekap saat halaman dibuka
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => generateReport('students'));
+    } else {
+      generateReport('students');
     }
   </script>
 </body>

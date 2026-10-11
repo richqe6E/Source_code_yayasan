@@ -162,7 +162,6 @@
       const studentMenu = isSiswaAktif ? [
         { href: 'dashboard.html', label: '📊 Dashboard' },
         { href: 'biodata.html', label: '👤 Biodata Siswa' },
-        { href: 'akademik.html', label: '🎓 Rapor & Akademik' },
         { href: 'spp.html', label: '💳 Tagihan SPP' },
         { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
       ] : [
@@ -200,6 +199,19 @@
         document.getElementById(`name-${type}`).textContent = file.name;
       }
 
+      let fileUrl = '';
+      if (window.uploadToSupabaseStorage && !window.location.hostname.includes('localhost')) {
+        try { fileUrl = await uploadToSupabaseStorage(file, 'dokumen_' + type); } catch (_) {}
+      }
+      if (!fileUrl) {
+        fileUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => resolve('');
+          reader.readAsDataURL(file);
+        });
+      }
+
       showToast(`Mengunggah ${file.name}...`, 'info');
 
       try {
@@ -207,7 +219,7 @@
           document_type: type,
           file_name: file.name,
           file_size: file.size,
-          file: file
+          file_url: fileUrl
         });
 
         if (res.success) {

@@ -72,30 +72,64 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <button onclick="printSppSummaryReport()" class="px-3.5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>Cetak Rekap SPP</span>
+        </button>
         <button onclick="openBulkInvoiceModal()" class="px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
           <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-          Tagihan Massal per Kelas
+          <span>Tagihan Massal per Kelas</span>
         </button>
         <button onclick="openSingleInvoiceModal()" class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          + Buat Tagihan Individu
+          <span>+ Buat Tagihan Individu</span>
         </button>
       </div>
     </div>
 
     <!-- Panel 1: Invoices -->
     <div id="panel-invoices">
-      <div class="bg-white border border-gray-200/80 rounded-2xl p-4 mb-4 shadow-sm flex flex-col sm:flex-row gap-3">
-        <input id="filter-inv-search" type="text" placeholder="Cari nomor tagihan atau nama siswa..." class="flex-1 px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
-        <select id="filter-inv-status" class="px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
-          <option value="">Semua Status Tagihan</option>
-          <option value="unpaid">Belum Lunas (Tunggakan)</option>
-          <option value="menunggu_verifikasi">Menunggu Verifikasi</option>
-          <option value="paid">Lunas</option>
-        </select>
-        <button onclick="loadInvoices()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition">
-          Filter
-        </button>
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-4 mb-4 shadow-sm space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+          <!-- 1. Realtime Search -->
+          <div class="relative">
+            <input id="filter-inv-search" type="text" oninput="applyInvoicesFilter()" placeholder="Cari nama siswa, NIS, atau no. tagihan..." class="w-full pl-9 pr-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+
+          <!-- 2. Status Dropdown -->
+          <div>
+            <select id="filter-inv-status" onchange="applyInvoicesFilter()" class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition font-semibold text-gray-700">
+              <option value="">Semua Status Tagihan</option>
+              <option value="unpaid">Belum Lunas (Tunggakan)</option>
+              <option value="menunggu_verifikasi">Menunggu Verifikasi</option>
+              <option value="paid">Lunas</option>
+            </select>
+          </div>
+
+          <!-- 3. Kelas Dropdown -->
+          <div>
+            <select id="filter-inv-class" onchange="applyInvoicesFilter()" class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition font-semibold text-gray-700">
+              <option value="">Semua Rombongan Belajar (Kelas)</option>
+            </select>
+          </div>
+
+          <!-- 4. Periode / Bulan Dropdown -->
+          <div>
+            <select id="filter-inv-month" onchange="applyInvoicesFilter()" class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition font-semibold text-gray-700">
+              <option value="">Semua Periode / Bulan SPP</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filter Bar Footer Info & Reset -->
+        <div class="flex items-center justify-between pt-2 border-t border-gray-100 text-[11px] text-gray-500">
+          <div id="filter-count-info">Menampilkan seluruh tagihan</div>
+          <button type="button" onclick="resetInvoicesFilter()" class="text-primary-600 hover:text-primary-800 font-semibold flex items-center gap-1 hover:underline">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Reset Semua Filter</span>
+          </button>
+        </div>
       </div>
 
       <div class="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
@@ -120,7 +154,17 @@
     </div>
 
     <!-- Panel 2: Verifications -->
-    <div id="panel-verifications" class="hidden">
+    <div id="panel-verifications" class="hidden space-y-4">
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3">
+        <div class="relative flex-1">
+          <input id="filter-verif-search" type="text" oninput="applyVerificationsFilter()" placeholder="Cari nama siswa atau no. tagihan yang menunggu verifikasi..." class="w-full pl-9 pr-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <button onclick="loadVerifications()" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition">
+          Muat Ulang
+        </button>
+      </div>
+
       <div class="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200/80">
@@ -308,8 +352,11 @@
       const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.classes)) || []);
       if (res.success && items.length > 0) {
         classesCache = items;
-        const sel = document.getElementById('bulk-class');
-        sel.innerHTML = '<option value="">Semua Siswa Aktif Seluruh Kelas</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        const selBulk = document.getElementById('bulk-class');
+        if (selBulk) selBulk.innerHTML = '<option value="">Semua Siswa Aktif Seluruh Kelas</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+        const selFilter = document.getElementById('filter-inv-class');
+        if (selFilter) selFilter.innerHTML = '<option value="">Semua Rombongan Belajar (Kelas)</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
       }
     }
 
@@ -324,14 +371,10 @@
     }
 
     async function loadInvoices() {
-      const search = document.getElementById('filter-inv-search').value.toLowerCase().trim();
-      const statusFilter = document.getElementById('filter-inv-status').value;
       const tbody = document.getElementById('invoices-tbody');
       tbody.innerHTML = Shell.skeletonRows(6, 4);
 
-      const params = { per_page: 100 };
-      if (statusFilter) params.status = statusFilter;
-      const res = await apiCall('invoices', 'list', params);
+      const res = await apiCall('invoices', 'list', { per_page: 200 });
 
       if (!res.success) {
         tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-xs text-rose-600 font-medium">${res.message || 'Gagal'}</td></tr>`;
@@ -339,16 +382,89 @@
       }
 
       invoicesCache = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.invoices)) || []);
+
+      // Populate opsi periode / bulan secara dinamis
+      const selMonth = document.getElementById('filter-inv-month');
+      if (selMonth && selMonth.options.length <= 1) {
+        const uniqueMonths = [...new Set(invoicesCache.map(i => i.period || i.month || i.description || '').filter(Boolean))];
+        uniqueMonths.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          selMonth.appendChild(opt);
+        });
+      }
+
+      applyInvoicesFilter();
+    }
+
+    function applyInvoicesFilter() {
+      const search = (document.getElementById('filter-inv-search')?.value || '').toLowerCase().trim();
+      const statusFilter = (document.getElementById('filter-inv-status')?.value || '').toLowerCase().trim();
+      const classFilter = document.getElementById('filter-inv-class')?.value || '';
+      const monthFilter = (document.getElementById('filter-inv-month')?.value || '').toLowerCase().trim();
+
       let list = [...invoicesCache];
+
+      // Filter URL student_id jika datang dari link profil siswa
+      const urlStudentId = new URLSearchParams(window.location.search).get('student_id');
+      if (urlStudentId && !search) {
+        list = list.filter(i => (i.student_id === urlStudentId));
+      }
+
+      // 1. Realtime Search (Nama, NIS, No Tagihan, Keterangan)
       if (search) {
         list = list.filter(i => 
           (i.invoice_number && i.invoice_number.toLowerCase().includes(search)) ||
-          (i.student_name && i.student_name.toLowerCase().includes(search))
+          (i.student_name && i.student_name.toLowerCase().includes(search)) ||
+          (i.description && i.description.toLowerCase().includes(search)) ||
+          (i.item_name && i.item_name.toLowerCase().includes(search))
         );
       }
 
+      // 2. Filter Status Tagihan
+      if (statusFilter) {
+        list = list.filter(i => (i.status || '').toLowerCase() === statusFilter);
+      }
+
+      // 3. Filter Kelas
+      if (classFilter) {
+        const studentIdsInClass = studentsCache.filter(s => s.class_id === classFilter).map(s => s.id);
+        list = list.filter(i => studentIdsInClass.includes(i.student_id));
+      }
+
+      // 4. Filter Periode / Bulan
+      if (monthFilter) {
+        list = list.filter(i => 
+          (i.period && i.period.toLowerCase().includes(monthFilter)) ||
+          (i.month && i.month.toLowerCase().includes(monthFilter)) ||
+          (i.description && i.description.toLowerCase().includes(monthFilter)) ||
+          (i.item_name && i.item_name.toLowerCase().includes(monthFilter))
+        );
+      }
+
+      // Update counter info
+      const countEl = document.getElementById('filter-count-info');
+      if (countEl) {
+        countEl.innerHTML = `Menampilkan <strong class="text-gray-900 font-bold">${list.length}</strong> dari total ${invoicesCache.length} tagihan`;
+      }
+
+      renderInvoicesTable(list);
+    }
+
+    function resetInvoicesFilter() {
+      document.getElementById('filter-inv-search').value = '';
+      document.getElementById('filter-inv-status').value = '';
+      document.getElementById('filter-inv-class').value = '';
+      document.getElementById('filter-inv-month').value = '';
+      applyInvoicesFilter();
+      showToast('Seluruh filter tagihan telah di-reset.', 'info');
+    }
+
+    function renderInvoicesTable(list) {
+      const tbody = document.getElementById('invoices-tbody');
       if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada data tagihan ditemukan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada data tagihan yang sesuai dengan kriteria filter.</td></tr>';
         return;
       }
 
@@ -383,7 +499,16 @@
               <button onclick="markPaidOffline('${i.id}')" title="Tandai lunas offline (pembayaran tunai di kantor TU)" class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition">
                 ✓ Lunas Tunai
               </button>
-            ` : ''}
+              <button onclick="sendWaInvoice('${i.id}')" title="Kirim pengingat tagihan via WhatsApp ke orang tua" class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z"/></svg>
+                <span>Kirim WA</span>
+              </button>
+            ` : `
+              <button onclick="printAdminReceipt('${i.id}')" title="Cetak Kuitansi Resmi" class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span>Kuitansi</span>
+              </button>
+            `}
             <button onclick="deleteInvoice('${i.id}')" title="Hapus tagihan" class="p-1 text-gray-400 hover:text-red-600 transition">
               <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
@@ -393,8 +518,10 @@
     }
 
     async function loadVerifications() {
-      const res = await apiCall('payments', 'list', { per_page: 50, status: 'pending' });
       const tbody = document.getElementById('payments-tbody');
+      tbody.innerHTML = Shell.skeletonRows(7, 3);
+
+      const res = await apiCall('payments', 'list', { per_page: 50, status: 'pending' });
 
       if (!res.success) {
         tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-xs text-rose-600 font-medium">${res.message || 'Gagal'}</td></tr>`;
@@ -402,12 +529,27 @@
       }
 
       paymentsCache = res.data || [];
-      if (paymentsCache.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada bukti transfer yang menunggu verifikasi saat ini.</td></tr>';
+      applyVerificationsFilter();
+    }
+
+    function applyVerificationsFilter() {
+      const q = (document.getElementById('filter-verif-search')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('payments-tbody');
+
+      let list = [...paymentsCache];
+      if (q) {
+        list = list.filter(p => 
+          (p.student_name && p.student_name.toLowerCase().includes(q)) ||
+          (p.invoice_number && p.invoice_number.toLowerCase().includes(q))
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada bukti transfer yang cocok atau menunggu verifikasi.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = paymentsCache.map(p => {
+      tbody.innerHTML = list.map(p => {
         const hasProof = !!p.proof_image_url;
         return `
         <tr class="hover:bg-gray-50/80 transition">
@@ -583,6 +725,219 @@
 
     function closeProofModal() {
       document.getElementById('proof-modal').classList.add('hidden');
+    }
+
+    function sendWaInvoice(invId) {
+      const inv = invoicesCache.find(x => x.id === invId);
+      if (!inv) return;
+      const s = studentsCache.find(x => x.id === inv.student_id) || {};
+      const parentPhone = s.father_phone || s.mother_phone || s.parent_phone || s.phone || '081234567890';
+      const cleanPhone = String(parentPhone).replace(/\D/g, '').replace(/^0/, '62');
+      const studentName = inv.student_name || s.full_name || '-';
+      const nis = s.nis || '-';
+      const month = inv.description || inv.month || inv.period || 'SPP';
+      const amount = formatIDR(inv.amount || 150000);
+      const dueDate = inv.due_date ? formatDate(inv.due_date) : 'Tgl 10';
+
+      const msg = `Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nYth. Bapak/Ibu Orang Tua / Wali dari ananda:\n• Nama Siswa: ${studentName}\n• NIS: ${nis}\n\nKami dari Tata Usaha Yayasan Samarinda menginformasikan kewajiban iuran bulanan sbb:\n• Tagihan: ${month}\n• Nominal: ${amount}\n• Jatuh Tempo: ${dueDate}\n\nPembayaran dapat dilakukan melalui transfer rekening resmi yayasan:\n- Bank Syariah Indonesia (BSI): 7123456789\n- Bank Kaltimtara: 0012345678\na.n. Yayasan Samarinda\n\nAtau pembayaran tunai langsung di kantor Tata Usaha sekolah. Setelah transfer, bukti dapat diunggah melalui Portal Siswa atau dikirimkan via WhatsApp ini.\n\nTerima kasih atas perhatian dan kerjasamanya.`;
+
+      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function printAdminReceipt(invId) {
+      const inv = invoicesCache.find(x => x.id === invId);
+      if (!inv) return;
+      const s = studentsCache.find(x => x.id === inv.student_id) || {};
+      const studentName = inv.student_name || s.full_name || '-';
+      const nis = s.nis || '-';
+      const className = s.class_name || s.kelas_sekarang || 'PAUD / TK Terpadu';
+      const invNum = inv.invoice_number || ('INV/' + new Date().getFullYear() + '/SPP');
+      const month = inv.description || inv.month || inv.period || 'SPP Bulanan';
+      const amount = inv.amount || 150000;
+      const paidAt = inv.paid_at ? formatDate(inv.paid_at) : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const paidBy = inv.paid_by || 'Tunai / Kasir TU Yayasan';
+
+      const printWindow = window.open('', '_blank', 'width=750,height=800');
+      if (!printWindow) {
+        alert('Mohon izinkan pop-up peramban untuk mencetak kuitansi.');
+        return;
+      }
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>Kuitansi Pembayaran SPP - ${invNum}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 36px; color: #0f172a; line-height: 1.5; }
+            .kop { text-align: center; border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 24px; }
+            .kop h1 { margin: 0; color: #0369a1; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+            .kop p { margin: 3px 0 0; font-size: 12px; color: #64748b; }
+            .kuitansi-title { text-align: center; margin-bottom: 20px; }
+            .kuitansi-title h2 { margin: 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #1e293b; letter-spacing: 1px; }
+            .kuitansi-num { font-size: 12px; color: #64748b; font-family: monospace; font-weight: 600; margin-top: 4px; }
+            .badge-lunas { display: inline-block; background: #ecfdf5; color: #065f46; border: 1.5px solid #a7f3d0; padding: 4px 14px; font-weight: 800; font-size: 13px; border-radius: 9999px; margin-top: 6px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+            td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
+            td.lbl { width: 32%; font-weight: 600; color: #64748b; }
+            td.val { font-weight: 700; color: #0f172a; }
+            .nominal-box { background: #f0f9ff; border: 2px dashed #0284c7; border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+            .nominal-label { font-size: 12px; font-weight: 700; color: #0369a1; text-transform: uppercase; }
+            .nominal-val { font-size: 22px; font-weight: 800; color: #0284c7; font-family: monospace; }
+            .terbilang { font-size: 12px; color: #475569; font-style: italic; }
+            .ttd-wrap { display: flex; justify-content: space-between; margin-top: 36px; font-size: 12px; }
+            .ttd { text-align: center; width: 220px; }
+            @media print { .no-print { display: none !important; } }
+          </style>
+        </head>
+        <body>
+          <div class="kop">
+            <h1>YAYASAN SAMARINDA</h1>
+            <p>Pendidikan Anak Usia Dini (PAUD), TK Terpadu & TPQ ULINNUHA</p>
+            <p>Jl. P. Antasari No. 45, Samarinda | Telp/WA: 0812-3456-7891</p>
+          </div>
+          <div class="kuitansi-title">
+            <h2>Kuitansi Resmi Pembayaran SPP</h2>
+            <div class="kuitansi-num">No. Invoice: ${invNum}</div>
+            <div class="badge-lunas">&#10003; LUNAS (PEMBAYARAN SAH)</div>
+          </div>
+          <table>
+            <tr><td class="lbl">Telah Diterima Dari</td><td class="val">${studentName}</td></tr>
+            <tr><td class="lbl">Nomor Induk Siswa (NIS)</td><td class="val" style="font-family:monospace;">${nis}</td></tr>
+            <tr><td class="lbl">Kelas / Rombel</td><td class="val">${className}</td></tr>
+            <tr><td class="lbl">Untuk Pembayaran</td><td class="val">${month}</td></tr>
+            <tr><td class="lbl">Tanggal Pelunasan</td><td class="val">${paidAt}</td></tr>
+            <tr><td class="lbl">Kanal Kas / Metode</td><td class="val">${paidBy}</td></tr>
+          </table>
+          <div class="nominal-box">
+            <div>
+              <div class="nominal-label">Jumlah Uang Diterima:</div>
+              <div class="terbilang"># Seratus Lima Puluh Ribu Rupiah #</div>
+            </div>
+            <div class="nominal-val">${formatIDR(amount)}</div>
+          </div>
+          <div class="ttd-wrap">
+            <div class="ttd">
+              <p>Wali Murid / Penyetor,</p>
+              <br><br><br>
+              <p><strong>( ${studentName} )</strong></p>
+            </div>
+            <div class="ttd">
+              <p>Samarinda, ${paidAt}<br>Bagian Keuangan &amp; Kasir TU,</p>
+              <br><br>
+              <p><strong>( Bendahara Sekolah )</strong></p>
+            </div>
+          </div>
+          <div class="no-print" style="text-align: center; margin-top: 32px;">
+            <button onclick="window.print()" style="padding: 10px 24px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Cetak Kuitansi Ini</button>
+          </div>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    function printSppSummaryReport() {
+      const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const totalInv = invoicesCache.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const paidInvs = invoicesCache.filter(i => i.status === 'paid');
+      const unpaidInvs = invoicesCache.filter(i => i.status !== 'paid');
+      const totalPaid = paidInvs.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const totalUnpaid = unpaidInvs.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const percent = totalInv > 0 ? Math.round((totalPaid / totalInv) * 100) : 0;
+
+      const printWindow = window.open('', '_blank', 'width=850,height=900');
+      if (!printWindow) {
+        alert('Mohon izinkan pop-up peramban untuk mencetak rekap.');
+        return;
+      }
+
+      const rowsHtml = invoicesCache.map((inv, idx) => `
+        <tr>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-family: monospace;">${idx + 1}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-family: monospace;">${inv.invoice_number || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-weight: 600;">${inv.student_name || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0;">${inv.description || inv.month || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: right; font-family: monospace; font-weight: 600;">${formatIDR(inv.amount)}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${inv.status === 'paid' ? '#059669' : '#dc2626'};">${inv.status === 'paid' ? 'LUNAS' : 'BELUM'}</td>
+        </tr>
+      `).join('');
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>Laporan Rekapitulasi SPP - Yayasan Samarinda</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 32px; color: #0f172a; line-height: 1.4; font-size: 12px; }
+            .kop { text-align: center; border-bottom: 3px double #0284c7; padding-bottom: 10px; margin-bottom: 20px; }
+            .kop h1 { margin: 0; color: #0369a1; font-size: 18px; font-weight: 800; }
+            .kop p { margin: 2px 0 0; font-size: 11px; color: #64748b; }
+            .title { text-align: center; margin-bottom: 16px; }
+            .title h2 { margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; color: #1e293b; }
+            .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+            .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; text-align: center; }
+            .kpi-lbl { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+            .kpi-val { font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 3px; font-family: monospace; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 11px; }
+            th { background: #f1f5f9; padding: 8px; text-align: left; font-weight: 700; color: #475569; border-bottom: 2px solid #cbd5e1; }
+            .ttd-wrap { display: flex; justify-content: space-between; margin-top: 32px; font-size: 11px; }
+            .ttd { text-align: center; width: 220px; }
+            @media print { .no-print { display: none !important; } }
+          </style>
+        </head>
+        <body>
+          <div class="kop">
+            <h1>YAYASAN SAMARINDA</h1>
+            <p>Pendidikan Terpadu: PAUD, Taman Kanak-Kanak (TK A &amp; TK B) dan TPQ ULINNUHA</p>
+            <p>Jl. P. Antasari No. 45, Samarinda | WhatsApp Resmi: 0812-3456-7891</p>
+          </div>
+          <div class="title">
+            <h2>Laporan Rekapitulasi Pembayaran SPP Siswa</h2>
+            <p style="margin: 3px 0 0; color: #64748b;">Per Tanggal: ${today}</p>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-lbl">Total Tagihan</div><div class="kpi-val">${formatIDR(totalInv)}</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Total Lunas</div><div class="kpi-val" style="color: #059669;">${formatIDR(totalPaid)}</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Total Tunggakan</div><div class="kpi-val" style="color: #dc2626;">${formatIDR(totalUnpaid)}</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Realisasi Kas</div><div class="kpi-val">${percent}%</div></div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30px;">No</th>
+                <th>No. Tagihan</th>
+                <th>Nama Siswa</th>
+                <th>Keterangan / Bulan</th>
+                <th style="text-align: right;">Nominal</th>
+                <th style="text-align: center;">Status</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+          <div class="ttd-wrap">
+            <div class="ttd">
+              <p>Mengetahui,<br>Ketua Yayasan Samarinda,</p>
+              <br><br><br>
+              <p><strong>( Pimpinan Yayasan )</strong></p>
+            </div>
+            <div class="ttd">
+              <p>Samarinda, ${today}<br>Bendahara &amp; Kepala Tata Usaha,</p>
+              <br><br><br>
+              <p><strong>( Bendahara Sekolah )</strong></p>
+            </div>
+          </div>
+          <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" style="padding: 10px 24px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Cetak Laporan Rekap Ini</button>
+          </div>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
 
     (async () => {

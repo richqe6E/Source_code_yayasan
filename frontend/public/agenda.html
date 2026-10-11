@@ -104,8 +104,8 @@
       try {
         if (typeof apiCall === 'function') {
           const res = await apiCall('events', 'list', { per_page: 30 });
-          if (res && res.success && Array.isArray(res.data)) {
-            items = res.data;
+          if (res && res.success) {
+            items = Array.isArray(res.data) ? res.data : ((res.data && res.data.items) || res.items || []);
           }
         }
       } catch (err) {

@@ -833,66 +833,94 @@
         </ul>
       </div>
 
-      <!-- Jadwal Resmi -->
+      <!-- Jadwal Resmi Dinamis -->
       <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <i class="fi fi-rr-calendar text-brand-600"></i>
-          <span>Jadwal Linimasa PPDB 2026</span>
+          <i class="fi fi-rr-calendar text-primary-600"></i>
+          <span id="ppdb-timeline-title">Jadwal Linimasa PPDB 2026/2027</span>
         </h3>
-        <div class="space-y-3 text-xs">
+        <div id="ppdb-timeline-container" class="space-y-3 text-xs">
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
             <span class="font-bold text-slate-800">1. Pendaftaran Online</span>
-            <span class="font-semibold text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-md">1 Jan - 31 Jul 2026</span>
+            <span id="timeline-reg-dates" class="font-semibold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-md">1 Jan - 31 Jul 2026</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
-            <span class="font-bold text-slate-800">2. Verifikasi Data</span>
-            <span class="text-slate-600">1 - 5 Agustus 2026</span>
+            <span class="font-bold text-slate-800">2. Verifikasi Berkas TU</span>
+            <span id="timeline-verif-dates" class="text-slate-600 font-medium">1 - 5 Agustus 2026</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
             <span class="font-bold text-slate-800">3. Pengumuman Kelulusan</span>
-            <span class="text-slate-600">10 Agustus 2026</span>
+            <span id="timeline-ann-dates" class="text-slate-600 font-medium">10 Agustus 2026</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+            <span class="font-bold text-slate-800">4. Daftar Ulang &amp; Penyerahan Berkas</span>
+            <span id="timeline-rereg-dates" class="text-slate-600 font-medium">12 - 20 Agustus 2026</span>
           </div>
         </div>
+        <p id="timeline-notes" class="text-xs text-slate-500 mt-3 hidden bg-sky-50 border border-sky-100 p-3 rounded-xl"></p>
       </div>
     </div>
   </main>
 
   <!-- Modal Sukses Pendaftaran PPDB -->
   <div id="success-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in-95 duration-200">
-      <div class="w-16 h-16 rounded-2xl bg-primary-50 border border-primary-200/70 text-primary-600 flex items-center justify-center mx-auto mb-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-4">
         <i class="fi fi-sr-check-circle text-3xl"></i>
       </div>
-      <h3 class="text-xl font-bold text-slate-900 mb-1">Pendaftaran Berhasil!</h3>
-      <p class="text-xs text-slate-500 mb-6 leading-relaxed">
-        Selamat! Data pendaftaran calon siswa telah tersimpan. Berikut nomor registrasi dan kredensial portal Anda:
+      <h3 class="text-xl font-bold text-slate-900 mb-1">Pendaftaran Berhasil Dikirim!</h3>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">
+        Alhamdulillah! Berkas formulir pendaftaran calon siswa telah tersimpan di sistem penerimaan Yayasan Samarinda.
       </p>
 
-      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left space-y-2.5 text-xs mb-6 font-mono">
-        <div class="flex justify-between">
+      <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-left space-y-2.5 text-xs mb-5 font-mono">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
           <span class="text-slate-500 font-sans">No. Registrasi:</span>
-          <span id="res-reg-num" class="font-bold text-brand-700 text-sm">REG-2026-XXXX</span>
+          <div class="flex items-center gap-1.5">
+            <span id="res-reg-num" class="font-bold text-primary-700 text-sm tracking-wide bg-primary-50 px-2 py-0.5 rounded border border-primary-200">REG-2026-XXXX</span>
+            <button type="button" onclick="copyRegNum()" title="Salin Nomor Registrasi" class="p-1 hover:bg-slate-200 text-slate-600 rounded transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            </button>
+          </div>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500 font-sans">Nama Siswa:</span>
-          <span id="res-student-name" class="font-bold text-slate-900">-</span>
+          <span class="text-slate-500 font-sans">Nama Calon Siswa:</span>
+          <span id="res-student-name" class="font-bold text-slate-900 font-sans">-</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500 font-sans">Email Login:</span>
-          <span id="res-login-email" class="font-bold text-slate-800">-</span>
+          <span class="text-slate-500 font-sans">Jenjang Tujuan:</span>
+          <span id="res-jenjang" class="font-bold text-slate-800 font-sans uppercase">-</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500 font-sans">Status Akun:</span>
-          <span class="px-2 py-0.5 rounded bg-primary-100 text-primary-800 font-bold text-[10px] font-sans">Calon Siswa Aktif</span>
+          <span class="text-slate-500 font-sans">Orang Tua / Wali:</span>
+          <span id="res-parent-name" class="font-medium text-slate-700 font-sans">-</span>
+        </div>
+        <div class="flex justify-between items-center pt-1 border-t border-slate-200">
+          <span class="text-slate-500 font-sans">Status Verifikasi:</span>
+          <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] font-sans border border-amber-200">⏳ Menunggu Verifikasi TU</span>
         </div>
       </div>
 
-      <div class="space-y-2">
-        <a id="btn-goto-portal" href="/siswa/dashboard.html" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-600/20 transition flex items-center justify-center gap-2">
-          <span>Akses SIAKAD Calon Siswa</span>
-          <i class="fi fi-rr-arrow-right text-xs"></i>
+      <div class="space-y-2.5">
+        <!-- WhatsApp Panitia Action -->
+        <a id="btn-whatsapp-confirm" href="#" target="_blank" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2">
+          <i class="fi fi-brands-whatsapp text-sm"></i>
+          <span>Konfirmasi ke WhatsApp Panitia PPDB</span>
         </a>
-        <a href="index.html" class="block w-full py-2.5 text-xs text-slate-500 hover:text-slate-800 transition">
+
+        <!-- Cek Status Action -->
+        <a id="btn-track-status" href="ppdb/status.html" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+          <i class="fi fi-rr-search text-xs"></i>
+          <span>Pantau Status Penerimaan Calon Siswa</span>
+        </a>
+
+        <!-- Print Slip Action -->
+        <button id="btn-print-reg" type="button" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-xl transition flex items-center justify-center gap-2">
+          <i class="fi fi-rr-print text-xs"></i>
+          <span>Cetak / Simpan Bukti Pendaftaran (PDF)</span>
+        </button>
+
+        <a href="index.html" class="block w-full py-2 text-xs text-slate-500 hover:text-slate-800 transition">
           Kembali ke Halaman Beranda
         </a>
       </div>
@@ -1398,23 +1426,32 @@
         const res = await apiCall('ppdb', 'submit', payload, 'POST');
         if (res && res.success) {
           const regNo = res.registration_number || res.registration_no || (res.data && (res.data.registration_number || res.data.registration_no)) || ('REG-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000));
-          const loginEmail = parentEmail || `${regNo.toLowerCase()}@pendaftar.yayasan.sch.id`;
+          const parentDisp = fatherName || motherName || guardianName || '-';
 
           document.getElementById('res-reg-num').textContent = regNo;
           document.getElementById('res-student-name').textContent = studentName;
-          document.getElementById('res-login-email').textContent = loginEmail;
+          document.getElementById('res-jenjang').textContent = selectedJenjang;
+          document.getElementById('res-parent-name').textContent = parentDisp;
 
-          // Store for auto-session in student portal if user proceeds
-          try {
-            const studentUser = {
-              role: 'siswa',
-              email: loginEmail,
-              name: studentName,
-              registration_number: regNo,
-              level: selectedJenjang
-            };
-            localStorage.setItem('siy_portal_pending_user', JSON.stringify(studentUser));
-          } catch (_) {}
+          // Siapkan Pesan & Tombol WhatsApp Panitia PPDB
+          const waPhone = '6281234567891'; // WhatsApp Resmi TU Yayasan Samarinda
+          const waText = `Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nSaya ingin konfirmasi bahwa saya telah mendaftarkan calon siswa secara online melalui website Yayasan Samarinda dengan rincian:\n\n• No. Registrasi: ${regNo}\n• Nama Calon Siswa: ${studentName}\n• Jenjang/Unit: ${selectedJenjang}\n• Orang Tua / Wali: ${parentDisp}\n• No. Kontak: ${parentPhone}\n\nMohon petunjuk informasi dan verifikasi berkas selanjutnya. Terima kasih.`;
+          const waBtn = document.getElementById('btn-whatsapp-confirm');
+          if (waBtn) {
+            waBtn.href = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;
+          }
+
+          // Tombol Pantau Status Penerimaan
+          const trackBtn = document.getElementById('btn-track-status');
+          if (trackBtn) {
+            trackBtn.href = `ppdb/status.html?reg=${encodeURIComponent(regNo)}`;
+          }
+
+          // Tombol Cetak Bukti Pendaftaran
+          const printBtn = document.getElementById('btn-print-reg');
+          if (printBtn) {
+            printBtn.onclick = () => printRegistrationSlip(regNo, studentName, selectedJenjang, parentDisp, parentPhone);
+          }
 
           document.getElementById('success-modal').classList.remove('hidden');
         } else {
@@ -1429,7 +1466,105 @@
       }
     }
 
-    // Periksa status periode dari database/web_settings
+    function copyRegNum() {
+      const regEl = document.getElementById('res-reg-num');
+      if (!regEl) return;
+      const text = regEl.textContent.trim();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert('Nomor Registrasi (' + text + ') berhasil disalin!');
+        }).catch(() => {
+          prompt('Salin nomor pendaftaran Anda:', text);
+        });
+      } else {
+        prompt('Salin nomor pendaftaran Anda:', text);
+      }
+    }
+
+    function printRegistrationSlip(regNo, name, jenjang, parent, phone) {
+      const printWindow = window.open('', '_blank', 'width=750,height=850');
+      if (!printWindow) {
+        alert('Mohon izinkan pop-up peramban untuk mencetak tanda bukti.');
+        return;
+      }
+      const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>Bukti Pendaftaran PPDB - ${regNo}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 32px; color: #0f172a; line-height: 1.5; }
+            .kop { text-align: center; border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 24px; }
+            .kop h1 { margin: 0; color: #0369a1; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+            .kop p { margin: 3px 0 0; font-size: 12px; color: #64748b; }
+            .title { text-align: center; margin-bottom: 20px; }
+            .title h2 { margin: 0; font-size: 16px; font-weight: 700; text-transform: uppercase; color: #1e293b; }
+            .badge { display: inline-block; background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; padding: 6px 14px; font-weight: 700; font-size: 15px; border-radius: 6px; font-family: monospace; margin-top: 6px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+            td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
+            td.lbl { width: 34%; font-weight: 600; color: #64748b; }
+            td.val { font-weight: 600; color: #0f172a; }
+            .box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; font-size: 12px; color: #334155; }
+            .box strong { color: #0f172a; }
+            .box ol { margin: 6px 0 0 16px; padding: 0; }
+            .box li { margin-bottom: 4px; }
+            .ttd-wrap { display: flex; justify-content: space-between; margin-top: 36px; font-size: 12px; }
+            .ttd { text-align: center; width: 220px; }
+            @media print { .no-print { display: none !important; } }
+          </style>
+        </head>
+        <body>
+          <div class="kop">
+            <h1>YAYASAN SAMARINDA</h1>
+            <p>Pendidikan Terpadu: PAUD, Taman Kanak-Kanak (TK A &amp; TK B) dan TPQ ULINNUHA</p>
+            <p>Jl. P. Antasari No. 45, Samarinda | WhatsApp Resmi: 0812-3456-7891</p>
+          </div>
+          <div class="title">
+            <h2>Tanda Bukti Registrasi PPDB Online</h2>
+            <div class="badge">${regNo}</div>
+          </div>
+          <table>
+            <tr><td class="lbl">Nama Calon Siswa</td><td class="val">${name}</td></tr>
+            <tr><td class="lbl">Jenjang / Unit Tujuan</td><td class="val" style="text-transform:uppercase;">${jenjang}</td></tr>
+            <tr><td class="lbl">Nama Orang Tua / Wali</td><td class="val">${parent}</td></tr>
+            <tr><td class="lbl">No. Kontak WhatsApp</td><td class="val">${phone}</td></tr>
+            <tr><td class="lbl">Tanggal Pendaftaran</td><td class="val">${today}</td></tr>
+            <tr><td class="lbl">Status Berkas Awal</td><td class="val" style="color: #b45309;">Menunggu Verifikasi Administrasi Tata Usaha</td></tr>
+          </table>
+          <div class="box">
+            <strong>Petunjuk Pemantauan &amp; Tindak Lanjut:</strong>
+            <ol>
+              <li>Simpan lembar bukti ini sebagai tanda sah pendaftaran daring.</li>
+              <li>Pantau perkembangan penerimaan sewaktu-waktu melalui menu <strong>PPDB &rarr; Cek Status</strong> di website resmi dengan memasukkan Nomor Registrasi di atas.</li>
+              <li>Jika dinyatakan <strong>Diterima</strong>, pihak sekolah akan menerbitkan NIS resmi untuk mengaktifkan Portal Siswa.</li>
+              <li>Konfirmasi berkas fisik dapat langsung dikomunikasikan ke nomor resmi Tata Usaha: 0812-3456-7891.</li>
+            </ol>
+          </div>
+          <div class="ttd-wrap">
+            <div class="ttd">
+              <p>Pendaftar / Orang Tua,</p>
+              <br><br><br>
+              <p><strong>(${parent})</strong></p>
+            </div>
+            <div class="ttd">
+              <p>Samarinda, ${today}<br>Panitia PPDB Yayasan Samarinda,</p>
+              <br><br>
+              <p><strong>( Tim Administrasi TU )</strong></p>
+            </div>
+          </div>
+          <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" style="padding: 10px 24px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Cetak Sekarang</button>
+          </div>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    // Periksa status periode dari database/web_settings dan update linimasa
     async function checkPpdbPeriod() {
       try {
         const res = await apiCall('ppdb', 'period');
@@ -1437,6 +1572,34 @@
           const p = res.data;
           const isClosed = (p.status === 'closed' || p.status === 'inactive' || p.status === 'ditutup');
           const academicYear = p.academic_year || '2026/2027';
+
+          // Update linimasa dinamis
+          const tlTitle = document.getElementById('ppdb-timeline-title');
+          if (tlTitle) tlTitle.textContent = `Jadwal Linimasa PPDB TA ${academicYear}`;
+
+          if (p.online_registration_dates) {
+            const el = document.getElementById('timeline-reg-dates');
+            if (el) el.textContent = p.online_registration_dates;
+          }
+          if (p.verification_dates) {
+            const el = document.getElementById('timeline-verif-dates');
+            if (el) el.textContent = p.verification_dates;
+          }
+          if (p.announcement_dates) {
+            const el = document.getElementById('timeline-ann-dates');
+            if (el) el.textContent = p.announcement_dates;
+          }
+          if (p.re_registration_dates) {
+            const el = document.getElementById('timeline-rereg-dates');
+            if (el) el.textContent = p.re_registration_dates;
+          }
+          if (p.notes) {
+            const el = document.getElementById('timeline-notes');
+            if (el) {
+              el.textContent = 'Catatan Panitia: ' + p.notes;
+              el.classList.remove('hidden');
+            }
+          }
 
           const badge = document.getElementById('ppdb-badge');
           if (isClosed) {

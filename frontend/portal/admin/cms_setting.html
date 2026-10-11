@@ -130,19 +130,41 @@
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
         <div class="md:col-span-7 space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">URL Foto Sekolah (Footer Background)</label>
-            <input type="text" id="set-footer-bg" oninput="updateFooterBgPreview()" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-xs" placeholder="images/school-campus.jpg atau https://...">
-            <p class="text-[11px] text-gray-400 mt-1">Kosongkan untuk menggunakan foto kampus resmi bawaan yayasan.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="file" id="footer-bg-file" accept="image/*" class="hidden" onchange="handleFooterBgUpload(event)">
-            <button type="button" onclick="document.getElementById('footer-bg-file').click()" class="px-3.5 py-2 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition border border-gray-300 flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span>Unggah Foto dari Komputer</span>
+          <!-- Toggle Pilihan Metode: File vs URL -->
+          <div class="flex items-center gap-1.5 p-1 bg-gray-100 rounded-xl w-fit border border-gray-200">
+            <button type="button" id="tab-footer-file" onclick="setFooterMode('file')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-800 shadow-sm flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Unggah File Komputer</span>
             </button>
-            <button type="button" onclick="resetFooterBgToDefault()" class="px-3 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition">
-              Reset ke Bawaan
+            <button type="button" id="tab-footer-url" onclick="setFooterMode('url')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-800 transition-all flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>Gunakan Link / URL Foto</span>
+            </button>
+          </div>
+
+          <!-- Mode A: File Upload Komputer -->
+          <div id="footer-file-container" class="space-y-2">
+            <div class="flex items-center gap-2">
+              <input type="file" id="footer-bg-file" accept="image/*" class="hidden" onchange="handleFooterBgUpload(event)">
+              <button type="button" onclick="document.getElementById('footer-bg-file').click()" class="px-4 py-2 text-xs font-semibold bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-xl transition border border-primary-200 flex items-center gap-2 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Pilih Foto dari Perangkat...</span>
+              </button>
+              <span id="footer-file-name" class="text-xs text-gray-500 italic">Belum ada file dipilih</span>
+            </div>
+            <p class="text-[11px] text-gray-400">Pilih foto gedung atau lingkungan sekolah berformat JPG/PNG.</p>
+          </div>
+
+          <!-- Mode B: URL Link Foto -->
+          <div id="footer-url-container" class="hidden space-y-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Link URL Foto</label>
+            <input type="text" id="set-footer-bg" oninput="updateFooterBgPreview()" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 font-mono text-xs" placeholder="https://images.unsplash.com/... atau images/school-campus.jpg">
+            <p class="text-[11px] text-gray-400">Pastikan URL berawalan http:// atau https:// dan dapat diakses publik.</p>
+          </div>
+
+          <div class="pt-1 flex items-center gap-2">
+            <button type="button" onclick="resetFooterBgToDefault()" class="px-3 py-1.5 text-xs font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition border border-gray-200">
+              Reset ke Foto Bawaan Kampus
             </button>
           </div>
         </div>
@@ -169,28 +191,71 @@
 
   <!-- Modal Tambah Slide Carousel -->
   <div id="slide-modal" class="hidden fixed inset-0 z-50 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 animate-in fade-in zoom-in duration-200">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 animate-in fade-in zoom-in duration-200">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-        <h3 class="text-base font-bold text-gray-900">Tambah Slide Hero</h3>
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Tambah Slide Hero Beranda</h3>
+          <p class="text-xs text-gray-500">Pilih salah satu metode: unggah foto dari komputer ATAU gunakan link URL gambar.</p>
+        </div>
         <button type="button" onclick="closeAddSlideModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
       </div>
 
       <form id="slide-form" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Judul / Caption Gambar</label>
-          <input type="text" id="slide-caption" required class="block w-full px-3 py-2 text-xs border border-gray-300 rounded-lg" placeholder="Contoh: Suasana Belajar Ceria">
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Judul / Keterangan Banner *</label>
+          <input type="text" id="slide-caption" required class="block w-full px-3.5 py-2 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500" placeholder="Contoh: Suasana Belajar Ceria Santri PAUD & TK">
         </div>
 
+        <!-- Tab Pemisah Terarah: Upload File VS Link URL -->
         <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Pilih Gambar Foto</label>
-          <input type="file" id="slide-file" accept="image/*" class="block w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
-          <p class="text-[11px] text-gray-400 mt-1">Atau gunakan URL gambar langsung di bawah ini:</p>
-          <input type="url" id="slide-url" class="block w-full mt-1 px-3 py-2 text-xs border border-gray-300 rounded-lg" placeholder="https://images.unsplash.com/...">
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Sumber Gambar</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl border border-gray-200">
+            <button type="button" id="tab-slide-file" onclick="setSlideInputMode('file')" class="py-2 px-3 rounded-lg text-xs font-bold bg-white text-gray-900 shadow-sm transition flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>1. Upload dari Galeri/PC</span>
+            </button>
+            <button type="button" id="tab-slide-url" onclick="setSlideInputMode('url')" class="py-2 px-3 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-900 transition flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>2. Masukkan Link/URL Foto</span>
+            </button>
+          </div>
         </div>
 
-        <div class="flex justify-end gap-2.5 pt-2">
-          <button type="button" onclick="closeAddSlideModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
-          <button type="submit" id="btn-save-slide" class="px-5 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-sm">
+        <!-- Mode Input A: File Picker -->
+        <div id="slide-mode-file" class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-700">Pilih Berkas Foto Gambar</label>
+          <div class="border-2 border-dashed border-gray-200 hover:border-primary-400 rounded-xl p-4 text-center cursor-pointer transition bg-gray-50/50" onclick="document.getElementById('slide-file').click()">
+            <input type="file" id="slide-file" accept="image/*" class="hidden" onchange="onSlideFileSelected(event)">
+            <svg class="w-8 h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <div id="slide-file-label" class="text-xs font-semibold text-gray-700">Klik untuk mencari foto dari komputer</div>
+            <div class="text-[11px] text-gray-400 mt-0.5">Format didukung: JPG, PNG, WEBP (Maks 5MB)</div>
+          </div>
+        </div>
+
+        <!-- Mode Input B: Link URL Text -->
+        <div id="slide-mode-url" class="hidden space-y-2">
+          <label class="block text-xs font-semibold text-gray-700">Tautan Gambar (Direct Image URL)</label>
+          <input type="url" id="slide-url" oninput="onSlideUrlChanged()" class="block w-full px-3.5 py-2 text-xs border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 font-mono" placeholder="https://images.unsplash.com/photo-...">
+          <p class="text-[11px] text-gray-400">Masukkan link gambar langsung dari web atau CDN cloud.</p>
+        </div>
+
+        <!-- Live Image Preview Box -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Pratinjau Foto Slide</span>
+            <button type="button" id="btn-clear-slide-preview" onclick="clearSlidePreview()" class="hidden text-[11px] text-red-600 font-semibold hover:underline">Hapus / Reset</button>
+          </div>
+          <div class="h-32 w-full rounded-xl overflow-hidden bg-gray-100 border border-gray-200 relative flex items-center justify-center">
+            <img id="slide-preview-img" src="" alt="Pratinjau Slide" class="hidden w-full h-full object-cover">
+            <div id="slide-preview-placeholder" class="text-xs text-gray-400 text-center px-4">
+              Foto belum dipilih. Pratinjau akan muncul di sini.
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2.5 pt-3 border-t border-gray-100">
+          <button type="button" onclick="closeAddSlideModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Batal</button>
+          <button type="submit" id="btn-save-slide" class="px-5 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-sm transition">
             Tambahkan Slide
           </button>
         </div>
@@ -217,25 +282,174 @@
     });
 
     let currentHeroImages = [];
+    let slideInputMode = 'file'; // 'file' atau 'url'
+    let selectedSlideFile = null;
+    let selectedSlideDataUrl = '';
 
-    function showAddSlideModal() { document.getElementById('slide-modal')?.classList.remove('hidden'); }
-    function closeAddSlideModal() { document.getElementById('slide-modal')?.classList.add('hidden'); }
+    function showAddSlideModal() {
+      document.getElementById('slide-form')?.reset();
+      selectedSlideFile = null;
+      selectedSlideDataUrl = '';
+      setSlideInputMode('file');
+      clearSlidePreview();
+      document.getElementById('slide-modal')?.classList.remove('hidden');
+    }
+
+    function closeAddSlideModal() {
+      document.getElementById('slide-modal')?.classList.add('hidden');
+    }
+
+    // Toggle Metode Footer Background
+    function setFooterMode(mode) {
+      const tabFile = document.getElementById('tab-footer-file');
+      const tabUrl = document.getElementById('tab-footer-url');
+      const contFile = document.getElementById('footer-file-container');
+      const contUrl = document.getElementById('footer-url-container');
+
+      if (mode === 'file') {
+        tabFile.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-800 shadow-sm flex items-center gap-1.5';
+        tabUrl.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-800 transition-all flex items-center gap-1.5';
+        contFile.classList.remove('hidden');
+        contUrl.classList.add('hidden');
+      } else {
+        tabUrl.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-800 shadow-sm flex items-center gap-1.5';
+        tabFile.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-800 transition-all flex items-center gap-1.5';
+        contUrl.classList.remove('hidden');
+        contFile.classList.add('hidden');
+        // Reset file input label saat beralih ke URL
+        const fileIn = document.getElementById('footer-bg-file');
+        if (fileIn) fileIn.value = '';
+        const nameLbl = document.getElementById('footer-file-name');
+        if (nameLbl) nameLbl.textContent = 'Mode Tautan URL aktif';
+      }
+    }
+
+    // Toggle Sumber Input Slide Hero (Pembatas Eksklusif)
+    function setSlideInputMode(mode) {
+      slideInputMode = mode;
+      const tabFile = document.getElementById('tab-slide-file');
+      const tabUrl = document.getElementById('tab-slide-url');
+      const modeFile = document.getElementById('slide-mode-file');
+      const modeUrl = document.getElementById('slide-mode-url');
+
+      if (mode === 'file') {
+        tabFile.className = 'py-2 px-3 rounded-lg text-xs font-bold bg-white text-gray-900 shadow-sm transition flex items-center justify-center gap-1.5';
+        tabUrl.className = 'py-2 px-3 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-900 transition flex items-center justify-center gap-1.5';
+        modeFile.classList.remove('hidden');
+        modeUrl.classList.add('hidden');
+
+        // Batas tegas: Kosongkan input URL jika beralih ke file
+        document.getElementById('slide-url').value = '';
+        if (selectedSlideDataUrl) {
+          showSlidePreview(selectedSlideDataUrl);
+        } else {
+          hideSlidePreview();
+        }
+      } else {
+        tabUrl.className = 'py-2 px-3 rounded-lg text-xs font-bold bg-white text-gray-900 shadow-sm transition flex items-center justify-center gap-1.5';
+        tabFile.className = 'py-2 px-3 rounded-lg text-xs font-semibold text-gray-500 hover:text-gray-900 transition flex items-center justify-center gap-1.5';
+        modeUrl.classList.remove('hidden');
+        modeFile.classList.add('hidden');
+
+        // Batas tegas: Kosongkan input file jika beralih ke URL
+        const fileInput = document.getElementById('slide-file');
+        if (fileInput) fileInput.value = '';
+        selectedSlideFile = null;
+        selectedSlideDataUrl = '';
+        document.getElementById('slide-file-label').textContent = 'Klik untuk mencari foto dari komputer';
+
+        onSlideUrlChanged();
+      }
+    }
+
+    function onSlideFileSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Harap pilih file gambar (JPG, PNG, atau WEBP)');
+        e.target.value = '';
+        return;
+      }
+
+      selectedSlideFile = file;
+      document.getElementById('slide-file-label').textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+
+      // Baca sebagai data URL untuk live image preview
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        selectedSlideDataUrl = evt.target.result;
+        showSlidePreview(selectedSlideDataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function onSlideUrlChanged() {
+      const url = document.getElementById('slide-url').value.trim();
+      if (url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('images/') || url.startsWith('/images/'))) {
+        showSlidePreview(url);
+      } else {
+        hideSlidePreview();
+      }
+    }
+
+    function showSlidePreview(src) {
+      const img = document.getElementById('slide-preview-img');
+      const placeholder = document.getElementById('slide-preview-placeholder');
+      const clearBtn = document.getElementById('btn-clear-slide-preview');
+
+      img.src = src;
+      img.classList.remove('hidden');
+      img.onerror = () => {
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        placeholder.textContent = 'Gambar tidak dapat dimuat dari link ini.';
+      };
+      img.onload = () => {
+        placeholder.classList.add('hidden');
+      };
+      placeholder.classList.add('hidden');
+      if (clearBtn) clearBtn.classList.remove('hidden');
+    }
+
+    function hideSlidePreview() {
+      const img = document.getElementById('slide-preview-img');
+      const placeholder = document.getElementById('slide-preview-placeholder');
+      const clearBtn = document.getElementById('btn-clear-slide-preview');
+
+      img.src = '';
+      img.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+      placeholder.textContent = 'Foto belum dipilih. Pratinjau akan muncul di sini.';
+      if (clearBtn) clearBtn.classList.add('hidden');
+    }
+
+    function clearSlidePreview() {
+      const fileIn = document.getElementById('slide-file');
+      if (fileIn) fileIn.value = '';
+      const urlIn = document.getElementById('slide-url');
+      if (urlIn) urlIn.value = '';
+      selectedSlideFile = null;
+      selectedSlideDataUrl = '';
+      document.getElementById('slide-file-label').textContent = 'Klik untuk mencari foto dari komputer';
+      hideSlidePreview();
+    }
 
     async function loadSettings() {
       try {
         const res = await apiCall('web_settings', 'get');
-        if (res.success && res.data) {
+        if (res && res.success && res.data) {
           const d = res.data;
-          document.getElementById('set-school-name').value = d.school_name || '';
-          document.getElementById('set-tagline').value = d.tagline || '';
-          document.getElementById('set-whatsapp').value = d.whatsapp || '';
-          document.getElementById('set-phone').value = d.phone || '';
-          document.getElementById('set-email').value = d.email || '';
-          document.getElementById('set-address').value = d.address || '';
-          document.getElementById('set-facebook').value = d.facebook_url || '';
-          document.getElementById('set-instagram').value = d.instagram_url || '';
-          document.getElementById('set-youtube').value = d.youtube_url || '';
-          document.getElementById('set-footer-bg').value = d.footer_bg_url || '';
+          document.getElementById('set-school-name').value = d.school_name || 'Yayasan Samarinda';
+          document.getElementById('set-tagline').value = d.tagline || 'Membina Generasi Qurani, Berakhlak Mulia & Berprestasi';
+          document.getElementById('set-whatsapp').value = d.whatsapp || '081234567890';
+          document.getElementById('set-phone').value = d.phone || '(0541) 234-5678';
+          document.getElementById('set-email').value = d.email || 'info@yayasan.sch.id';
+          document.getElementById('set-address').value = d.address || 'Jl. Samratulangi, Sungai Keledang, Samarinda';
+          document.getElementById('set-facebook').value = d.facebook_url || 'https://facebook.com/yayasansamarinda';
+          document.getElementById('set-instagram').value = d.instagram_url || 'https://instagram.com/yayasansamarinda';
+          document.getElementById('set-youtube').value = d.youtube_url || 'https://youtube.com/@yayasansamarinda';
+          document.getElementById('set-footer-bg').value = d.footer_bg_url || '/images/school-campus.jpg';
           updateFooterBgPreview();
 
           // Hero images
@@ -251,13 +465,17 @@
       const val = document.getElementById('set-footer-bg')?.value.trim();
       const el = document.getElementById('footer-preview-bg');
       if (el) {
-        el.style.backgroundImage = `url('${val || '../../public/images/school-campus.jpg'}')`;
+        el.style.backgroundImage = `url('${val || '/images/school-campus.jpg'}')`;
       }
     }
 
     function resetFooterBgToDefault() {
       const input = document.getElementById('set-footer-bg');
-      if (input) input.value = '';
+      if (input) input.value = '/images/school-campus.jpg';
+      const fileIn = document.getElementById('footer-bg-file');
+      if (fileIn) fileIn.value = '';
+      const nameLbl = document.getElementById('footer-file-name');
+      if (nameLbl) nameLbl.textContent = 'Foto bawaan kampus';
       updateFooterBgPreview();
       showToast('Foto latar footer dikembalikan ke foto bawaan kampus.', 'info');
     }
@@ -265,21 +483,26 @@
     async function handleFooterBgUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
+
+      const nameLbl = document.getElementById('footer-file-name');
+      if (nameLbl) nameLbl.textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+
       try {
         showToast('Mengunggah foto footer...', 'info');
         const url = await uploadToSupabaseStorage(file, 'footer_bg');
         if (url) {
           document.getElementById('set-footer-bg').value = url;
           updateFooterBgPreview();
-          showToast('Foto berhasil diunggah! Tekan Simpan Semua Pengaturan.', 'success');
+          showToast('Foto latar footer berhasil dipilih! Tekan "Simpan Semua Pengaturan" di atas.', 'success');
         }
       } catch (err) {
-        showToast('Gagal mengunggah foto', 'error');
+        showToast('Gagal memproses foto footer', 'error');
       }
     }
 
     function renderSlides() {
       const container = document.getElementById('slides-grid');
+      if (!container) return;
       if (!currentHeroImages || currentHeroImages.length === 0) {
         container.innerHTML = '<div class="col-span-full py-6 text-center text-xs text-gray-400">Belum ada slide gambar hero.</div>';
         return;
@@ -288,7 +511,7 @@
       container.innerHTML = currentHeroImages.map((s, idx) => `
         <div class="border border-gray-200 rounded-xl overflow-hidden bg-gray-50 flex flex-col justify-between group shadow-sm">
           <div class="h-36 w-full overflow-hidden bg-gray-200 relative">
-            <img src="${s.url}" alt="${s.caption || 'Slide'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            <img src="${s.url}" alt="${s.caption || 'Slide'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/images/school-campus.jpg'">
             <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] font-bold">Slide #${idx + 1}</span>
           </div>
           <div class="p-3 flex items-center justify-between gap-2">
@@ -305,37 +528,61 @@
       if (confirm('Hapus slide gambar ini dari carousel beranda?')) {
         currentHeroImages.splice(idx, 1);
         renderSlides();
+        showToast('Slide dihapus dari daftar.', 'info');
       }
     }
 
+    // Submit Form Tambah Slide (Mematuhi Mode Terarah)
     document.getElementById('slide-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const caption = document.getElementById('slide-caption').value.trim();
-      const fileInput = document.getElementById('slide-file');
-      const urlInput = document.getElementById('slide-url').value.trim();
       const saveBtn = document.getElementById('btn-save-slide');
+      let finalImageUrl = '';
 
-      let imageUrl = urlInput;
+      if (slideInputMode === 'file') {
+        if (!selectedSlideFile) {
+          alert('Harap pilih file foto dari komputer terlebih dahulu!');
+          return;
+        }
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Mengunggah Foto...';
+        try {
+          finalImageUrl = await uploadToSupabaseStorage(selectedSlideFile, 'hero_slide');
+        } catch (uploadErr) {
+          finalImageUrl = selectedSlideDataUrl;
+        }
+        if (!finalImageUrl && selectedSlideFile) {
+          finalImageUrl = await new Promise(resolve => {
+            const r = new FileReader();
+            r.onload = ev => resolve(ev.target.result);
+            r.onerror = () => resolve('');
+            r.readAsDataURL(selectedSlideFile);
+          });
+        }
+      } else {
+        const urlInput = document.getElementById('slide-url').value.trim();
+        if (!urlInput) {
+          alert('Harap masukkan alamat URL gambar langsung!');
+          return;
+        }
+        finalImageUrl = urlInput;
+      }
+
+      if (!finalImageUrl) {
+        alert('Gagal memproses gambar. Pastikan file atau link gambar valid.');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Tambahkan Slide';
+        return;
+      }
 
       saveBtn.disabled = true;
       saveBtn.textContent = 'Menyimpan...';
 
       try {
-        if (fileInput.files && fileInput.files.length > 0) {
-          imageUrl = await uploadToSupabaseStorage(fileInput.files[0], 'hero_slide');
-        }
-
-        if (!imageUrl) {
-          alert('Pilih file gambar atau masukkan URL gambar!');
-          return;
-        }
-
-        currentHeroImages.push({ url: imageUrl, caption });
+        currentHeroImages.push({ url: finalImageUrl, caption });
         renderSlides();
         closeAddSlideModal();
-        showToast('Slide berhasil ditambahkan! Tekan Simpan Semua Pengaturan untuk menerapkan ke beranda.', 'success');
-      } catch (err) {
-        alert('Gagal mengunggah gambar');
+        showToast('Slide berhasil ditambahkan! Silakan klik "Simpan Semua Pengaturan" untuk menerapkan.', 'success');
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Tambahkan Slide';
@@ -345,7 +592,7 @@
     async function saveAllSettings() {
       const btn = document.getElementById('btn-save-all');
       btn.disabled = true;
-      btn.textContent = 'Menyimpan ke Supabase...';
+      btn.textContent = 'Menyimpan ke Database...';
 
       const payload = {
         school_name: document.getElementById('set-school-name').value.trim(),
@@ -357,7 +604,7 @@
         facebook_url: document.getElementById('set-facebook').value.trim(),
         instagram_url: document.getElementById('set-instagram').value.trim(),
         youtube_url: document.getElementById('set-youtube').value.trim(),
-        footer_bg_url: document.getElementById('set-footer-bg').value.trim(),
+        footer_bg_url: document.getElementById('set-footer-bg').value.trim() || '/images/school-campus.jpg',
         hero_images: currentHeroImages
       };
 
@@ -378,7 +625,26 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadSettings);
+    // Expose all interactive functions to window scope
+    window.showAddSlideModal = showAddSlideModal;
+    window.closeAddSlideModal = closeAddSlideModal;
+    window.setFooterMode = setFooterMode;
+    window.setSlideInputMode = setSlideInputMode;
+    window.clearSlidePreview = clearSlidePreview;
+    window.onSlideFileSelected = onSlideFileSelected;
+    window.onSlideUrlChanged = onSlideUrlChanged;
+    window.handleFooterBgUpload = handleFooterBgUpload;
+    window.resetFooterBgToDefault = resetFooterBgToDefault;
+    window.renderSlides = renderSlides;
+    window.deleteSlide = deleteSlide;
+    window.saveAllSettings = saveAllSettings;
+
+    // Load data immediately or upon DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadSettings);
+    } else {
+      loadSettings();
+    }
   </script>
 </body>
 </html>

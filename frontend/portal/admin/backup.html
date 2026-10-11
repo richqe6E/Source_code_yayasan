@@ -3,42 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Backup - Yayasan Samarinda</title>
+  <title>Backup &amp; Restore Database - Yayasan Samarinda</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
-    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+          colors: { primary: { 50:'#F0F9FF',100:'#E0F2FE',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } }
+        }
+      }
+    };
   </script>
   <link rel="stylesheet" href="../../public/css/style.css">
 </head>
-<body class="font-sans bg-gray-50 text-gray-800">
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
   <div id="app-shell"></div>
 
-  <main class="p-4 sm:p-6 lg:p-8">
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
-      <h2 class="text-base font-semibold text-gray-900">Daftar Backup</h2>
-      <button onclick="createBackup()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">+ Buat Backup</button>
+  <main class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <span>Backup &amp; Restore Database</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-500 mt-1">
+          Pusat pencadangan mandiri dan pemulihan data yayasan (Siswa, Tagihan SPP, Pendaftar PPDB, Guru, Kelas, dan Konten).
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="createAndDownloadBackup()" id="btn-create-top" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold shadow-md shadow-primary-600/20 flex items-center gap-2 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Buat &amp; Unduh Cadangan Sekarang</span>
+        </button>
+      </div>
     </div>
 
-    <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4 text-sm text-blue-800">
-      <div class="font-medium mb-1">Tentang backup</div>
-      <ul class="list-disc list-inside space-y-0.5 text-xs">
-        <li>Backup menyalin seluruh sheet sebagai file CSV ke Google Drive.</li>
-        <li>Backup disimpan di folder khusus Drive (lihat Config.gs).</li>
-        <li>Retention otomatis: hanya simpan 3 bulan terakhir.</li>
-      </ul>
+    <!-- Status Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary-600 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3zm0 4h16"/></svg>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Format Cadangan</div>
+          <div class="text-sm font-bold text-gray-900">JSON Terstruktur (Portable)</div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Integritas Data</div>
+          <div class="text-sm font-bold text-emerald-700">100% Siap Dipulihkan</div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Riwayat Backup</div>
+          <div id="stat-total-backups" class="text-sm font-bold text-gray-900">0 Arsip Tersimpan</div>
+        </div>
+      </div>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <!-- 2 Column: Backup Card & Restore Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Panel 1: Buat Cadangan (Backup) -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center font-bold">1</div>
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Pencadangan Database (Backup)</h2>
+              <p class="text-xs text-gray-500">Ambil salinan seluruh database yayasan saat ini ke komputer Anda.</p>
+            </div>
+          </div>
+
+          <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600 space-y-2">
+            <div class="font-semibold text-gray-800">Cakupan Data yang Dicadangkan:</div>
+            <ul class="grid grid-cols-2 gap-1.5 text-[11px] text-gray-600 list-disc list-inside">
+              <li>Data Siswa Aktif &amp; Kelas</li>
+              <li>Tagihan &amp; Riwayat Pembayaran SPP</li>
+              <li>Pendaftar PPDB Online</li>
+              <li>Data Guru &amp; Akun Admin</li>
+              <li>Konten Berita, Pengumuman &amp; Galeri</li>
+              <li>Pengaturan Website &amp; Medsos</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="createAndDownloadBackup()" id="btn-create-action" class="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold shadow-md shadow-primary-600/20 flex items-center justify-center gap-2 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>Unduh File Cadangan (.JSON) Sekarang</span>
+          </button>
+          <span class="block text-center text-[11px] text-gray-400 mt-2">File langsung tersimpan di folder Download komputer Anda.</span>
+        </div>
+      </div>
+
+      <!-- Panel 2: Pemulihan Data (Restore) -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col justify-between space-y-4">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">2</div>
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Pemulihan Database (Restore)</h2>
+              <p class="text-xs text-gray-500">Pulihkan database dari file cadangan <code class="font-mono text-primary-600">.json</code> yang Anda miliki.</p>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Pilih File Cadangan dari Komputer</label>
+            <div class="border-2 border-dashed border-gray-200 hover:border-amber-400 rounded-xl p-4 text-center cursor-pointer transition bg-gray-50/50" onclick="document.getElementById('restore-file-input').click()">
+              <input type="file" id="restore-file-input" accept=".json,application/json" class="hidden" onchange="handleRestoreFilePicked(event)">
+              <svg class="w-7 h-7 mx-auto text-amber-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              <div id="restore-file-label" class="text-xs font-semibold text-gray-800">Klik untuk memilih file backup (.json)</div>
+              <div id="restore-file-sub" class="text-[11px] text-gray-400 mt-0.5">Mendukung file cadangan resmi SIYAYASAN V2</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="confirmAndExecuteRestore()" id="btn-restore-action" disabled class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold shadow-md shadow-amber-600/20 flex items-center justify-center gap-2 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Pulihkan Database Sekarang</span>
+          </button>
+          <span class="block text-center text-[11px] text-amber-700 mt-2">⚠️ Peringatan: Data aktif akan digantikan dengan isi berkas cadangan ini.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Riwayat Cadangan (Server History Table) -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div>
+          <h2 class="text-base font-bold text-gray-900">Riwayat Berkas Cadangan Tersimpan</h2>
+          <p class="text-xs text-gray-500">Daftar arsip cadangan yang pernah dibuat dalam sistem.</p>
+        </div>
+        <button onclick="loadBackups()" class="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-lg transition border border-gray-200">
+          Muat Ulang
+        </button>
+      </div>
+
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Folder</th><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">File</th><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th></tr>
+          <thead class="bg-gray-50/75">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Waktu Cadangan</th>
+              <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Nama Berkas</th>
+              <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Jumlah Modul Data</th>
+              <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Ukuran File</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Aksi Kelola</th>
+            </tr>
           </thead>
-          <tbody id="backups-tbody" class="bg-white divide-y divide-gray-200"><tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">Memuat...</td></tr></tbody>
+          <tbody id="backups-tbody" class="bg-white divide-y divide-gray-100">
+            <tr><td colspan="5" class="px-4 py-8 text-center text-xs text-gray-500">Memuat riwayat cadangan...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
+
   </main>
 
   <script src="../../shared/js/auth.js"></script>
@@ -54,63 +188,222 @@
       active: 'backup.html',
       portalLabel: 'Portal Admin',
       title: 'Backup & Restore',
-      subtitle: 'Cadangkan database ke Google Drive',
+      subtitle: 'Pencadangan dan Pemulihan Database Sekolah',
       showRefresh: true,
       onRefresh: loadBackups
     });
 
+    let selectedRestoreData = null;
+    let backupsCache = [];
+
+    // 1. Load Riwayat Backup
     async function loadBackups() {
       Shell.hideError();
       const stopSpin = Shell.startRefresh();
       const tbody = document.getElementById('backups-tbody');
-      tbody.innerHTML = Shell.skeletonRows(4, 3);
+      tbody.innerHTML = Shell.skeletonRows(5, 3);
 
       try {
         const res = await apiCall('backup', 'backups');
         if (!res.success) {
-          Shell.showError(res.message || 'Gagal memuat daftar backup');
-          tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-red-600">${res.message || 'Gagal'}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-xs text-rose-600">${res.message || 'Gagal memuat daftar backup'}</td></tr>`;
           return;
         }
+
         const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.backups)) || []);
+        backupsCache = items;
+        document.getElementById('stat-total-backups').textContent = `${items.length} Arsip Tersimpan`;
+
         if (items.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">Belum ada backup</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-xs text-gray-500">Belum ada riwayat berkas cadangan. Klik "Buat &amp; Unduh Cadangan" di atas.</td></tr>';
           return;
         }
-        tbody.innerHTML = items.map(b => `
-          <tr>
-            <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap tabular-nums">${formatDateTime(b.created_at)}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 min-w-0"><span class="truncate block max-w-xs font-mono">${b.folder_name || '-'}</span></td>
-            <td class="px-4 py-3 text-sm text-gray-600 tabular-nums whitespace-nowrap">${b.file_count || '-'} file</td>
-            <td class="px-4 py-3 text-sm whitespace-nowrap space-x-3">
-              <a href="${b.folder_url || '#'}" target="_blank" class="text-primary-700 hover:text-primary-900 font-medium">Buka Drive</a>
-              <button onclick="restoreBackup('${b.id}')" class="text-yellow-700 hover:text-yellow-900 font-medium">Restore</button>
+
+        tbody.innerHTML = items.map((b, idx) => `
+          <tr class="hover:bg-gray-50/80 transition">
+            <td class="px-4 py-3.5 text-xs text-gray-700 whitespace-nowrap font-medium">${formatDateTime(b.created_at)}</td>
+            <td class="px-4 py-3.5 text-xs font-mono text-gray-900 whitespace-nowrap font-semibold">${b.folder_name || b.filename || 'backup-' + b.id + '.json'}</td>
+            <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">${b.file_count || 10} modul data</td>
+            <td class="px-4 py-3.5 text-xs font-mono text-gray-600 whitespace-nowrap">${b.size_mb ? b.size_mb + ' MB' : '< 1 MB'}</td>
+            <td class="px-4 py-3.5 text-xs whitespace-nowrap text-center space-x-2">
+              <button onclick="downloadBackupEntry(${idx})" class="px-2.5 py-1 text-[11px] font-bold text-primary-700 bg-primary-50 border border-primary-200 rounded-lg hover:bg-primary-100 transition inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Unduh JSON</span>
+              </button>
+              <button onclick="restoreFromEntry('${b.id}')" class="px-2.5 py-1 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition inline-flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Pulihkan</span>
+              </button>
+              <button onclick="deleteBackupEntry('${b.id}')" class="p-1 text-gray-400 hover:text-red-600 transition" title="Hapus arsip">
+                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
             </td>
-          </tr>`).join('');
+          </tr>
+        `).join('');
       } catch (e) {
-        Shell.showError('Tidak dapat terhubung ke server.');
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-xs text-rose-600">Gagal terhubung ke server.</td></tr>';
       } finally {
         stopSpin();
       }
     }
 
-    async function createBackup() {
-      if (!confirm('Buat backup sekarang? Proses ini dapat memakan waktu.')) return;
-      const btn = event.target;
-      btn.disabled = true; btn.textContent = 'Membuat...';
-      const res = await apiCall('backup', 'create');
-      showToast(res.message, res.success ? 'success' : 'error');
-      btn.disabled = false; btn.textContent = '+ Buat Backup';
-      if (res.success) loadBackups();
+    // 2. Buat dan Unduh Cadangan (Trigger Browser Download)
+    async function createAndDownloadBackup() {
+      const btn1 = document.getElementById('btn-create-top');
+      const btn2 = document.getElementById('btn-create-action');
+      [btn1, btn2].forEach(b => { if (b) { b.disabled = true; b.textContent = 'Membuat Cadangan...'; } });
+
+      try {
+        const res = await apiCall('backup', 'create');
+        if (!res.success) {
+          showToast(res.message || 'Gagal membuat backup', 'error');
+          return;
+        }
+
+        const bData = res.data || {};
+        const snapshot = bData.snapshot || bData.data || bData;
+        const filename = bData.filename || bData.folder_name || `backup-yayasan-${new Date().toISOString().slice(0, 10)}.json`;
+
+        // Trigger download JSON ke browser komputer
+        const jsonStr = JSON.stringify(snapshot, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast(`Cadangan database berhasil dibuat dan diunduh: ${filename}`, 'success');
+        loadBackups();
+      } catch (err) {
+        showToast('Terjadi kesalahan saat membuat backup.', 'error');
+      } finally {
+        if (btn1) {
+          btn1.disabled = false;
+          btn1.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg><span>Buat &amp; Unduh Cadangan Sekarang</span>';
+        }
+        if (btn2) {
+          btn2.disabled = false;
+          btn2.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg><span>Unduh File Cadangan (.JSON) Sekarang</span>';
+        }
+      }
     }
 
-    async function restoreBackup(id) {
-      if (!confirm('Restore data dari backup ini? Tindakan ini akan menimpa sheet saat ini. Lanjutkan?')) return;
-      const res = await apiCall('backup', 'restore', { id });
-      showToast(res.message, res.success ? 'success' : 'error');
+    // 3. Download Ulang dari Baris Riwayat
+    function downloadBackupEntry(idx) {
+      const b = backupsCache[idx];
+      if (!b) return;
+      const snapshot = b.snapshot || b.data || b;
+      const filename = b.folder_name || b.filename || `backup-${b.id}.json`;
+      const jsonStr = JSON.stringify(snapshot, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Mengunduh berkas ${filename}...`, 'info');
     }
 
-    loadBackups();
+    // 4. File Picker untuk Restore
+    function handleRestoreFilePicked(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (typeof parsed !== 'object' || !parsed) throw new Error('Format JSON tidak valid');
+
+          selectedRestoreData = parsed;
+          document.getElementById('restore-file-label').textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+          
+          const keys = Object.keys(parsed).filter(k => k !== 'meta');
+          document.getElementById('restore-file-sub').textContent = `✓ Berkas valid: Memuat ${keys.length} modul database (${keys.slice(0, 4).join(', ')}...)`;
+          document.getElementById('btn-restore-action').disabled = false;
+          showToast('Berkas cadangan berhasil dibaca dan siap dipulihkan!', 'success');
+        } catch (err) {
+          alert('Berkas yang dipilih bukan berkas JSON cadangan yang valid.');
+          selectedRestoreData = null;
+          document.getElementById('restore-file-label').textContent = 'Klik untuk memilih file backup (.json)';
+          document.getElementById('restore-file-sub').textContent = 'Berkas tidak valid';
+          document.getElementById('btn-restore-action').disabled = true;
+          e.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // 5. Eksekusi Restore dari File yang Dipilih
+    async function confirmAndExecuteRestore() {
+      if (!selectedRestoreData) {
+        alert('Pilih file cadangan (.json) terlebih dahulu!');
+        return;
+      }
+
+      const confirmed = confirm('⚠️ PERHATIAN:\n\nApakah Anda yakin ingin memulihkan seluruh data database dari file cadangan ini?\nSeluruh data aktif saat ini akan disinkronkan dengan isi file cadangan.\n\nLanjutkan pemulihan?');
+      if (!confirmed) return;
+
+      const btn = document.getElementById('btn-restore-action');
+      btn.disabled = true;
+      btn.textContent = 'Memulihkan Database...';
+
+      try {
+        const res = await apiCall('backup', 'restore', { data: selectedRestoreData });
+        if (res.success) {
+          alert('✓ SUKSES: Seluruh data database berhasil dipulihkan dari file cadangan!');
+          showToast('Database berhasil dipulihkan!', 'success');
+          // Reset
+          selectedRestoreData = null;
+          document.getElementById('restore-file-input').value = '';
+          document.getElementById('restore-file-label').textContent = 'Klik untuk memilih file backup (.json)';
+          document.getElementById('restore-file-sub').textContent = 'Mendukung file cadangan resmi SIYAYASAN V2';
+          btn.disabled = true;
+          loadBackups();
+        } else {
+          showToast(res.message || 'Gagal memulihkan database', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat memulihkan database.', 'error');
+      } finally {
+        btn.textContent = 'Pulihkan Database Sekarang';
+      }
+    }
+
+    // 6. Restore dari Riwayat Tersimpan
+    async function restoreFromEntry(id) {
+      const confirmed = confirm('Pulihkan database dari arsip cadangan ini? Tindakan ini akan menyinkronkan database dengan data arsip.');
+      if (!confirmed) return;
+
+      try {
+        const res = await apiCall('backup', 'restore', { id });
+        showToast(res.message || 'Database dipulihkan', res.success ? 'success' : 'error');
+        if (res.success) loadBackups();
+      } catch (e) {
+        showToast('Gagal memulihkan data', 'error');
+      }
+    }
+
+    // 7. Hapus Arsip Cadangan
+    async function deleteBackupEntry(id) {
+      if (!confirm('Hapus arsip cadangan ini dari riwayat?')) return;
+      try {
+        const res = await apiCall('backup', 'delete', { id });
+        showToast(res.message || 'Arsip dihapus', res.success ? 'success' : 'error');
+        if (res.success) loadBackups();
+      } catch (e) {
+        showToast('Gagal menghapus arsip', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBackups);
   </script>
 </body>
 </html>

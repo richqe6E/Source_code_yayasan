@@ -50,17 +50,41 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Foto / Cover (Opsional)</label>
-          <div class="flex items-center gap-3">
-            <label class="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
+          <label class="block text-xs font-semibold text-gray-700 mb-1.5">Foto / Cover (Opsional)</label>
+          
+          <!-- Mode Switcher -->
+          <div class="flex items-center gap-1.5 p-1 bg-gray-100 rounded-lg w-fit border border-gray-200 mb-2">
+            <button type="button" id="tab-cnt-file" onclick="setContentImgMode('file')" class="px-3 py-1 rounded text-xs font-bold transition bg-white text-gray-800 shadow-sm flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>1. Upload dari Galeri / Folder</span>
+            </button>
+            <button type="button" id="tab-cnt-url" onclick="setContentImgMode('url')" class="px-3 py-1 rounded text-xs font-semibold text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>2. Gunakan Link / URL Gambar</span>
+            </button>
+          </div>
+
+          <!-- Mode File -->
+          <div id="cnt-file-wrap" class="flex items-center gap-3">
+            <label class="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
               <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               <span id="form-image-label">Pilih Foto dari Galeri / Folder</span>
               <input id="form-image-file" type="file" accept="image/*" class="hidden">
             </label>
             <button type="button" id="form-image-clear" class="hidden text-xs text-red-600 hover:text-red-800 font-medium">Hapus</button>
           </div>
+
+          <!-- Mode URL -->
+          <div id="cnt-url-wrap" class="hidden space-y-1">
+            <input type="url" id="form-image-url-input" oninput="onContentUrlChanged()" class="w-full px-3 py-2 border border-gray-300 rounded-md text-xs font-mono focus:ring-2 focus:ring-primary-500" placeholder="https://images.unsplash.com/... atau https://...">
+            <p class="text-[11px] text-gray-400">Masukkan link gambar langsung. Foto yang di-upload akan otomatis dikosongkan.</p>
+          </div>
+
+          <!-- Live Preview -->
           <div id="form-image-preview-wrap" class="hidden mt-2">
-            <img id="form-image-preview" alt="preview" class="w-32 h-32 object-cover rounded-md border border-gray-200">
+            <div class="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-100 shadow-sm">
+              <img id="form-image-preview" alt="preview" class="w-full h-full object-cover">
+            </div>
           </div>
           <input id="form-image-url" type="hidden">
         </div>
@@ -234,22 +258,89 @@
       document.getElementById('form-event-date').required = isEvent;
 
       // Reset image picker state
-      const fileInput = document.getElementById('form-image-file');
-      const previewWrap = document.getElementById('form-image-preview-wrap');
-      const previewImg = document.getElementById('form-image-preview');
-      const label = document.getElementById('form-image-label');
-      const clearBtn = document.getElementById('form-image-clear');
-      const hiddenUrl = document.getElementById('form-image-url');
-      if (fileInput) fileInput.value = '';
-      if (previewWrap) previewWrap.classList.add('hidden');
-      if (previewImg) previewImg.src = '';
-      if (label) label.textContent = 'Pilih Foto dari Galeri / Folder';
-      if (clearBtn) clearBtn.classList.add('hidden');
-      if (hiddenUrl) hiddenUrl.value = '';
+      contentImgMode = 'file';
+      setContentImgMode('file');
+      clearContentImage();
     }
 
     function closeContentModal() {
       document.getElementById('content-modal').classList.add('hidden');
+    }
+
+    let contentImgMode = 'file';
+
+    function setContentImgMode(mode) {
+      contentImgMode = mode;
+      const tabFile = document.getElementById('tab-cnt-file');
+      const tabUrl = document.getElementById('tab-cnt-url');
+      const wrapFile = document.getElementById('cnt-file-wrap');
+      const wrapUrl = document.getElementById('cnt-url-wrap');
+
+      if (mode === 'file') {
+        tabFile.className = 'px-3 py-1 rounded text-xs font-bold transition bg-white text-gray-800 shadow-sm flex items-center gap-1.5';
+        tabUrl.className = 'px-3 py-1 rounded text-xs font-semibold text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5';
+        wrapFile.classList.remove('hidden');
+        wrapUrl.classList.add('hidden');
+
+        // Kosongkan URL saat beralih ke file
+        document.getElementById('form-image-url-input').value = '';
+        const hiddenUrl = document.getElementById('form-image-url');
+        if (!document.getElementById('form-image-file').files.length) {
+          hiddenUrl.value = '';
+          hideContentPreview();
+        }
+      } else {
+        tabUrl.className = 'px-3 py-1 rounded text-xs font-bold transition bg-white text-gray-800 shadow-sm flex items-center gap-1.5';
+        tabFile.className = 'px-3 py-1 rounded text-xs font-semibold text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5';
+        wrapUrl.classList.remove('hidden');
+        wrapFile.classList.add('hidden');
+
+        // Kosongkan File saat beralih ke URL
+        const fileInput = document.getElementById('form-image-file');
+        fileInput.value = '';
+        document.getElementById('form-image-label').textContent = 'Pilih Foto dari Galeri / Folder';
+        onContentUrlChanged();
+      }
+    }
+
+    function onContentUrlChanged() {
+      const url = document.getElementById('form-image-url-input').value.trim();
+      const hiddenUrl = document.getElementById('form-image-url');
+      const previewWrap = document.getElementById('form-image-preview-wrap');
+      const previewImg = document.getElementById('form-image-preview');
+      const clearBtn = document.getElementById('form-image-clear');
+
+      if (url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('images/'))) {
+        hiddenUrl.value = url;
+        previewImg.src = url;
+        previewWrap.classList.remove('hidden');
+        clearBtn.classList.remove('hidden');
+      } else {
+        hiddenUrl.value = '';
+        hideContentPreview();
+      }
+    }
+
+    function hideContentPreview() {
+      const previewWrap = document.getElementById('form-image-preview-wrap');
+      const previewImg = document.getElementById('form-image-preview');
+      const clearBtn = document.getElementById('form-image-clear');
+      if (previewWrap) previewWrap.classList.add('hidden');
+      if (previewImg) previewImg.src = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+    }
+
+    function clearContentImage() {
+      const fileInput = document.getElementById('form-image-file');
+      const urlInput = document.getElementById('form-image-url-input');
+      const hiddenUrl = document.getElementById('form-image-url');
+      const label = document.getElementById('form-image-label');
+
+      if (fileInput) fileInput.value = '';
+      if (urlInput) urlInput.value = '';
+      if (hiddenUrl) hiddenUrl.value = '';
+      if (label) label.textContent = 'Pilih Foto dari Galeri / Folder';
+      hideContentPreview();
     }
 
     // File picker -> preview -> base64 ke hidden image_url
@@ -265,8 +356,8 @@
       fileInput.addEventListener('change', function() {
         const f = fileInput.files && fileInput.files[0];
         if (!f) return;
-        if (f.size > 4 * 1024 * 1024) {
-          showToast('Ukuran foto maksimal 4 MB.', 'error');
+        if (f.size > 5 * 1024 * 1024) {
+          showToast('Ukuran foto maksimal 5 MB.', 'error');
           fileInput.value = '';
           return;
         }
@@ -282,14 +373,7 @@
         reader.readAsDataURL(f);
       });
 
-      clearBtn.addEventListener('click', function() {
-        fileInput.value = '';
-        hiddenUrl.value = '';
-        previewImg.src = '';
-        previewWrap.classList.add('hidden');
-        label.textContent = 'Pilih Foto dari Galeri / Folder';
-        clearBtn.classList.add('hidden');
-      });
+      clearBtn.addEventListener('click', clearContentImage);
     })();
 
     document.getElementById('content-form').addEventListener('submit', async function(e) {

@@ -86,8 +86,8 @@ CREATE TABLE IF NOT EXISTS web_settings (
     facebook_url TEXT DEFAULT 'https://facebook.com/yayasansamarinda',
     instagram_url TEXT DEFAULT 'https://instagram.com/yayasansamarinda',
     youtube_url TEXT DEFAULT 'https://youtube.com/@yayasansamarinda',
-    phone VARCHAR(50) DEFAULT '0812-3456-7890',
-    whatsapp VARCHAR(50) DEFAULT '081234567890',
+    phone VARCHAR(50) DEFAULT '0812-3456-7891',
+    whatsapp VARCHAR(50) DEFAULT '081234567891',
     email VARCHAR(100) DEFAULT 'info@yayasan.sch.id',
     address TEXT DEFAULT 'Jl. Pendidikan No. 123, Samarinda, Kalimantan Timur',
     ppdb_active_note TEXT DEFAULT 'Pendaftaran Gelombang 1 Dibuka! Kuota Terbatas.',
@@ -436,7 +436,7 @@ END $$;
 
 -- 1. Master Sekolah & CMS
 INSERT INTO schools (id, name, npsn, level, address, phone, whatsapp_number, email, headmaster_name, instagram_url, youtube_url, facebook_url) VALUES
-('SCH-001', 'Yayasan Samarinda', '69912345', 'PAUD, TK, dan TPQ', 'Jl. Pendidikan No. 123, Samarinda, Kalimantan Timur', '0812-3456-7890', '081234567890', 'info@yayasan.sch.id', 'Ustadzah Fatimah, S.Pd.I.', 'https://instagram.com/yayasansamarinda', 'https://youtube.com/@yayasansamarinda', 'https://facebook.com/yayasansamarinda')
+('SCH-001', 'Yayasan Samarinda', '69912345', 'PAUD, TK, dan TPQ', 'Jl. Pendidikan No. 123, Samarinda, Kalimantan Timur', '0812-3456-7891', '081234567891', 'info@yayasan.sch.id', 'Ustadzah Fatimah, S.Pd.I.', 'https://instagram.com/yayasansamarinda', 'https://youtube.com/@yayasansamarinda', 'https://facebook.com/yayasansamarinda')
 ON CONFLICT (id) DO UPDATE SET
     whatsapp_number = EXCLUDED.whatsapp_number,
     instagram_url = EXCLUDED.instagram_url,

@@ -284,7 +284,33 @@ const DB = {
   // Backup history
   backups: [
     { id: 'BAK-2026-09-01', folder_name: 'Backups', folder_url: '#', file_count: 8, size_mb: 1.4, created_at: '2026-09-01T00:00:00.000Z', created_by: 'Super Administrator' }
-  ]
+  ],
+
+  // CMS Web Settings (Banner Hero, Sosmed, Kontak)
+  web_settings: {
+    id: 'SET-001',
+    school_name: 'Yayasan Samarinda',
+    tagline: 'Membina Generasi Qurani, Berakhlak Mulia & Berprestasi',
+    header_title: 'Sistem Informasi Akademik & Portal Yayasan Samarinda',
+    footer_bg_url: '/images/school-campus.jpg',
+    login_bg_url: '/images/school-campus.jpg',
+    announcement_banner: 'Penerimaan Peserta Didik Baru (PPDB) 2026/2027 Resmi Dibuka!',
+    whatsapp_official: '081234567890',
+    whatsapp: '081234567890',
+    contact_email: 'info@yayasan.sch.id',
+    email: 'info@yayasan.sch.id',
+    phone: '(0541) 234-5678',
+    address: 'Jl. Samratulangi, Sungai Keledang, Samarinda',
+    academic_year: '2026/2027',
+    instagram_url: 'https://instagram.com/yayasansamarinda',
+    youtube_url: 'https://youtube.com/@yayasansamarinda',
+    facebook_url: 'https://facebook.com/yayasansamarinda',
+    hero_images: [
+      { url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1600&auto=format&fit=crop', caption: 'Suasana Belajar Ceria Santri PAUD & TK' },
+      { url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop', caption: 'Pendidikan Karakter & Hafalan Qur\'an Sejak Dini' },
+      { url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&auto=format&fit=crop', caption: 'Fasilitas Belajar & Lingkungan Islami Nyaman' }
+    ]
+  }
 };
 
 // Sessions store: token -> user
@@ -308,15 +334,19 @@ function rbacDeny(params, allowed) {
   let role = params._user_role;
   if (role && typeof role === 'object') role = role.code;
   if (!role) return { success: false, message: 'Sesi tidak valid. Silakan login ulang.', error: { code: 'UNAUTHORIZED' } };
+  const roleNorm = String(role).toLowerCase();
   const list = (Array.isArray(allowed) ? allowed : [allowed]).map(r => String(r).toLowerCase());
-  if (list.length > 0 && !list.includes(String(role).toLowerCase())) {
+  const isMatch = list.includes(roleNorm) || 
+                  (roleNorm === 'siswa_aktif' && list.includes('siswa')) ||
+                  (roleNorm === 'siswa' && list.includes('siswa_aktif'));
+  if (list.length > 0 && !isMatch) {
     return { success: false, message: 'Anda tidak memiliki akses ke fitur ini', error: { code: 'FORBIDDEN' } };
   }
   return null;
 }
 
-function handleApiRequest(path, params, method) {
-  const cleanPath = String(path).replace(/^\/+/, '').replace(/^api\/v1\//, '');
+function handleApiRequest(apiPath, params, method) {
+  const cleanPath = String(apiPath).replace(/^\/+/, '').replace(/^api\/v1\//, '');
   const [module, action] = cleanPath.split('/');
 
   // 1. AUTH
@@ -513,6 +543,14 @@ function handleApiRequest(path, params, method) {
       if (!reg) {
         return { success: false, error: { code: 'NOT_FOUND', message: 'Nomor pendaftaran tidak ditemukan' } };
       }
+      if (reg.status === 'converted') {
+        const linkedStudent = DB.students.find(s => (reg.student_id && s.id === reg.student_id) || (reg.converted_nis && s.nis === reg.converted_nis) || (s.full_name === (reg.child_name || reg.full_name)));
+        if (linkedStudent) {
+          reg.converted_nis = linkedStudent.nis;
+          reg.class_name = linkedStudent.class_name;
+          reg.student_id = linkedStudent.id;
+        }
+      }
       return {
         success: true,
         data: {
@@ -551,6 +589,7 @@ function handleApiRequest(path, params, method) {
       const reg = DB.ppdb_registrations.find(r => r.id === params.id || r.registration_number === params.id);
       if (reg) {
         reg.status = 'approved';
+        if (params.notes) reg.notes = params.notes;
       }
       return { success: true, data: { message: 'Pendaftar berhasil disetujui', registration: reg } };
     }
@@ -574,6 +613,7 @@ function handleApiRequest(path, params, method) {
       reg.status = 'converted';
       const nextSeq = DB.students.length + 1;
       const targetNis = params.nis || ('2026' + String(nextSeq).padStart(3, '0'));
+      const targetClass = DB.classes.find(c => c.id === (params.class_id || 'CLS-001')) || {};
       const newStu = {
         id: 'STU-' + String(nextSeq).padStart(3, '0'),
         nis: targetNis,
@@ -583,7 +623,7 @@ function handleApiRequest(path, params, method) {
         nickname: reg.nickname || '',
         gender: reg.gender,
         class_id: params.class_id || 'CLS-001',
-        class_name: (DB.classes.find(c => c.id === (params.class_id || 'CLS-001')) || {}).name || 'PAUD A - Bintang Kecil',
+        class_name: targetClass.name || 'PAUD A - Bintang Kecil',
         birth_place: reg.birth_place,
         birth_date: reg.birth_date,
         parent_id: 'PAR-' + String(nextSeq).padStart(3, '0'),
@@ -592,6 +632,9 @@ function handleApiRequest(path, params, method) {
         status: 'active'
       };
       DB.students.push(newStu);
+      reg.converted_nis = targetNis;
+      reg.student_id = newStu.id;
+      reg.class_name = newStu.class_name;
       const defaultPass = reg.birth_date ? reg.birth_date.replace(/\D/g, '') : ('ortu' + String(nextSeq).padStart(3, '0'));
       const initialCredentials = {
         student_name: newStu.full_name,
@@ -744,33 +787,37 @@ function handleApiRequest(path, params, method) {
       const studentId = targetStudent ? targetStudent.id : 'STU-001';
       let invoices = (DB.invoices || []).filter(i => i.student_id === studentId);
       if (invoices.length === 0) {
-        invoices = [
-          {
-            id: 'INV-2026-09-001',
-            invoice_number: 'INV/2026/09/001',
-            student_id: studentId,
-            student_name: targetStudent ? targetStudent.full_name : 'Santri',
-            month: 'September 2026',
-            period: '2026/2027',
-            amount: 150000,
-            due_date: '2026-09-15',
-            status: 'unpaid',
-            description: 'SPP Bulan September 2026'
-          },
-          {
-            id: 'INV-2026-08-001',
-            invoice_number: 'INV/2026/08/001',
-            student_id: studentId,
-            student_name: targetStudent ? targetStudent.full_name : 'Santri',
-            month: 'Agustus 2026',
-            period: '2026/2027',
-            amount: 150000,
-            due_date: '2026-08-15',
-            status: 'paid',
-            paid_at: '2026-08-10',
-            description: 'SPP Bulan Agustus 2026'
-          }
-        ];
+        const studentName = targetStudent ? (targetStudent.full_name || targetStudent.name) : 'Santri';
+        const invUnpaid = {
+          id: 'INV-' + studentId + '-2026-10',
+          invoice_number: 'INV/2026/10/' + studentId,
+          student_id: studentId,
+          student_name: studentName,
+          month: 'Oktober 2026',
+          item_name: 'SPP Bulan Oktober 2026',
+          period: '2026/2027',
+          amount: 150000,
+          due_date: '2026-10-10',
+          status: 'unpaid',
+          description: 'SPP Bulan Oktober 2026'
+        };
+        const invPaid = {
+          id: 'INV-' + studentId + '-2026-09',
+          invoice_number: 'INV/2026/09/' + studentId,
+          student_id: studentId,
+          student_name: studentName,
+          month: 'September 2026',
+          item_name: 'SPP Bulan September 2026',
+          period: '2026/2027',
+          amount: 150000,
+          due_date: '2026-09-10',
+          status: 'paid',
+          paid_at: '2026-09-08',
+          paid_by: 'Transfer BSI',
+          description: 'SPP Bulan September 2026'
+        };
+        DB.invoices.push(invUnpaid, invPaid);
+        invoices = [invUnpaid, invPaid];
       }
       const payments = (DB.payments || []).filter(p => invoices.some(i => i.id === p.invoice_id) || p.student_id === studentId);
       return {
@@ -812,6 +859,37 @@ function handleApiRequest(path, params, method) {
 
   // 3. STUDENTS
   if (module === 'students') {
+      if (action === 'save_evaluasi') {
+        const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+        if (deny) return deny;
+        if (!DB.evaluasi) DB.evaluasi = [];
+        const studentId = params.student_id;
+        const evalRecord = {
+          id: 'EVAL-' + Date.now(),
+          student_id: studentId,
+          semester: params.semester || 'Semester 1',
+          academic_year: params.academic_year || '2026/2027',
+          aspects: params.aspects || {},
+          notes: params.notes || '',
+          created_at: new Date().toISOString()
+        };
+        DB.evaluasi.push(evalRecord);
+        return { success: true, message: 'Evaluasi STPPA berhasil disimpan', data: evalRecord };
+      }
+      if (action === 'reset_password') {
+        const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+        if (deny) return deny;
+        const studentId = params.student_id || params.id;
+        const stu = (DB.students || []).find(s => s.id === studentId || s.nis === studentId);
+        if (!stu) return { success: false, message: 'Data siswa tidak ditemukan' };
+        if (!stu.birth_date) return { success: false, message: 'Tanggal lahir siswa belum diisi, tidak dapat mereset password ke tanggal lahir.' };
+        
+        const defaultPassword = stu.birth_date;
+        const u = (DB.users || []).find(user => user.student_id === stu.id || user.username === stu.nis);
+        if (u) u.password = defaultPassword;
+        return { success: true, message: 'Password berhasil direset ke tanggal lahir (' + defaultPassword + ')' };
+      }
+
     if (action === 'list') {
       // guru/ortu/pendaftar tidak boleh akses admin list — harus pakai teachers/me atau students/myChildren
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
@@ -1190,11 +1268,80 @@ function handleApiRequest(path, params, method) {
 
   // 8. PAYMENTS & INVOICES
   if (module === 'invoices') {
+      if (action === 'create_bulk') {
+        const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+        if (deny) return deny;
+        const classId = params.class_id;
+        const month = params.month || 'Oktober 2026';
+        const amount = Number(params.amount) || 150000;
+        const dueDate = params.due_date || new Date().toISOString().split('T')[0];
+        const itemName = params.item_name || ('SPP ' + month);
+
+        let targetStudents = (DB.students || []).filter(s => (s.status || 'active') === 'active');
+        if (classId) {
+          targetStudents = targetStudents.filter(s => s.class_id === classId);
+        }
+        if (targetStudents.length === 0) {
+          return { success: false, message: 'Tidak ada siswa aktif ditemukan pada kelas/filter ini' };
+        }
+
+        const created = [];
+        for (const stu of targetStudents) {
+          const inv = {
+            id: 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+            invoice_number: 'INV/' + new Date().getFullYear() + '/' + String(DB.invoices.length + 1).padStart(3, '0'),
+            student_id: stu.id,
+            student_name: stu.full_name,
+            item_name: itemName,
+            period: month,
+            amount: amount,
+            due_date: dueDate,
+            status: 'unpaid',
+            created_at: new Date().toISOString()
+          };
+          DB.invoices.push(inv);
+          created.push(inv);
+        }
+        return { success: true, message: created.length + ' tagihan massal berhasil diterbitkan', data: { invoices: created } };
+      }
+
     if (action === 'list') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'orang_tua', 'guru']);
       if (deny) return deny;
       let list = [...DB.invoices];
+      
+      // Filter by student_id
       if (params.student_id) list = list.filter(i => i.student_id === params.student_id);
+      
+      // Filter by status (unpaid, paid, menunggu_verifikasi)
+      if (params.status) {
+        const stNorm = String(params.status).toLowerCase();
+        list = list.filter(i => (i.status || '').toLowerCase() === stNorm);
+      }
+
+      // Filter by class_id
+      if (params.class_id) {
+        const studentIdsInClass = DB.students.filter(s => s.class_id === params.class_id).map(s => s.id);
+        list = list.filter(i => studentIdsInClass.includes(i.student_id));
+      }
+
+      // Filter by search keyword
+      if (params.search) {
+        const q = String(params.search).toLowerCase();
+        list = list.filter(i => 
+          (i.invoice_number && i.invoice_number.toLowerCase().includes(q)) ||
+          (i.student_name && i.student_name.toLowerCase().includes(q)) ||
+          (i.description && i.description.toLowerCase().includes(q)) ||
+          (i.item_name && i.item_name.toLowerCase().includes(q))
+        );
+      }
+
+      // Filter by month/period
+      if (params.month) {
+        const m = String(params.month).toLowerCase();
+        list = list.filter(i => (i.period && i.period.toLowerCase().includes(m)) || (i.item_name && i.item_name.toLowerCase().includes(m)));
+      }
+
       // RBAC: ortu hanya boleh lihat invoice anaknya
       const requesterRole = params._user_role;
       const requesterEmail = (params._user_email || '').toLowerCase();
@@ -1295,8 +1442,8 @@ function handleApiRequest(path, params, method) {
       return { success: true, data: { total_invoice: totalInv, total_paid: totalPaid, total_outstanding: totalOut, pending_verification: pendingVer } };
     }
     // submit: orang tua kirim konfirmasi pembayaran online (upload foto)
-    if (action === 'submit' || action === 'confirm') {
-      const deny = rbacDeny(params, ['orang_tua']);
+    if (action === 'submit' || action === 'confirm' || action === 'create') {
+        const deny = rbacDeny(params, ['orang_tua', 'siswa', 'super_admin', 'admin_tu']);
       if (deny) return deny;
       const inv = DB.invoices.find(i => i.id === params.invoice_id);
       if (!inv) return { success: false, message: 'Tagihan tidak ditemukan' };
@@ -1344,7 +1491,11 @@ function handleApiRequest(path, params, method) {
       pay.status = 'verified';
       pay.verified_at = new Date().toISOString();
       const inv = DB.invoices.find(i => i.id === pay.invoice_id);
-      if (inv) inv.status = 'paid';
+      if (inv) {
+        inv.status = 'paid';
+        inv.paid_at = pay.payment_date || new Date().toISOString();
+        inv.paid_by = 'Transfer Bank (Diverifikasi Admin)';
+      }
       return { success: true, message: 'Pembayaran berhasil diverifikasi. Status tagihan: Lunas.', data: { message: 'Pembayaran berhasil diverifikasi. Status tagihan: Lunas.' } };
     }
     // reject: admin tolak pembayaran
@@ -1516,10 +1667,14 @@ function handleApiRequest(path, params, method) {
       const perPage = Number(params.per_page) || 50;
       const page = Number(params.page) || 1;
       let list = [...items].reverse();
-      if (params.status) list = list.filter(i => i.status === params.status);
+      if (params.is_published === 'true' || params.is_published === true) {
+        list = list.filter(i => i.status === 'published' || i.is_published === true || i.is_published === 'TRUE');
+      } else if (params.status) {
+        list = list.filter(i => i.status === params.status);
+      }
       const total = list.length;
       const sliced = list.slice((page - 1) * perPage, page * perPage);
-      return { success: true, data: { items: sliced, total, pagination: { page, per_page: perPage, total } } };
+      return { success: true, data: { items: sliced, total, pagination: { page, per_page: perPage, total } }, items: sliced, total };
     }
     if (action === 'get') {
       const item = items.find(i => i.id === params.id || (params.slug && i.slug === params.slug));
@@ -1549,7 +1704,7 @@ function handleApiRequest(path, params, method) {
       Object.assign(items[idx], params);
       return { success: true, message: 'Konten diperbarui', data: { message: 'Konten diperbarui', item: items[idx] } };
     }
-    if (action === 'delete') {
+    if (action === 'delete' || action === 'remove') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
       const idx = items.findIndex(i => i.id === params.id);
@@ -1735,7 +1890,7 @@ function handleApiRequest(path, params, method) {
     }
   }
 
-  // 16. REPORTS
+  // 16. REPORTS & EXCEL REKAP
   if (module === 'reports') {
     if (action === 'generate') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
@@ -1743,52 +1898,363 @@ function handleApiRequest(path, params, method) {
       const reportType = params.report_type || 'students';
       let rows = [];
       let headers = [];
-      if (reportType === 'students' || reportType === 'all') {
-        headers = ['NIS', 'Nama', 'Kelas', 'Status'];
-        rows = DB.students.map(s => [s.nis || '', s.full_name || s.name, s.class_name || s.class_id || '', s.status || 'active']);
-      } else if (reportType === 'attendance') {
-        headers = ['Tanggal', 'Siswa', 'Kelas', 'Status', 'Catatan'];
-        rows = DB.attendance.map(a => [a.date, a.student_name, a.class_id, a.status, a.notes || '']);
+
+      if (reportType === 'students') {
+        headers = ['No', 'NIS', 'Nama Lengkap', 'Kelas', 'Jenis Kelamin', 'Nama Wali', 'No. HP / WA', 'Status'];
+        rows = DB.students.map((s, idx) => [
+          idx + 1,
+          s.nis || '-',
+          s.full_name || s.name || '-',
+          s.class_name || s.kelas_sekarang || s.class_id || '-',
+          s.gender === 'L' ? 'Laki-laki' : (s.gender === 'P' ? 'Perempuan' : (s.gender || '-')),
+          s.parent_name || s.father_name || s.mother_name || '-',
+          s.parent_phone || s.phone || '-',
+          (s.status || 'active').toUpperCase()
+        ]);
       } else if (reportType === 'payments' || reportType === 'finance') {
-        headers = ['Tagihan', 'Siswa', 'Nominal', 'Status'];
-        rows = DB.invoices.map(i => [i.invoice_number, i.student_name, i.amount, i.status]);
-      } else if (reportType === 'development') {
-        headers = ['Siswa', 'NAM', 'Fisik-Motorik', 'Kognitif', 'Bahasa', 'Sosial-Emosional', 'Seni'];
-        rows = DB.developments.map(d => [d.student_name, d.aspect_nam || '', d.aspect_fisik_motorik || '', d.aspect_kognitif || '', d.aspect_bahasa || '', d.aspect_sosial_emosional || '', d.aspect_seni || '']);
+        headers = ['No', 'No. Tagihan', 'Nama Siswa', 'Keterangan / Periode', 'Nominal (Rp)', 'Jatuh Tempo', 'Status Tagihan'];
+        let list = [...DB.invoices];
+        if (params.month) {
+          list = list.filter(i => (i.due_date && i.due_date.startsWith(params.month)) || (i.period && i.period.includes(params.month)));
+        }
+        rows = list.map((i, idx) => [
+          idx + 1,
+          i.invoice_number || '-',
+          i.student_name || '-',
+          i.description || i.item_name || i.period || i.month || '-',
+          Number(i.amount || 0).toLocaleString('id-ID'),
+          i.due_date || '-',
+          i.status === 'paid' ? 'LUNAS' : (i.status === 'menunggu_verifikasi' ? 'MENUNGGU VERIFIKASI' : 'BELUM LUNAS')
+        ]);
       } else if (reportType === 'ppdb') {
-        headers = ['No. Pendaftaran', 'Nama', 'Status', 'Tanggal'];
-        rows = DB.ppdb_registrations.map(r => [r.registration_number, r.full_name || r.child_name, r.status, r.registration_date || r.created_at]);
+        headers = ['No', 'No. Pendaftaran', 'Nama Calon Siswa', 'Jalur / Jenjang', 'Nama Wali', 'No. HP', 'Status', 'Tgl Daftar'];
+        let list = [...DB.ppdb_registrations];
+        if (params.academic_year) {
+          list = list.filter(r => (r.academic_year && r.academic_year.includes(params.academic_year)) || (r.period_name && r.period_name.includes(params.academic_year)));
+        }
+        rows = list.map((r, idx) => [
+          idx + 1,
+          r.registration_number || r.registration_no || '-',
+          r.full_name || r.child_name || '-',
+          (r.form_type || 'PAUD').toUpperCase(),
+          r.father_name || r.parent_name || '-',
+          r.phone || r.father_phone || '-',
+          (r.status || 'pending').toUpperCase(),
+          (r.registration_date || r.created_at || '').slice(0, 10)
+        ]);
+      } else if (reportType === 'attendance') {
+        headers = ['No', 'Tanggal', 'Nama Siswa', 'Kelas', 'Status Kehadiran', 'Catatan'];
+        let list = [...(DB.attendance || [])];
+        if (params.month) {
+          list = list.filter(a => a.date && a.date.startsWith(params.month));
+        }
+        rows = list.map((a, idx) => [
+          idx + 1,
+          a.date || '-',
+          a.student_name || '-',
+          a.class_id || '-',
+          (a.status || 'hadir').toUpperCase(),
+          a.notes || '-'
+        ]);
+      } else if (reportType === 'development') {
+        headers = ['No', 'Siswa', 'Semester', 'Tahun Ajaran', 'NAM', 'Fisik Motorik', 'Kognitif', 'Bahasa', 'Sosial Emosional', 'Seni'];
+        let list = [...(DB.developments || [])];
+        if (params.semester) list = list.filter(d => String(d.semester) === String(params.semester));
+        if (params.year) list = list.filter(d => d.academic_year && d.academic_year.includes(params.year));
+        rows = list.map((d, idx) => [
+          idx + 1,
+          d.student_name || '-',
+          d.semester || '1',
+          d.academic_year || '2026/2027',
+          d.aspect_nam || 'Baik',
+          d.aspect_fisik_motorik || 'Baik',
+          d.aspect_kognitif || 'Baik',
+          d.aspect_bahasa || 'Baik',
+          d.aspect_sosial_emosional || 'Baik',
+          d.aspect_seni || 'Baik'
+        ]);
+      } else if (reportType === 'all') {
+        headers = ['No', 'Modul Data', 'Jumlah Entitas Terdaftar', 'Keterangan'];
+        rows = [
+          [1, 'Siswa Aktif', String(DB.students.filter(s => (s.status || 'active') === 'active').length) + ' Siswa', 'Terdaftar di database yayasan'],
+          [2, 'Tenaga Pengajar (Guru)', String(DB.teachers.length) + ' Guru', 'Pengajar aktif'],
+          [3, 'Rombongan Belajar (Kelas)', String(DB.classes.length) + ' Kelas', 'Tahun Ajaran 2026/2027'],
+          [4, 'Tagihan SPP Tercatat', String(DB.invoices.length) + ' Tagihan', 'Total transaksi keuangan'],
+          [5, 'Pendaftar PPDB', String(DB.ppdb_registrations.length) + ' Berkas', 'Penerimaan siswa baru']
+        ];
       }
-      return { success: true, data: { report_type: reportType, headers, rows, total: rows.length, generated_at: new Date().toISOString() } };
+
+      return {
+        success: true,
+        data: {
+          report_type: reportType,
+          headers,
+          rows,
+          total: rows.length,
+          generated_at: new Date().toISOString()
+        }
+      };
+    }
+
+    // Import Tagihan SPP Massal dari Excel / CSV
+    if (action === 'import_invoices') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const rawItems = Array.isArray(params.items) ? params.items : [];
+      if (rawItems.length === 0) {
+        return { success: false, message: 'Tidak ada data tagihan yang dikirim untuk diimpor' };
+      }
+
+      let insertedCount = 0;
+      for (const row of rawItems) {
+        // Cari siswa yang cocok berdasarkan NIS atau nama
+        const stu = DB.students.find(s => 
+          (row.nis && s.nis && String(s.nis).trim() === String(row.nis).trim()) ||
+          (row.student_name && s.full_name && s.full_name.toLowerCase().includes(String(row.student_name).toLowerCase().trim()))
+        ) || DB.students[0];
+
+        const inv = {
+          id: 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+          invoice_number: row.invoice_number || ('INV/' + new Date().getFullYear() + '/' + String(DB.invoices.length + 1).padStart(3, '0')),
+          student_id: stu ? stu.id : (row.student_id || 'STU-001'),
+          student_name: row.student_name || (stu ? stu.full_name : 'Siswa Import'),
+          item_name: row.description || row.item_name || 'SPP Import Excel',
+          description: row.description || row.item_name || 'SPP Import Excel',
+          period: row.period || row.month || 'Periode Berjalan',
+          amount: Number(row.amount) || 150000,
+          due_date: row.due_date || new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+          status: (row.status || 'unpaid').toLowerCase(),
+          created_at: new Date().toISOString()
+        };
+        DB.invoices.unshift(inv);
+        insertedCount++;
+      }
+
+      DB.activity_logs.unshift({
+        id: 'LOG-' + Date.now(),
+        user_id: params._user_id || 'admin',
+        user_name: 'Administrator',
+        action: 'import_invoices',
+        module: 'reports',
+        description: `Import ${insertedCount} data tagihan SPP dari file Excel/CSV`,
+        created_at: new Date().toISOString()
+      });
+
+      return {
+        success: true,
+        message: `Berhasil mengimpor ${insertedCount} data tagihan ke dalam database!`,
+        count: insertedCount
+      };
+    }
+
+    // Import Data Siswa Massal dari Excel / CSV
+    if (action === 'import_students') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const rawItems = Array.isArray(params.items) ? params.items : [];
+      if (rawItems.length === 0) {
+        return { success: false, message: 'Tidak ada data siswa yang dikirim untuk diimpor' };
+      }
+
+      let insertedCount = 0;
+      for (const row of rawItems) {
+        const seq = DB.students.length + 1;
+        const newStu = {
+          id: 'STU-' + String(seq).padStart(3, '0'),
+          nis: row.nis || ('NIS' + String(1000 + seq)),
+          full_name: row.full_name || row.name || 'Siswa Baru ' + seq,
+          name: row.full_name || row.name || 'Siswa Baru ' + seq,
+          nickname: row.nickname || (row.full_name || '').split(' ')[0] || 'Siswa',
+          gender: row.gender || 'L',
+          birth_place: row.birth_place || 'Samarinda',
+          birth_date: row.birth_date || '2020-01-01',
+          class_id: row.class_id || (DB.classes[0] ? DB.classes[0].id : 'CLS-001'),
+          class_name: row.class_name || (DB.classes[0] ? DB.classes[0].name : 'PAUD A'),
+          kelas_sekarang: row.class_name || (DB.classes[0] ? DB.classes[0].name : 'PAUD A'),
+          parent_name: row.parent_name || row.father_name || 'Wali Siswa',
+          father_name: row.father_name || row.parent_name || 'Wali Siswa',
+          mother_name: row.mother_name || '',
+          parent_phone: row.phone || row.parent_phone || '081234567890',
+          phone: row.phone || row.parent_phone || '081234567890',
+          parent_email: row.email || `${seq}@siswa.yayasan.sch.id`,
+          address: row.address || 'Samarinda',
+          status: 'active',
+          joined_at: new Date().toISOString().split('T')[0]
+        };
+        DB.students.push(newStu);
+        insertedCount++;
+      }
+
+      DB.activity_logs.unshift({
+        id: 'LOG-' + Date.now(),
+        user_id: params._user_id || 'admin',
+        user_name: 'Administrator',
+        action: 'import_students',
+        module: 'reports',
+        description: `Import ${insertedCount} data siswa dari file Excel/CSV`,
+        created_at: new Date().toISOString()
+      });
+
+      return {
+        success: true,
+        message: `Berhasil mengimpor ${insertedCount} data siswa ke dalam database!`,
+        count: insertedCount
+      };
     }
   }
 
-  // 17. BACKUP
+  // 17. BACKUP & RESTORE
   if (module === 'backup') {
     if (action === 'list' || action === 'backups') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
-      return { success: true, data: { items: DB.backups || [], backups: DB.backups || [], total: (DB.backups || []).length } };
+      return { success: true, data: { items: DB.backups || [], backups: DB.backups || [], total: (DB.backups || []).length }, items: DB.backups || [] };
     }
     if (action === 'create') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
+      const bakId = 'BAK-' + Date.now();
+      const dStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const filename = `backup-yayasan-${dStr}.json`;
+      const bakDir = path.join(__dirname, 'backups');
+      if (!fs.existsSync(bakDir)) {
+        try { fs.mkdirSync(bakDir, { recursive: true }); } catch (_) {}
+      }
+      const bakPath = path.join(bakDir, filename);
+
+      const snapshotData = {
+        meta: {
+          app: 'SIYAYASAN V2',
+          exported_at: new Date().toISOString(),
+          version: '2.0.0'
+        },
+        users: DB.users || [],
+        students: DB.students || [],
+        classes: DB.classes || [],
+        teachers: DB.teachers || [],
+        invoices: DB.invoices || [],
+        payments: DB.payments || [],
+        ppdb_registrations: DB.ppdb_registrations || [],
+        ppdb_periods: DB.ppdb_periods || [],
+        attendance: DB.attendance || [],
+        developments: DB.developments || [],
+        news: DB.news || [],
+        announcements: DB.announcements || [],
+        events: DB.events || [],
+        galleries: DB.galleries || [],
+        school_profile: DB.school_profile || {},
+        web_settings: DB.web_settings || {},
+        activity_logs: DB.activity_logs || []
+      };
+
+      let sizeMb = 0.5;
+      try {
+        const dump = JSON.stringify(snapshotData, null, 2);
+        fs.writeFileSync(bakPath, dump, 'utf8');
+        sizeMb = Math.round((Buffer.byteLength(dump) / (1024 * 1024)) * 100) / 100;
+      } catch (_) {}
+
       const newBak = {
-        id: 'BAK-' + Date.now(),
-        folder_name: 'Backups',
+        id: bakId,
+        folder_name: filename,
+        filename: filename,
         folder_url: '#',
-        file_count: 8,
-        size_mb: 1.5,
+        file_count: Object.keys(snapshotData).length,
+        size_mb: sizeMb,
         created_at: new Date().toISOString(),
         created_by: 'Administrator'
       };
       DB.backups.unshift(newBak);
-      return { success: true, message: 'Backup berhasil dibuat', data: { message: 'Backup berhasil dibuat', backup: newBak } };
+
+      DB.activity_logs.unshift({
+        id: 'LOG-' + Date.now(),
+        user_id: params._user_id || 'admin',
+        user_name: 'Administrator',
+        action: 'backup_create',
+        module: 'backup',
+        description: `Membuat backup database: ${filename}`,
+        created_at: new Date().toISOString()
+      });
+
+      return {
+        success: true,
+        message: 'Backup database berhasil dibuat: ' + filename,
+        data: {
+          message: 'Backup berhasil dibuat',
+          backup: newBak,
+          filename: filename,
+          download_url: `/backups/${filename}`,
+          snapshot: snapshotData
+        }
+      };
     }
     if (action === 'restore') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
-      return { success: true, message: 'Restore dimulai. Data akan dimuat ulang.', data: { message: 'Restore dimulai. Data akan dimuat ulang.' } };
+
+      let restoreData = params.data || params.backup_data;
+
+      // Jika restore via ID backup yang tersimpan di disk
+      if (!restoreData && params.id) {
+        const found = DB.backups.find(b => b.id === params.id || b.folder_name === params.id);
+        if (found) {
+          const diskPath = path.join(__dirname, 'backups', found.folder_name);
+          if (fs.existsSync(diskPath)) {
+            try {
+              restoreData = JSON.parse(fs.readFileSync(diskPath, 'utf8'));
+            } catch (_) {}
+          }
+        }
+      }
+
+      if (!restoreData) {
+        return { success: false, message: 'Data file cadangan (JSON) tidak ditemukan atau format tidak sesuai.' };
+      }
+
+      // Restore setiap modul
+      if (Array.isArray(restoreData.students)) DB.students = restoreData.students;
+      if (Array.isArray(restoreData.users)) DB.users = restoreData.users;
+      if (Array.isArray(restoreData.classes)) DB.classes = restoreData.classes;
+      if (Array.isArray(restoreData.teachers)) DB.teachers = restoreData.teachers;
+      if (Array.isArray(restoreData.invoices)) DB.invoices = restoreData.invoices;
+      if (Array.isArray(restoreData.payments)) DB.payments = restoreData.payments;
+      if (Array.isArray(restoreData.ppdb_registrations)) DB.ppdb_registrations = restoreData.ppdb_registrations;
+      if (Array.isArray(restoreData.news)) DB.news = restoreData.news;
+      if (Array.isArray(restoreData.galleries)) DB.galleries = restoreData.galleries;
+      if (restoreData.school_profile && typeof restoreData.school_profile === 'object') DB.school_profile = restoreData.school_profile;
+      if (restoreData.web_settings && typeof restoreData.web_settings === 'object') DB.web_settings = restoreData.web_settings;
+
+      DB.activity_logs.unshift({
+        id: 'LOG-' + Date.now(),
+        user_id: params._user_id || 'admin',
+        user_name: 'Administrator',
+        action: 'backup_restore',
+        module: 'backup',
+        description: 'Memulihkan database dari file cadangan',
+        created_at: new Date().toISOString()
+      });
+
+      return {
+        success: true,
+        message: 'Database yayasan berhasil dipulihkan dari file cadangan!',
+        data: {
+          message: 'Data berhasil disinkronkan.',
+          restored_tables: Object.keys(restoreData).length
+        }
+      };
+    }
+    if (action === 'delete') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const idx = DB.backups.findIndex(b => b.id === params.id);
+      if (idx !== -1) {
+        const removed = DB.backups.splice(idx, 1)[0];
+        try {
+          const p = path.join(__dirname, 'backups', removed.folder_name);
+          if (fs.existsSync(p)) fs.unlinkSync(p);
+        } catch (_) {}
+      }
+      return { success: true, message: 'Riwayat cadangan berhasil dihapus' };
     }
   }
 
@@ -1917,31 +2383,39 @@ function handleApiRequest(path, params, method) {
 
   // 22. WEB SETTINGS & CMS (cms_setting.html)
   if (module === 'web_settings' || module === 'settings') {
+    const DEFAULT_SETTINGS = {
+      id: 'SET-001',
+      school_name: 'Yayasan Samarinda',
+      tagline: 'Membina Generasi Qurani, Berakhlak Mulia & Berprestasi',
+      header_title: 'Sistem Informasi Akademik & Portal Yayasan Samarinda',
+      footer_bg_url: '/images/school-campus.jpg',
+      login_bg_url: '/images/school-campus.jpg',
+      announcement_banner: 'Penerimaan Peserta Didik Baru (PPDB) 2026/2027 Resmi Dibuka!',
+      whatsapp_official: '081234567890',
+      whatsapp: '081234567890',
+      contact_email: 'info@yayasan.sch.id',
+      email: 'info@yayasan.sch.id',
+      phone: '(0541) 234-5678',
+      address: 'Jl. Samratulangi, Sungai Keledang, Samarinda',
+      academic_year: '2026/2027',
+      instagram_url: 'https://instagram.com/yayasansamarinda',
+      youtube_url: 'https://youtube.com/@yayasansamarinda',
+      facebook_url: 'https://facebook.com/yayasansamarinda',
+      hero_images: [
+        { url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1600&auto=format&fit=crop', caption: 'Suasana Belajar Ceria Santri PAUD & TK' },
+        { url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop', caption: 'Pendidikan Karakter & Hafalan Qur\'an Sejak Dini' },
+        { url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&auto=format&fit=crop', caption: 'Fasilitas Belajar & Lingkungan Islami Nyaman' }
+      ]
+    };
+
     if (action === 'get') {
-      const settings = DB.web_settings || {
-        id: 'SET-001',
-        school_name: 'Yayasan Samarinda',
-        header_title: 'Sistem Informasi Akademik & Portal Yayasan Samarinda',
-        footer_bg_url: 'images/school-campus.jpg',
-        login_bg_url: 'images/school-campus.jpg',
-        announcement_banner: 'Penerimaan Peserta Didik Baru (PPDB) 2026/2027 Resmi Dibuka!',
-        whatsapp_official: '081234567890',
-        whatsapp: '081234567890',
-        contact_email: 'info@yayasan.sch.id',
-        email: 'info@yayasan.sch.id',
-        phone: '(0541) 234-5678',
-        address: 'Jl. Samratulangi, Sungai Keledang, Samarinda',
-        academic_year: '2026/2027',
-        instagram_url: 'https://instagram.com/yayasansamarinda',
-        youtube_url: 'https://youtube.com/@yayasansamarinda',
-        facebook_url: 'https://facebook.com/yayasansamarinda'
-      };
-      return { success: true, data: settings };
+      const merged = Object.assign({}, DEFAULT_SETTINGS, DB.web_settings || {});
+      return { success: true, data: merged };
     }
     if (action === 'update') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
-      if (!DB.web_settings) DB.web_settings = {};
+      if (!DB.web_settings) DB.web_settings = Object.assign({}, DEFAULT_SETTINGS);
       Object.assign(DB.web_settings, params);
       return { success: true, message: 'Pengaturan website berhasil disimpan', data: DB.web_settings };
     }
