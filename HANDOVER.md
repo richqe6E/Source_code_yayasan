@@ -1,10 +1,17 @@
 # 📦 DOKUMEN HANDOVER & STATUS SISTEM — SIYAYASAN V2
 
 > **PANDUAN UNTUK AGEN AI / DEVELOPER BERIKUTNYA:**  
-> Dokumen ini adalah **Single Source of Truth** terkini proyek SIYAYASAN V2 per **09 Oktober 2026**.  
+> Dokumen ini adalah **Single Source of Truth** terkini proyek SIYAYASAN V2 per **11 Oktober 2026**.  
 > Harap baca dokumen ini sebelum melakukan modifikasi apapun. Jangan mengubah arsitektur yang sudah disepakati, jangan menambahkan library baru di luar spesifikasi, dan patuhi batasan branding serta pembagian peran resmi.
 
 ---
+
+## 📌 Status Repositori GitHub Resmi
+* **URL GitHub**: [https://github.com/richqe6E/Source_code_yayasan](https://github.com/richqe6E/Source_code_yayasan)
+* **Branch Utama**: `main`
+* **Status Sinkronisasi**: 100% Up to Date & Clean (Siap di-clone di laptop lain).
+* **Proteksi Git**: `.gitignore` aktif mengabaikan `.env*` dan `.vercel/` demi keamanan data rahasia.
+
 
 ## 1. ⚙️ Ringkasan Proyek & Ketentuan Arsitektur
 
@@ -124,4 +131,4 @@ node frontend/dev-server.js
 ```
 
 ---
-*Dokumen ini diperbarui pada 09 Oktober 2026. Seluruh konteks kerja, arsitektur 2 portal resmi, dan status implementasi tersimpan secara presisi.*
+*Dokumen ini diperbarui secara resmi pada 11 Oktober 2026. Repositori GitHub resmi telah terhubung (https://github.com/richqe6E/Source_code_yayasan), seluruh kode sumber terunggah 100%, dan seluruh konteks kerja tersimpan secara presisi.*
