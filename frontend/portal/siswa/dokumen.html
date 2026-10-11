@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokumen Persyaratan - Yayasan Samarinda</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#F0F9FF', 100:'#E0F2FE', 200:'#BAE6FD', 300:'#7DD3FC', 400:'#38BDF8', 500:'#0EA5E9', 600:'#0284C7', 700:'#0369A1', 800:'#075985', 900:'#0C4A6E', 950:'#082F49' },
+            primary: { 50:'#F0F9FF', 100:'#E0F2FE', 500:'#0EA5E9', 600:'#0284C7', 700:'#0369A1', 800:'#075985', 900:'#0C4A6E' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased min-h-screen">
+  <div id="app-shell"></div>
+
+  <main id="main-slot" class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Upload Berkas Persyaratan</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Unggah dokumen resmi (Akte, KK, Pas Foto) untuk verifikasi pendaftaran oleh tim admin sekolah.</p>
+      </div>
+    </div>
+
+    <!-- Upload Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Upload Pas Foto -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pas Foto 3x4</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700">Wajib</span>
+          </div>
+          <p class="text-xs text-slate-600 mb-4">Foto formal anak berseragam/rapi dengan latar belakang bebas. Format: JPG/PNG (Max. 2MB).</p>
+
+          <div id="preview-foto-box" class="w-24 h-32 mx-auto rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 overflow-hidden mb-4 relative">
+            <img id="img-preview-foto" class="hidden w-full h-full object-cover">
+            <span id="placeholder-foto" class="text-xs text-slate-400 text-center px-2">Preview Foto</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block w-full py-2.5 px-3 bg-brand-50 hover:bg-brand-100 text-brand-800 text-xs font-bold rounded-xl text-center cursor-pointer border border-brand-200 transition-colors">
+            <span>Pilih Pas Foto</span>
+            <input type="file" id="file-foto" accept="image/*" class="hidden" onchange="handleFileSelect('foto')">
+          </label>
+        </div>
+      </div>
+
+      <!-- Upload Kartu Keluarga -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Kartu Keluarga (KK)</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700">Wajib</span>
+          </div>
+          <p class="text-xs text-slate-600 mb-4">Foto atau scan Kartu Keluarga yang jelas dan terbaca. Format: JPG/PNG/PDF (Max. 5MB).</p>
+
+          <div class="p-6 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-center mb-4">
+            <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span id="name-kk" class="text-xs text-slate-500 block truncate">Belum dipilih</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block w-full py-2.5 px-3 bg-brand-50 hover:bg-brand-100 text-brand-800 text-xs font-bold rounded-xl text-center cursor-pointer border border-brand-200 transition-colors">
+            <span>Pilih Berkas KK</span>
+            <input type="file" id="file-kk" accept="image/*,.pdf" class="hidden" onchange="handleFileSelect('kk')">
+          </label>
+        </div>
+      </div>
+
+      <!-- Upload Akte Kelahiran -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Akte Kelahiran</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700">Wajib</span>
+          </div>
+          <p class="text-xs text-slate-600 mb-4">Scan atau foto Akte Kelahiran resmi dari Disdukcapil. Format: JPG/PNG/PDF (Max. 5MB).</p>
+
+          <div class="p-6 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-center mb-4">
+            <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span id="name-akte" class="text-xs text-slate-500 block truncate">Belum dipilih</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block w-full py-2.5 px-3 bg-brand-50 hover:bg-brand-100 text-brand-800 text-xs font-bold rounded-xl text-center cursor-pointer border border-brand-200 transition-colors">
+            <span>Pilih Berkas Akte</span>
+            <input type="file" id="file-akte" accept="image/*,.pdf" class="hidden" onchange="handleFileSelect('akte')">
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Riwayat Dokumen Terupload -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Daftar Dokumen Terunggah</h2>
+          <p class="text-xs text-slate-500">Arsip berkas persyaratan yang tersimpan di sistem</p>
+        </div>
+        <button onclick="loadDocuments()" class="text-xs font-bold text-brand-700 hover:text-brand-800">
+          Refresh Daftar
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 text-slate-500 uppercase tracking-wider">
+              <th class="py-3 px-4">Jenis Dokumen</th>
+              <th class="py-3 px-4">Nama File</th>
+              <th class="py-3 px-4">Waktu Unggah</th>
+              <th class="py-3 px-4">Status Verifikasi</th>
+              <th class="py-3 px-4 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="documents-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-400">
+                Belum ada dokumen yang diunggah.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="../../shared/js/supabase-config.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+
+  <script>
+    if (!requireAuth('siswa,siswa_aktif,calon_siswa')) {}
+
+    async function initPage() {
+      const user = getCurrentUser() || {};
+      const isSiswaAktif = (user.role && user.role.code === 'siswa_aktif') || user.role === 'siswa_aktif';
+
+      const studentMenu = isSiswaAktif ? [
+        { href: 'dashboard.html', label: '📊 Dashboard' },
+        { href: 'biodata.html', label: '👤 Biodata Siswa' },
+        { href: 'akademik.html', label: '🎓 Rapor & Akademik' },
+        { href: 'spp.html', label: '💳 Tagihan SPP' },
+        { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
+      ] : [
+        { href: 'dashboard.html', label: '📊 Status PPDB' },
+        { href: 'biodata.html', label: '📝 Lengkapi Biodata' },
+        { href: 'dokumen.html', label: '📁 Upload Dokumen' }
+      ];
+
+      Shell.init({
+        menu: studentMenu,
+        active: 'dokumen.html',
+        portalLabel: isSiswaAktif ? 'Portal Siswa Aktif' : 'Portal Calon Siswa (PPDB)',
+        title: 'Upload Dokumen Persyaratan',
+        subtitle: 'Lengkapi berkas pendaftaran dan administrasi'
+      });
+
+      await loadDocuments();
+    }
+
+    async function handleFileSelect(type) {
+      const input = document.getElementById(`file-${type}`);
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+
+      // Preview Foto jika tipe adalah foto
+      if (type === 'foto') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('img-preview-foto').src = e.target.result;
+          document.getElementById('img-preview-foto').classList.remove('hidden');
+          document.getElementById('placeholder-foto').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById(`name-${type}`).textContent = file.name;
+      }
+
+      showToast(`Mengunggah ${file.name}...`, 'info');
+
+      try {
+        const res = await apiCall('siswa', 'upload_document', {
+          document_type: type,
+          file_name: file.name,
+          file_size: file.size,
+          file: file
+        });
+
+        if (res.success) {
+          showToast(`Dokumen ${type.toUpperCase()} berhasil diunggah!`, 'success');
+          loadDocuments();
+        } else {
+          showToast(res.message || 'Gagal mengunggah file', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat mengunggah', 'error');
+      }
+    }
+
+    async function loadDocuments() {
+      try {
+        const res = await apiCall('siswa', 'get_documents');
+        const docs = (res.success && res.data) ? res.data : [];
+        const tbody = document.getElementById('documents-table-body');
+
+        if (docs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-400">
+                Belum ada dokumen yang diunggah.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const typeLabels = {
+          foto: 'Pas Foto 3x4',
+          kk: 'Kartu Keluarga',
+          akte: 'Akte Kelahiran',
+          lainnya: 'Dokumen Tambahan'
+        };
+
+        tbody.innerHTML = docs.map(d => {
+          const verifiedBadge = d.is_verified 
+            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Terverifikasi</span>'
+            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">⏳ Menunggu Review</span>';
+
+          return `
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="py-3 px-4 font-bold text-slate-900">${typeLabels[d.document_type] || d.document_type}</td>
+              <td class="py-3 px-4 text-slate-600 truncate max-w-xs">${d.file_name || 'Berkas Dokumen'}</td>
+              <td class="py-3 px-4 text-slate-500">${formatDateTime(d.created_at)}</td>
+              <td class="py-3 px-4">${verifiedBadge}</td>
+              <td class="py-3 px-4 text-right">
+                <a href="${d.file_url}" target="_blank" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition-colors">
+                  Lihat Berkas
+                </a>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error loading documents:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+key,value,type,description,is_public,created_at,created_by,updated_at,updated_by,is_deleted
+organization_name,"Yayasan Pendidikan [Nama]",string,"Nama lengkap yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+organization_short_name,Yayasan,string,"Nama singkat yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+organization_logo_file_id,,string,"Drive ID logo yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+organization_address,"Jl. Contoh No. 123, Jakarta",string,"Alamat yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+organization_phone,021-12345678,string,"Telepon yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+organization_email,info@yayasan.sch.id,string,"Email yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+ppdb_open,FALSE,boolean,"Apakah periode PPDB sedang buka?",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+current_period_label,2026/2027,string,"Label tahun ajaran aktif",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+timezone,Asia/Jakarta,string,"Timezone yayasan",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+date_format,YYYY-MM-DD,string,"Format tanggal standar ISO 8601",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+currency,IDR,string,"Mata uang",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+default_language,id,string,"Bahasa default (id = Indonesia)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+min_password_length,8,number,"Panjang minimum password",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+session_timeout_minutes,30,number,"Idle session timeout (menit)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+max_login_attempts,5,number,"Max gagal login sebelum lockout",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+lockout_duration_minutes,30,number,"Durasi lockout akun (menit)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+backup_retention_months,3,number,"Backup disimpan berapa bulan",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+enable_wa_notification,FALSE,boolean,"Aktifkan notifikasi WhatsApp?",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+wa_gateway,,string,"WA gateway provider (fonnte/waha/twilio)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+wa_api_key,,string,"API key WA gateway (encrypted)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+email_from,noreply@yayasan.sch.id,string,"Email pengirim notifikasi",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+email_from_name,SIYAYASAN,string,"Nama pengirim email",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+spp_default_amount,250000,number,"SPP default per bulan (IDR)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+registration_fee_default,150000,number,"Biaya pendaftaran default (IDR)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+max_upload_size_mb,5,number,"Ukuran max upload file (MB)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+max_photo_size_mb,2,number,"Ukuran max upload foto (MB)",FALSE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE

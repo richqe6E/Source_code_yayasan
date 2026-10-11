@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Siswa - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <div id="error-banner" class="hidden mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span id="error-message">Terjadi kesalahan</span>
+      </div>
+      <button onclick="load()" class="text-xs font-semibold px-2.5 py-1 bg-red-100 hover:bg-red-200 rounded text-red-800">Coba Lagi</button>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="relative w-full sm:w-72">
+        <input id="filter-search" type="text" placeholder="Cari nama atau NIS siswa..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </div>
+      <div class="text-xs text-gray-500 tabular-nums">
+        Total Siswa: <span id="total-count" class="font-semibold text-gray-800">-</span>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">NIS</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Lengkap</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">JK</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kelas</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody" class="bg-white divide-y divide-gray-200">
+            <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('guru,admin_tu,super_admin');
+
+    const MENU = [
+      { href: 'dashboard.html', label: 'Dashboard' },
+      { href: 'presensi.html', label: 'Presensi' },
+      { href: 'development.html', label: 'Catatan Perkembangan' },
+      { href: 'students.html', label: 'Siswa' },
+      { href: 'profile.html', label: 'Profil' }
+    ];
+
+    Shell.init({
+      menu: MENU,
+      active: 'students.html',
+      portalLabel: 'Portal Guru',
+      title: 'Daftar Siswa',
+      subtitle: 'Siswa yang berada di bawah bimbingan Anda',
+      showRefresh: true,
+      onRefresh: load
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    }
+
+    async function load() {
+      const tbody = document.getElementById('students-tbody');
+      const errBanner = document.getElementById('error-banner');
+      errBanner.classList.add('hidden');
+      tbody.innerHTML = Shell.skeletonRows ? Shell.skeletonRows(5, 5) : '<tr><td colspan="5" class="p-6 text-center text-sm text-gray-400 animate-pulse">Memuat...</td></tr>';
+
+      const params = { per_page: 100 };
+      const s = document.getElementById('filter-search').value.trim();
+      if (s) params.search = s;
+
+      try {
+        const res = await apiCall('teachers', 'me');
+        if (!res.success) {
+          errBanner.classList.remove('hidden');
+          document.getElementById('error-message').textContent = res.message || 'Gagal memuat daftar siswa';
+          tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-sm text-red-600">${escapeHtml(res.message || 'Gagal memuat data')}</td></tr>`;
+          document.getElementById('total-count').textContent = '0';
+          return;
+        }
+
+        const all = (res.data && Array.isArray(res.data.students)) ? res.data.students : [];
+        const s = document.getElementById('filter-search').value.trim().toLowerCase();
+        const data = s ? all.filter(st => (st.full_name || '').toLowerCase().includes(s) || (st.nis || '').includes(s)) : all;
+        document.getElementById('total-count').textContent = data.length;
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-12 text-center text-sm text-gray-500">Tidak ada siswa yang cocok atau Anda belum memiliki kelas aktif.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.map(st => `
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3 text-sm font-mono text-gray-700 tabular-nums">${escapeHtml(st.nis || '-')}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 min-w-0 max-w-xs truncate">${escapeHtml(st.full_name)}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${st.gender === 'L' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'}">
+                ${st.gender === 'L' ? 'Laki-laki' : 'Perempuan'}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-600">${escapeHtml(st.class_name || '-')}</td>
+            <td class="px-4 py-3 text-sm text-right space-x-2 whitespace-nowrap">
+              <a href="presensi.html?student_id=${encodeURIComponent(st.id)}" class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors">
+                Presensi
+              </a>
+              <a href="development.html?student_id=${encodeURIComponent(st.id)}" class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors">
+                Perkembangan
+              </a>
+            </td>
+          </tr>`).join('');
+      } catch (e) {
+        errBanner.classList.remove('hidden');
+        document.getElementById('error-message').textContent = 'Koneksi gagal atau sesi telah berakhir';
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-sm text-red-600">Koneksi terganggu</td></tr>';
+      }
+    }
+
+    let searchTimer;
+    document.getElementById('filter-search').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(load, 300);
+    });
+
+    load();
+  </script>
+</body>
+</html>

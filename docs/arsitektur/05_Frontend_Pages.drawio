@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-12T12:00:00.000Z" agent="SIYAYASAN-Architect" version="24.0.0" type="device">
+  <diagram name="Frontend Pages" id="frontend-pages">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="SIYAYASAN — Frontend Page Map" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="800" y="20" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===== PUBLIC WEBSITE ===== -->
+        <mxCell id="public-section" value="PUBLIC WEBSITE (Tanpa Login)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="600" height="1180" as="geometry" />
+        </mxCell>
+
+        <!-- Home -->
+        <mxCell id="page-home" value="/index.html&#xa;🏠 Beranda" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Profil -->
+        <mxCell id="page-profil" value="/profil.html&#xa;📋 Profil Yayasan&#xa;• Sambutan&#xa;• Visi-Misi&#xa;• Struktur Org" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;align=left;verticalAlign=top;fontSize=10;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="290" y="130" width="160" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="page-profil-sekolah" value="/profil/sekolah.html&#xa;🏫 Program &amp; Fasilitas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;align=left;verticalAlign=top;fontSize=10;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="475" y="130" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Berita -->
+        <mxCell id="page-berita" value="/berita.html&#xa;📰 Daftar Berita" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="260" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="page-berita-detail" value="/berita/{slug}.html&#xa;📄 Detail Berita" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="260" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Pengumuman -->
+        <mxCell id="page-pengumuman" value="/pengumuman.html&#xa;📢 Pengumuman" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="340" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Galeri -->
+        <mxCell id="page-galeri" value="/galeri.html&#xa;🖼️ Galeri Foto" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Agenda -->
+        <mxCell id="page-agenda" value="/agenda.html&#xa;📅 Agenda Kegiatan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Kontak -->
+        <mxCell id="page-kontak" value="/kontak.html&#xa;📞 Kontak &amp; Lokasi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="580" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- PPDB -->
+        <mxCell id="page-ppdb-info" value="/ppdb.html&#xa;📝 Info PPDB&#xa;• Persyaratan&#xa;• Jadwal&#xa;• Pilih Form" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;align=left;verticalAlign=top;fontSize=10;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="80" y="660" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="page-ppdb-form-tpq" value="/ppdb/form-tpq.html&#xa;📝 Form TPQ Ulinnuha" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="660" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="page-ppdb-form-paud" value="/ppdb/form-paud.html&#xa;📝 Form PAUD/TK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="475" y="660" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="page-ppdb-status" value="/ppdb/status.html&#xa;🔍 Cek Status Pendaftaran" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#3B82F6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="740" width="345" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Login -->
+        <mxCell id="page-login" value="/login.html&#xa;🔐 Login Portal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="820" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Footer note -->
+        <mxCell id="note" value="Catatan: Semua halaman publik menggunakan template responsive (mobile-first) dan Tailwind CSS via CDN." style="text;html=1;strokeColor=#E5E7EB;fillColor=#F9FAFB;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#6B7280;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="80" y="900" width="540" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ADMIN PORTAL ===== -->
+        <mxCell id="admin-section" value="PORTAL ADMIN (Super Admin, Admin TU)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="680" y="80" width="600" height="1180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-dashboard" value="/admin/dashboard.html&#xa;📊 Dashboard Admin&#xa;(statistik global)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;align=left;verticalAlign=top;fontSize=10;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="720" y="130" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-users" value="/admin/users.html&#xa;👥 Manajemen User" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="930" y="130" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-students" value="/admin/students.html&#xa;👨‍🎓 Manajemen Siswa" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="130" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-teachers" value="/admin/teachers.html&#xa;👨‍🏫 Manajemen Guru" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="220" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-parents" value="/admin/parents.html&#xa;👪 Manajemen Orang Tua" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="930" y="220" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-classes" value="/admin/classes.html&#xa;🏫 Manajemen Kelas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="220" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-ppdb" value="/admin/ppdb.html&#xa;📝 Review PPDB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="310" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-ppdb-detail" value="/admin/ppdb/{id}.html&#xa;🔍 Detail Pendaftaran" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="930" y="310" width="330" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-payments" value="/admin/payments.html&#xa;💰 Verifikasi Pembayaran" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="400" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-invoices" value="/admin/invoices.html&#xa;🧾 Tagihan SPP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="930" y="400" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-content" value="/admin/content.html&#xa;📰 Berita &amp; Pengumuman" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="400" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-reports" value="/admin/reports.html&#xa;📈 Laporan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="490" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-backup" value="/admin/backup.html&#xa;💾 Backup Database" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="930" y="490" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="admin-logs" value="/admin/logs.html&#xa;📜 Activity Log (Audit)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FECACA;strokeColor=#EF4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="490" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== GURU PORTAL ===== -->
+        <mxCell id="guru-section" value="PORTAL GURU" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="80" width="420" height="600" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guru-dashboard" value="/guru/dashboard.html&#xa;📊 Dashboard Guru" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#10B981;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="130" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guru-presensi" value="/guru/presensi.html&#xa;📅 Input Presensi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#10B981;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="210" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guru-recap" value="/guru/presensi/recap.html&#xa;📈 Rekap Presensi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#10B981;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="210" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guru-development" value="/guru/development.html&#xa;📝 Catatan Perkembangan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#10B981;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="290" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guru-students" value="/guru/students.html&#xa;👨‍🎓 Daftar Siswa Kelas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#10B981;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="290" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guru-profile" value="/guru/profile.html&#xa;👤 Profil Guru" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#10B981;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="370" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== ORANG TUA PORTAL ===== -->
+        <mxCell id="ortu-section" value="PORTAL ORANG TUA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBCFE8;strokeColor=#EC4899;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="710" width="420" height="550" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-dashboard" value="/ortu/dashboard.html&#xa;📊 Dashboard Ortu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="760" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-anak" value="/ortu/anak.html&#xa;👨‍🎓 Data Anak-anak" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="840" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-presensi" value="/ortu/presensi.html&#xa;📅 Presensi Anak" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="840" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-perkembangan" value="/ortu/perkembangan.html&#xa;📈 Perkembangan Anak" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="920" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-tagihan" value="/ortu/tagihan.html&#xa;💰 Tagihan SPP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="1000" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-bayar" value="/ortu/bayar.html&#xa;💳 Bayar / Upload Bukti" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="1000" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-pengumuman" value="/ortu/pengumuman.html&#xa;📢 Pengumuman" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="1080" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ortu-profile" value="/ortu/profile.html&#xa;👤 Profil Ortu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A8D4;strokeColor=#EC4899;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="1160" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== SHARED PORTAL ===== -->
+        <mxCell id="shared-section" value="SHARED COMPONENTS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#6366F1;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1300" width="1700" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comp-navbar" value="components/navbar.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-sidebar" value="components/sidebar.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-footer" value="components/footer.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-modal" value="components/modal.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-table" value="components/table.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="860" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-form" value="components/form.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-chart" value="components/chart.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="1340" width="180" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

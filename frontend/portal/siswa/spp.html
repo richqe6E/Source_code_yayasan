@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tagihan & Pembayaran SPP - Yayasan Samarinda</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#F0F9FF', 100:'#E0F2FE', 200:'#BAE6FD', 300:'#7DD3FC', 400:'#38BDF8', 500:'#0EA5E9', 600:'#0284C7', 700:'#0369A1', 800:'#075985', 900:'#0C4A6E', 950:'#082F49' },
+            primary: { 50:'#F0F9FF', 100:'#E0F2FE', 500:'#0EA5E9', 600:'#0284C7', 700:'#0369A1', 800:'#075985', 900:'#0C4A6E' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased min-h-screen">
+  <div id="app-shell"></div>
+
+  <main id="main-slot" class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Informasi Tagihan & SPP</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Cek rincian pembayaran SPP bulanan dan konfirmasi bukti transfer secara transparan.</p>
+      </div>
+      <button onclick="showRekeningModal()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 rounded-xl text-xs font-bold transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        <span>Nomor Rekening Yayasan</span>
+      </button>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Total Tunggakan</span>
+        <div class="text-2xl font-extrabold text-red-600" id="stat-unpaid-amount">Rp 0</div>
+        <span class="text-xs text-slate-500 mt-1 block" id="stat-unpaid-count">0 tagihan belum dibayar</span>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Tagihan Lunas</span>
+        <div class="text-2xl font-extrabold text-emerald-600" id="stat-paid-count">0 Tagihan</div>
+        <span class="text-xs text-slate-500 mt-1 block">Telah diverifikasi Admin TU</span>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Biaya SPP Bulanan</span>
+        <div class="text-2xl font-extrabold text-slate-900">Rp 150.000</div>
+        <span class="text-xs text-slate-500 mt-1 block">Jatuh tempo tgl 10 tiap bulan</span>
+      </div>
+    </div>
+
+    <!-- Tabel Daftar Tagihan -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Daftar Tagihan SPP Siswa</h2>
+          <p class="text-xs text-slate-500">Rincian status pembayaran per bulan</p>
+        </div>
+        <button onclick="loadSPPData()" class="text-xs font-bold text-brand-700 hover:text-brand-800">
+          Refresh Data
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 text-slate-500 uppercase tracking-wider">
+              <th class="py-3 px-4">Bulan / Periode</th>
+              <th class="py-3 px-4">Nominal</th>
+              <th class="py-3 px-4">Jatuh Tempo</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="invoices-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-400">
+                Memuat data tagihan SPP...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Rekening Bank Yayasan -->
+  <div id="rekening-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="text-base font-bold text-slate-900">Rekening Resmi Yayasan</h3>
+        <button type="button" onclick="closeRekeningModal()" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="space-y-3 mb-5">
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] font-bold text-slate-500 uppercase">Bank Syariah Indonesia (BSI)</div>
+          <div class="text-base font-extrabold text-brand-800 tracking-wider my-0.5">712-3456-789</div>
+          <div class="text-xs text-slate-600">a.n. Yayasan Pendidikan Samarinda</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] font-bold text-slate-500 uppercase">Bank Muamalat</div>
+          <div class="text-base font-extrabold text-purple-800 tracking-wider my-0.5">345-0012-987</div>
+          <div class="text-xs text-slate-600">a.n. Yayasan Pendidikan Samarinda</div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500 mb-4 italic">
+        *Harap sertakan nama santri pada berita transfer dan upload bukti transfer melalui portal ini.
+      </p>
+      <div class="text-right">
+        <button type="button" onclick="closeRekeningModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Upload Bukti Transfer -->
+  <div id="payment-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <h3 class="text-base font-bold text-slate-900">Konfirmasi Pembayaran</h3>
+        <button type="button" onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+      </div>
+
+      <form id="payment-form" class="space-y-4">
+        <input type="hidden" id="pay-invoice-id">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tagihan Bulan</label>
+          <input type="text" id="pay-month-name" readonly class="block w-full px-3 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-700 font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Jumlah Transfer</label>
+          <input type="text" id="pay-amount" readonly class="block w-full px-3 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-700 font-bold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Upload Bukti Transfer</label>
+          <input type="file" id="pay-proof" accept="image/*" required class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+        </div>
+
+        <div class="flex justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closePaymentModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+          <button type="submit" id="submit-pay-btn" class="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-md shadow-brand-600/20">
+            Kirim Konfirmasi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../shared/js/supabase-config.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+
+  <script>
+    if (!requireAuth('siswa,siswa_aktif')) {}
+
+    function showRekeningModal() { document.getElementById('rekening-modal')?.classList.remove('hidden'); }
+    function closeRekeningModal() { document.getElementById('rekening-modal')?.classList.add('hidden'); }
+    function closePaymentModal() { document.getElementById('payment-modal')?.classList.add('hidden'); }
+
+    function openPayModal(invId, month, amount) {
+      document.getElementById('pay-invoice-id').value = invId;
+      document.getElementById('pay-month-name').value = month;
+      document.getElementById('pay-amount').value = formatIDR(amount);
+      document.getElementById('payment-modal')?.classList.remove('hidden');
+    }
+
+    async function initPage() {
+      Shell.init({
+        menu: [
+          { href: 'dashboard.html', label: '📊 Dashboard' },
+          { href: 'biodata.html', label: '👤 Biodata Siswa' },
+          { href: 'akademik.html', label: '🎓 Rapor & Akademik' },
+          { href: 'spp.html', label: '💳 Tagihan SPP' },
+          { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
+        ],
+        active: 'spp.html',
+        portalLabel: 'Portal Siswa Aktif',
+        title: 'Tagihan SPP Siswa',
+        subtitle: 'Status Keuangan & Pembayaran Bulanan'
+      });
+
+      await loadSPPData();
+    }
+
+    async function loadSPPData() {
+      try {
+        const res = await apiCall('siswa', 'get_spp');
+        const invoices = (res.success && res.data && res.data.invoices) ? res.data.invoices : [];
+        const tbody = document.getElementById('invoices-table-body');
+
+        if (invoices.length === 0) {
+          // Buat data contoh tagihan jika masih kosong
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-400">
+                Belum ada tagihan SPP yang diterbitkan.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const unpaid = invoices.filter(i => i.status === 'unpaid');
+        const paid = invoices.filter(i => i.status === 'paid');
+        const totalUnpaid = unpaid.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+
+        document.getElementById('stat-unpaid-amount').textContent = formatIDR(totalUnpaid);
+        document.getElementById('stat-unpaid-count').textContent = `${unpaid.length} tagihan belum dibayar`;
+        document.getElementById('stat-paid-count').textContent = `${paid.length} Tagihan`;
+
+        tbody.innerHTML = invoices.map(inv => {
+          let statusBadge = '';
+          let actionBtn = '';
+
+          if (inv.status === 'paid') {
+            statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Lunas</span>';
+            actionBtn = '<span class="text-slate-400 text-xs font-medium">Lunas</span>';
+          } else if (inv.status === 'menunggu_verifikasi') {
+            statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">⏳ Sedang Diverifikasi</span>';
+            actionBtn = '<span class="text-amber-600 text-xs font-medium">Menunggu TU</span>';
+          } else {
+            statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">Belum Bayar</span>';
+            actionBtn = `
+              <button onclick="openPayModal('${inv.id}', '${inv.month}', ${inv.amount})" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs transition-colors">
+                Konfirmasi Bayar
+              </button>
+            `;
+          }
+
+          return `
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="py-3 px-4 font-bold text-slate-900">${inv.month} (${inv.period || '2026/2027'})</td>
+              <td class="py-3 px-4 font-semibold text-slate-800">${formatIDR(inv.amount)}</td>
+              <td class="py-3 px-4 text-slate-500">${formatDate(inv.due_date)}</td>
+              <td class="py-3 px-4">${statusBadge}</td>
+              <td class="py-3 px-4 text-right">${actionBtn}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Error loading SPP data:', err);
+      }
+    }
+
+    document.getElementById('payment-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const invId = document.getElementById('pay-invoice-id').value;
+      const fileInput = document.getElementById('pay-proof');
+      const submitBtn = document.getElementById('submit-pay-btn');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Pilih file bukti transfer terlebih dahulu');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Mengirim...';
+
+      try {
+        const file = fileInput.files[0];
+        const uploadedUrl = await uploadToSupabaseStorage(file, 'spp_proof');
+
+        const res = await apiCall('payments', 'create', {
+          invoice_id: invId,
+          proof_image_url: uploadedUrl,
+          method: 'transfer',
+          notes: 'Konfirmasi pembayaran SPP oleh siswa/wali murid'
+        });
+
+        if (res.success) {
+          showToast('Konfirmasi pembayaran berhasil dikirim! Menunggu verifikasi TU.', 'success');
+          closePaymentModal();
+          loadSPPData();
+        } else {
+          showToast(res.message || 'Gagal mengirim konfirmasi', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat mengunggah', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Kirim Konfirmasi';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

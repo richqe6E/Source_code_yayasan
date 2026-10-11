@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Orang Tua - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8 max-w-4xl">
+    <div id="error-banner" class="hidden mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span id="error-message">Terjadi kesalahan</span>
+      </div>
+      <button onclick="loadMe()" class="text-xs font-semibold px-2.5 py-1 bg-red-100 hover:bg-red-200 rounded text-red-800">Coba Lagi</button>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6 shadow-sm">
+      <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+        <div class="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow" id="avatar">O</div>
+        <div class="min-w-0">
+          <div class="text-lg font-bold text-gray-900 truncate" id="name">-</div>
+          <div class="text-sm text-gray-600 truncate" id="email">-</div>
+          <div class="inline-flex items-center px-2 py-0.5 mt-1 rounded text-xs font-medium bg-primary-50 text-primary-700 capitalize" id="role">-</div>
+        </div>
+      </div>
+
+      <form id="profile-form" class="grid sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2">
+          <h3 class="text-sm font-semibold text-gray-900 mb-2">Data Diri Orang Tua / Wali</h3>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+          <input id="f-name" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input id="f-email" disabled class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-gray-50 text-gray-500 cursor-not-allowed">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">No HP / WhatsApp</label>
+          <input id="f-phone" placeholder="08..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pekerjaan</label>
+          <input id="f-job" placeholder="Pekerjaan saat ini" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Domisili</label>
+          <textarea id="f-address" rows="2" placeholder="Alamat lengkap tempat tinggal" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+        </div>
+        <div class="sm:col-span-2 pt-2">
+          <button type="submit" id="save-profile-btn" class="px-5 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-md hover:bg-primary-700 shadow-sm transition-colors">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-900 mb-1">Keamanan Akun</h3>
+      <p class="text-xs text-gray-500 mb-4">Ganti password Anda secara berkala demi keamanan data.</p>
+
+      <form id="pwd-form" class="space-y-4 max-w-sm">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password Lama</label>
+          <input id="p-old" type="password" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+          <input id="p-new" type="password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+          <input id="p-conf" type="password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <button type="submit" id="pwd-btn" class="px-4 py-2 bg-gray-800 text-white text-sm font-semibold rounded-md hover:bg-gray-900 transition-colors">
+          Ubah Password
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth();
+
+    const MENU = [
+      { href: 'dashboard.html', label: 'Dashboard' },
+      { href: 'anak.html', label: 'Anak Saya' },
+      { href: 'presensi.html', label: 'Presensi' },
+      { href: 'perkembangan.html', label: 'Perkembangan' },
+      { href: 'tagihan.html', label: 'Tagihan' },
+      { href: 'pengumuman.html', label: 'Pengumuman' },
+      { href: 'profile.html', label: 'Profil' }
+    ];
+
+    Shell.init({
+      menu: MENU,
+      active: 'profile.html',
+      portalLabel: 'Portal Orang Tua',
+      title: 'Profil Saya',
+      subtitle: 'Kelola data pribadi dan keamanan akun',
+      showRefresh: true,
+      onRefresh: () => {
+        syncCurrentUser();
+        loadMe();
+      }
+    });
+
+    function syncCurrentUser() {
+      const u = getCurrentUser();
+      if (u) {
+        const dName = u.full_name || u.name || 'Orang Tua';
+        document.getElementById('name').textContent = dName;
+        document.getElementById('email').textContent = u.email || '-';
+        document.getElementById('role').textContent = u.role_label || u.role || 'orang_tua';
+        document.getElementById('avatar').textContent = dName.charAt(0).toUpperCase();
+        document.getElementById('f-name').value = dName;
+        document.getElementById('f-email').value = u.email || '';
+      }
+    }
+    syncCurrentUser();
+
+    async function loadMe() {
+      const errBanner = document.getElementById('error-banner');
+      errBanner.classList.add('hidden');
+      try {
+        const res = await apiCall('parent', 'me');
+        if (res.success && res.data) {
+          const p = res.data.parent || res.data;
+          document.getElementById('f-phone').value = p.phone || '';
+          document.getElementById('f-job').value = p.occupation || p.job || '';
+          document.getElementById('f-address').value = p.address || '';
+        }
+      } catch (e) {
+        errBanner.classList.remove('hidden');
+        document.getElementById('error-message').textContent = 'Gagal memuat detail data profil orang tua';
+      }
+    }
+    loadMe();
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('save-profile-btn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan...';
+
+      try {
+        const res = await apiCall('parent', 'update_profile', {
+          full_name: document.getElementById('f-name').value.trim(),
+          phone: document.getElementById('f-phone').value.trim(),
+          occupation: document.getElementById('f-job').value.trim(),
+          address: document.getElementById('f-address').value.trim()
+        });
+        showToast(res.message || (res.success ? 'Profil berhasil diperbarui' : 'Gagal memperbarui profil'), res.success ? 'success' : 'error');
+        if (res.success) {
+          const u = getCurrentUser() || {};
+          u.full_name = document.getElementById('f-name').value.trim();
+          localStorage.setItem('siy_user', JSON.stringify(u));
+          syncCurrentUser();
+        }
+      } catch (err) {
+        showToast('Koneksi terganggu', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+
+    document.getElementById('pwd-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const oldP = document.getElementById('p-old').value;
+      const newP = document.getElementById('p-new').value;
+      const conf = document.getElementById('p-conf').value;
+      if (newP !== conf) {
+        showToast('Password baru dan konfirmasi tidak cocok', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('pwd-btn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
+
+      try {
+        const res = await apiCall('auth', 'change_password', { old_password: oldP, new_password: newP });
+        showToast(res.message || (res.success ? 'Password berhasil diubah' : 'Gagal mengubah password'), res.success ? 'success' : 'error');
+        if (res.success) e.target.reset();
+      } catch (err) {
+        showToast('Koneksi terganggu', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+  </script>
+</body>
+</html>

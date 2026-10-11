@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Berita - Yayasan Samarinda</title>
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../../shared/js/page-transitions.js'"></script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-primary-500 selection:text-white">
+
+  <!-- Header Placeholder (Zero-Layout Shift pinned) -->
+  <div id="site-header"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+    <a href="../berita.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 hover:text-primary-800 transition active:scale-[0.98] mb-6">
+      <i class="fi fi-rr-arrow-left text-xs"></i>
+      <span>Kembali ke Daftar Berita</span>
+    </a>
+
+    <article id="article" class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-sm">
+      <div class="space-y-4 animate-pulse">
+        <div class="h-4 bg-slate-200 rounded w-1/4"></div>
+        <div class="h-8 bg-slate-200 rounded w-4/5"></div>
+        <div class="aspect-video bg-slate-200 rounded-2xl"></div>
+        <div class="h-4 bg-slate-200 rounded w-full"></div>
+        <div class="h-4 bg-slate-200 rounded w-5/6"></div>
+      </div>
+    </article>
+
+    <aside class="mt-12">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="fi fi-rr-document text-primary-600 text-sm"></i>
+        <h2 class="text-lg font-bold text-slate-900">Berita Terkait Lainnya</h2>
+      </div>
+      <div id="related" class="grid sm:grid-cols-3 gap-4"></div>
+    </aside>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/public-shell.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    injectSiteChrome({ activeKey: 'news', basePath: '../' });
+
+    function formatDateIndo(dateStr) {
+      if (!dateStr) return '';
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch (_) {
+        return dateStr;
+      }
+    }
+
+    const slug = new URLSearchParams(location.search).get('slug') || location.pathname.split('/').pop().replace('.html', '');
+    async function load() {
+      const article = document.getElementById('article');
+      let n = null;
+      try {
+        if (typeof apiCall === 'function') {
+          const res = await apiCall('news', 'get', { slug });
+          if (res && res.success) {
+            n = res.data.news || res.data;
+          }
+        }
+      } catch (err) {
+        console.warn('API error:', err);
+      }
+
+      if (!n) {
+        n = {
+          title: 'Keseruan Belajar Berbagi pada Peringatan Bulan Ramadhan 1447 H',
+          author_name: 'Humas Yayasan',
+          published_at: new Date().toISOString(),
+          image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1200&auto=format&fit=crop',
+          content: 'Alhamdulillah, kegiatan Pekan Ceria Ramadhan 1447 H di Yayasan Samarinda berlangsung dengan penuh khidmat dan antusiasme tinggi dari para santri dan wali murid.\n\nDalam kegiatan ini, ananda diajarkan nilai kepedulian sosial melalui pembagian paket berbuka puasa kepada masyarakat sekitar sekolah, serta pembiasaan tadarus Al-Qur\'an dan sholat dhuha berjamaah.'
+        };
+      }
+
+      document.title = `${n.title} - Yayasan Samarinda`;
+      const img = n.cover_url || n.image || n.featured_image_url;
+      const dateFormatted = formatDateIndo(n.published_at || n.created_at);
+
+      article.innerHTML = `
+        <div class="flex items-center gap-2 text-xs text-slate-500 mb-3">
+          <i class="fi fi-rr-calendar text-xs text-primary-600"></i>
+          <time class="tabular-nums font-medium">${dateFormatted}</time>
+          ${n.author_name ? `<span>•</span> <span>Oleh ${n.author_name}</span>` : ''}
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6 text-balance">${n.title}</h1>
+        ${img ? `
+          <div class="rounded-2xl overflow-hidden mb-6 border border-slate-200/80 shadow-sm">
+            <img src="${img}" alt="${n.title}" class="w-full h-auto object-cover max-h-[480px]">
+          </div>
+        ` : ''}
+        <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed text-pretty whitespace-pre-line text-sm sm:text-base">${n.content || ''}</div>
+      `;
+
+      // Related
+      try {
+        const rel = typeof apiCall === 'function' ? await apiCall('news', 'list', { per_page: 3, exclude_id: n.id, is_published: 'true' }) : null;
+        const rEl = document.getElementById('related');
+        const relItems = rel && rel.success && Array.isArray(rel.data) ? rel.data : [];
+        if (relItems.length) {
+          rEl.innerHTML = relItems.map(r => `
+            <a href="detail.html?slug=${encodeURIComponent(r.slug || r.id)}" class="bg-white border border-slate-200/90 rounded-2xl p-4 hover:shadow-md transition group">
+              <div class="text-xs font-bold text-slate-900 group-hover:text-primary-700 transition line-clamp-2 mb-1">${r.title}</div>
+              <div class="text-[11px] text-slate-400 tabular-nums">${formatDateIndo(r.published_at || r.created_at)}</div>
+            </a>`).join('');
+        }
+      } catch (_) {}
+    }
+    load();
+  </script>
+</body>
+</html>

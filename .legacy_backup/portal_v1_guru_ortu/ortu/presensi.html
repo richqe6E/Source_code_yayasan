@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presensi Anak - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <div id="error-banner" class="hidden mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span id="error-message">Terjadi kesalahan</span>
+      </div>
+      <button onclick="load()" class="text-xs font-semibold px-2.5 py-1 bg-red-100 hover:bg-red-200 rounded text-red-800">Coba Lagi</button>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
+      <div class="grid sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Pilih Anak</label>
+          <select id="att-student" onchange="load()" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Periode Bulan</label>
+          <input id="att-month" type="month" onchange="load()" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div class="flex items-end">
+          <button onclick="load()" class="w-full px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-md hover:bg-primary-700 transition-colors">
+            Tampilkan Presensi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+      <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-green-700 tabular-nums" id="ct-hadir">-</div>
+        <div class="text-xs text-green-800 font-medium mt-0.5">Hadir</div>
+      </div>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-yellow-700 tabular-nums" id="ct-izin">-</div>
+        <div class="text-xs text-yellow-800 font-medium mt-0.5">Izin</div>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-blue-700 tabular-nums" id="ct-sakit">-</div>
+        <div class="text-xs text-blue-800 font-medium mt-0.5">Sakit</div>
+      </div>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-red-700 tabular-nums" id="ct-alpha">-</div>
+        <div class="text-xs text-red-800 font-medium mt-0.5">Alpha</div>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status Kehadiran</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Catatan Guru</th>
+            </tr>
+          </thead>
+          <tbody id="att-tbody" class="bg-white divide-y divide-gray-200">
+            <tr><td colspan="3" class="px-4 py-6 text-center text-sm text-gray-500">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('orang_tua,pendaftar');
+
+    const MENU = [
+      { href: 'dashboard.html', label: 'Dashboard' },
+      { href: 'anak.html', label: 'Anak Saya' },
+      { href: 'presensi.html', label: 'Presensi' },
+      { href: 'perkembangan.html', label: 'Perkembangan' },
+      { href: 'tagihan.html', label: 'Tagihan' },
+      { href: 'pengumuman.html', label: 'Pengumuman' },
+      { href: 'profile.html', label: 'Profil' }
+    ];
+
+    Shell.init({
+      menu: MENU,
+      active: 'presensi.html',
+      portalLabel: 'Portal Orang Tua',
+      title: 'Presensi Anak',
+      subtitle: 'Riwayat kehadiran anak didik per bulan',
+      showRefresh: true,
+      onRefresh: load
+    });
+
+    document.getElementById('att-month').value = new Date().toISOString().slice(0, 7);
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    }
+
+    async function loadChildren() {
+      const qp = new URLSearchParams(window.location.search);
+      const targetStudent = qp.get('student_id');
+
+      const res = await apiCall('students', 'myChildren');
+      const sel = document.getElementById('att-student');
+      const rawList = res.data && res.data.children ? res.data.children : (Array.isArray(res.data) ? res.data : []);
+      const children = rawList.map(item => {
+        const s = item.student || item;
+        const cls = item.class || {};
+        return {
+          id: s.id,
+          full_name: s.full_name || '-',
+          class_name: cls.name || s.class_name || 'Tanpa Kelas'
+        };
+      });
+
+      if (res.success && children.length > 0) {
+        sel.innerHTML = children.map(c => `
+          <option value="${c.id}" ${targetStudent === c.id ? 'selected' : ''}>
+            ${escapeHtml(c.full_name)} (${escapeHtml(c.class_name)})
+          </option>
+        `).join('');
+        if (children.length === 1) {
+          sel.disabled = true;
+          sel.classList.add('bg-gray-50', 'text-gray-900', 'font-semibold', 'cursor-default');
+          const lbl = sel.previousElementSibling;
+          if (lbl) lbl.textContent = 'Data Anak Terdaftar';
+        }
+      } else {
+        sel.innerHTML = '<option value="">(Belum ada anak terhubung)</option>';
+      }
+      load();
+    }
+
+    async function load() {
+      const studentId = document.getElementById('att-student').value;
+      const month = document.getElementById('att-month').value;
+      const tbody = document.getElementById('att-tbody');
+      const errBanner = document.getElementById('error-banner');
+      errBanner.classList.add('hidden');
+
+      if (!studentId) {
+        tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-gray-500">Pilih data anak terlebih dahulu.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = Shell.skeletonRows ? Shell.skeletonRows(3, 5) : '<tr><td colspan="3" class="p-6 text-center text-sm text-gray-400 animate-pulse">Memuat...</td></tr>';
+
+      try {
+        const res = await apiCall('attendance', 'history', { student_id: studentId, month });
+        if (!res.success) {
+          errBanner.classList.remove('hidden');
+          document.getElementById('error-message').textContent = res.message || 'Gagal memuat riwayat presensi';
+          tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-red-600">${escapeHtml(res.message || 'Gagal memuat presensi')}</td></tr>`;
+          return;
+        }
+
+        const records = Array.isArray(res.data) ? res.data : ((res.data && res.data.records) || (res.raw && res.raw.records) || []);
+        if (records.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-12 text-center text-sm text-gray-500">Belum ada catatan presensi untuk bulan yang dipilih.</td></tr>';
+        } else {
+          tbody.innerHTML = records.map(r => {
+            // Backend pakai kode H/I/S/A; UI pakai Hadir/Izin/Sakit/Alpha
+            const statusLabel = { 'H': 'Hadir', 'I': 'Izin', 'S': 'Sakit', 'A': 'Alpha' }[String(r.status).toUpperCase()] || r.status;
+            const statusKey = String(r.status).toLowerCase();
+            return `
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3 text-sm text-gray-800 font-medium tabular-nums whitespace-nowrap">${formatDate(r.date)}</td>
+              <td class="px-4 py-3 whitespace-nowrap"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge(statusKey)}">${escapeHtml(statusLabel)}</span></td>
+              <td class="px-4 py-3 text-xs text-gray-600 min-w-0 max-w-sm truncate">${escapeHtml(r.notes || r.note || '-')}</td>
+            </tr>`;
+          }).join('');
+        }
+
+        const s = (res.raw && res.raw.summary) || (res.data && res.data.summary) || {};
+        const hadirCount = s.hadir || records.filter(r => String(r.status).toUpperCase() === 'H').length;
+        const izinCount = s.izin || records.filter(r => String(r.status).toUpperCase() === 'I').length;
+        const sakitCount = s.sakit || records.filter(r => String(r.status).toUpperCase() === 'S').length;
+        const alphaCount = s.alpha || records.filter(r => String(r.status).toUpperCase() === 'A').length;
+
+        document.getElementById('ct-hadir').textContent = hadirCount;
+        document.getElementById('ct-izin').textContent = izinCount;
+        document.getElementById('ct-sakit').textContent = sakitCount;
+        document.getElementById('ct-alpha').textContent = alphaCount;
+      } catch (e) {
+        errBanner.classList.remove('hidden');
+        document.getElementById('error-message').textContent = 'Koneksi terganggu saat memuat presensi';
+        tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-red-600">Koneksi terganggu</td></tr>';
+      }
+    }
+
+    function badge(s) {
+      return {
+        hadir: 'bg-green-100 text-green-800 border border-green-200',
+        izin: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+        sakit: 'bg-blue-100 text-blue-800 border border-blue-200',
+        alpha: 'bg-red-100 text-red-800 border border-red-200'
+      }[s] || 'bg-gray-100 text-gray-700';
+    }
+
+    loadChildren();
+  </script>
+</body>
+</html>

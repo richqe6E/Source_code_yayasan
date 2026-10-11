@@ -1,0 +1,92 @@
+{
+  "version": 2,
+  "name": "siyayasan-portal",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "builds": [
+    { "src": "public/**/*", "use": "@vercel/static" },
+    { "src": "portal/**/*", "use": "@vercel/static" },
+    { "src": "shared/**/*", "use": "@vercel/static" }
+  ],
+  "redirects": [
+    { "source": "/admin", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/admin/", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/siswa", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/siswa/", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/portal/admin", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/portal/admin/", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/portal/siswa", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/portal/siswa/", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/guru", "destination": "/login.html", "permanent": false },
+    { "source": "/guru/(.*)", "destination": "/login.html", "permanent": false },
+    { "source": "/ortu", "destination": "/login.html", "permanent": false },
+    { "source": "/ortu/(.*)", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/guru", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/guru/(.*)", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/ortu", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/ortu/(.*)", "destination": "/login.html", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/public/favicon.ico" },
+    { "source": "/shared/(.*)", "destination": "/shared/$1" },
+    { "source": "/public/(.*)", "destination": "/public/$1" },
+    { "source": "/css/(.*)", "destination": "/public/css/$1" },
+    { "source": "/js/(.*)", "destination": "/public/js/$1" },
+    { "source": "/videos/(.*)", "destination": "/public/videos/$1" },
+    { "source": "/assets/(.*)", "destination": "/public/assets/$1" },
+    { "source": "/admin/(.*)", "destination": "/portal/admin/$1" },
+    { "source": "/siswa/(.*)", "destination": "/portal/siswa/$1" },
+    { "source": "/portal/(.*)", "destination": "/portal/$1" },
+    { "source": "/ppdb/form-paud.html", "destination": "/public/ppdb/form-paud.html" },
+    { "source": "/ppdb/form-tpq.html", "destination": "/public/ppdb/form-tpq.html" },
+    { "source": "/ppdb/status.html", "destination": "/public/ppdb/status.html" },
+    { "source": "/ppdb/(.*)", "destination": "/public/ppdb/$1" },
+    { "source": "/berita/(.*)", "destination": "/public/berita/detail.html" },
+    { "source": "/form-paud.html", "destination": "/public/ppdb/form-paud.html" },
+    { "source": "/form-tpq.html", "destination": "/public/ppdb/form-tpq.html" },
+    { "source": "/status.html", "destination": "/public/ppdb/status.html" },
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/index.html", "destination": "/public/index.html" },
+    { "source": "/index", "destination": "/public/index.html" },
+    { "source": "/profil.html", "destination": "/public/profil.html" },
+    { "source": "/profil", "destination": "/public/profil.html" },
+    { "source": "/berita.html", "destination": "/public/berita.html" },
+    { "source": "/berita", "destination": "/public/berita.html" },
+    { "source": "/galeri.html", "destination": "/public/galeri.html" },
+    { "source": "/galeri", "destination": "/public/galeri.html" },
+    { "source": "/kontak.html", "destination": "/public/kontak.html" },
+    { "source": "/kontak", "destination": "/public/kontak.html" },
+    { "source": "/ppdb.html", "destination": "/public/ppdb.html" },
+    { "source": "/ppdb", "destination": "/public/ppdb.html" },
+    { "source": "/register.html", "destination": "/public/register.html" },
+    { "source": "/register", "destination": "/public/register.html" },
+    { "source": "/login.html", "destination": "/public/login.html" },
+    { "source": "/login", "destination": "/public/login.html" },
+    { "source": "/pengumuman.html", "destination": "/public/pengumuman.html" },
+    { "source": "/pengumuman", "destination": "/public/pengumuman.html" },
+    { "source": "/agenda.html", "destination": "/public/agenda.html" },
+    { "source": "/agenda", "destination": "/public/agenda.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/shared/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/public/css/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    }
+  ]
+}

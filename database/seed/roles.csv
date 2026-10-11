@@ -1,0 +1,6 @@
+id,code,name,description,is_system,created_at,created_by,updated_at,updated_by,is_deleted
+ROLE-2026-00001,super_admin,Super Admin,"Akses penuh ke seluruh sistem yayasan",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+ROLE-2026-00002,admin_tu,Admin / TU,"Tata Usaha - kelola operasional harian PPDB, siswa, pembayaran",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+ROLE-2026-00003,guru,Guru,"Guru PAUD/TK - input presensi dan perkembangan anak",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+ROLE-2026-00004,orang_tua,Orang Tua,"Wali murid - lihat data dan perkembangan anak",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+ROLE-2026-00005,pendaftar,Pendaftar,"Calon siswa - akses portal PPDB online",TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE

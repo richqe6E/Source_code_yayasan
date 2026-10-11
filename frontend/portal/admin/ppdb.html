@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPDB - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <!-- PPDB Status & Schedule Quick Control Banner -->
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div id="admin-ppdb-status-icon" class="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold bg-green-100 text-green-700">✓</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-gray-900">Status Pendaftaran Publik:</h2>
+            <span id="admin-ppdb-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 uppercase">MEMUAT...</span>
+          </div>
+          <p id="admin-ppdb-period-text" class="text-xs text-gray-500 mt-0.5">Tahun Ajaran 2026/2027 • Jadwal resmi aktif</p>
+        </div>
+      </div>
+      <button onclick="openPeriodModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs sm:text-sm font-semibold rounded-md shadow-sm transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        Atur Jadwal &amp; Buka/Tutup PPDB
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200 mb-4 overflow-x-auto">
+      <nav class="flex gap-1 -mb-px min-w-max">
+        <button data-tab="all" onclick="switchTab('all')" class="ppdb-tab px-4 py-2 text-sm font-medium border-b-2 border-primary-600 text-primary-700">Semua</button>
+        <button data-tab="pending" onclick="switchTab('pending')" class="ppdb-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900">Pending</button>
+        <button data-tab="approved" onclick="switchTab('approved')" class="ppdb-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900">Approved</button>
+        <button data-tab="rejected" onclick="switchTab('rejected')" class="ppdb-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900">Rejected</button>
+      </nav>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <input id="filter-search" type="text" placeholder="Cari nama..." class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+        <select id="filter-type" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+          <option value="">Semua Jenis</option><option value="paud">PAUD/TK</option><option value="tpq">TPQ</option>
+        </select>
+        <button onclick="loadPpdb()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">Filter</button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">No. Pendaftaran</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Nama Anak</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Jenis</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Orang Tua</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tgl Daftar</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="ppdb-tbody" class="bg-white divide-y divide-gray-200">
+            <tr><td colspan="7" class="px-4 py-6 text-center text-sm text-gray-500">Memuat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Pengaturan Jadwal & Periode PPDB -->
+  <div id="period-modal" class="hidden fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
+      <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <h3 class="text-base font-bold text-gray-900">Pengaturan Periode &amp; Jadwal PPDB</h3>
+        <button type="button" onclick="closePeriodModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+      </div>
+      <form id="period-form" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Status Pendaftaran di Website Utama *</label>
+          <select id="p-status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium focus:ring-2 focus:ring-primary-500">
+            <option value="open">Buka (Formulir Pendaftaran Ditampilkan)</option>
+            <option value="closed">Tutup (Formulir Disembunyikan, Muncul Pemberitahuan Ditutup)</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Saat ditutup, tombol isi formulir di halaman publik akan otomatis hilang dan digantikan pemberitahuan pendaftaran ditutup.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Tahun Ajaran / Periode</label>
+          <input id="p-academic-year" type="text" placeholder="Contoh: 2026/2027" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+        </div>
+        <div class="border-t border-gray-100 pt-3">
+          <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide mb-3">Jadwal Penting (Tampil di Website Utama)</h4>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">1. Pendaftaran Online</label>
+              <input id="p-reg-dates" type="text" placeholder="Misal: 1 Oktober - 30 November 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">2. Verifikasi Berkas</label>
+              <input id="p-verif-dates" type="text" placeholder="Misal: 5 - 15 Desember 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">3. Pengumuman Kelulusan</label>
+              <input id="p-ann-dates" type="text" placeholder="Misal: 20 Desember 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">4. Daftar Ulang &amp; Penyerahan Berkas</label>
+              <input id="p-rereg-dates" type="text" placeholder="Misal: 22 - 31 Desember 2026" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Catatan Tambahan untuk Calon Pendaftar (Opsional)</label>
+          <textarea id="p-notes" rows="2" placeholder="Catatan opsional yang tampil di bawah jadwal penting..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
+          <button type="button" onclick="closePeriodModal()" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">Batal</button>
+          <button id="btn-save-period" type="submit" class="px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-md hover:bg-primary-700 shadow-sm">Simpan Pengaturan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Detail Pendaftaran -->
+  <div id="ppdb-detail-modal" class="hidden fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
+      <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <h3 class="text-base font-semibold text-gray-900">Detail Pendaftaran Calon Siswa</h3>
+        <button onclick="document.getElementById('ppdb-detail-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">&times;</button>
+      </div>
+      <div id="ppdb-detail-body" class="p-5"></div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'ppdb.html',
+      portalLabel: 'Portal Admin',
+      title: 'Manajemen PPDB',
+      subtitle: 'Verifikasi, kelola calon siswa, & atur periode pendaftaran',
+      showRefresh: true,
+      onRefresh: () => { loadPpdbPeriod(); loadPpdb(); }
+    });
+
+    let currentTab = 'all';
+    let currentPeriod = null;
+
+    async function loadPpdbPeriod() {
+      try {
+        const res = await apiCall('ppdb', 'period');
+        if (res && res.success && res.data) {
+          currentPeriod = res.data;
+          const isOpen = currentPeriod.status === 'open';
+          const icon = document.getElementById('admin-ppdb-status-icon');
+          const badge = document.getElementById('admin-ppdb-status-badge');
+          const text = document.getElementById('admin-ppdb-period-text');
+
+          if (isOpen) {
+            icon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold bg-green-100 text-green-700';
+            icon.textContent = '✓';
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 uppercase';
+            badge.textContent = 'BUKA (PENDAFTARAN AKTIF)';
+          } else {
+            icon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold bg-amber-100 text-amber-700';
+            icon.textContent = '✕';
+            badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 uppercase';
+            badge.textContent = 'TUTUP (FORMULIR DISEMBUNYIKAN)';
+          }
+          text.textContent = `Tahun Ajaran ${currentPeriod.academic_year || '2026/2027'} • Linimasa jadwal aktif di website publik`;
+        }
+      } catch (err) {
+        console.warn('Gagal memuat status periode PPDB:', err);
+      }
+    }
+
+    function openPeriodModal() {
+      if (currentPeriod) {
+        document.getElementById('p-status').value = currentPeriod.status || 'open';
+        document.getElementById('p-academic-year').value = currentPeriod.academic_year || '2026/2027';
+        document.getElementById('p-reg-dates').value = currentPeriod.online_registration_dates || '';
+        document.getElementById('p-verif-dates').value = currentPeriod.verification_dates || '';
+        document.getElementById('p-ann-dates').value = currentPeriod.announcement_dates || '';
+        document.getElementById('p-rereg-dates').value = currentPeriod.re_registration_dates || '';
+        document.getElementById('p-notes').value = currentPeriod.notes || '';
+      }
+      document.getElementById('period-modal').classList.remove('hidden');
+    }
+
+    function closePeriodModal() {
+      document.getElementById('period-modal').classList.add('hidden');
+    }
+
+    document.getElementById('period-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-period');
+      btn.disabled = true; btn.textContent = 'Menyimpan...';
+
+      const payload = {
+        status: document.getElementById('p-status').value,
+        academic_year: document.getElementById('p-academic-year').value.trim() || '2026/2027',
+        online_registration_dates: document.getElementById('p-reg-dates').value.trim(),
+        verification_dates: document.getElementById('p-verif-dates').value.trim(),
+        announcement_dates: document.getElementById('p-ann-dates').value.trim(),
+        re_registration_dates: document.getElementById('p-rereg-dates').value.trim(),
+        notes: document.getElementById('p-notes').value.trim()
+      };
+
+      try {
+        const res = await apiCall('ppdb', 'update_period', payload);
+        showToast(res.message || 'Pengaturan PPDB berhasil disimpan', res.success ? 'success' : 'error');
+        if (res.success) {
+          closePeriodModal();
+          loadPpdbPeriod();
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan pengaturan PPDB', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Simpan Pengaturan';
+      }
+    });
+
+    async function loadPpdb() {
+      Shell.hideError();
+      const stopSpin = Shell.startRefresh();
+      const params = { per_page: 50 };
+      if (currentTab !== 'all') params.status = currentTab;
+      const search = document.getElementById('filter-search').value;
+      const type = document.getElementById('filter-type').value;
+      if (search) params.search = search;
+      if (type) params.form_type = type;
+
+      const tbody = document.getElementById('ppdb-tbody');
+      tbody.innerHTML = Shell.skeletonRows(7, 4);
+
+      try {
+        const res = await apiCall('ppdb', 'list', params);
+        if (!res.success) {
+          Shell.showError(res.message || 'Gagal memuat data PPDB');
+          tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-sm text-red-600">${res.message || 'Gagal'}</td></tr>`;
+          return;
+        }
+        const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.registrations)) || []);
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-sm text-gray-500">Tidak ada data pendaftaran</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(r => `
+          <tr>
+            <td class="px-4 py-3 text-sm font-mono tabular-nums text-gray-700 whitespace-nowrap">${r.registration_number || '-'}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 min-w-0"><span class="truncate block max-w-xs">${r.child_name || '-'}</span></td>
+            <td class="px-4 py-3 text-sm text-gray-600 uppercase font-medium">${r.form_type || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">${r.father_name || r.mother_name || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 tabular-nums whitespace-nowrap">${formatDate(r.created_at)}</td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs rounded font-medium ${ppdbStatus(r.status)}">${r.status}</span></td>
+            <td class="px-4 py-3 text-sm whitespace-nowrap space-x-2">
+              <button onclick="viewDetail('${r.id}')" class="text-primary-700 hover:text-primary-900 font-medium">Lihat</button>
+              ${r.status === 'pending' ? `<button onclick="approveReg('${r.id}')" class="text-green-700 hover:text-green-900 font-medium">Setujui</button><button onclick="rejectReg('${r.id}')" class="text-red-700 hover:text-red-900 font-medium">Tolak</button>` : ''}
+              ${r.status === 'approved' || r.status === 'accepted' ? `<button onclick="convertReg('${r.id}')" class="text-blue-700 hover:text-blue-900 font-medium">Convert ke Siswa</button>` : ''}
+            </td>
+          </tr>`).join('');
+      } catch (e) {
+        Shell.showError('Tidak dapat terhubung ke server.');
+      } finally {
+        stopSpin();
+      }
+    }
+
+    function ppdbStatus(status) {
+      return { pending: 'bg-yellow-100 text-yellow-700', approved: 'bg-green-100 text-green-700', rejected: 'bg-red-100 text-red-700', converted: 'bg-blue-100 text-blue-700' }[status] || 'bg-gray-100 text-gray-700';
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.ppdb-tab').forEach(b => {
+        b.classList.remove('border-primary-600','text-primary-700');
+        b.classList.add('border-transparent','text-gray-600');
+      });
+      const active = document.querySelector(`[data-tab="${tab}"]`);
+      active.classList.add('border-primary-600','text-primary-700');
+      active.classList.remove('border-transparent','text-gray-600');
+      loadPpdb();
+    }
+
+    async function viewDetail(id) {
+      const res = await apiCall('ppdb', 'get', { id });
+      if (!res.success) { showToast(res.message, 'error'); return; }
+      const r = res.data;
+      document.getElementById('ppdb-detail-body').innerHTML = `
+        <dl class="grid grid-cols-2 gap-3 text-sm">
+          <div><dt class="text-gray-500">No. Pendaftaran</dt><dd class="font-mono font-semibold">${r.registration_number}</dd></div>
+          <div><dt class="text-gray-500">Status</dt><dd><span class="px-2 py-0.5 text-xs rounded font-medium ${ppdbStatus(r.status)}">${r.status}</span></dd></div>
+          <div><dt class="text-gray-500">Nama Anak</dt><dd class="font-semibold text-gray-900">${r.child_name || '-'}</dd></div>
+          <div><dt class="text-gray-500">Jenis</dt><dd class="uppercase font-medium">${r.form_type || '-'}</dd></div>
+          <div><dt class="text-gray-500">Tgl Lahir</dt><dd class="font-mono">${r.birth_date || r.child_birth_date || '-'}</dd></div>
+          <div><dt class="text-gray-500">JK</dt><dd>${r.child_gender || r.gender || '-'}</dd></div>
+          <div><dt class="text-gray-500">Ayah</dt><dd>${r.father_name || '-'}</dd></div>
+          <div><dt class="text-gray-500">Ibu</dt><dd>${r.mother_name || '-'}</dd></div>
+          <div><dt class="text-gray-500">Email Ortu</dt><dd>${r.parent_email || r.email || '-'}</dd></div>
+          <div><dt class="text-gray-500">No WhatsApp</dt><dd class="font-mono">${r.parent_phone || r.phone || '-'}</dd></div>
+          <div class="col-span-2"><dt class="text-gray-500">Alamat</dt><dd>${r.address || '-'}</dd></div>
+          ${r.child_photo_url ? `<div class="col-span-2"><dt class="text-gray-500 mb-1">Foto Calon Siswa</dt><dd><img src="${r.child_photo_url}" class="w-24 h-24 object-cover rounded-md border"></dd></div>` : ''}
+          ${r.notes ? `<div class="col-span-2"><dt class="text-gray-500">Catatan</dt><dd>${r.notes}</dd></div>` : ''}
+        </dl>
+      `;
+      document.getElementById('ppdb-detail-modal').classList.remove('hidden');
+    }
+
+    async function approveReg(id) {
+      const notes = prompt('Catatan verifikasi (opsional):');
+      const res = await apiCall('ppdb', 'approve', { id, notes: notes || '' });
+      showToast(res.message, res.success ? 'success' : 'error');
+      if (res.success) loadPpdb();
+    }
+
+    async function rejectReg(id) {
+      const reason = prompt('Alasan penolakan:');
+      if (!reason) return;
+      const res = await apiCall('ppdb', 'reject', { id, reason });
+      showToast(res.message, res.success ? 'success' : 'error');
+      if (res.success) loadPpdb();
+    }
+
+    async function convertReg(id) {
+      // Ambil daftar kelas untuk dropdown tujuan
+      let classes = [];
+      try {
+        const cr = await apiCall('classes', 'list', { per_page: 100 });
+        const raw = cr.data && (cr.data.classes || cr.data.items || (Array.isArray(cr.data) ? cr.data : []));
+        classes = Array.isArray(raw) ? raw : [];
+      } catch (_) { classes = []; }
+
+      if (classes.length === 0) {
+        showToast('Tidak ada kelas tersedia. Buat kelas terlebih dahulu di menu Kelas.', 'error');
+        return;
+      }
+
+      const defaultNis = '2026' + String(Math.floor(1000 + Math.random() * 9000));
+      const optionsHtml = classes.map(c => `<option value="${c.id}">${c.name} (${c.level || ''})</option>`).join('');
+
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 z-50 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <h3 class="text-base font-bold text-gray-900">Aktivasi Siswa Baru (PPDB)</h3>
+            <button id="cm-close" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+          </div>
+          <div class="p-5 space-y-4">
+            <p class="text-xs text-gray-600 leading-relaxed">
+              Pendaftar akan diaktifkan menjadi <strong>Siswa Aktif</strong>. Akun Portal Siswa otomatis aktif dengan username berupa <strong>NIS</strong> dan kata sandi awal berupa <strong>Tanggal Lahir</strong>.
+            </p>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Nomor Induk Siswa (NIS) *</label>
+              <input type="text" id="cm-nis" value="${defaultNis}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-gray-900 focus:ring-2 focus:ring-primary-500">
+              <span class="text-[11px] text-gray-400">NIS ini digunakan siswa untuk login ke Portal Siswa.</span>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Kelas Tujuan *</label>
+              <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
+              <button id="cm-cancel" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Batal</button>
+              <button id="cm-ok" class="px-5 py-2 bg-primary-600 text-white text-xs font-bold rounded-lg hover:bg-primary-700 shadow-md shadow-primary-600/20">Aktivasi Siswa</button>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+
+      const close = () => modal.remove();
+      modal.querySelector('#cm-close').onclick = close;
+      modal.querySelector('#cm-cancel').onclick = close;
+      modal.querySelector('#cm-ok').onclick = async () => {
+        const classId = modal.querySelector('#cm-class').value;
+        const nis = modal.querySelector('#cm-nis').value.trim();
+        if (!classId) { showToast('Pilih kelas terlebih dahulu', 'warning'); return; }
+        if (!nis) { showToast('Masukkan NIS siswa', 'warning'); return; }
+
+        const okBtn = modal.querySelector('#cm-ok');
+        okBtn.disabled = true; okBtn.textContent = 'Mengaktifkan...';
+
+        try {
+          const res = await apiCall('ppdb', 'convert', { id, class_id: classId, nis });
+          if (res.success && res.data) {
+            close();
+            showConvertSuccessModal(res.data);
+            loadPpdb();
+          } else {
+            showToast(res.message || 'Gagal mengaktifkan siswa', 'error');
+            okBtn.disabled = false; okBtn.textContent = 'Aktivasi Siswa';
+          }
+        } catch (e) {
+          showToast('Gagal mengaktifkan siswa', 'error');
+          okBtn.disabled = false; okBtn.textContent = 'Aktivasi Siswa';
+        }
+      };
+    }
+
+    function showConvertSuccessModal(data) {
+      const s = data.student || {};
+      const nis = data.nis || s.nis || '-';
+      const className = data.class_name || s.class_name || '-';
+      const studentName = s.full_name || s.name || '-';
+      const creds = data.initial_credentials || {};
+      const defaultPassword = creds.default_password || creds.password_hint || 'Tanggal Lahir Siswa (DDMMYYYY)';
+      const loginUrl = creds.login_url || (window.location.origin + '/public/login.html');
+      const copyText = `AKSES PORTAL SISWA YAYASAN SAMARINDA\nNama Siswa: ${studentName}\nNIS (Username): ${nis}\nPassword Awal: ${defaultPassword}\nLink Portal: ${loginUrl}\n\n*Catatan: Segera buat kata sandi baru saat pertama kali login.`;
+
+      const succModal = document.createElement('div');
+      succModal.className = 'fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4';
+      succModal.innerHTML = `
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div class="p-6 bg-gradient-to-r from-emerald-600 to-teal-700 text-white">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h3 class="text-lg font-bold">Siswa Berhasil Diaktifkan!</h3>
+            <p class="text-xs text-emerald-100 mt-0.5">Siswa resmi terdaftar di database yayasan dan dapat mengakses Portal Siswa.</p>
+          </div>
+
+          <div class="p-6 space-y-4 text-xs">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 font-mono">
+              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">Nama Siswa:</span><span class="font-bold text-slate-900">${studentName}</span></div>
+              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">NIS (Login ID):</span><span class="font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">${nis}</span></div>
+              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">Kelas Masuk:</span><span class="font-bold text-slate-800 font-sans">${className}</span></div>
+              <div class="flex justify-between items-center border-t border-slate-200 pt-2"><span class="text-slate-500 font-sans">Password Awal:</span><span class="font-bold text-emerald-700 font-sans">${defaultPassword}</span></div>
+            </div>
+
+            <p class="text-slate-600 text-xs leading-relaxed">
+              Saat pertama kali login di Portal Siswa, siswa/wali murid diwajibkan untuk membuat kata sandi baru demi keamanan akun.
+            </p>
+
+            <div class="space-y-2 pt-2">
+              <button id="btn-copy-creds" type="button" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                <span id="copy-btn-text">Salin Rincian Akun (1-Klik)</span>
+              </button>
+              <button id="btn-close-succ" type="button" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">
+                Tutup Jendela
+              </button>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(succModal);
+
+      succModal.querySelector('#btn-close-succ').onclick = () => succModal.remove();
+      succModal.querySelector('#btn-copy-creds').onclick = () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(copyText).then(() => {
+            const txt = succModal.querySelector('#copy-btn-text');
+            if (txt) txt.textContent = '✓ Berhasil Disalin ke Clipboard!';
+            setTimeout(() => { if (txt) txt.textContent = 'Salin Rincian Akun (1-Klik)'; }, 2500);
+          }).catch(() => {
+            showToast('Gagal menyalin info akun', 'error');
+          });
+        } else {
+          showToast('Fitur clipboard tidak didukung di browser ini', 'warning');
+        }
+      };
+    }
+
+    loadPpdbPeriod();
+    loadPpdb();
+  </script>
+</body>
+</html>

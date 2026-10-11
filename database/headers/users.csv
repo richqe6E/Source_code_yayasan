@@ -1,0 +1,1 @@
+id,email,password_hash,full_name,phone,role_id,status,linked_entity_id,linked_entity_type,last_login,failed_login_count,locked_until,email_verified,created_at,created_by,updated_at,updated_by,is_deleted

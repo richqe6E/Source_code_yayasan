@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dokumentasi foto kegiatan belajar, pentas seni, dan momen berharga santri Yayasan Samarinda.">
+  <title>Galeri Dokumentasi - Yayasan Samarinda</title>
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-primary-500 selection:text-white">
+
+  <!-- Header Placeholder (Zero-Layout Shift pinned) -->
+  <div id="site-header"></div>
+
+  <!-- Hero Header Section -->
+  <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-14 sm:py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 text-balance">
+        Galeri Foto &amp; Aktivitas
+      </h1>
+      <p class="text-base sm:text-lg text-primary-100 max-w-2xl mx-auto leading-relaxed text-pretty">
+        Potret senyum ceria, kreativitas tanpa batas, dan kebersamaan santri di lingkungan sekolah Yayasan Samarinda.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="aspect-square bg-white border border-slate-200 rounded-2xl animate-pulse"></div>
+      <div class="aspect-square bg-white border border-slate-200 rounded-2xl animate-pulse"></div>
+      <div class="aspect-square bg-white border border-slate-200 rounded-2xl animate-pulse"></div>
+      <div class="aspect-square bg-white border border-slate-200 rounded-2xl animate-pulse"></div>
+    </div>
+  </main>
+
+  <!-- Photo Lightbox Modal -->
+  <div id="photo-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="relative max-w-4xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800">
+      <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/80 transition" aria-label="Tutup">
+        <i class="fi fi-rr-cross-small text-xl"></i>
+      </button>
+      <div class="max-h-[75vh] flex items-center justify-center bg-black">
+        <img id="modal-img" src="" alt="Detail Foto" class="max-h-[75vh] w-auto object-contain">
+      </div>
+      <div class="p-5 bg-slate-900">
+        <h4 id="modal-title" class="text-base font-bold text-white mb-1"></h4>
+        <p id="modal-desc" class="text-xs text-slate-400"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer Placeholder -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
+  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
+  <script src="js/public-shell.js"></script>
+  <script>
+    injectSiteChrome({ activeKey: 'gallery', basePath: './' });
+
+    let galleryItems = [];
+
+    function openModal(index) {
+      const item = galleryItems[index];
+      if (!item) return;
+      document.getElementById('modal-img').src = item.image_url;
+      document.getElementById('modal-title').textContent = item.title || 'Foto Aktivitas Siswa';
+      document.getElementById('modal-desc').textContent = item.description || 'Dokumentasi resmi Yayasan Samarinda';
+      const m = document.getElementById('photo-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeModal() {
+      const m = document.getElementById('photo-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    document.getElementById('photo-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    async function loadGallery() {
+      const grid = document.getElementById('gallery-grid');
+      try {
+        if (typeof apiCall === 'function') {
+          const res = await apiCall('gallery', 'list', { per_page: 100 });
+          if (res && res.success && Array.isArray(res.data)) {
+            galleryItems = res.data;
+          }
+        }
+      } catch (err) {
+        console.warn('API gallery:', err);
+      }
+
+      if (!galleryItems || galleryItems.length === 0) {
+        galleryItems = [
+          {
+            title: 'Keceriaan Belajar Mewarnai Santri TK',
+            description: 'Melatih motorik halus dan pengenalan paduan warna estetis.',
+            image_url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop'
+          },
+          {
+            title: 'Bimbingan Tahsin Al-Qur\'an Bersama Ustadzah',
+            description: 'Makharijul huruf dengan metode interaktif yang menyenangkan.',
+            image_url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800&auto=format&fit=crop'
+          },
+          {
+            title: 'Praktek Sholat Berjamaah & Doa Harian',
+            description: 'Pembiasaan ibadah praktis sejak usia dini di musholla sekolah.',
+            image_url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop'
+          },
+          {
+            title: 'Pentas Seni & Kreasi Anak Indonesia',
+            description: 'Mengasah keberanian tampil dan rasa percaya diri siswa di depan umum.',
+            image_url: 'https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=800&auto=format&fit=crop'
+          },
+          {
+            title: 'Outing Class Edukatif Mengenal Tanaman',
+            description: 'Observasi alam terbuka di kebun edukasi sekolah.',
+            image_url: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=800&auto=format&fit=crop'
+          },
+          {
+            title: 'Senam Pagi Bersama Guru dan Teman',
+            description: 'Kebugaran fisik motorik kasar anak setiap hari Jumat pagi.',
+            image_url: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=800&auto=format&fit=crop'
+          }
+        ];
+      }
+
+      grid.innerHTML = galleryItems.map((g, i) => `
+        <div onclick="openModal(${i})" class="group aspect-square bg-slate-100 rounded-2xl overflow-hidden relative cursor-pointer border border-slate-200/80 shadow-sm hover:shadow-md transition active:scale-[0.96]">
+          <img src="${g.image_url}" alt="${g.title}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 text-white">
+            <span class="text-xs font-bold leading-snug line-clamp-1">${g.title}</span>
+            <span class="text-[10px] text-sky-300 mt-0.5 inline-flex items-center gap-1">
+              <i class="fi fi-rr-zoom-in text-[10px]"></i> Klik untuk perbesar
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    loadGallery();
+  </script>
+</body>
+</html>

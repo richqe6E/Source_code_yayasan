@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPDB Online - Yayasan Samarinda</title>
+  <meta name="description" content="Pendaftaran Peserta Didik Baru (PPDB) Online Yayasan Samarinda untuk PAUD, TK, dan TPQ.">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            brand: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            },
+            primary: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-brand-600 selection:text-white">
+
+  <div id="site-header"></div>
+
+  <!-- Hero Section PPDB -->
+  <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-14 sm:py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
+    
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <div id="ppdb-badge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-4 shadow-sm">
+        <i class="fi fi-rr-bullhorn text-xs text-sky-300"></i>
+        <span id="ppdb-badge-text">PPDB Online Tahun Ajaran 2026/2027</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 drop-shadow-sm">
+        Penerimaan Peserta Didik Baru
+      </h1>
+      <p id="ppdb-hero-desc" class="text-primary-100 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        Pendaftaran online resmi jenjang PAUD, TK A, TK B, dan TPQ Yayasan Samarinda. Daftarkan ananda secara mudah dan pantau hasil seleksi melalui Portal Siswa.
+      </p>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="#formulir-pendaftaran" class="px-6 py-3 bg-white text-primary-900 hover:bg-primary-50 text-sm font-bold rounded-lg shadow-lg shadow-black/10 transition flex items-center gap-2">
+          <i class="fi fi-rr-edit text-base text-primary-700"></i>
+          <span>Isi Formulir Pendaftaran</span>
+        </a>
+        <a href="ppdb/status.html" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 text-sm font-bold rounded-lg backdrop-blur-md transition flex items-center gap-2">
+          <i class="fi fi-rr-search text-base text-sky-300"></i>
+          <span>Cek Status Pendaftaran</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Konten Utama PPDB -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+
+    <!-- Status Periode Tutup (Tampil HANYA jika admin menonaktifkan PPDB) -->
+    <div id="ppdb-closed-card" class="hidden mb-10 bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8 text-center shadow-sm">
+      <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <i class="fi fi-rr-lock text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-bold text-slate-900 mb-1">Pendaftaran PPDB Belum Dibuka</h2>
+      <p id="ppdb-closed-msg" class="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed mb-4">
+        Mohon maaf, saat ini pendaftaran online sedang ditutup. Silakan periksa linimasa jadwal resmi di bawah ini.
+      </p>
+    </div>
+
+    <!-- Master Form Pendaftaran Terpadu (Multi-Tahap / Wizard) -->
+    <section id="formulir-pendaftaran" class="mb-14 scroll-mt-24">
+      <div class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-200/50">
+        
+        <!-- Header Formulir -->
+        <div class="border-b border-slate-100 pb-5 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-widest text-primary-700 mb-1">Formulir Resmi PPDB Online</p>
+              <h2 class="text-2xl font-bold text-slate-900">Pendaftaran Calon Siswa &amp; Santri Baru</h2>
+            </div>
+            <div class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold self-start sm:self-auto">
+              <span id="current-step-badge">Tahap 1 dari 5</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">Lengkapi tahapan pendaftaran di bawah ini sesuai dokumen resmi (Akta Kelahiran &amp; Kartu Keluarga).</p>
+        </div>
+
+        <!-- Stepper Progress Tracker -->
+        <div class="mb-8">
+          <!-- Progress Bar Line -->
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-4">
+            <div id="step-progress-bar" class="bg-primary-600 h-full rounded-full transition-all duration-300 w-1/5"></div>
+          </div>
+
+          <!-- Stepper Buttons / Badges -->
+          <div class="grid grid-cols-5 gap-1.5 text-center select-none">
+            <button type="button" onclick="goToStep(1)" id="step-nav-1" class="flex flex-col items-center gap-1 group py-1 text-primary-700 font-bold transition">
+              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-primary-100 transition">1</span>
+              <span class="text-[10px] sm:text-xs font-semibold truncate max-w-full">1. Siswa</span>
+            </button>
+            <button type="button" onclick="goToStep(2)" id="step-nav-2" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition">
+              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition">2</span>
+              <span class="text-[10px] sm:text-xs font-semibold truncate max-w-full">2. Alamat</span>
+            </button>
+            <button type="button" onclick="goToStep(3)" id="step-nav-3" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition">
+              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition">3</span>
+              <span class="text-[10px] sm:text-xs font-semibold truncate max-w-full">3. Orang Tua</span>
+            </button>
+            <button type="button" onclick="goToStep(4)" id="step-nav-4" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition">
+              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition">4</span>
+              <span class="text-[10px] sm:text-xs font-semibold truncate max-w-full">4. Berkas</span>
+            </button>
+            <button type="button" onclick="goToStep(5)" id="step-nav-5" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition">
+              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition">5</span>
+              <span class="text-[10px] sm:text-xs font-semibold truncate max-w-full">5. Review</span>
+            </button>
+          </div>
+        </div>
+
+        <form id="ppdb-direct-form" onsubmit="return false;">
+          
+          <!-- ==================== TAHAP 1: PILIHAN JENJANG & IDENTITAS SISWA ==================== -->
+          <div id="step-pane-1" class="step-pane space-y-6">
+            <!-- Pilihan Jenjang -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i class="fi fi-rr-school text-primary-600 text-sm"></i>
+                Pilih Jenjang Pendidikan *
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <label class="relative flex flex-col p-3.5 border-2 border-primary-600 bg-primary-50/60 rounded-2xl cursor-pointer transition select-none jenjang-option" onclick="selectJenjang('PAUD')">
+                  <input type="radio" name="jenjang" value="PAUD" checked class="hidden">
+                  <span class="text-xs font-bold text-slate-900">PAUD Terpadu</span>
+                  <span class="text-[11px] text-slate-500 mt-0.5">Usia 2 - 4 Tahun</span>
+                </label>
+                <label class="relative flex flex-col p-3.5 border border-slate-200 hover:border-primary-300 rounded-2xl cursor-pointer transition select-none jenjang-option" onclick="selectJenjang('TK A')">
+                  <input type="radio" name="jenjang" value="TK A" class="hidden">
+                  <span class="text-xs font-bold text-slate-900">TK A</span>
+                  <span class="text-[11px] text-slate-500 mt-0.5">Usia 4 - 5 Tahun</span>
+                </label>
+                <label class="relative flex flex-col p-3.5 border border-slate-200 hover:border-primary-300 rounded-2xl cursor-pointer transition select-none jenjang-option" onclick="selectJenjang('TK B')">
+                  <input type="radio" name="jenjang" value="TK B" class="hidden">
+                  <span class="text-xs font-bold text-slate-900">TK B</span>
+                  <span class="text-[11px] text-slate-500 mt-0.5">Usia 5 - 6 Tahun</span>
+                </label>
+                <label class="relative flex flex-col p-3.5 border border-slate-200 hover:border-primary-300 rounded-2xl cursor-pointer transition select-none jenjang-option" onclick="selectJenjang('TPQ')">
+                  <input type="radio" name="jenjang" value="TPQ" class="hidden">
+                  <span class="text-xs font-bold text-slate-900">TPQ Al-Quran</span>
+                  <span class="text-[11px] text-slate-500 mt-0.5">Santri Baru</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Data Pribadi Calon Siswa -->
+            <div class="pt-4 border-t border-slate-100">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i class="fi fi-rr-user text-primary-600 text-sm"></i>
+                Identitas Calon Anak Didik / Santri
+              </label>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                  <label for="f-student-name" class="block text-xs font-semibold text-slate-700 mb-1">
+                    Nama Lengkap Ananda (Sesuai Akta Kelahiran) <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"><i class="fi fi-rr-id-badge text-sm"></i></span>
+                    <input type="text" id="f-student-name" required placeholder="Contoh: Muhammad Al-Fatih" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                  </div>
+                </div>
+
+                <div>
+                  <label for="f-nickname" class="block text-xs font-semibold text-slate-700 mb-1">
+                    Nama Panggilan <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="text" id="f-nickname" required placeholder="Contoh: Fatih" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center justify-center gap-2 p-2.5 border border-slate-200 rounded-xl text-xs font-semibold cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50">
+                      <input type="radio" name="gender" value="L" checked class="text-primary-600">
+                      <span>Laki-laki</span>
+                    </label>
+                    <label class="flex items-center justify-center gap-2 p-2.5 border border-slate-200 rounded-xl text-xs font-semibold cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50">
+                      <input type="radio" name="gender" value="P" class="text-primary-600">
+                      <span>Perempuan</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="f-nik" class="block text-xs font-semibold text-slate-700 mb-1">
+                    Nomor NIK Siswa (16 Digit Sesuai KK) <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="text" id="f-nik" maxlength="16" required placeholder="Contoh: 647201xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition font-mono">
+                </div>
+
+                <div>
+                  <label for="f-birth-place" class="block text-xs font-semibold text-slate-700 mb-1">
+                    Tempat Lahir <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="text" id="f-birth-place" required placeholder="Samarinda" value="Samarinda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                </div>
+
+                <div>
+                  <label for="f-birth-date" class="block text-xs font-semibold text-slate-700 mb-1">
+                    Tanggal Lahir Ananda <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="date" id="f-birth-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Anak Ke / Jumlah Saudara</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="f-child-order" min="1" max="15" placeholder="Anak Ke-1" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                    <input type="number" id="f-siblings-count" min="0" max="20" placeholder="Dari 2 Sdr" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                  </div>
+                </div>
+
+                <div>
+                  <label for="f-child-status" class="block text-xs font-semibold text-slate-700 mb-1">Status Keberadaan Anak</label>
+                  <select id="f-child-status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                    <option value="Kandung" selected>Anak Kandung</option>
+                    <option value="Yatim">Yatim (Ayah Wafat)</option>
+                    <option value="Piatu">Piatu (Ibu Wafat)</option>
+                    <option value="Yatim Piatu">Yatim Piatu</option>
+                    <option value="Tiri">Anak Tiri</option>
+                    <option value="Angkat">Anak Angkat</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-religion" class="block text-xs font-semibold text-slate-700 mb-1">Agama</label>
+                  <select id="f-religion" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                    <option value="Islam" selected>Islam</option>
+                    <option value="Kristen">Kristen</option>
+                    <option value="Katolik">Katolik</option>
+                    <option value="Hindu">Hindu</option>
+                    <option value="Buddha">Buddha</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-citizenship" class="block text-xs font-semibold text-slate-700 mb-1">Kewarganegaraan</label>
+                  <select id="f-citizenship" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                    <option value="WNI" selected>WNI (Warga Negara Indonesia)</option>
+                    <option value="WNA">WNA (Warga Negara Asing)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="f-language" class="block text-xs font-semibold text-slate-700 mb-1">Bahasa Sehari-hari di Rumah</label>
+                  <input type="text" id="f-language" placeholder="Bahasa Indonesia" value="Bahasa Indonesia" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="f-special-notes" class="block text-xs font-semibold text-slate-700 mb-1">Ciri-ciri Khusus / Riwayat Alergi (Opsional)</label>
+                  <input type="text" id="f-special-notes" placeholder="Contoh: Alergi udang, kidal, berkacamata, dll." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol Navigasi Tahap 1 -->
+            <div class="pt-6 border-t border-slate-100 flex justify-end">
+              <button type="button" onclick="nextStep(1)" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer active:scale-[0.98]">
+                <span>Lanjut</span>
+                <i class="fi fi-rr-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==================== TAHAP 2: ALAMAT & TEMPAT TINGGAL ==================== -->
+          <div id="step-pane-2" class="step-pane hidden space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fi fi-rr-marker text-primary-600 text-sm"></i>
+                Alamat Tempat Tinggal &amp; Akses Sekolah
+              </label>
+              <p class="text-xs text-slate-500 mt-1">Data alamat digunakan untuk pemetaan rombongan belajar dan administrasi rayon.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="f-province" class="block text-xs font-semibold text-slate-700 mb-1">Provinsi <span class="text-rose-500">*</span></label>
+                <input type="text" id="f-province" required value="Kalimantan Timur" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+              </div>
+
+              <div>
+                <label for="f-city" class="block text-xs font-semibold text-slate-700 mb-1">Kabupaten / Kota <span class="text-rose-500">*</span></label>
+                <input type="text" id="f-city" required value="Kota Samarinda" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+              </div>
+
+              <div>
+                <label for="f-district" class="block text-xs font-semibold text-slate-700 mb-1">Kecamatan <span class="text-rose-500">*</span></label>
+                <select id="f-district" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                  <option value="Samarinda Seberang" selected>Samarinda Seberang</option>
+                  <option value="Samarinda Ulu">Samarinda Ulu</option>
+                  <option value="Samarinda Kota">Samarinda Kota</option>
+                  <option value="Samarinda Ilir">Samarinda Ilir</option>
+                  <option value="Sungai Kunjang">Sungai Kunjang</option>
+                  <option value="Palaran">Palaran</option>
+                  <option value="Sambutan">Sambutan</option>
+                  <option value="Sungai Pinang">Sungai Pinang</option>
+                  <option value="Samarinda Utara">Samarinda Utara</option>
+                  <option value="Loa Janan Ilir">Loa Janan Ilir</option>
+                  <option value="Luar Kota Samarinda">Luar Kota Samarinda</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="f-subdistrict" class="block text-xs font-semibold text-slate-700 mb-1">Desa / Kelurahan <span class="text-rose-500">*</span></label>
+                <input type="text" id="f-subdistrict" required placeholder="Contoh: Sungai Keledang" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="f-address" class="block text-xs font-semibold text-slate-700 mb-1">Alamat Lengkap Rumah (Jalan, Gang, No Rumah, RT/RW) <span class="text-rose-500">*</span></label>
+                <textarea id="f-address" rows="3" required placeholder="Contoh: Jl. Samratulangi Gang 2 No. 15, RT 08" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition"></textarea>
+              </div>
+
+              <div>
+                <label for="f-distance" class="block text-xs font-semibold text-slate-700 mb-1">Jarak Tempat Tinggal ke Sekolah</label>
+                <select id="f-distance" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                  <option value="Kurang dari 1 km" selected>Kurang dari 1 km</option>
+                  <option value="1 - 3 km">1 - 3 km</option>
+                  <option value="3 - 5 km">3 - 5 km</option>
+                  <option value="Lebih dari 5 km">Lebih dari 5 km</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="f-transportation" class="block text-xs font-semibold text-slate-700 mb-1">Transportasi ke Sekolah</label>
+                <select id="f-transportation" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 transition">
+                  <option value="Diantar Sepeda Motor" selected>Diantar Sepeda Motor</option>
+                  <option value="Diantar Mobil">Diantar Mobil</option>
+                  <option value="Jalan Kaki">Jalan Kaki</option>
+                  <option value="Angkutan Umum / Ojol">Angkutan Umum / Ojol</option>
+                  <option value="Jemputan Sekolah">Jemputan Sekolah</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Tombol Navigasi Tahap 2 -->
+            <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+              <button type="button" onclick="prevStep(2)" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition inline-flex items-center gap-2 cursor-pointer">
+                <i class="fi fi-rr-arrow-left text-xs"></i>
+                <span>Kembali</span>
+              </button>
+              <button type="button" onclick="nextStep(2)" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer active:scale-[0.98]">
+                <span>Lanjut</span>
+                <i class="fi fi-rr-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==================== TAHAP 3: DATA ORANG TUA / WALI & AKUN ==================== -->
+          <div id="step-pane-3" class="step-pane hidden space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fi fi-rr-users text-primary-600 text-sm"></i>
+                Identitas Orang Tua / Wali &amp; Akun Portal Siswa
+              </label>
+              <p class="text-xs text-slate-500 mt-1">Data ini digunakan untuk komunikasi sekolah, notifikasi WhatsApp PPDB, dan akses login Portal Siswa.</p>
+            </div>
+
+            <!-- Data Ayah -->
+            <div class="bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80 space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-primary-800 flex items-center gap-2">
+                <i class="fi fi-rr-user text-sm"></i>
+                Data Ayah
+              </h3>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="f-father-name" class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Ayah <span class="text-rose-500">*</span></label>
+                  <input type="text" id="f-father-name" required placeholder="Nama lengkap ayah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-father-status" class="block text-xs font-semibold text-slate-700 mb-1">Status Ayah</label>
+                  <select id="f-father-status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                    <option value="Kandung" selected>Kandung</option>
+                    <option value="Tiri">Tiri</option>
+                    <option value="Angkat">Angkat</option>
+                    <option value="Wali">Wali</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="f-father-birth" class="block text-xs font-semibold text-slate-700 mb-1">Tempat &amp; Tanggal Lahir Ayah</label>
+                  <input type="text" id="f-father-birth" placeholder="Contoh: Samarinda, 12 Mei 1985" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-father-education" class="block text-xs font-semibold text-slate-700 mb-1">Pendidikan Terakhir Ayah</label>
+                  <select id="f-father-education" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                    <option value="SMA/SMK Sederajat" selected>SMA/SMK Sederajat</option>
+                    <option value="D3/Diploma">D3 / Diploma</option>
+                    <option value="S1/Sarjana">S1 / Sarjana</option>
+                    <option value="S2/Magister">S2 / Magister</option>
+                    <option value="SMP Sederajat">SMP Sederajat</option>
+                    <option value="SD Sederajat">SD Sederajat</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="f-father-job" class="block text-xs font-semibold text-slate-700 mb-1">Pekerjaan Ayah</label>
+                  <input type="text" id="f-father-job" placeholder="PNS, Wiraswasta, Karyawan Swasta, dll." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-father-phone" class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP Ayah</label>
+                  <input type="tel" id="f-father-phone" placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Ibu -->
+            <div class="bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80 space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-primary-800 flex items-center gap-2">
+                <i class="fi fi-rr-user text-sm"></i>
+                Data Ibu
+              </h3>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="f-mother-name" class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Ibu <span class="text-rose-500">*</span></label>
+                  <input type="text" id="f-mother-name" required placeholder="Nama lengkap ibu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-mother-status" class="block text-xs font-semibold text-slate-700 mb-1">Status Ibu</label>
+                  <select id="f-mother-status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                    <option value="Kandung" selected>Kandung</option>
+                    <option value="Tiri">Tiri</option>
+                    <option value="Angkat">Angkat</option>
+                    <option value="Wali">Wali</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="f-mother-birth" class="block text-xs font-semibold text-slate-700 mb-1">Tempat &amp; Tanggal Lahir Ibu</label>
+                  <input type="text" id="f-mother-birth" placeholder="Contoh: Samarinda, 20 Agustus 1988" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-mother-education" class="block text-xs font-semibold text-slate-700 mb-1">Pendidikan Terakhir Ibu</label>
+                  <select id="f-mother-education" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                    <option value="SMA/SMK Sederajat" selected>SMA/SMK Sederajat</option>
+                    <option value="D3/Diploma">D3 / Diploma</option>
+                    <option value="S1/Sarjana">S1 / Sarjana</option>
+                    <option value="S2/Magister">S2 / Magister</option>
+                    <option value="SMP Sederajat">SMP Sederajat</option>
+                    <option value="SD Sederajat">SD Sederajat</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="f-mother-job" class="block text-xs font-semibold text-slate-700 mb-1">Pekerjaan Ibu</label>
+                  <input type="text" id="f-mother-job" placeholder="Ibu Rumah Tangga, PNS, Swasta, dll." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-mother-phone" class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP Ibu</label>
+                  <input type="tel" id="f-mother-phone" placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Wali (Opsional) -->
+            <div class="bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80 space-y-4">
+              <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleGuardianSection()">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                  <i class="fi fi-rr-user-add text-sm text-primary-600"></i>
+                  Data Wali (Opsional - Diisi jika calon anak tinggal bersama wali)
+                </h3>
+                <span id="guardian-toggle-btn" class="text-xs font-bold text-primary-600 flex items-center gap-1">
+                  <span id="guardian-toggle-text">Buka Formulir Wali</span>
+                  <i id="guardian-toggle-icon" class="fi fi-rr-angle-small-down text-base transition-transform"></i>
+                </span>
+              </div>
+              <div id="guardian-fields" class="hidden grid sm:grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                <div>
+                  <label for="f-guardian-name" class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Wali</label>
+                  <input type="text" id="f-guardian-name" placeholder="Nama lengkap wali" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-guardian-relation" class="block text-xs font-semibold text-slate-700 mb-1">Hubungan dengan Siswa</label>
+                  <input type="text" id="f-guardian-relation" placeholder="Paman, Kakek/Nenek, Kakak, dll." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div>
+                  <label for="f-guardian-education" class="block text-xs font-semibold text-slate-700 mb-1">Pendidikan Terakhir Wali</label>
+                  <select id="f-guardian-education" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                    <option value="">- Pilih Pendidikan -</option>
+                    <option value="SMA/SMK Sederajat">SMA/SMK Sederajat</option>
+                    <option value="D3/Diploma">D3 / Diploma</option>
+                    <option value="S1/Sarjana">S1 / Sarjana</option>
+                    <option value="S2/Magister">S2 / Magister</option>
+                    <option value="SMP Sederajat">SMP Sederajat</option>
+                    <option value="SD Sederajat">SD Sederajat</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="f-guardian-job" class="block text-xs font-semibold text-slate-700 mb-1">Pekerjaan Wali</label>
+                  <input type="text" id="f-guardian-job" placeholder="Pekerjaan wali" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+                <div class="sm:col-span-2">
+                  <label for="f-guardian-phone" class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp / HP Wali</label>
+                  <input type="tel" id="f-guardian-phone" placeholder="08xxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                </div>
+              </div>
+            </div>
+
+            <!-- Kontak Notifikasi Utama & Akun Portal -->
+            <div class="bg-primary-50/60 p-5 rounded-2xl border border-primary-200/80 space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-primary-900 flex items-center gap-2">
+                <i class="fi fi-rr-bell text-sm text-primary-600"></i>
+                Nomor Notifikasi &amp; Akun Login Portal Siswa
+              </h3>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                  <label for="f-parent-phone" class="block text-xs font-semibold text-slate-800 mb-1">
+                    Nomor WhatsApp Utama Penerima Notifikasi Hasil Seleksi <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"><i class="fi fi-brands-whatsapp text-sm"></i></span>
+                    <input type="tel" id="f-parent-phone" required placeholder="081234567890" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition font-mono">
+                  </div>
+                </div>
+
+                <div>
+                  <label for="f-parent-email" class="block text-xs font-semibold text-slate-800 mb-1">
+                    Email Orang Tua (Untuk Akun Login Portal)
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"><i class="fi fi-rr-envelope text-sm"></i></span>
+                    <input type="email" id="f-parent-email" placeholder="orangtua@email.com (opsional)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                  </div>
+                </div>
+
+                <div>
+                  <label for="f-password" class="block text-xs font-semibold text-slate-800 mb-1">
+                    Buat Password Login Portal Siswa <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"><i class="fi fi-rr-lock text-sm"></i></span>
+                    <input type="password" id="f-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 bg-white transition">
+                  </div>
+                  <span class="text-[10px] text-slate-500 mt-1 block">Digunakan untuk login mengecek pengumuman &amp; berkas.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol Navigasi Tahap 3 -->
+            <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+              <button type="button" onclick="prevStep(3)" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition inline-flex items-center gap-2 cursor-pointer">
+                <i class="fi fi-rr-arrow-left text-xs"></i>
+                <span>Kembali</span>
+              </button>
+              <button type="button" onclick="nextStep(3)" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer active:scale-[0.98]">
+                <span>Lanjut</span>
+                <i class="fi fi-rr-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==================== TAHAP 4: UNGGAH BERKAS LAMPIRAN ==================== -->
+          <div id="step-pane-4" class="step-pane hidden space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fi fi-rr-document-signed text-primary-600 text-sm"></i>
+                Unggah Berkas &amp; Dokumen Lampiran
+              </label>
+              <p class="text-xs text-slate-500 mt-1">Sesuai persyaratan, lampirkan pas foto, akta kelahiran, dan kartu keluarga ananda. Format file: JPG, PNG, atau PDF (maks. 5MB per berkas).</p>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-5">
+              <!-- Berkas 1: Pas Foto Siswa -->
+              <div class="border-2 border-dashed border-slate-300 hover:border-primary-500 rounded-2xl p-5 text-center transition bg-slate-50/50 flex flex-col justify-between group">
+                <div>
+                  <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center mx-auto mb-3">
+                    <i class="fi fi-rr-camera text-xl"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 mb-1">1. Pas Foto Siswa</h4>
+                  <p class="text-[11px] text-slate-500 mb-3">Foto resmi ananda yang rapi &amp; jelas.</p>
+                  
+                  <!-- Preview Box -->
+                  <div id="preview-box-photo" class="hidden mb-3">
+                    <img id="img-preview-photo" class="w-24 h-32 object-cover rounded-lg mx-auto shadow-sm border border-slate-200" alt="Preview Foto">
+                    <span id="name-preview-photo" class="text-[10px] text-slate-500 block mt-1 truncate"></span>
+                  </div>
+                </div>
+
+                <div>
+                  <input type="file" id="f-file-photo" accept="image/jpeg,image/png" class="hidden" onchange="handleFileSelected(this, 'photo')">
+                  <button type="button" onclick="document.getElementById('f-file-photo').click()" class="w-full py-2 px-3 bg-white border border-slate-300 hover:border-primary-500 text-slate-700 font-semibold text-xs rounded-xl shadow-sm transition">
+                    Pilih File Foto
+                  </button>
+                </div>
+              </div>
+
+              <!-- Berkas 2: Akta Kelahiran -->
+              <div class="border-2 border-dashed border-slate-300 hover:border-primary-500 rounded-2xl p-5 text-center transition bg-slate-50/50 flex flex-col justify-between group">
+                <div>
+                  <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center mx-auto mb-3">
+                    <i class="fi fi-rr-document text-xl"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 mb-1">2. Akta Kelahiran</h4>
+                  <p class="text-[11px] text-slate-500 mb-3">Foto / Scan Akta Kelahiran anak.</p>
+                  
+                  <!-- Preview Box -->
+                  <div id="preview-box-birth-cert" class="hidden mb-3">
+                    <img id="img-preview-birth-cert" class="w-24 h-32 object-cover rounded-lg mx-auto shadow-sm border border-slate-200" alt="Preview Akta">
+                    <span id="name-preview-birth-cert" class="text-[10px] text-slate-500 block mt-1 truncate"></span>
+                  </div>
+                </div>
+
+                <div>
+                  <input type="file" id="f-file-birth-cert" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="handleFileSelected(this, 'birth_cert')">
+                  <button type="button" onclick="document.getElementById('f-file-birth-cert').click()" class="w-full py-2 px-3 bg-white border border-slate-300 hover:border-primary-500 text-slate-700 font-semibold text-xs rounded-xl shadow-sm transition">
+                    Pilih File Akta
+                  </button>
+                </div>
+              </div>
+
+              <!-- Berkas 3: Kartu Keluarga -->
+              <div class="border-2 border-dashed border-slate-300 hover:border-primary-500 rounded-2xl p-5 text-center transition bg-slate-50/50 flex flex-col justify-between group">
+                <div>
+                  <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center mx-auto mb-3">
+                    <i class="fi fi-rr-address-card text-xl"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 mb-1">3. Kartu Keluarga (KK)</h4>
+                  <p class="text-[11px] text-slate-500 mb-3">Foto / Scan KK lembar asli.</p>
+                  
+                  <!-- Preview Box -->
+                  <div id="preview-box-family-card" class="hidden mb-3">
+                    <img id="img-preview-family-card" class="w-24 h-32 object-cover rounded-lg mx-auto shadow-sm border border-slate-200" alt="Preview KK">
+                    <span id="name-preview-family-card" class="text-[10px] text-slate-500 block mt-1 truncate"></span>
+                  </div>
+                </div>
+
+                <div>
+                  <input type="file" id="f-file-family-card" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="handleFileSelected(this, 'family_card')">
+                  <button type="button" onclick="document.getElementById('f-file-family-card').click()" class="w-full py-2 px-3 bg-white border border-slate-300 hover:border-primary-500 text-slate-700 font-semibold text-xs rounded-xl shadow-sm transition">
+                    Pilih File KK
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-sky-50/70 border border-sky-200 rounded-2xl flex items-start gap-3 text-xs text-sky-900">
+              <i class="fi fi-rr-info text-sky-600 text-base mt-0.5 shrink-0"></i>
+              <p>
+                <strong>Catatan Kemudahan:</strong> Berkas dokumen di atas dapat diunggah sekarang agar verifikasi lebih cepat, atau dapat Anda lengkapi nanti melalui Portal Calon Siswa setelah pendaftaran selesai.
+              </p>
+            </div>
+
+            <!-- Tombol Navigasi Tahap 4 -->
+            <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+              <button type="button" onclick="prevStep(4)" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition inline-flex items-center gap-2 cursor-pointer">
+                <i class="fi fi-rr-arrow-left text-xs"></i>
+                <span>Kembali</span>
+              </button>
+              <button type="button" onclick="nextStep(4)" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer active:scale-[0.98]">
+                <span>Lanjut</span>
+                <i class="fi fi-rr-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==================== TAHAP 5: REVIEW DATA & SUBMIT ==================== -->
+          <div id="step-pane-5" class="step-pane hidden space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fi fi-rr-check-circle text-primary-600 text-sm"></i>
+                Review Data Pendaftaran Sebelum Dikirim
+              </label>
+              <p class="text-xs text-slate-500 mt-1">Mohon pastikan seluruh data calon siswa dan orang tua sudah benar sebelum mengirimkan formulir.</p>
+            </div>
+
+            <!-- Dynamic Review Cards Grid -->
+            <div class="grid sm:grid-cols-2 gap-4 text-xs">
+              <!-- Review 1: Siswa -->
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-slate-800 uppercase tracking-wider">Identitas Calon Siswa</span>
+                  <button type="button" onclick="goToStep(1)" class="text-primary-600 font-bold hover:underline">Edit</button>
+                </div>
+                <div class="space-y-1 text-slate-600">
+                  <div class="flex justify-between"><span class="text-slate-400">Jenjang:</span><span id="rev-level" class="font-bold text-slate-900">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Nama Lengkap:</span><span id="rev-student-name" class="font-bold text-slate-900">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Nama Panggilan:</span><span id="rev-nickname">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Jenis Kelamin:</span><span id="rev-gender">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">NIK:</span><span id="rev-nik" class="font-mono">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Tempat, Tgl Lahir:</span><span id="rev-birth">-</span></div>
+                </div>
+              </div>
+
+              <!-- Review 2: Alamat -->
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-slate-800 uppercase tracking-wider">Alamat &amp; Domisili</span>
+                  <button type="button" onclick="goToStep(2)" class="text-primary-600 font-bold hover:underline">Edit</button>
+                </div>
+                <div class="space-y-1 text-slate-600">
+                  <div class="flex justify-between"><span class="text-slate-400">Alamat Jalan:</span><span id="rev-address" class="text-right font-medium text-slate-900 max-w-[60%] truncate">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Kecamatan:</span><span id="rev-district">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Kab/Kota:</span><span id="rev-city">Kota Samarinda</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Jarak ke Sekolah:</span><span id="rev-distance">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Transportasi:</span><span id="rev-transport">-</span></div>
+                </div>
+              </div>
+
+              <!-- Review 3: Orang Tua -->
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-slate-800 uppercase tracking-wider">Data Orang Tua / Kontak</span>
+                  <button type="button" onclick="goToStep(3)" class="text-primary-600 font-bold hover:underline">Edit</button>
+                </div>
+                <div class="space-y-1 text-slate-600">
+                  <div class="flex justify-between"><span class="text-slate-400">Nama Ayah:</span><span id="rev-father-name" class="font-bold text-slate-900">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Nama Ibu:</span><span id="rev-mother-name" class="font-bold text-slate-900">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">No. WA Utama:</span><span id="rev-parent-phone" class="font-bold text-emerald-700 font-mono">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">Email Portal:</span><span id="rev-parent-email">-</span></div>
+                </div>
+              </div>
+
+              <!-- Review 4: Berkas -->
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-slate-800 uppercase tracking-wider">Status Berkas Lampiran</span>
+                  <button type="button" onclick="goToStep(4)" class="text-primary-600 font-bold hover:underline">Edit</button>
+                </div>
+                <div class="space-y-1 text-slate-600">
+                  <div class="flex justify-between items-center"><span class="text-slate-400">Pas Foto Siswa:</span><span id="rev-file-photo" class="font-semibold text-slate-500">Belum diunggah</span></div>
+                  <div class="flex justify-between items-center"><span class="text-slate-400">Akta Kelahiran:</span><span id="rev-file-birth-cert" class="font-semibold text-slate-500">Belum diunggah</span></div>
+                  <div class="flex justify-between items-center"><span class="text-slate-400">Kartu Keluarga:</span><span id="rev-file-family-card" class="font-semibold text-slate-500">Belum diunggah</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pernyataan Keabsahan Data -->
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" id="f-statement-check" class="mt-1 w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500">
+                <span class="text-xs text-slate-700 leading-relaxed select-none">
+                  Saya menyatakan dengan sesungguhnya bahwa seluruh data yang diisikan serta berkas yang dilampirkan dalam formulir PPDB online ini adalah <strong>benar, sah, dan dapat dipertanggungjawabkan</strong> sesuai dokumen kependudukan resmi.
+                </span>
+              </label>
+            </div>
+
+            <!-- Tombol Navigasi Tahap 5 (Submit Final) -->
+            <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <button type="button" onclick="prevStep(5)" class="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition inline-flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fi fi-rr-arrow-left text-xs"></i>
+                <span>Kembali Periksa Data</span>
+              </button>
+
+              <button 
+                type="button" 
+                id="btn-submit-ppdb" 
+                onclick="submitPpdbRegistration()"
+                class="w-full sm:w-auto px-8 py-3.5 bg-primary-600 hover:bg-primary-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-primary-600/20 transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Kirim Pendaftaran PPDB Sekarang</span>
+                <i class="fi fi-rr-paper-plane text-sm"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- Persyaratan & Jadwal Penting PPDB -->
+    <div class="grid lg:grid-cols-2 gap-6 mb-12">
+      <!-- Persyaratan -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <i class="fi fi-rr-document-signed text-brand-600"></i>
+          <span>Persyaratan Berkas PPDB</span>
+        </h3>
+        <ul class="space-y-3 text-xs sm:text-sm text-slate-600">
+          <li class="flex items-start gap-2.5">
+            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
+            <span>Usia sesuai jenjang (PAUD: 2-4 tahun, TK A: 4-5 tahun, TK B: 5-6 tahun).</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
+            <span>Foto / Scan Akta Kelahiran anak.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
+            <span>Foto / Scan Kartu Keluarga (KK).</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
+            <span>Pas foto anak (dapat diunggah langsung di Portal Siswa setelah mendaftar).</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Jadwal Resmi -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <i class="fi fi-rr-calendar text-brand-600"></i>
+          <span>Jadwal Linimasa PPDB 2026</span>
+        </h3>
+        <div class="space-y-3 text-xs">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+            <span class="font-bold text-slate-800">1. Pendaftaran Online</span>
+            <span class="font-semibold text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-md">1 Jan - 31 Jul 2026</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+            <span class="font-bold text-slate-800">2. Verifikasi Data</span>
+            <span class="text-slate-600">1 - 5 Agustus 2026</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+            <span class="font-bold text-slate-800">3. Pengumuman Kelulusan</span>
+            <span class="text-slate-600">10 Agustus 2026</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Sukses Pendaftaran PPDB -->
+  <div id="success-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in-95 duration-200">
+      <div class="w-16 h-16 rounded-2xl bg-primary-50 border border-primary-200/70 text-primary-600 flex items-center justify-center mx-auto mb-4">
+        <i class="fi fi-sr-check-circle text-3xl"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-900 mb-1">Pendaftaran Berhasil!</h3>
+      <p class="text-xs text-slate-500 mb-6 leading-relaxed">
+        Selamat! Data pendaftaran calon siswa telah tersimpan. Berikut nomor registrasi dan kredensial portal Anda:
+      </p>
+
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left space-y-2.5 text-xs mb-6 font-mono">
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-sans">No. Registrasi:</span>
+          <span id="res-reg-num" class="font-bold text-brand-700 text-sm">REG-2026-XXXX</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-sans">Nama Siswa:</span>
+          <span id="res-student-name" class="font-bold text-slate-900">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-sans">Email Login:</span>
+          <span id="res-login-email" class="font-bold text-slate-800">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-sans">Status Akun:</span>
+          <span class="px-2 py-0.5 rounded bg-primary-100 text-primary-800 font-bold text-[10px] font-sans">Calon Siswa Aktif</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <a id="btn-goto-portal" href="/siswa/dashboard.html" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-600/20 transition flex items-center justify-center gap-2">
+          <span>Akses SIAKAD Calon Siswa</span>
+          <i class="fi fi-rr-arrow-right text-xs"></i>
+        </a>
+        <a href="index.html" class="block w-full py-2.5 text-xs text-slate-500 hover:text-slate-800 transition">
+          Kembali ke Halaman Beranda
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
+  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+  <script src="js/public-shell.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    injectSiteChrome({ activeKey: 'ppdb', basePath: './' });
+
+    let currentStep = 1;
+    let selectedJenjang = 'PAUD';
+    const uploadedFiles = {
+      photo: null,
+      birth_cert: null,
+      family_card: null
+    };
+
+    function selectJenjang(jenjang) {
+      selectedJenjang = jenjang;
+      document.querySelectorAll('.jenjang-option').forEach(el => {
+        const inp = el.querySelector('input');
+        if (inp && inp.value === jenjang) {
+          inp.checked = true;
+          el.className = 'relative flex flex-col p-3.5 border-2 border-primary-600 bg-primary-50/60 rounded-2xl cursor-pointer transition select-none jenjang-option';
+        } else {
+          if (inp) inp.checked = false;
+          el.className = 'relative flex flex-col p-3.5 border border-slate-200 hover:border-primary-300 rounded-2xl cursor-pointer transition select-none jenjang-option';
+        }
+      });
+    }
+
+    // Toggle Data Wali Section
+    function toggleGuardianSection() {
+      const gFields = document.getElementById('guardian-fields');
+      const gText = document.getElementById('guardian-toggle-text');
+      const gIcon = document.getElementById('guardian-toggle-icon');
+      if (!gFields) return;
+      
+      const isHidden = gFields.classList.contains('hidden');
+      if (isHidden) {
+        gFields.classList.remove('hidden');
+        if (gText) gText.textContent = 'Tutup Formulir Wali';
+        if (gIcon) gIcon.classList.add('rotate-180');
+      } else {
+        gFields.classList.add('hidden');
+        if (gText) gText.textContent = 'Buka Formulir Wali';
+        if (gIcon) gIcon.classList.remove('rotate-180');
+      }
+    }
+
+    // File Selection & Live Preview
+    function handleFileSelected(input, type) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran file maksimal adalah 5MB.');
+        input.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        uploadedFiles[type] = {
+          file: file,
+          dataUrl: dataUrl,
+          name: file.name,
+          size: (file.size / 1024).toFixed(1) + ' KB'
+        };
+
+        const key = (type === 'photo') ? 'photo' : (type === 'birth_cert' ? 'birth-cert' : 'family-card');
+        const pBox = document.getElementById('preview-box-' + key);
+        const pImg = document.getElementById('img-preview-' + key);
+        const pName = document.getElementById('name-preview-' + key);
+
+        if (pBox) pBox.classList.remove('hidden');
+        if (pName) pName.textContent = `${file.name} (${uploadedFiles[type].size})`;
+
+        if (pImg) {
+          if (file.type.startsWith('image/')) {
+            pImg.src = dataUrl;
+          } else {
+            // PDF or non-image icon placeholder
+            pImg.src = 'https://cdn-icons-png.flaticon.com/512/337/337946.png';
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Validate a specific step
+    function validateStep(step) {
+      if (step === 1) {
+        const name = (document.getElementById('f-student-name').value || '').trim();
+        if (!name) {
+          alert('Harap isi Nama Lengkap calon siswa sesuai Akta Kelahiran.');
+          document.getElementById('f-student-name').focus();
+          return false;
+        }
+
+        const nickname = (document.getElementById('f-nickname').value || '').trim();
+        if (!nickname) {
+          alert('Harap isi Nama Panggilan ananda.');
+          document.getElementById('f-nickname').focus();
+          return false;
+        }
+
+        const nik = (document.getElementById('f-nik').value || '').trim();
+        if (!nik || nik.length < 16) {
+          alert('Harap isi NIK calon siswa sebanyak 16 digit sesuai Kartu Keluarga.');
+          document.getElementById('f-nik').focus();
+          return false;
+        }
+
+        const birthPlace = (document.getElementById('f-birth-place').value || '').trim();
+        if (!birthPlace) {
+          alert('Harap isi Tempat Lahir ananda.');
+          document.getElementById('f-birth-place').focus();
+          return false;
+        }
+
+        const birthDate = document.getElementById('f-birth-date').value;
+        if (!birthDate) {
+          alert('Harap tentukan Tanggal Lahir ananda.');
+          document.getElementById('f-birth-date').focus();
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 2) {
+        const address = (document.getElementById('f-address').value || '').trim();
+        if (!address) {
+          alert('Harap isi Alamat Lengkap tempat tinggal (Jalan, No Rumah, RT/RW).');
+          document.getElementById('f-address').focus();
+          return false;
+        }
+
+        const subdistrict = (document.getElementById('f-subdistrict').value || '').trim();
+        if (!subdistrict) {
+          alert('Harap isi Kelurahan / Desa tempat tinggal.');
+          document.getElementById('f-subdistrict').focus();
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 3) {
+        const fatherName = (document.getElementById('f-father-name').value || '').trim();
+        if (!fatherName) {
+          alert('Harap isi Nama Lengkap Ayah.');
+          document.getElementById('f-father-name').focus();
+          return false;
+        }
+
+        const motherName = (document.getElementById('f-mother-name').value || '').trim();
+        if (!motherName) {
+          alert('Harap isi Nama Lengkap Ibu.');
+          document.getElementById('f-mother-name').focus();
+          return false;
+        }
+
+        const parentPhone = (document.getElementById('f-parent-phone').value || '').trim();
+        if (!parentPhone || parentPhone.length < 9) {
+          alert('Harap isi Nomor WhatsApp Utama penerima pengumuman PPDB dengan benar.');
+          document.getElementById('f-parent-phone').focus();
+          return false;
+        }
+
+        const pwd = (document.getElementById('f-password').value || '').trim();
+        if (!pwd || pwd.length < 6) {
+          alert('Harap buat Password Login Portal Siswa minimal 6 karakter.');
+          document.getElementById('f-password').focus();
+          return false;
+        }
+        return true;
+      }
+
+      return true;
+    }
+
+    // Populate Dynamic Summary on Step 5
+    function populateReviewSummary() {
+      const studentName = (document.getElementById('f-student-name').value || '').trim();
+      const nickname = (document.getElementById('f-nickname').value || '').trim();
+      const nik = (document.getElementById('f-nik').value || '').trim();
+      const genderEl = document.querySelector('input[name="gender"]:checked');
+      const gender = genderEl ? (genderEl.value === 'L' ? 'Laki-laki' : 'Perempuan') : 'Laki-laki';
+      const birthPlace = (document.getElementById('f-birth-place').value || '').trim();
+      const birthDate = document.getElementById('f-birth-date').value;
+
+      const address = (document.getElementById('f-address').value || '').trim();
+      const subdistrict = (document.getElementById('f-subdistrict').value || '').trim();
+      const district = document.getElementById('f-district').value;
+      const city = document.getElementById('f-city').value;
+      const distance = document.getElementById('f-distance').value;
+      const transport = document.getElementById('f-transportation').value;
+
+      const fatherName = (document.getElementById('f-father-name').value || '').trim();
+      const motherName = (document.getElementById('f-mother-name').value || '').trim();
+      const parentPhone = (document.getElementById('f-parent-phone').value || '').trim();
+      const parentEmail = (document.getElementById('f-parent-email').value || '').trim();
+
+      // Format Date Indo
+      let formattedDate = birthDate;
+      if (birthDate) {
+        const parts = birthDate.split('-');
+        if (parts.length === 3) {
+          const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+          const mIdx = parseInt(parts[1], 10) - 1;
+          formattedDate = `${parseInt(parts[2], 10)} ${months[mIdx] || parts[1]} ${parts[0]}`;
+        }
+      }
+
+      document.getElementById('rev-level').textContent = selectedJenjang;
+      document.getElementById('rev-student-name').textContent = studentName || '-';
+      document.getElementById('rev-nickname').textContent = nickname || '-';
+      document.getElementById('rev-gender').textContent = gender;
+      document.getElementById('rev-nik').textContent = nik || '-';
+      document.getElementById('rev-birth').textContent = `${birthPlace}, ${formattedDate}`;
+
+      document.getElementById('rev-address').textContent = address || '-';
+      document.getElementById('rev-district').textContent = `${subdistrict}, ${district}`;
+      document.getElementById('rev-city').textContent = city || 'Kota Samarinda';
+      document.getElementById('rev-distance').textContent = distance;
+      document.getElementById('rev-transport').textContent = transport;
+
+      document.getElementById('rev-father-name').textContent = fatherName || '-';
+      document.getElementById('rev-mother-name').textContent = motherName || '-';
+      document.getElementById('rev-parent-phone').textContent = parentPhone || '-';
+      document.getElementById('rev-parent-email').textContent = parentEmail || 'Belum diisi (Login via No. Registrasi)';
+
+      // Berkas Review
+      const revPhoto = document.getElementById('rev-file-photo');
+      if (uploadedFiles.photo) {
+        revPhoto.className = 'font-semibold text-emerald-600 flex items-center gap-1';
+        revPhoto.innerHTML = `<i class="fi fi-rr-check text-xs"></i> <span>${uploadedFiles.photo.name}</span>`;
+      } else {
+        revPhoto.className = 'font-semibold text-slate-400';
+        revPhoto.textContent = 'Belum diunggah (dapat menyusul)';
+      }
+
+      const revBirth = document.getElementById('rev-file-birth-cert');
+      if (uploadedFiles.birth_cert) {
+        revBirth.className = 'font-semibold text-emerald-600 flex items-center gap-1';
+        revBirth.innerHTML = `<i class="fi fi-rr-check text-xs"></i> <span>${uploadedFiles.birth_cert.name}</span>`;
+      } else {
+        revBirth.className = 'font-semibold text-slate-400';
+        revBirth.textContent = 'Belum diunggah (dapat menyusul)';
+      }
+
+      const revKk = document.getElementById('rev-file-family-card');
+      if (uploadedFiles.family_card) {
+        revKk.className = 'font-semibold text-emerald-600 flex items-center gap-1';
+        revKk.innerHTML = `<i class="fi fi-rr-check text-xs"></i> <span>${uploadedFiles.family_card.name}</span>`;
+      } else {
+        revKk.className = 'font-semibold text-slate-400';
+        revKk.textContent = 'Belum diunggah (dapat menyusul)';
+      }
+    }
+
+    // Step Navigation
+    function updateStepperUI(targetStep) {
+      currentStep = targetStep;
+
+      // Update progress bar
+      const progressBar = document.getElementById('step-progress-bar');
+      if (progressBar) {
+        const percentages = ['20%', '40%', '60%', '80%', '100%'];
+        progressBar.style.width = percentages[targetStep - 1];
+      }
+
+      // Update nav indicators
+      for (let i = 1; i <= 5; i++) {
+        const navBtn = document.getElementById(`step-nav-${i}`);
+        if (!navBtn) continue;
+        const badge = navBtn.querySelector('span:first-child');
+        
+        if (i === targetStep) {
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-primary-700 font-bold transition';
+          if (badge) {
+            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-primary-100 transition';
+            badge.textContent = String(i);
+          }
+        } else if (i < targetStep) {
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-emerald-700 font-semibold transition cursor-pointer';
+          if (badge) {
+            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-sm transition';
+            badge.innerHTML = '<i class="fi fi-rr-check text-xs"></i>';
+          }
+        } else {
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition cursor-pointer';
+          if (badge) {
+            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition';
+            badge.textContent = String(i);
+          }
+        }
+      }
+
+      // Switch Panes
+      for (let i = 1; i <= 5; i++) {
+        const pane = document.getElementById(`step-pane-${i}`);
+        if (pane) {
+          if (i === targetStep) {
+            pane.classList.remove('hidden');
+          } else {
+            pane.classList.add('hidden');
+          }
+        }
+      }
+
+      // Populate review if step 5
+      if (targetStep === 5) {
+        populateReviewSummary();
+      }
+
+      // Scroll to form view
+      const formEl = document.getElementById('formulir-pendaftaran');
+      if (formEl) {
+        formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function goToStep(targetStep) {
+      if (targetStep > currentStep) {
+        // Must pass validation of previous steps
+        for (let s = currentStep; s < targetStep; s++) {
+          if (!validateStep(s)) return;
+        }
+      }
+      updateStepperUI(targetStep);
+    }
+
+    function nextStep(current) {
+      if (!validateStep(current)) return;
+      if (current < 5) {
+        updateStepperUI(current + 1);
+      }
+    }
+
+    function prevStep(current) {
+      if (current > 1) {
+        updateStepperUI(current - 1);
+      }
+    }
+
+    // Submit PPDB Registration
+    async function submitPpdbRegistration() {
+      const check = document.getElementById('f-statement-check');
+      if (!check.checked) {
+        alert('Harap centang pernyataan keabsahan data sebelum mengirim formulir pendaftaran.');
+        check.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-ppdb');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-block animate-spin mr-2"><i class="fi fi-rr-spinner"></i></span><span>Memproses & Menyimpan Pendaftaran...</span>';
+
+      // Gather form inputs
+      const studentName = (document.getElementById('f-student-name').value || '').trim();
+      const nickname = (document.getElementById('f-nickname').value || '').trim();
+      const genderEl = document.querySelector('input[name="gender"]:checked');
+      const gender = genderEl ? genderEl.value : 'L';
+      const nik = (document.getElementById('f-nik').value || '').trim();
+      const birthPlace = (document.getElementById('f-birth-place').value || '').trim();
+      const birthDate = document.getElementById('f-birth-date').value;
+      const childOrder = (document.getElementById('f-child-order').value || '').trim();
+      const siblingsCount = (document.getElementById('f-siblings-count').value || '').trim();
+      const childStatusEl = document.getElementById('f-child-status');
+      const childStatus = childStatusEl ? childStatusEl.value : 'Kandung';
+      const religion = document.getElementById('f-religion').value;
+      const citizenship = document.getElementById('f-citizenship').value;
+      const language = (document.getElementById('f-language').value || '').trim();
+      const specialNotes = (document.getElementById('f-special-notes').value || '').trim();
+
+      // Address
+      const province = (document.getElementById('f-province').value || '').trim();
+      const city = (document.getElementById('f-city').value || '').trim();
+      const district = document.getElementById('f-district').value;
+      const subdistrict = (document.getElementById('f-subdistrict').value || '').trim();
+      const address = (document.getElementById('f-address').value || '').trim();
+      const distance = document.getElementById('f-distance').value;
+      const transportation = document.getElementById('f-transportation').value;
+
+      // Parents
+      const fatherName = (document.getElementById('f-father-name').value || '').trim();
+      const fatherStatus = document.getElementById('f-father-status').value;
+      const fatherBirth = (document.getElementById('f-father-birth').value || '').trim();
+      const fatherEducation = document.getElementById('f-father-education').value;
+      const fatherJob = (document.getElementById('f-father-job').value || '').trim();
+      const fatherPhone = (document.getElementById('f-father-phone').value || '').trim();
+
+      const motherName = (document.getElementById('f-mother-name').value || '').trim();
+      const motherStatus = document.getElementById('f-mother-status').value;
+      const motherBirth = (document.getElementById('f-mother-birth').value || '').trim();
+      const motherEducation = document.getElementById('f-mother-education').value;
+      const motherJob = (document.getElementById('f-mother-job').value || '').trim();
+      const motherPhone = (document.getElementById('f-mother-phone').value || '').trim();
+
+      // Guardian
+      const guardianNameEl = document.getElementById('f-guardian-name');
+      const guardianName = guardianNameEl ? guardianNameEl.value.trim() : '';
+      const guardianRelationEl = document.getElementById('f-guardian-relation');
+      const guardianRelation = guardianRelationEl ? guardianRelationEl.value.trim() : '';
+      const guardianEducationEl = document.getElementById('f-guardian-education');
+      const guardianEducation = guardianEducationEl ? guardianEducationEl.value : '';
+      const guardianJobEl = document.getElementById('f-guardian-job');
+      const guardianJob = guardianJobEl ? guardianJobEl.value.trim() : '';
+      const guardianPhoneEl = document.getElementById('f-guardian-phone');
+      const guardianPhone = guardianPhoneEl ? guardianPhoneEl.value.trim() : '';
+
+      // Account
+      const parentPhone = (document.getElementById('f-parent-phone').value || '').trim();
+      const parentEmail = (document.getElementById('f-parent-email').value || '').trim();
+      const password = (document.getElementById('f-password').value || '').trim();
+
+      const formType = (selectedJenjang === 'TPQ') ? 'tpq' : 'paud';
+
+      // Comprehensive Notes JSON containing all detailed metadata from Detail Formulir.md
+      const detailNotes = {
+        nik,
+        nickname,
+        child_order: childOrder,
+        siblings_count: siblingsCount,
+        child_status: childStatus,
+        religion,
+        citizenship,
+        language,
+        special_notes: specialNotes,
+        full_address: {
+          address,
+          subdistrict,
+          district,
+          city,
+          province,
+          distance,
+          transportation
+        },
+        father: {
+          name: fatherName,
+          status: fatherStatus,
+          birth: fatherBirth,
+          education: fatherEducation,
+          job: fatherJob,
+          phone: fatherPhone
+        },
+        mother: {
+          name: motherName,
+          status: motherStatus,
+          birth: motherBirth,
+          education: motherEducation,
+          job: motherJob,
+          phone: motherPhone
+        },
+        guardian: guardianName ? {
+          name: guardianName,
+          relation: guardianRelation,
+          education: guardianEducation,
+          job: guardianJob,
+          phone: guardianPhone
+        } : null,
+        account: {
+          notification_phone: parentPhone,
+          email: parentEmail,
+          password: password
+        }
+      };
+
+      const payload = {
+        form_type: formType,
+        level: selectedJenjang,
+        full_name: studentName,
+        child_name: studentName,
+        nickname: nickname,
+        gender: gender,
+        birth_place: birthPlace,
+        birth_date: birthDate,
+        father_name: fatherName,
+        mother_name: motherName,
+        parent_name: fatherName || motherName,
+        phone: parentPhone,
+        parent_phone: parentPhone,
+        address: `${address}, Kel. ${subdistrict}, Kec. ${district}, ${city}, ${province}`,
+        email: parentEmail,
+        password: password,
+        photo_url: uploadedFiles.photo ? uploadedFiles.photo.dataUrl : '',
+        birth_certificate_url: uploadedFiles.birth_cert ? uploadedFiles.birth_cert.dataUrl : '',
+        family_card_url: uploadedFiles.family_card ? uploadedFiles.family_card.dataUrl : '',
+        notes: JSON.stringify(detailNotes)
+      };
+
+      try {
+        const res = await apiCall('ppdb', 'submit', payload, 'POST');
+        if (res && res.success) {
+          const regNo = res.registration_number || res.registration_no || (res.data && (res.data.registration_number || res.data.registration_no)) || ('REG-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000));
+          const loginEmail = parentEmail || `${regNo.toLowerCase()}@pendaftar.yayasan.sch.id`;
+
+          document.getElementById('res-reg-num').textContent = regNo;
+          document.getElementById('res-student-name').textContent = studentName;
+          document.getElementById('res-login-email').textContent = loginEmail;
+
+          // Store for auto-session in student portal if user proceeds
+          try {
+            const studentUser = {
+              role: 'siswa',
+              email: loginEmail,
+              name: studentName,
+              registration_number: regNo,
+              level: selectedJenjang
+            };
+            localStorage.setItem('siy_portal_pending_user', JSON.stringify(studentUser));
+          } catch (_) {}
+
+          document.getElementById('success-modal').classList.remove('hidden');
+        } else {
+          alert((res && res.message) || 'Pendaftaran gagal disimpan ke sistem. Silakan coba lagi.');
+          btn.disabled = false;
+          btn.innerHTML = '<span>Kirim Pendaftaran PPDB Sekarang</span><i class="fi fi-rr-paper-plane text-sm"></i>';
+        }
+      } catch (err) {
+        alert('Terjadi kendala saat mengirim: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span>Kirim Pendaftaran PPDB Sekarang</span><i class="fi fi-rr-paper-plane text-sm"></i>';
+      }
+    }
+
+    // Periksa status periode dari database/web_settings
+    async function checkPpdbPeriod() {
+      try {
+        const res = await apiCall('ppdb', 'period');
+        if (res && res.success && res.data) {
+          const p = res.data;
+          const isClosed = (p.status === 'closed' || p.status === 'inactive' || p.status === 'ditutup');
+          const academicYear = p.academic_year || '2026/2027';
+
+          const badge = document.getElementById('ppdb-badge');
+          if (isClosed) {
+            document.getElementById('ppdb-closed-card').classList.remove('hidden');
+            if (badge) {
+              badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-900/60 backdrop-blur-md border border-slate-700/60 text-xs font-semibold text-slate-300 mb-4 shadow-sm';
+              badge.innerHTML = `<i class="fi fi-rr-lock text-xs text-slate-400"></i><span id="ppdb-badge-text">Pendaftaran PPDB Ditutup</span>`;
+            }
+          } else if (badge) {
+            badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-4 shadow-sm';
+            badge.innerHTML = `<i class="fi fi-rr-bullhorn text-xs text-sky-300"></i><span id="ppdb-badge-text">PPDB Online Tahun Ajaran ${academicYear}</span>`;
+          }
+        }
+      } catch (e) {
+        // Biarkan formulir terbuka sebagai default
+      }
+    }
+
+    checkPpdbPeriod();
+  </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hubungi kantor tata usaha Yayasan Samarinda - Alamat, telepon, WhatsApp resmi, dan formulir konsultasi.">
+  <title>Hubungi Kami - Yayasan Samarinda</title>
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-primary-500 selection:text-white">
+
+  <!-- Header Placeholder (Zero-Layout Shift pinned) -->
+  <div id="site-header"></div>
+
+  <!-- Hero Header Section -->
+  <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-14 sm:py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 text-balance">
+        Hubungi Yayasan Samarinda
+      </h1>
+      <p class="text-base sm:text-lg text-primary-100 max-w-2xl mx-auto leading-relaxed text-pretty">
+        Pintu kami selalu terbuka untuk pertanyaan seputar pendaftaran siswa baru, kegiatan sekolah, maupun kemitraan.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+
+      <!-- Left Column: Contact Cards & Operational Info -->
+      <div class="lg:col-span-5 space-y-4">
+        <!-- Alamat -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100/70 text-primary-700 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fi fi-rr-marker"></i>
+            </div>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Alamat Kampus Utama</h3>
+              <p class="text-sm font-semibold text-slate-900 leading-relaxed" id="contact-page-address">
+                Jl. Samratulangi, Sungai Keledang, Kec. Samarinda Seberang, Kota Samarinda, Kalimantan Timur 75242
+              </p>
+              <div class="text-[11px] text-primary-700 font-medium mt-1">Kampus Politeknik Negeri Samarinda (POLNES)</div>
+              <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-800 mt-2 transition">
+                <span>Buka di Google Maps</span>
+                <i class="fi fi-rr-arrow-up-right text-[10px]"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telepon & WhatsApp -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100/70 text-primary-700 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fi fi-rr-phone-call"></i>
+            </div>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Kontak Telepon &amp; WhatsApp</h3>
+              <p class="text-sm font-semibold text-slate-900 tabular-nums" id="contact-page-phone">+62 541 234-5678 (Kantor TU)</p>
+              <p class="text-sm font-bold text-primary-700 mt-1 tabular-nums" id="contact-page-wa">+62 812-3456-7890 (WhatsApp Resmi)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100/70 text-primary-700 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fi fi-rr-envelope"></i>
+            </div>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Surat Elektronik (Email)</h3>
+              <a href="mailto:info@yayasan-samarinda.sch.id" class="text-sm font-semibold text-slate-900 hover:text-primary-700 transition" id="contact-page-email">
+                info@yayasan-samarinda.sch.id
+              </a>
+              <div class="text-[11px] text-slate-500 mt-0.5">Respon dalam waktu maksimal 1x24 jam kerja</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jam Pelayanan -->
+        <div class="bg-primary-50/70 border border-primary-100 rounded-2xl p-5">
+          <div class="flex items-center gap-2 mb-2 text-xs font-bold text-primary-900 uppercase tracking-wider">
+            <i class="fi fi-rr-clock-three text-xs"></i>
+            <span>Jam Operasional Pelayanan</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-700">
+            <div class="flex justify-between">
+              <span class="font-medium">Senin - Kamis:</span>
+              <span class="font-bold tabular-nums">07.30 - 15.30 WITA</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Jumat:</span>
+              <span class="font-bold tabular-nums">07.30 - 11.30 WITA</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Sabtu:</span>
+              <span class="font-bold tabular-nums">08.00 - 12.00 WITA</span>
+            </div>
+            <div class="flex justify-between text-slate-400 pt-1 border-t border-primary-200/60">
+              <span>Minggu &amp; Hari Libur Nasional:</span>
+              <span>Tutup</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Consultation Form -->
+      <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-9 shadow-sm">
+        <div class="mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight text-balance">
+            Kirim Pertanyaan / Pesan
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed text-pretty" id="contact-wa-desc">
+            Pesan Anda akan otomatis terhubung ke WhatsApp resmi Tata Usaha Yayasan untuk penanganan yang cepat dan personal.
+          </p>
+        </div>
+
+        <div id="contact-alert" class="hidden mb-6 p-4 bg-primary-50 border border-primary-200 text-primary-900 text-xs sm:text-sm rounded-xl flex items-center gap-3">
+          <i class="fi fi-rr-check text-primary-600 text-base"></i>
+          <span id="contact-alert-text">Pesan Anda berhasil disiapkan.</span>
+        </div>
+
+        <form id="contact-form" class="space-y-4">
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="contact-name" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Nama Lengkap Anda <span class="text-rose-500">*</span>
+              </label>
+              <input id="contact-name" type="text" required placeholder="Contoh: Ibu Rina Wardani" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white focus:outline-none transition">
+            </div>
+
+            <div>
+              <label for="contact-phone" class="block text-xs font-bold text-slate-700 mb-1.5">
+                No. WhatsApp / HP <span class="text-rose-500">*</span>
+              </label>
+              <input id="contact-phone" type="tel" required placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white focus:outline-none transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="contact-email" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Alamat Email Aktif <span class="text-rose-500">*</span>
+            </label>
+            <input id="contact-email" type="email" required placeholder="nama@email.com" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white focus:outline-none transition">
+          </div>
+
+          <div>
+            <label for="contact-topic" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Topik Pertanyaan
+            </label>
+            <select id="contact-topic" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white focus:outline-none transition">
+              <option value="Informasi PPDB (Pendaftaran Siswa Baru)">Informasi PPDB (Pendaftaran Siswa Baru)</option>
+              <option value="Biaya Pendidikan / SPP">Biaya Pendidikan / SPP</option>
+              <option value="Kurikulum & Fasilitas Sekolah">Kurikulum &amp; Fasilitas Sekolah</option>
+              <option value="Lainnya">Pertanyaan Lainnya</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="contact-message" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Pesan / Pertanyaan <span class="text-rose-500">*</span>
+            </label>
+            <textarea id="contact-message" rows="4" required placeholder="Tuliskan pertanyaan atau kebutuhan Anda secara detail..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:bg-white focus:outline-none transition"></textarea>
+          </div>
+
+          <button type="submit" class="w-full ps-6 pe-5 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg shadow-md shadow-primary-600/20 transition inline-flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer">
+            <i class="fi fi-brands-whatsapp text-lg"></i>
+            <span>Kirim Pesan ke WhatsApp Resmi TU</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Interactive Google Maps Location Section -->
+    <section class="mt-12 sm:mt-16 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-9 shadow-sm" id="lokasi-kampus">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+            Lokasi Kampus di Google Maps
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Kunjungi kampus kami secara langsung atau buka navigasi rute di Google Maps.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 shrink-0">
+          <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-primary-600/20 active:scale-[0.98] transition">
+            <i class="fi fi-rr-map-marker text-xs"></i>
+            <span>Buka di Google Maps</span>
+            <i class="fi fi-rr-arrow-up-right text-[10px]"></i>
+          </a>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=-0.5334528,117.1243218" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 active:scale-[0.98] transition">
+            <i class="fi fi-rr-navigation text-xs text-primary-600"></i>
+            <span>Petunjuk Arah</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Google Maps Embed Container -->
+      <div class="relative w-full h-[380px] sm:h-[480px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-slate-100">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.6873539169824!2d117.12174687588383!3d-0.5334527994614271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f4bc56ac1f5%3A0x6cc39448081e9f18!2sPOLNES%20-%20Politeknik%20Negeri%20Samarinda!5e0!3m2!1sid!2sid!4v1740000000000!5m2!1sid!2sid"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Peta Lokasi Kampus di Google Maps"
+          class="w-full h-full"
+        ></iframe>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer Placeholder -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
+  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
+  <script src="js/public-shell.js"></script>
+  <script>
+    injectSiteChrome({ activeKey: 'contact', basePath: './' });
+
+    let currentWaNumber = '6281234567890';
+    let currentSchoolName = 'Yayasan Samarinda';
+
+    async function loadContactSchoolInfo() {
+      try {
+        const cached = sessionStorage.getItem('siyayasan_school_profile');
+        let school = cached ? JSON.parse(cached) : null;
+        if (!school && typeof window.apiCall === 'function') {
+          const res = await window.apiCall('schools', 'get');
+          if (res && res.success && res.data) school = res.data;
+        }
+        if (school) {
+          if (school.name) currentSchoolName = school.name;
+          if (school.address) document.getElementById('contact-page-address').textContent = school.address;
+          if (school.phone) document.getElementById('contact-page-phone').textContent = `${school.phone} (Kantor TU)`;
+          if (school.whatsapp_number) {
+            currentWaNumber = school.whatsapp_number.replace(/\D/g, '');
+            document.getElementById('contact-page-wa').textContent = `+${currentWaNumber} (WhatsApp Resmi)`;
+            document.getElementById('contact-wa-desc').textContent = `Pesan Anda akan otomatis terhubung ke WhatsApp resmi ${currentSchoolName} (+${currentWaNumber}) untuk penanganan yang cepat dan personal.`;
+          }
+          if (school.email) document.getElementById('contact-page-email').textContent = school.email;
+        }
+      } catch (_) {}
+    }
+    loadContactSchoolInfo();
+
+    document.getElementById('contact-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const phone = document.getElementById('contact-phone').value.trim() || '-';
+      const topic = document.getElementById('contact-topic').value;
+      const message = document.getElementById('contact-message').value.trim();
+
+      const waText = `Halo Admin ${currentSchoolName},%0A%0ASaya ingin berkonsultasi melalui website resmi:%0A- *Nama:* ${encodeURIComponent(name)}%0A- *No HP:* ${encodeURIComponent(phone)}%0A- *Email:* ${encodeURIComponent(email)}%0A- *Topik:* ${encodeURIComponent(topic)}%0A- *Pesan:*%0A${encodeURIComponent(message)}`;
+
+      window.open(`https://wa.me/${currentWaNumber}?text=${waText}`, '_blank');
+
+      const alertBox = document.getElementById('contact-alert');
+      const alertText = document.getElementById('contact-alert-text');
+      alertText.textContent = `Terima kasih, ${name}! Pesan Anda telah dialihkan ke WhatsApp resmi ${currentSchoolName} (+${currentWaNumber}).`;
+      alertBox.classList.remove('hidden');
+
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

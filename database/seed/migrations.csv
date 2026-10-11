@@ -1,0 +1,2 @@
+id,name,description,applied_at,applied_by,rollback_sql
+MIGR-001,initial_schema,"Schema awal SIYAYASAN v1.0 dengan 33 sheet",2026-09-12T00:00:00Z,USR-2026-00001,DROP ALL TABLES

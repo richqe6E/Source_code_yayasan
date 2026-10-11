@@ -1,0 +1,2 @@
+id,code,name,level,address,phone,email,head_id,status,created_at,created_by,updated_at,updated_by,is_deleted
+SCH-2026-00001,TK-A,TK Pertiwi 1,TK,"Jl. Contoh No. 123, Jakarta",021-12345678,info@yayasan.sch.id,,active,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE

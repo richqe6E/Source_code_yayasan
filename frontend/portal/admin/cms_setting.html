@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengaturan Website & Tampilan - Portal Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: { primary: { 50:'#F0F9FF',100:'#E0F2FE',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } }
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">CMS Pengaturan Website & Tampilan</h1>
+        <p class="text-xs sm:text-sm text-gray-500 mt-1">Kelola gambar Carousel Hero di beranda, link media sosial, dan kontak resmi sekolah.</p>
+      </div>
+      <button onclick="saveAllSettings()" id="btn-save-all" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold shadow-md shadow-primary-600/20 flex items-center gap-2 transition-all">
+        <span>Simpan Semua Pengaturan</span>
+      </button>
+    </div>
+
+    <!-- Section 1: Hero Carousel Manager -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-5">
+      <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+        <div>
+          <h2 class="text-base font-bold text-gray-900">Banner & Hero Carousel (Beranda Utama)</h2>
+          <p class="text-xs text-gray-500">Gambar latar belakang berganti secara otomatis (crossfade 5 detik)</p>
+        </div>
+        <button onclick="showAddSlideModal()" class="px-3.5 py-1.5 bg-primary-50 hover:bg-primary-100 text-primary-700 border border-primary-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Tambah Gambar Slide</span>
+        </button>
+      </div>
+
+      <!-- Slides Grid -->
+      <div id="slides-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Section 2: Identitas & Kontak Sekolah -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-5">
+      <div class="pb-3 border-b border-gray-100">
+        <h2 class="text-base font-bold text-gray-900">Identitas & Informasi Kontak</h2>
+        <p class="text-xs text-gray-500">Informasi ini ditampilkan pada Header atas, Footer, dan Halaman Kontak.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nama Yayasan / Sekolah</label>
+          <input type="text" id="set-school-name" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Tagline / Slogan</label>
+          <input type="text" id="set-tagline" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nomor WhatsApp Resmi</label>
+          <input type="text" id="set-whatsapp" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="081234567890">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Nomor Telepon Kantor</label>
+          <input type="text" id="set-phone" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="(0541) 234-5678">
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Email Resmi</label>
+          <input type="email" id="set-email" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Alamat Lengkap</label>
+          <textarea id="set-address" rows="2" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Media Sosial -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-5">
+      <div class="pb-3 border-b border-gray-100">
+        <h2 class="text-base font-bold text-gray-900">Tautan Media Sosial</h2>
+        <p class="text-xs text-gray-500">Link akun media sosial resmi yayasan yang aktif</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Facebook Page URL</label>
+          <input type="url" id="set-facebook" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="https://facebook.com/...">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Instagram Profile URL</label>
+          <input type="url" id="set-instagram" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="https://instagram.com/...">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">YouTube Channel URL</label>
+          <input type="url" id="set-youtube" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="https://youtube.com/@...">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Foto Latar Belakang Footer (Gradasi 50%) -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-4">
+      <div class="pb-3 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-base font-bold text-gray-900">Foto Latar Belakang Bagian Bawah (Footer Website)</h2>
+          <p class="text-xs text-gray-500">Foto gedung atau lingkungan sekolah dengan gradasi 50% transparan agar tampilan footer lebih berisi dan profesional.</p>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary-50 text-primary-700 border border-primary-200">
+          Gradasi 50% Aktif
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+        <div class="md:col-span-7 space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">URL Foto Sekolah (Footer Background)</label>
+            <input type="text" id="set-footer-bg" oninput="updateFooterBgPreview()" class="block w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-xs" placeholder="images/school-campus.jpg atau https://...">
+            <p class="text-[11px] text-gray-400 mt-1">Kosongkan untuk menggunakan foto kampus resmi bawaan yayasan.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="file" id="footer-bg-file" accept="image/*" class="hidden" onchange="handleFooterBgUpload(event)">
+            <button type="button" onclick="document.getElementById('footer-bg-file').click()" class="px-3.5 py-2 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition border border-gray-300 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Unggah Foto dari Komputer</span>
+            </button>
+            <button type="button" onclick="resetFooterBgToDefault()" class="px-3 py-2 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition">
+              Reset ke Bawaan
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Card -->
+        <div class="md:col-span-5">
+          <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Pratinjau Tampilan Footer (Gradasi 50%)</div>
+          <div class="relative h-28 w-full rounded-xl overflow-hidden border border-gray-200 shadow-inner bg-slate-950 flex flex-col justify-end p-3">
+            <div id="footer-preview-bg" class="absolute inset-0 bg-cover bg-center transition-all duration-300" style="background-image: url('../../public/images/school-campus.jpg');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-900/60 pointer-events-none"></div>
+            <div class="relative z-10 text-white">
+              <div class="text-xs font-extrabold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                <span>Yayasan Samarinda</span>
+              </div>
+              <div class="text-[10px] text-slate-300">&copy; 2026 Hak Cipta Dilindungi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Tambah Slide Carousel -->
+  <div id="slide-modal" class="hidden fixed inset-0 z-50 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+        <h3 class="text-base font-bold text-gray-900">Tambah Slide Hero</h3>
+        <button type="button" onclick="closeAddSlideModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+
+      <form id="slide-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Judul / Caption Gambar</label>
+          <input type="text" id="slide-caption" required class="block w-full px-3 py-2 text-xs border border-gray-300 rounded-lg" placeholder="Contoh: Suasana Belajar Ceria">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Pilih Gambar Foto</label>
+          <input type="file" id="slide-file" accept="image/*" class="block w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+          <p class="text-[11px] text-gray-400 mt-1">Atau gunakan URL gambar langsung di bawah ini:</p>
+          <input type="url" id="slide-url" class="block w-full mt-1 px-3 py-2 text-xs border border-gray-300 rounded-lg" placeholder="https://images.unsplash.com/...">
+        </div>
+
+        <div class="flex justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closeAddSlideModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
+          <button type="submit" id="btn-save-slide" class="px-5 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-sm">
+            Tambahkan Slide
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'cms_setting.html',
+      portalLabel: 'Portal Admin',
+      title: 'Pengaturan Website & Tampilan',
+      subtitle: 'CMS Banner Hero & Media Sosial Yayasan'
+    });
+
+    let currentHeroImages = [];
+
+    function showAddSlideModal() { document.getElementById('slide-modal')?.classList.remove('hidden'); }
+    function closeAddSlideModal() { document.getElementById('slide-modal')?.classList.add('hidden'); }
+
+    async function loadSettings() {
+      try {
+        const res = await apiCall('web_settings', 'get');
+        if (res.success && res.data) {
+          const d = res.data;
+          document.getElementById('set-school-name').value = d.school_name || '';
+          document.getElementById('set-tagline').value = d.tagline || '';
+          document.getElementById('set-whatsapp').value = d.whatsapp || '';
+          document.getElementById('set-phone').value = d.phone || '';
+          document.getElementById('set-email').value = d.email || '';
+          document.getElementById('set-address').value = d.address || '';
+          document.getElementById('set-facebook').value = d.facebook_url || '';
+          document.getElementById('set-instagram').value = d.instagram_url || '';
+          document.getElementById('set-youtube').value = d.youtube_url || '';
+          document.getElementById('set-footer-bg').value = d.footer_bg_url || '';
+          updateFooterBgPreview();
+
+          // Hero images
+          currentHeroImages = Array.isArray(d.hero_images) ? d.hero_images : [];
+          renderSlides();
+        }
+      } catch (e) {
+        console.error('Error loading web settings:', e);
+      }
+    }
+
+    function updateFooterBgPreview() {
+      const val = document.getElementById('set-footer-bg')?.value.trim();
+      const el = document.getElementById('footer-preview-bg');
+      if (el) {
+        el.style.backgroundImage = `url('${val || '../../public/images/school-campus.jpg'}')`;
+      }
+    }
+
+    function resetFooterBgToDefault() {
+      const input = document.getElementById('set-footer-bg');
+      if (input) input.value = '';
+      updateFooterBgPreview();
+      showToast('Foto latar footer dikembalikan ke foto bawaan kampus.', 'info');
+    }
+
+    async function handleFooterBgUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        showToast('Mengunggah foto footer...', 'info');
+        const url = await uploadToSupabaseStorage(file, 'footer_bg');
+        if (url) {
+          document.getElementById('set-footer-bg').value = url;
+          updateFooterBgPreview();
+          showToast('Foto berhasil diunggah! Tekan Simpan Semua Pengaturan.', 'success');
+        }
+      } catch (err) {
+        showToast('Gagal mengunggah foto', 'error');
+      }
+    }
+
+    function renderSlides() {
+      const container = document.getElementById('slides-grid');
+      if (!currentHeroImages || currentHeroImages.length === 0) {
+        container.innerHTML = '<div class="col-span-full py-6 text-center text-xs text-gray-400">Belum ada slide gambar hero.</div>';
+        return;
+      }
+
+      container.innerHTML = currentHeroImages.map((s, idx) => `
+        <div class="border border-gray-200 rounded-xl overflow-hidden bg-gray-50 flex flex-col justify-between group shadow-sm">
+          <div class="h-36 w-full overflow-hidden bg-gray-200 relative">
+            <img src="${s.url}" alt="${s.caption || 'Slide'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            <span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] font-bold">Slide #${idx + 1}</span>
+          </div>
+          <div class="p-3 flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-gray-800 truncate">${s.caption || 'Slide Banner'}</span>
+            <button type="button" onclick="deleteSlide(${idx})" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus Slide">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deleteSlide(idx) {
+      if (confirm('Hapus slide gambar ini dari carousel beranda?')) {
+        currentHeroImages.splice(idx, 1);
+        renderSlides();
+      }
+    }
+
+    document.getElementById('slide-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const caption = document.getElementById('slide-caption').value.trim();
+      const fileInput = document.getElementById('slide-file');
+      const urlInput = document.getElementById('slide-url').value.trim();
+      const saveBtn = document.getElementById('btn-save-slide');
+
+      let imageUrl = urlInput;
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Menyimpan...';
+
+      try {
+        if (fileInput.files && fileInput.files.length > 0) {
+          imageUrl = await uploadToSupabaseStorage(fileInput.files[0], 'hero_slide');
+        }
+
+        if (!imageUrl) {
+          alert('Pilih file gambar atau masukkan URL gambar!');
+          return;
+        }
+
+        currentHeroImages.push({ url: imageUrl, caption });
+        renderSlides();
+        closeAddSlideModal();
+        showToast('Slide berhasil ditambahkan! Tekan Simpan Semua Pengaturan untuk menerapkan ke beranda.', 'success');
+      } catch (err) {
+        alert('Gagal mengunggah gambar');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Tambahkan Slide';
+      }
+    });
+
+    async function saveAllSettings() {
+      const btn = document.getElementById('btn-save-all');
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan ke Supabase...';
+
+      const payload = {
+        school_name: document.getElementById('set-school-name').value.trim(),
+        tagline: document.getElementById('set-tagline').value.trim(),
+        whatsapp: document.getElementById('set-whatsapp').value.trim(),
+        phone: document.getElementById('set-phone').value.trim(),
+        email: document.getElementById('set-email').value.trim(),
+        address: document.getElementById('set-address').value.trim(),
+        facebook_url: document.getElementById('set-facebook').value.trim(),
+        instagram_url: document.getElementById('set-instagram').value.trim(),
+        youtube_url: document.getElementById('set-youtube').value.trim(),
+        footer_bg_url: document.getElementById('set-footer-bg').value.trim(),
+        hero_images: currentHeroImages
+      };
+
+      try {
+        const res = await apiCall('web_settings', 'update', payload);
+        if (res.success) {
+          showToast('Seluruh pengaturan website berhasil diperbarui!', 'success');
+          // Clear session cache so visitors immediately see new settings
+          sessionStorage.removeItem('siyayasan_school_profile');
+        } else {
+          showToast(res.message || 'Gagal menyimpan pengaturan', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan sistem saat menyimpan', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Simpan Semua Pengaturan';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSettings);
+  </script>
+</body>
+</html>

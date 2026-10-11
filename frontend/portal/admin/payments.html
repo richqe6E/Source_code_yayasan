@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembayaran &amp; SPP - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            primary: {
+              50: '#F0F9FF', 100: '#E0F2FE', 200: '#BAE6FD', 300: '#7DD3FC',
+              400: '#38BDF8', 500: '#0EA5E9', 600: '#0284C7', 700: '#0369A1',
+              800: '#075985', 900: '#0C4A6E'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased selection:bg-primary-500 selection:text-white">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <!-- Ringkasan Finansial KPI -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm">
+        <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Tagihan</div>
+        <div class="text-xl font-extrabold text-gray-900 tracking-tight tabular-nums" id="kpi-total"><div class="skeleton h-6 w-28 rounded-lg"></div></div>
+        <span class="text-[10px] text-gray-500 mt-1 block">Seluruh tagihan tercatat</span>
+      </div>
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm">
+        <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Sudah Dibayar</div>
+        <div class="text-xl font-extrabold text-emerald-700 tracking-tight tabular-nums" id="kpi-paid"><div class="skeleton h-6 w-28 rounded-lg"></div></div>
+        <span class="text-[10px] text-emerald-600/80 mt-1 block">Dana SPP masuk kas</span>
+      </div>
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm">
+        <div class="text-[11px] font-bold text-rose-600 uppercase tracking-wider mb-1">Tunggakan Siswa</div>
+        <div class="text-xl font-extrabold text-rose-700 tracking-tight tabular-nums" id="kpi-outstanding"><div class="skeleton h-6 w-28 rounded-lg"></div></div>
+        <span class="text-[10px] text-rose-600/80 mt-1 block">Tagihan belum dilunasi</span>
+      </div>
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm">
+        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider mb-1">Menunggu Verifikasi</div>
+        <div class="text-xl font-extrabold text-amber-700 tracking-tight tabular-nums" id="kpi-pending"><div class="skeleton h-6 w-16 rounded-lg"></div></div>
+        <span class="text-[10px] text-amber-600/80 mt-1 block">Bukti transfer masuk</span>
+      </div>
+    </div>
+
+    <!-- Tab Bar & Action Buttons -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+      <div class="border-b border-gray-200 overflow-x-auto">
+        <nav class="flex gap-2 -mb-px min-w-max">
+          <button data-tab="invoices" onclick="switchTab('invoices')" class="pay-tab px-5 py-3 text-xs font-bold border-b-2 border-primary-600 text-primary-700 flex items-center gap-2">
+            <span>Daftar Tagihan &amp; SPP</span>
+          </button>
+          <button data-tab="verifications" onclick="switchTab('verifications')" class="pay-tab px-5 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-900 flex items-center gap-2">
+            <span>Verifikasi Bukti Transfer</span>
+            <span id="badge-verif-count" class="hidden px-2 py-0.5 text-[10px] rounded-full bg-amber-100 text-amber-800 font-bold">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openBulkInvoiceModal()" class="px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Tagihan Massal per Kelas
+        </button>
+        <button onclick="openSingleInvoiceModal()" class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          + Buat Tagihan Individu
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel 1: Invoices -->
+    <div id="panel-invoices">
+      <div class="bg-white border border-gray-200/80 rounded-2xl p-4 mb-4 shadow-sm flex flex-col sm:flex-row gap-3">
+        <input id="filter-inv-search" type="text" placeholder="Cari nomor tagihan atau nama siswa..." class="flex-1 px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+        <select id="filter-inv-status" class="px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+          <option value="">Semua Status Tagihan</option>
+          <option value="unpaid">Belum Lunas (Tunggakan)</option>
+          <option value="menunggu_verifikasi">Menunggu Verifikasi</option>
+          <option value="paid">Lunas</option>
+        </select>
+        <button onclick="loadInvoices()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition">
+          Filter
+        </button>
+      </div>
+
+      <div class="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200/80">
+            <thead class="bg-gray-50/75">
+              <tr>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No. Tagihan</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama Siswa</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Keterangan / Periode</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nominal (Rp)</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3.5 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi Kelola</th>
+              </tr>
+            </thead>
+            <tbody id="invoices-tbody" class="bg-white divide-y divide-gray-100">
+              <tr><td colspan="6" class="px-4 py-8 text-center text-xs text-gray-500">Memuat data tagihan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Verifications -->
+    <div id="panel-verifications" class="hidden">
+      <div class="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200/80">
+            <thead class="bg-gray-50/75">
+              <tr>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Tgl Transfer</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama Siswa</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No. Tagihan</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jumlah Transfer</th>
+                <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Metode</th>
+                <th class="px-4 py-3.5 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Bukti Foto Transfer</th>
+                <th class="px-4 py-3.5 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Verifikasi Admin</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody" class="bg-white divide-y divide-gray-100">
+              <tr><td colspan="7" class="px-4 py-8 text-center text-xs text-gray-500">Memuat data verifikasi...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Buat Tagihan Individu -->
+  <div id="single-inv-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Buat Tagihan Siswa</h3>
+          <p class="text-xs text-gray-500">Terbitkan tagihan khusus untuk satu siswa</p>
+        </div>
+        <button type="button" onclick="closeSingleInvModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="single-inv-form" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Pilih Siswa *</label>
+          <select id="single-student" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Nama Tagihan / Deskripsi *</label>
+          <input id="single-item" type="text" required placeholder="Contoh: SPP Oktober 2026 atau Biaya Seragam" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Nominal Tagihan (Rp) *</label>
+          <input id="single-amount" type="number" required placeholder="150000" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Jatuh Tempo *</label>
+          <input id="single-due" type="date" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="closeSingleInvModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
+          <button id="btn-save-single-inv" type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">Terbitkan Tagihan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Buat Tagihan Massal per Kelas -->
+  <div id="bulk-inv-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Terbitkan Tagihan SPP Massal</h3>
+          <p class="text-xs text-gray-500">Otomatis buatkan invoice SPP untuk semua murid aktif di kelas</p>
+        </div>
+        <button type="button" onclick="closeBulkInvModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="bulk-inv-form" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Pilih Kelas *</label>
+          <select id="bulk-class" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="">Semua Siswa Aktif Seluruh Kelas</option>
+          </select>
+          <span class="text-[10px] text-gray-500 mt-1 block">Pilih kelas tertentu atau seluruh siswa aktif sekaligus.</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Bulan SPP *</label>
+            <input id="bulk-month" type="text" required placeholder="Contoh: Oktober 2026" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nominal per Siswa (Rp) *</label>
+            <input id="bulk-amount" type="number" required value="150000" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Jatuh Tempo *</label>
+          <input id="bulk-due" type="date" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+
+        <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-900">
+          💡 Tagihan akan otomatis masuk ke akun Portal Siswa masing-masing siswa yang bersangkutan.
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="closeBulkInvModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
+          <button id="btn-save-bulk-inv" type="submit" class="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl shadow-sm transition">Terbitkan Massal Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Lightbox Bukti Transfer -->
+  <div id="proof-modal" class="hidden fixed inset-0 z-50 bg-gray-950/80 backdrop-blur-md flex items-center justify-center p-4" onclick="closeProofModal()">
+    <div class="bg-white rounded-2xl p-5 max-w-lg w-full shadow-2xl border border-gray-800/10" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center pb-3 mb-3 border-b border-gray-100">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Bukti Pembayaran Masuk</span>
+          <h4 id="proof-student-title" class="text-sm font-bold text-gray-900">-</h4>
+        </div>
+        <button onclick="closeProofModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 text-xl font-bold">&times;</button>
+      </div>
+      <div class="bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center min-h-[240px] max-h-[60vh] border border-gray-200">
+        <img id="proof-img" src="" alt="Bukti Transfer" class="max-h-[58vh] w-auto max-w-full object-contain">
+      </div>
+      <div class="mt-3 flex justify-between items-center text-xs text-gray-500">
+        <span id="proof-inv-info">-</span>
+        <a id="proof-dl-link" href="#" target="_blank" class="text-primary-600 font-semibold hover:underline">Buka Gambar Asli &nearr;</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'payments.html',
+      portalLabel: 'Portal Admin',
+      title: 'Pembayaran &amp; Rekap SPP',
+      subtitle: 'Kelola tagihan SPP bulanan, invoice massal & validasi bukti transfer siswa',
+      showRefresh: true,
+      onRefresh: refreshAll
+    });
+
+    let currentTab = 'invoices';
+    let invoicesCache = [];
+    let paymentsCache = [];
+    let classesCache = [];
+    let studentsCache = [];
+
+    async function refreshAll() {
+      Shell.hideError();
+      const stopSpin = Shell.startRefresh();
+      try {
+        await Promise.all([loadKpis(), loadInvoices(), loadVerifications(), loadClasses(), loadStudentsList()]);
+      } catch (e) {
+        Shell.showError('Tidak dapat terhubung ke server database.');
+      } finally {
+        stopSpin();
+      }
+    }
+
+    async function loadKpis() {
+      const res = await apiCall('payments', 'summary');
+      if (res.success && res.data) {
+        document.getElementById('kpi-total').textContent = formatIDR(res.data.total_invoice || 0);
+        document.getElementById('kpi-paid').textContent = formatIDR(res.data.total_paid || 0);
+        document.getElementById('kpi-outstanding').textContent = formatIDR(res.data.total_outstanding || 0);
+        
+        const pendingCount = res.data.pending_verification || 0;
+        document.getElementById('kpi-pending').textContent = pendingCount;
+        
+        const badge = document.getElementById('badge-verif-count');
+        if (pendingCount > 0) {
+          badge.textContent = pendingCount;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+
+    async function loadClasses() {
+      const res = await apiCall('classes', 'list', { per_page: 100 });
+      const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.classes)) || []);
+      if (res.success && items.length > 0) {
+        classesCache = items;
+        const sel = document.getElementById('bulk-class');
+        sel.innerHTML = '<option value="">Semua Siswa Aktif Seluruh Kelas</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      }
+    }
+
+    async function loadStudentsList() {
+      const res = await apiCall('students', 'list', { per_page: 100, status: 'active' });
+      const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.students)) || []);
+      if (res.success && items.length > 0) {
+        studentsCache = items;
+        const sel = document.getElementById('single-student');
+        sel.innerHTML = studentsCache.map(s => `<option value="${s.id}">${s.full_name} (${s.nis || 'NIS -'}) - ${s.kelas_sekarang || s.class_name || '-'}</option>`).join('');
+      }
+    }
+
+    async function loadInvoices() {
+      const search = document.getElementById('filter-inv-search').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('filter-inv-status').value;
+      const tbody = document.getElementById('invoices-tbody');
+      tbody.innerHTML = Shell.skeletonRows(6, 4);
+
+      const params = { per_page: 100 };
+      if (statusFilter) params.status = statusFilter;
+      const res = await apiCall('invoices', 'list', params);
+
+      if (!res.success) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-xs text-rose-600 font-medium">${res.message || 'Gagal'}</td></tr>`;
+        return;
+      }
+
+      invoicesCache = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.invoices)) || []);
+      let list = [...invoicesCache];
+      if (search) {
+        list = list.filter(i => 
+          (i.invoice_number && i.invoice_number.toLowerCase().includes(search)) ||
+          (i.student_name && i.student_name.toLowerCase().includes(search))
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada data tagihan ditemukan.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(i => {
+        let badge = 'bg-amber-50 text-amber-800 border border-amber-200';
+        let label = 'Belum Lunas';
+        if (i.status === 'paid') {
+          badge = 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+          label = 'Lunas';
+        } else if (i.status === 'menunggu_verifikasi') {
+          badge = 'bg-blue-50 text-blue-800 border border-blue-200';
+          label = 'Menunggu Verifikasi';
+        }
+
+        const isUnpaid = i.status === 'unpaid' || i.status === 'menunggu_verifikasi';
+
+        return `
+        <tr class="hover:bg-gray-50/80 transition">
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs font-mono font-bold text-gray-800">${i.invoice_number || '-'}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap">
+            <div class="text-xs font-bold text-gray-900">${i.student_name || '-'}</div>
+          </td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs text-gray-600">${i.description || i.month || '-'}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs font-mono font-bold text-gray-900">${formatIDR(i.amount)}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap">
+            <span class="px-2.5 py-1 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 ${badge}">
+              ${label}
+            </span>
+          </td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-center space-x-1.5">
+            ${isUnpaid ? `
+              <button onclick="markPaidOffline('${i.id}')" title="Tandai lunas offline (pembayaran tunai di kantor TU)" class="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition">
+                ✓ Lunas Tunai
+              </button>
+            ` : ''}
+            <button onclick="deleteInvoice('${i.id}')" title="Hapus tagihan" class="p-1 text-gray-400 hover:text-red-600 transition">
+              <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadVerifications() {
+      const res = await apiCall('payments', 'list', { per_page: 50, status: 'pending' });
+      const tbody = document.getElementById('payments-tbody');
+
+      if (!res.success) {
+        tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-xs text-rose-600 font-medium">${res.message || 'Gagal'}</td></tr>`;
+        return;
+      }
+
+      paymentsCache = res.data || [];
+      if (paymentsCache.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada bukti transfer yang menunggu verifikasi saat ini.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = paymentsCache.map(p => {
+        const hasProof = !!p.proof_image_url;
+        return `
+        <tr class="hover:bg-gray-50/80 transition">
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs text-gray-600">${formatDate(p.payment_date || p.submitted_at)}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs font-bold text-gray-900">${p.student_name || '-'}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs font-mono text-gray-600">${p.invoice_number || '-'}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs font-mono font-bold text-gray-900">${formatIDR(p.amount)}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-xs text-gray-600 capitalize">${p.method || 'Transfer'}</td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-center">
+            ${hasProof ? `
+              <button onclick="openProofModal('${p.id}')" class="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-700 border border-primary-200 rounded-lg text-xs font-bold hover:bg-primary-100 transition">
+                <span>📷 Lihat Bukti Foto</span>
+              </button>
+            ` : '<span class="text-xs text-gray-400">Tidak ada foto</span>'}
+          </td>
+          <td class="px-4 py-3.5 whitespace-nowrap text-center space-x-2">
+            <button onclick="verifyPayment('${p.id}', true)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+              ✓ Setujui (Lunas)
+            </button>
+            <button onclick="verifyPayment('${p.id}', false)" class="px-3 py-1 bg-gray-100 hover:bg-rose-50 text-gray-600 hover:text-rose-700 text-xs font-semibold rounded-lg border border-gray-200 transition">
+              Tolak
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.pay-tab').forEach(b => {
+        b.classList.remove('border-primary-600', 'text-primary-700');
+        b.classList.add('border-transparent', 'text-gray-500');
+      });
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('border-primary-600', 'text-primary-700');
+      document.querySelector(`[data-tab="${tab}"]`).classList.remove('border-transparent', 'text-gray-500');
+
+      document.getElementById('panel-invoices').classList.toggle('hidden', tab !== 'invoices');
+      document.getElementById('panel-verifications').classList.toggle('hidden', tab !== 'verifications');
+      if (tab === 'verifications') loadVerifications();
+    }
+
+    // Modal Single Invoice
+    function openSingleInvoiceModal() {
+      document.getElementById('single-inv-modal').classList.remove('hidden');
+      document.getElementById('single-due').value = new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10);
+    }
+    function closeSingleInvModal() {
+      document.getElementById('single-inv-modal').classList.add('hidden');
+    }
+
+    document.getElementById('single-inv-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById('single-student').value;
+      const s = studentsCache.find(x => x.id === studentId);
+      const studentName = s ? s.full_name : '';
+
+      const data = {
+        student_id: studentId,
+        student_name: studentName,
+        item_name: document.getElementById('single-item').value.trim(),
+        description: document.getElementById('single-item').value.trim(),
+        amount: parseFloat(document.getElementById('single-amount').value),
+        due_date: document.getElementById('single-due').value
+      };
+
+      const btn = document.getElementById('btn-save-single-inv');
+      btn.disabled = true;
+      btn.textContent = 'Menerbitkan...';
+
+      try {
+        const res = await apiCall('invoices', 'create', data);
+        showToast(res.message || 'Tagihan berhasil diterbitkan', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeSingleInvModal();
+          loadInvoices();
+          loadKpis();
+        }
+      } catch (err) {
+        showToast('Gagal membuat tagihan', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Terbitkan Tagihan';
+      }
+    });
+
+    // Modal Bulk Invoice
+    function openBulkInvoiceModal() {
+      document.getElementById('bulk-inv-modal').classList.remove('hidden');
+      document.getElementById('bulk-due').value = new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10);
+    }
+    function closeBulkInvModal() {
+      document.getElementById('bulk-inv-modal').classList.add('hidden');
+    }
+
+    document.getElementById('bulk-inv-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const classId = document.getElementById('bulk-class').value;
+      const month = document.getElementById('bulk-month').value.trim();
+      const amount = parseFloat(document.getElementById('bulk-amount').value);
+      const dueDate = document.getElementById('bulk-due').value;
+
+      const btn = document.getElementById('btn-save-bulk-inv');
+      btn.disabled = true;
+      btn.textContent = 'Menerbitkan Massal...';
+
+      try {
+        const res = await apiCall('invoices', 'create_bulk', {
+          class_id: classId,
+          month: month,
+          item_name: `SPP ${month}`,
+          amount: amount,
+          due_date: dueDate
+        });
+        showToast(res.message || 'Tagihan massal berhasil diterbitkan', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeBulkInvModal();
+          loadInvoices();
+          loadKpis();
+        }
+      } catch (err) {
+        showToast('Gagal menerbitkan tagihan massal', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Terbitkan Massal Sekarang';
+      }
+    });
+
+    // Verifikasi Pembayaran
+    async function verifyPayment(id, isApproved) {
+      if (!isApproved && !confirm('Tolak pembayaran ini? Tagihan siswa akan dikembalikan ke status Belum Lunas.')) return;
+      const action = isApproved ? 'verify' : 'reject';
+      const res = await apiCall('payments', action, { id });
+      showToast(res.message || 'Pembayaran diperbarui', res.success ? 'success' : 'error');
+      if (res.success) {
+        loadVerifications();
+        loadInvoices();
+        loadKpis();
+      }
+    }
+
+    async function markPaidOffline(invoiceId) {
+      if (!confirm('Tandai tagihan ini sebagai LUNAS (Pembayaran Tunai di Kantor TU)?')) return;
+      const res = await apiCall('invoices', 'mark_paid', { id: invoiceId });
+      showToast(res.message || 'Tagihan lunas', res.success ? 'success' : 'error');
+      if (res.success) {
+        loadInvoices();
+        loadKpis();
+      }
+    }
+
+    async function deleteInvoice(id) {
+      if (!confirm('Hapus tagihan ini?')) return;
+      const res = await apiCall('invoices', 'delete', { id });
+      showToast(res.message || 'Tagihan dihapus', res.success ? 'success' : 'error');
+      if (res.success) {
+        loadInvoices();
+        loadKpis();
+      }
+    }
+
+    function openProofModal(payId) {
+      const p = paymentsCache.find(x => x.id === payId);
+      if (!p || !p.proof_image_url) {
+        showToast('Bukti transfer tidak tersedia', 'error');
+        return;
+      }
+      document.getElementById('proof-img').src = p.proof_image_url;
+      document.getElementById('proof-dl-link').href = p.proof_image_url;
+      document.getElementById('proof-student-title').textContent = `${p.student_name} (${p.invoice_number || 'Tagihan'})`;
+      document.getElementById('proof-inv-info').textContent = `Jumlah: ${formatIDR(p.amount)} • Tgl: ${formatDate(p.payment_date || p.submitted_at)}`;
+      document.getElementById('proof-modal').classList.remove('hidden');
+    }
+
+    function closeProofModal() {
+      document.getElementById('proof-modal').classList.add('hidden');
+    }
+
+    (async () => {
+      await refreshAll();
+    })();
+  </script>
+</body>
+</html>

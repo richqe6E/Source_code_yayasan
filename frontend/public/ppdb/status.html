@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cek Status Pendaftaran PPDB - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased flex flex-col min-h-screen">
+
+  <div id="site-header"></div>
+
+  <!-- Sub-header PPDB context -->
+  <div class="bg-primary-50 border-b border-primary-100">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+      <a href="../ppdb.html" class="flex items-center gap-2 text-sm text-primary-800 hover:text-primary-900 font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Kembali ke Beranda PPDB
+      </a>
+      <div class="text-xs sm:text-sm font-semibold text-primary-800">Tracking Status PPDB</div>
+    </div>
+  </div>
+
+  <section class="bg-gradient-to-br from-primary-700 to-primary-900 text-white py-10 sm:py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-2xl sm:text-4xl font-bold mb-2">Cek Status Pendaftaran PPDB</h1>
+      <p class="text-primary-100 text-sm sm:text-base max-w-xl mx-auto">
+        Pantau proses verifikasi berkas dan penerimaan calon siswa PAUD, TK, maupun TPQ secara transparan.
+      </p>
+    </div>
+  </section>
+
+  <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex-1 w-full">
+    <div class="bg-white border border-gray-200 rounded-lg p-5 sm:p-6 shadow-sm mb-6">
+      <form id="check-form" class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <input id="reg-number" type="text" required placeholder="Contoh: REG-2026-00001" class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md text-sm font-mono uppercase focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <button type="submit" id="check-btn" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-md shadow-sm transition-colors whitespace-nowrap">
+          Cari Status
+        </button>
+      </form>
+    </div>
+
+    <div id="result" class="hidden"></div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/public-shell.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    injectSiteChrome({ activeKey: 'ppdb', basePath: '../' });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    }
+
+    async function checkStatus(regNumber) {
+      const reg = (regNumber || '').trim().toUpperCase();
+      if (!reg) return;
+
+      const result = document.getElementById('result');
+      const btn = document.getElementById('check-btn');
+      btn.disabled = true;
+      btn.textContent = 'Mengecek...';
+
+      result.classList.remove('hidden');
+      result.innerHTML = `
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm animate-pulse space-y-4">
+          <div class="flex justify-between items-center">
+            <div class="space-y-2"><div class="h-3 bg-gray-200 rounded w-24"></div><div class="h-6 bg-gray-200 rounded w-40"></div></div>
+            <div class="h-6 bg-gray-200 rounded w-20"></div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const res = await apiCall('ppdb', 'check_status', { registration_number: reg });
+        if (!res.success) {
+          result.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-sm text-red-800">
+              <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 font-bold">!</div>
+              <p class="font-bold text-red-900 mb-1">Nomor Pendaftaran Tidak Ditemukan</p>
+              <p class="text-xs text-red-700">${escapeHtml(res.message || 'Pastikan nomor pendaftaran yang Anda masukkan sesuai dengan bukti pendaftaran Anda (contoh: REG-2026-00001).')}</p>
+            </div>
+          `;
+          return;
+        }
+
+        const r = (res.data && res.data.registration) ? res.data.registration : (res.data || {});
+        const regNumber = r.registration_number || r.registration_no || r.id || reg;
+        const childName = r.child_name || r.full_name || '-';
+        const birthDate = r.child_birth_date || r.birth_date;
+        const createdAt = r.created_at || r.registration_date;
+        const rawStatus = (r.status || 'pending').toLowerCase();
+
+        const colors = {
+          pending: 'bg-amber-100 text-amber-800 border-amber-200',
+          submitted: 'bg-amber-100 text-amber-800 border-amber-200',
+          waiting_verification: 'bg-amber-100 text-amber-800 border-amber-200',
+          approved: 'bg-green-100 text-green-800 border-green-200',
+          accepted: 'bg-green-100 text-green-800 border-green-200',
+          rejected: 'bg-red-100 text-red-800 border-red-200',
+          converted: 'bg-blue-100 text-blue-800 border-blue-200'
+        };
+
+        const statusLabels = {
+          pending: 'Menunggu Verifikasi TU',
+          submitted: 'Menunggu Verifikasi TU',
+          waiting_verification: 'Menunggu Verifikasi TU',
+          approved: 'Diterima (Lolos Seleksi)',
+          accepted: 'Diterima (Lolos Seleksi)',
+          rejected: 'Belum Diterima',
+          converted: 'Siswa Aktif Terdaftar'
+        };
+
+        const isApproved = rawStatus === 'approved' || rawStatus === 'accepted';
+        const isRejected = rawStatus === 'rejected';
+
+        result.innerHTML = `
+          <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-gray-100 gap-2">
+              <div>
+                <div class="text-xs text-gray-500 font-medium">Nomor Pendaftaran</div>
+                <div class="text-xl font-bold text-gray-900 font-mono tracking-wider tabular-nums">${escapeHtml(regNumber)}</div>
+              </div>
+              <div>
+                <span class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${colors[rawStatus] || 'bg-gray-100 text-gray-700 border-gray-200'}">
+                  ${escapeHtml(statusLabels[rawStatus] || r.status)}
+                </span>
+              </div>
+            </div>
+
+            <dl class="grid sm:grid-cols-2 gap-4 text-sm mb-4">
+              <div><dt class="text-xs text-gray-500">Nama Lengkap Anak</dt><dd class="font-semibold text-gray-900">${escapeHtml(childName)}</dd></div>
+              <div><dt class="text-xs text-gray-500">Jalur / Unit Program</dt><dd class="font-semibold text-gray-900 uppercase">${escapeHtml(r.form_type || 'PAUD/TK')}</dd></div>
+              <div><dt class="text-xs text-gray-500">Tanggal Lahir</dt><dd class="font-medium text-gray-800 tabular-nums">${birthDate ? (window.formatDateID ? formatDateID(birthDate) : formatDate(birthDate)) : '-'}</dd></div>
+              <div><dt class="text-xs text-gray-500">Tanggal Mendaftar</dt><dd class="font-medium text-gray-800 tabular-nums">${createdAt ? (window.formatDateID ? formatDateID(createdAt) : formatDate(createdAt)) : '-'}</dd></div>
+            </dl>
+
+            ${r.notes ? `
+              <div class="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm mb-4">
+                <span class="text-xs font-bold text-gray-700 block mb-1">Catatan Panitia PPDB:</span>
+                <p class="text-gray-700 text-xs sm:text-sm leading-relaxed">${escapeHtml(r.notes)}</p>
+              </div>` : ''}
+
+            ${isApproved ? `
+              <div class="bg-green-50 border border-green-200 rounded-md p-4 text-green-900 text-sm">
+                <div class="font-bold mb-1">🎉 Selamat! Calon Siswa Dinyatakan Diterima</div>
+                <p class="text-xs leading-relaxed">Silakan datang ke sekretariat yayasan atau login ke SIAKAD untuk melengkapi berkas administrasi dan pembayaran seragam/SPP.</p>
+                <div class="mt-3">
+                  <a href="../login.html" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-lg shadow-sm active:scale-[0.98] transition">
+                    <span>Masuk ke SIAKAD</span>
+                    <i class="fi fi-rr-arrow-right text-[10px]"></i>
+                  </a>
+                </div>
+              </div>` : ''}
+
+            ${isRejected ? `
+              <div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-900 text-sm">
+                <div class="font-bold mb-1">Mohon Maaf, Pendaftaran Belum Dapat Diterima</div>
+                <p class="text-xs leading-relaxed">Kuota kelas pada unit terkait telah penuh atau berkas persyaratan belum memenuhi kualifikasi tahun ajaran ini.</p>
+              </div>` : ''}
+          </div>
+        `;
+      } catch (err) {
+        result.innerHTML = `
+          <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-sm text-red-800">
+            Koneksi terganggu. Silakan periksa jaringan internet Anda dan coba lagi.
+          </div>
+        `;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Cari Status';
+      }
+    }
+
+    document.getElementById('check-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const reg = document.getElementById('reg-number').value.trim();
+      checkStatus(reg);
+    });
+
+    // Auto-check if URL has query parameter `?reg=...`
+    const urlParams = new URLSearchParams(window.location.search);
+    const regParam = urlParams.get('reg');
+    if (regParam) {
+      document.getElementById('reg-number').value = regParam;
+      checkStatus(regParam);
+    }
+  </script>
+</body>
+</html>

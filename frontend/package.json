@@ -1,0 +1,14 @@
+{
+  "name": "siyayasan-portal",
+  "version": "1.0.0",
+  "description": "SIYAYASAN Frontend Portal - Landing page & dashboard yayasan pendidikan",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "preview": "vercel"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

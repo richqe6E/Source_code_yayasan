@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Presensi Bulanan</div>
+        <p class="text-xs text-gray-600 mb-3">Rekap kehadiran siswa per bulan.</p>
+        <div class="flex gap-2">
+          <input type="month" id="rep-att-month" class="px-2 py-1 border border-gray-300 rounded text-sm min-w-0 flex-1">
+          <button onclick="downloadReport('attendance')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 shrink-0">Buat</button>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Pembayaran SPP</div>
+        <p class="text-xs text-gray-600 mb-3">Rekap tagihan & pembayaran.</p>
+        <div class="flex gap-2">
+          <input type="month" id="rep-pay-month" class="px-2 py-1 border border-gray-300 rounded text-sm min-w-0 flex-1">
+          <button onclick="downloadReport('payments')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 shrink-0">Buat</button>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Catatan Perkembangan</div>
+        <p class="text-xs text-gray-600 mb-3">Rekap rapor semester siswa.</p>
+        <div class="flex gap-2 flex-wrap">
+          <select id="rep-dev-semester" class="px-2 py-1 border border-gray-300 rounded text-sm">
+            <option value="1">Ganjil</option><option value="2">Genap</option>
+          </select>
+          <input type="text" id="rep-dev-year" placeholder="2026" class="px-2 py-1 border border-gray-300 rounded text-sm w-20">
+          <button onclick="downloadReport('development')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Statistik Siswa</div>
+        <p class="text-xs text-gray-600 mb-3">Total siswa, kelas, jenis kelamin.</p>
+        <button onclick="downloadReport('students')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">PPDB per Tahun</div>
+        <p class="text-xs text-gray-600 mb-3">Rekap pendaftar PPDB per tahun ajaran.</p>
+        <input type="text" id="rep-ppdb-year" placeholder="2026/2027" class="px-2 py-1 border border-gray-300 rounded text-sm mb-2 w-full">
+          <button onclick="downloadReport('ppdb')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+        <div class="text-sm font-semibold text-gray-900 mb-2 truncate">Rekap Lengkap</div>
+        <p class="text-xs text-gray-600 mb-3">Bundle semua laporan (untuk yayasan).</p>
+        <button onclick="downloadReport('all')" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">Buat</button>
+      </div>
+    </div>
+
+    <div class="mt-6 bg-white border border-gray-200 rounded-lg p-5">
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">Hasil Rekap</h3>
+      <div id="report-result" class="text-sm text-gray-600">Klik "Buat" pada salah satu laporan di atas.</div>
+    </div>
+  </main>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'reports.html',
+      portalLabel: 'Portal Admin',
+      title: 'Laporan',
+      subtitle: 'Rekap data & cetak laporan',
+      showRefresh: false,
+      onRefresh: null
+    });
+
+    async function downloadReport(type) {
+      const params = { report_type: type };
+      if (type === 'attendance') params.month = document.getElementById('rep-att-month').value;
+      if (type === 'payments') params.month = document.getElementById('rep-pay-month').value;
+      if (type === 'development') {
+        params.semester = document.getElementById('rep-dev-semester').value;
+        params.year = document.getElementById('rep-dev-year').value;
+      }
+      if (type === 'ppdb') params.academic_year = document.getElementById('rep-ppdb-year').value;
+
+      const result = document.getElementById('report-result');
+      Shell.hideError();
+      result.innerHTML = `
+        <div class="space-y-3 py-2">
+          <div class="skeleton h-4 w-48 rounded"></div>
+          <div class="skeleton h-4 w-full rounded"></div>
+          <div class="skeleton h-4 w-3/4 rounded"></div>
+        </div>
+      `;
+      try {
+        const res = await apiCall('reports', 'generate', params);
+        if (!res.success) {
+          Shell.showError(res.message || 'Gagal membuat laporan');
+          result.innerHTML = `<div class="text-sm text-red-600 font-medium">${res.message || 'Gagal membuat laporan'}</div>`;
+          return;
+        }
+
+        if (res.data.file_url) {
+          result.innerHTML = `<div>Laporan siap: <a href="${res.data.file_url}" target="_blank" class="text-primary-700 font-medium underline">Download / Cetak</a></div>`;
+        } else if (res.data.rows) {
+          const rows = res.data.rows;
+          result.innerHTML = `<div class="overflow-x-auto"><table class="min-w-full text-xs divide-y divide-gray-200"><thead class="bg-gray-50">${(res.data.headers || []).map(h=>`<th class="px-3 py-2 text-left font-semibold text-gray-700 uppercase">${h}</th>`).join('')}</thead><tbody class="divide-y divide-gray-100">${rows.slice(0,50).map(r=>`<tr>${r.map(c=>`<td class="px-3 py-2 tabular-nums text-gray-800">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length>50?`<div class="text-xs text-gray-500 mt-2 tabular-nums">Menampilkan 50 dari ${rows.length} baris.</div>`:''}</div>`;
+        } else {
+          result.innerHTML = '<div class="text-green-700 font-medium">Laporan berhasil dibuat.</div>';
+        }
+      } catch (e) {
+        Shell.showError('Tidak dapat terhubung ke server.');
+        result.innerHTML = '<div class="text-sm text-red-600">Gagal terhubung ke server.</div>';
+      }
+    }
+  </script>
+</body>
+</html>

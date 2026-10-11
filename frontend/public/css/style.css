@@ -1,0 +1,180 @@
+/* SIYAYASAN - Shared styles (Aligned with jakubkrehel/skills: better-interface, better-ui, better-typography, better-colors) */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ======================================================== */
+/* 1. TYPOGRAPHY (better-typography)                        */
+/* ======================================================== */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  letter-spacing: -0.018em;
+  overflow-wrap: break-word;
+}
+
+p, .prose p, .lead {
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+/* Tabular figures for data, numbers, stats, and prices */
+.tabular-nums, [data-stat], .stat-value, .currency-value, time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badges and tags: no awkward wrap */
+.badge, [class*="rounded-full"][class*="text-xs"], [class*="rounded-full"][class*="text-["] {
+  white-space: nowrap;
+}
+
+/* ======================================================== */
+/* 2. TACTILE PRESS & INTERRUPTIBLE MOTION (better-ui)      */
+/* ======================================================== */
+/* Buttons & interactive pills tactile scale on press: exactly scale(0.96) */
+button,
+a[role="button"],
+.btn,
+[class*="active:scale"] {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+button:active:not(:disabled),
+a[role="button"]:active,
+.btn:active:not(:disabled),
+[class*="active:scale"]:active {
+  transform: scale(0.96) !important;
+}
+
+/* Optical alignment for button icons */
+button i, .btn i, a i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Symmetrical & professional optical alignment for arrow icons */
+button i[class*="arrow"],
+a i[class*="arrow"],
+.btn i[class*="arrow"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Micro smooth nudge on hover for right-pointing arrows */
+button:hover i[class*="arrow-right"],
+a:hover i[class*="arrow-right"] {
+  transform: translateX(2px);
+}
+
+button:hover i[class*="arrow-left"],
+a:hover i[class*="arrow-left"] {
+  transform: translateX(-2px);
+}
+
+/* Image subtle 1px outline for crisp depth (better-ui) */
+img.has-edge-outline,
+.card-media img {
+  outline: 1px solid rgba(0, 0, 0, 0.06);
+  outline-offset: -1px;
+}
+
+/* ======================================================== */
+/* 3. MODERN VIEW TRANSITIONS & ZERO-SHIFT HEADER           */
+/* ======================================================== */
+/* Sticky pinned navigation across all pages */
+#site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+/* Header stays rock-solid pinned in place during navigation */
+#site-header, nav.sticky {
+  view-transition-name: site-header;
+}
+
+::view-transition-old(root) {
+  animation: 140ms cubic-bezier(0.2, 0, 0, 1) both siyFadeOut;
+}
+::view-transition-new(root) {
+  animation: 200ms cubic-bezier(0.2, 0, 0, 1) both siyFadeIn;
+}
+@keyframes siyFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes siyFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ======================================================== */
+/* 4. SURFACES & SHADOW ELEVATION (better-ui)               */
+/* ======================================================== */
+.siy-elevation-1 {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.03);
+}
+.siy-elevation-2 {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+}
+.siy-elevation-3 {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.02);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #F8FAFC; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* Accessibility - focus styles (better-accessibility & better-colors) */
+*:focus-visible {
+  outline: 2px solid #0284C7 !important;
+  outline-offset: 2px !important;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #0284C7;
+  color: white;
+  padding: 8px 16px;
+  font-weight: 600;
+  border-radius: 0 0 8px 0;
+  z-index: 100;
+  transition: top 150ms ease-out;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Print styles */
+@media print {
+  .no-print { display: none !important; }
+  body { font-size: 11pt; color: #000; background: white; }
+  .card, .border, .shadow { border: 1px solid #ddd !important; box-shadow: none !important; }
+  a { color: #000; text-decoration: underline; }
+  .print-break { page-break-after: always; }
+}

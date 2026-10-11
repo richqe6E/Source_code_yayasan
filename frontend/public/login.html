@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login SIAKAD - Yayasan Samarinda</title>
+  <meta name="description" content="Masuk ke Sistem Informasi Akademik (SIAKAD) Yayasan Samarinda.">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons (Official Font Icons) -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            },
+            theme: {
+              primary: '#0284C7',
+              primaryHover: '#0369A1',
+              accent: '#0284C7'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+  <!-- Lottie Player for High-Performance Vector Animations -->
+  <script src="js/lottie-player.js" onerror="this.onerror=null;this.src='https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js'"></script>
+  <style>
+    .glass-card {
+      background: #FFFFFF;
+      box-shadow: 0 25px 60px -15px rgba(2, 6, 23, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+    /* Ilustrasi SVG styling */
+    .illus-float {
+      animation: floatSlow 6s ease-in-out infinite;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body class="font-sans bg-slate-950 text-slate-800 antialiased min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-10 relative overflow-x-hidden selection:bg-brand-600 selection:text-white">
+
+  <!-- Background Foto Sekolah dengan Gradasi 60-70% (Elegan, Berisi & Profesional) -->
+  <div id="login-bg-image" class="fixed inset-0 bg-cover bg-center pointer-events-none scale-105 transition-all duration-1000" style="background-image: url('images/school-campus.jpg');"></div>
+  
+  <!-- Overlay Gradasi Gelap 60-70% Institusional (Anti-Slop: Tampilan Berwibawa & Kartu Sangat Kontras) -->
+  <div class="fixed inset-0 pointer-events-none backdrop-blur-[1.5px]" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.72) 0%, rgba(30, 41, 59, 0.62) 50%, rgba(8, 47, 73, 0.68) 100%);"></div>
+
+  <!-- Master Card Container (Sesuai Referensi Split 2 Kolom) -->
+  <div class="glass-card relative z-10 rounded-[28px] sm:rounded-[36px] w-full max-w-5xl overflow-hidden grid lg:grid-cols-12 shadow-2xl transition-all duration-300">
+
+    <!-- ======================================================== -->
+    <!-- KOLOM KIRI: ILUSTRASI BRANDING & VISUAL (5 Kolom) -->
+    <!-- ======================================================== -->
+    <div class="lg:col-span-5 bg-gradient-to-br from-brand-50/90 via-sky-50/50 to-blue-50/40 p-8 sm:p-10 flex flex-col justify-between relative border-b lg:border-b-0 lg:border-r border-slate-100 overflow-hidden">
+      
+      <!-- Lingkaran Aksen Halus Latar Belakang -->
+      <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-brand-200/40 blur-2xl pointer-events-none"></div>
+      <div class="absolute bottom-10 right-0 w-56 h-56 rounded-full bg-sky-200/30 blur-2xl pointer-events-none"></div>
+
+      <!-- Top Branding Logo -->
+      <div class="relative z-10">
+        <a href="index.html" class="inline-flex items-center gap-3 group">
+          <img src="images/logo.png" alt="Logo Yayasan" class="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+          <div>
+            <span class="block text-base font-extrabold text-slate-900 tracking-tight leading-none group-hover:text-brand-700 transition">Yayasan Samarinda</span>
+            <span class="block text-[11px] font-semibold text-brand-700 tracking-wider uppercase mt-1">SIAKAD Terpadu</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Vector Motion Showcase (Lottie Player Vector Animation) -->
+      <div class="relative z-10 my-auto py-6 sm:py-8 flex flex-col items-center justify-center">
+        <div class="w-full max-w-[340px] relative group illus-float flex items-center justify-center">
+          <!-- Ambient Glow Effect -->
+          <div class="absolute -inset-2 bg-gradient-to-r from-brand-400/20 via-sky-400/20 to-blue-500/20 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
+
+          <!-- Lottie Player Vector Container -->
+          <div class="relative w-full aspect-square max-h-[300px] flex items-center justify-center">
+            <lottie-player 
+              src="assets/lottie/education.json" 
+              background="transparent" 
+              speed="1" 
+              style="width: 100%; height: 100%;" 
+              loop 
+              autoplay>
+            </lottie-player>
+          </div>
+        </div>
+
+        <div class="mt-4 text-center px-4">
+          <p class="text-xs font-bold text-slate-800 tracking-tight">Sistem Informasi Akademik (SIAKAD)</p>
+        </div>
+      </div>
+
+      <!-- Bottom Mini Feature Pill -->
+      <div class="relative z-10 flex items-center justify-between pt-4 border-t border-slate-200/60 text-[11px] text-slate-600">
+        <span class="inline-flex items-center gap-1.5 font-medium">
+          <i class="fi fi-sr-shield-check text-brand-600 text-sm"></i>
+          Keamanan Terenkripsi
+        </span>
+        <span class="text-slate-400">Versi 2.0</span>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- KOLOM KANAN: FORMULIR LOGIN (7 Kolom Sesuai Referensi) -->
+    <!-- ======================================================== -->
+    <div class="lg:col-span-7 p-8 sm:p-12 lg:p-14 flex flex-col justify-between bg-white">
+      
+      <!-- Top Bar: Navigasi Kembali -->
+      <div class="flex items-center justify-between mb-8">
+        <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+          <i class="fi fi-rr-arrow-left text-[10px]"></i>
+          <span>Kembali ke Beranda</span>
+        </a>
+      </div>
+
+      <!-- Header Teks Form -->
+      <div class="mb-6">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Login SIAKAD</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Masukkan kredensial akun Anda untuk melanjutkan.</p>
+      </div>
+
+      <!-- Segmented Tab: Siswa vs Admin -->
+      <div class="mb-6 p-1 bg-slate-100 rounded-xl flex gap-1 text-xs font-semibold">
+        <button type="button" id="tab-siswa" onclick="switchLoginMode('siswa')" class="flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5">
+          <i class="fi fi-rr-graduation-cap text-brand-600 text-sm"></i>
+          <span>Siswa</span>
+        </button>
+        <button type="button" id="tab-admin" onclick="switchLoginMode('admin')" class="flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+          <i class="fi fi-rr-shield-check text-slate-500 text-sm"></i>
+          <span>Admin</span>
+        </button>
+      </div>
+
+      <!-- Form Login -->
+      <form id="login-form" class="space-y-4">
+        
+        <!-- Field 1: Identifier (NIS / Email) -->
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <label for="identifier" id="identifier-label" class="block text-xs font-bold text-slate-700">
+              Nomor Induk Siswa (NIS) *
+            </label>
+            <button 
+              type="button" 
+              id="nis-help-btn"
+              onclick="toggleNisTooltip(event)" 
+              class="w-4 h-4 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 text-[10px] font-bold leading-none inline-flex items-center justify-center transition active:scale-95 focus:outline-none"
+              title="Informasi NIS"
+              aria-label="Informasi NIS"
+            >?</button>
+          </div>
+
+          <!-- Petunjuk NIS (Collapsible) -->
+          <div id="nis-tooltip" class="hidden mb-2 bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-600 flex items-start justify-between gap-2">
+            <div>
+              <span class="font-semibold text-slate-800 text-xs">Petunjuk NIS:</span>
+              <p class="mt-0.5 text-[11px] text-slate-600 leading-relaxed">Nomor Induk Siswa tertera pada kartu pelajar atau bukti registrasi PPDB Anda (contoh: <code>2026001</code>).</p>
+            </div>
+            <button type="button" onclick="closeNisTooltip(event)" class="text-slate-400 hover:text-slate-600 p-0.5 text-xs leading-none font-bold" aria-label="Tutup petunjuk NIS">✕</button>
+          </div>
+
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i id="identifier-icon" class="fi fi-rr-graduation-cap text-base"></i>
+            </span>
+            <input 
+              type="text" 
+              id="identifier" 
+              name="identifier" 
+              required
+              autocomplete="username"
+              placeholder="Contoh: 2026001" 
+              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 text-sm font-medium text-slate-800 placeholder-slate-400 outline-none transition"
+            >
+          </div>
+        </div>
+
+        <!-- Field 2: Password -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-1.5">
+              <label for="password" class="block text-xs font-bold text-slate-700">
+                Password *
+              </label>
+              <button 
+                type="button" 
+                id="pwd-help-btn"
+                onclick="togglePasswordTooltip(event)" 
+                class="w-4 h-4 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 text-[10px] font-bold leading-none inline-flex items-center justify-center transition active:scale-95 focus:outline-none"
+                title="Petunjuk password awal"
+                aria-label="Petunjuk password awal"
+              >?</button>
+            </div>
+            
+            <button type="button" onclick="openHelpModal()" class="text-xs text-slate-500 hover:text-slate-800 transition">
+              Bantuan?
+            </button>
+          </div>
+
+          <!-- Petunjuk Password Awal (Collapsible) -->
+          <div id="pwd-tooltip" class="hidden mb-2 bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-600 flex items-start justify-between gap-2">
+            <div>
+              <span class="font-semibold text-slate-800 text-xs">Password Awal Siswa Baru:</span>
+              <p class="mt-0.5 text-[11px] text-slate-600 leading-relaxed">Gunakan format <strong>Tanggal Lahir</strong> (contoh: <code>2018-05-14</code> atau <code>14052018</code>) sebagai password awal akun Anda.</p>
+            </div>
+            <button type="button" onclick="closePasswordTooltip(event)" class="text-slate-400 hover:text-slate-600 p-0.5 text-xs leading-none font-bold" aria-label="Tutup petunjuk password">✕</button>
+          </div>
+
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fi fi-rr-lock text-base"></i>
+            </span>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              required
+              autocomplete="current-password"
+              placeholder="Masukkan password Anda" 
+              class="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 text-sm font-medium text-slate-800 placeholder-slate-400 outline-none transition"
+            >
+            <button 
+              type="button" 
+              id="toggle-password" 
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition"
+              aria-label="Tampilkan atau sembunyikan password"
+            >
+              <i id="toggle-password-icon" class="fi fi-rr-eye text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input 
+              type="checkbox" 
+              id="remember" 
+              class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300 transition cursor-pointer"
+              checked
+            >
+            <span class="text-xs font-semibold text-slate-600">Keep me logged in</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button 
+            type="submit" 
+            id="btn-submit"
+            class="w-full py-3 px-6 rounded-lg bg-brand-600 hover:bg-brand-700 active:scale-[0.98] text-white font-bold text-sm shadow-md shadow-brand-700/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span id="btn-text">Masuk ke SIAKAD</span>
+            <i class="fi fi-rr-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Divider / Or Section -->
+      <div class="relative my-6 text-center">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+        <span class="relative px-3 bg-white text-xs font-medium text-slate-400">atau pendaftar baru?</span>
+      </div>
+
+      <!-- Quick Action: PPDB Registration -->
+      <div class="text-center">
+        <p class="text-xs text-slate-600">
+          Belum memiliki akun calon siswa? 
+          <a href="ppdb.html" class="font-bold text-brand-700 hover:text-brand-800 hover:underline transition ml-1 inline-flex items-center gap-1">
+            <span>Daftar PPDB Online</span>
+            <i class="fi fi-rr-user-add text-xs"></i>
+          </a>
+        </p>
+      </div>
+
+      <!-- Footer Copyright (Sesuai Referensi) -->
+      <div class="mt-8 pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400">
+        &copy; 2026 Yayasan Pendidikan Islam Samarinda. All rights reserved.
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Bantuan Login -->
+  <div id="help-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mx-auto mb-4">
+        <i class="fi fi-rr-interrogation text-xl"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 text-center mb-1">Panduan Login SIAKAD</h3>
+      <p class="text-xs text-slate-600 text-center mb-4 leading-relaxed">
+        Akun siswa menggunakan <strong>NIS</strong> terdaftar dan <strong>Tanggal Lahir</strong> bawaan.
+      </p>
+      <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-700 space-y-1.5 mb-4">
+        <div>• <strong>Siswa Aktif:</strong> Masukkan NIS (cth: 2026001)</div>
+        <div>• <strong>Password Awal:</strong> Format YYYY-MM-DD (cth: 2020-05-14)</div>
+        <div>• <strong>Lupa Password?</strong> Silakan hubungi admin sekolah untuk reset akun.</div>
+      </div>
+      <div class="space-y-2">
+        <a id="help-wa-link" href="https://wa.me/6281234567890?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20login%20portal%20Yayasan" target="_blank" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-[0.98]">
+          <i class="fi fi-brands-whatsapp text-sm"></i>
+          <span>Hubungi Admin TU via WhatsApp</span>
+        </a>
+        <button type="button" onclick="closeHelpModal()" class="w-full py-2 px-4 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-[0.98]">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Wajib Ganti Password Pertama Kali -->
+  <div id="password-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-4">
+        <i class="fi fi-rr-shield-exclamation text-xl"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 text-center mb-1">Amankan Akun Anda</h3>
+      <p class="text-xs text-slate-600 text-center mb-5 leading-relaxed">
+        Selamat datang! Demi keamanan, silakan buat password baru pribadi Anda sebelum masuk ke Portal Siswa.
+      </p>
+
+      <form id="new-password-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru *</label>
+          <input type="password" id="new-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Konfirmasi Password Baru *</label>
+          <input type="password" id="confirm-password" required minlength="6" placeholder="Ulangi password baru" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+        </div>
+
+        <button type="submit" id="btn-save-new-password" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-600/20 transition">
+          Simpan &amp; Masuk ke Portal Siswa
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Auth, API & Page Transitions Script -->
+  <script src="/shared/js/auth.js" onerror="this.onerror=null;this.src='../shared/js/auth.js'"></script>
+  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
+  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+
+  <script>
+    let currentLoginMode = 'siswa';
+    let pendingSessionData = null;
+
+    // Toggle Mode Login (Siswa vs Admin)
+    function switchLoginMode(mode) {
+      currentLoginMode = mode;
+      const tabSiswa = document.getElementById('tab-siswa');
+      const tabAdmin = document.getElementById('tab-admin');
+      const label = document.getElementById('identifier-label');
+      const input = document.getElementById('identifier');
+      const icon = document.getElementById('identifier-icon');
+      const nisHelpBtn = document.getElementById('nis-help-btn');
+      const pwdHelpBtn = document.getElementById('pwd-help-btn');
+
+      // Tutup tooltip jika sedang terbuka
+      closeNisTooltip();
+      closePasswordTooltip();
+
+      if (mode === 'admin') {
+        tabAdmin.className = 'flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5 font-semibold';
+        tabSiswa.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5 font-semibold';
+        label.textContent = 'Email Admin *';
+        input.placeholder = 'admin@yayasan.sch.id';
+        input.type = 'email';
+        icon.className = 'fi fi-rr-envelope text-base';
+        if (nisHelpBtn) nisHelpBtn.classList.add('hidden');
+        if (pwdHelpBtn) pwdHelpBtn.classList.add('hidden');
+      } else {
+        tabSiswa.className = 'flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5 font-semibold';
+        tabAdmin.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5 font-semibold';
+        label.textContent = 'Nomor Induk Siswa (NIS) *';
+        input.placeholder = 'Contoh: 2026001';
+        input.type = 'text';
+        icon.className = 'fi fi-rr-graduation-cap text-base';
+        if (nisHelpBtn) nisHelpBtn.classList.remove('hidden');
+        if (pwdHelpBtn) pwdHelpBtn.classList.remove('hidden');
+      }
+    }
+
+    function toggleNisTooltip(e) {
+      if (e) e.stopPropagation();
+      const el = document.getElementById('nis-tooltip');
+      const pwd = document.getElementById('pwd-tooltip');
+      if (pwd) pwd.classList.add('hidden');
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function closeNisTooltip(e) {
+      if (e) e.stopPropagation();
+      const el = document.getElementById('nis-tooltip');
+      if (el) el.classList.add('hidden');
+    }
+
+    function togglePasswordTooltip(e) {
+      if (e) e.stopPropagation();
+      const el = document.getElementById('pwd-tooltip');
+      const nis = document.getElementById('nis-tooltip');
+      if (nis) nis.classList.add('hidden');
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function closePasswordTooltip(e) {
+      if (e) e.stopPropagation();
+      const el = document.getElementById('pwd-tooltip');
+      if (el) el.classList.add('hidden');
+    }
+
+    // Tutup tooltip saat klik di luar
+    document.addEventListener('click', function(e) {
+      const nisTooltip = document.getElementById('nis-tooltip');
+      const nisBtn = document.getElementById('nis-help-btn');
+      if (nisTooltip && !nisTooltip.contains(e.target) && e.target !== nisBtn) {
+        nisTooltip.classList.add('hidden');
+      }
+      const pwdTooltip = document.getElementById('pwd-tooltip');
+      const pwdBtn = document.getElementById('pwd-help-btn');
+      if (pwdTooltip && !pwdTooltip.contains(e.target) && e.target !== pwdBtn) {
+        pwdTooltip.classList.add('hidden');
+      }
+    });
+
+    // Toggle Show/Hide Password
+    document.getElementById('toggle-password').addEventListener('click', function() {
+      const pwd = document.getElementById('password');
+      const icon = document.getElementById('toggle-password-icon');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.className = 'fi fi-rr-eye-crossed text-base';
+      } else {
+        pwd.type = 'password';
+        icon.className = 'fi fi-rr-eye text-base';
+      }
+    });
+
+    function openHelpModal() {
+      document.getElementById('help-modal').classList.remove('hidden');
+    }
+    function closeHelpModal() {
+      document.getElementById('help-modal').classList.add('hidden');
+    }
+
+    // Form Login Submit
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('identifier').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const btn = document.getElementById('btn-submit');
+      const btnText = document.getElementById('btn-text');
+
+      if (!identifier || !password) {
+        showToast('Mohon isi nomor identitas/email dan password.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.textContent = 'Memverifikasi...';
+
+      try {
+        const res = await apiCall('auth', 'login', { identifier, password });
+
+        if (res.success && res.data) {
+          const user = res.data.user || {};
+          const token = res.data.token || ('siy_' + Date.now());
+
+          // Periksa apakah siswa aktif baru dan belum mengganti password awal
+          if (user.role && (user.role.code === 'siswa_aktif' || user.role === 'siswa_aktif') && user.is_password_changed === false) {
+            pendingSessionData = { token, user };
+            document.getElementById('password-modal').classList.remove('hidden');
+            btn.disabled = false;
+            btnText.textContent = 'Login';
+            return;
+          }
+
+          // Simpan sesi dan arahkan
+          localStorage.setItem('siy_token', token);
+          localStorage.setItem('siy_user', JSON.stringify(user));
+          showToast('Login berhasil! Mengalihkan ke SIAKAD...', 'success');
+
+          setTimeout(() => {
+            const redirectUrl = getPortalRedirect(user.role ? (user.role.code || user.role) : 'siswa');
+            window.location.href = redirectUrl;
+          }, 800);
+        } else {
+          showToast(res.message || 'NIS/Email atau password salah.', 'error');
+          btn.disabled = false;
+          btnText.textContent = 'Login';
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat masuk: ' + err.message, 'error');
+        btn.disabled = false;
+        btnText.textContent = 'Login';
+      }
+    });
+
+    // Form Update Password Baru (Pertama Kali Masuk)
+    document.getElementById('new-password-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const newPwd = document.getElementById('new-password').value.trim();
+      const confirmPwd = document.getElementById('confirm-password').value.trim();
+
+      if (newPwd.length < 6) {
+        showToast('Password baru minimal 6 karakter.', 'error');
+        return;
+      }
+      if (newPwd !== confirmPwd) {
+        showToast('Konfirmasi password tidak cocok.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-new-password');
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan...';
+
+      try {
+        const res = await apiCall('auth', 'change_password', {
+          user_id: pendingSessionData.user.id,
+          new_password: newPwd
+        });
+
+        if (res.success) {
+          pendingSessionData.user.is_password_changed = true;
+          localStorage.setItem('siy_token', pendingSessionData.token);
+          localStorage.setItem('siy_user', JSON.stringify(pendingSessionData.user));
+          showToast('Password berhasil diperbarui! Mengalihkan ke SIAKAD...', 'success');
+
+          setTimeout(() => {
+            window.location.href = '/siswa/dashboard.html';
+          }, 1000);
+        } else {
+          showToast(res.message || 'Gagal mengubah password', 'error');
+          btn.disabled = false;
+          btnText.textContent = 'Simpan & Masuk ke SIAKAD';
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat memperbarui password', 'error');
+        btn.disabled = false;
+        btnText.textContent = 'Simpan & Masuk ke SIAKAD';
+      }
+    });
+
+    // Auto-check jika sudah login
+    if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+      const user = getUser();
+      if (user && user.role) {
+        const redirectUrl = getPortalRedirect(user.role.code || user.role);
+        // User bisa tetap logout jika sengaja membuka halaman login
+      }
+    }
+
+    // Auto hydrate background sekolah jika ada konfigurasi CMS
+    async function loadLoginSchoolBg() {
+      try {
+        const cached = sessionStorage.getItem('siyayasan_school_profile');
+        if (cached) {
+          const s = JSON.parse(cached);
+          if (s && s.footer_bg_url) {
+            const bgEl = document.getElementById('login-bg-image');
+            if (bgEl) bgEl.style.backgroundImage = `url("${s.footer_bg_url}")`;
+          }
+        }
+        if (typeof apiCall === 'function') {
+          const res = await apiCall('web_settings', 'get');
+          if (res && res.success && res.data && res.data.footer_bg_url) {
+            const bgEl = document.getElementById('login-bg-image');
+            if (bgEl) bgEl.style.backgroundImage = `url("${res.data.footer_bg_url}")`;
+          }
+        }
+      } catch (_) {}
+    }
+    loadLoginSchoolBg();
+  </script>
+</body>
+</html>

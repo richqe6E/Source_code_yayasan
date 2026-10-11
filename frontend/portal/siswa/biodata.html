@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biodata Siswa - Yayasan Samarinda</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#F0F9FF', 100:'#E0F2FE', 200:'#BAE6FD', 300:'#7DD3FC', 400:'#38BDF8', 500:'#0EA5E9', 600:'#0284C7', 700:'#0369A1', 800:'#075985', 900:'#0C4A6E', 950:'#082F49' },
+            primary: { 50:'#F0F9FF', 100:'#E0F2FE', 500:'#0EA5E9', 600:'#0284C7', 700:'#0369A1', 800:'#075985', 900:'#0C4A6E' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased min-h-screen">
+  <div id="app-shell"></div>
+
+  <main id="main-slot" class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Formulir Biodata Siswa</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Lengkapi data pribadi dan orang tua untuk arsip administrasi resmi sekolah.</p>
+      </div>
+      <div id="save-status" class="hidden sm:flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
+        <i class="fi fi-rr-check text-xs text-primary-700"></i>
+        <span>Data Tersimpan</span>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <form id="biodata-form" class="space-y-6">
+
+      <!-- Section 1: Data Calon Siswa -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-5">
+        <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-sm">1</div>
+          <h2 class="text-base font-bold text-slate-900">Data Pribadi Siswa / Santri</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label for="full_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nama Lengkap (Sesuai Akte Kelahiran) <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="full_name" name="full_name" required
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+
+          <div>
+            <label for="nickname" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nama Panggilan
+            </label>
+            <input type="text" id="nickname" name="nickname"
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all"
+                   placeholder="Contoh: Rayhan">
+          </div>
+
+          <div>
+            <label for="gender" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Jenis Kelamin <span class="text-red-500">*</span>
+            </label>
+            <select id="gender" name="gender" required
+                    class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+              <option value="">Pilih Jenis Kelamin</option>
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="birth_place" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Tempat Lahir <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="birth_place" name="birth_place" required
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all"
+                   placeholder="Kota Kelahiran (Contoh: Samarinda)">
+          </div>
+
+          <div>
+            <label for="birth_date" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Tanggal Lahir <span class="text-red-500">*</span>
+            </label>
+            <input type="date" id="birth_date" name="birth_date" required
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="address" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Alamat Tempat Tinggal Lengkap <span class="text-red-500">*</span>
+            </label>
+            <textarea id="address" name="address" rows="3" required
+                      class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all"
+                      placeholder="Jalan, RT/RW, Kelurahan, Kecamatan, Kota"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Data Orang Tua / Wali -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-5">
+        <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-sm">2</div>
+          <h2 class="text-base font-bold text-slate-900">Data Orang Tua / Wali</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="father_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nama Ayah Kandung <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="father_name" name="father_name" required
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+
+          <div>
+            <label for="mother_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nama Ibu Kandung <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="mother_name" name="mother_name" required
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+
+          <div>
+            <label for="parent_phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nomor WhatsApp / HP Orang Tua <span class="text-red-500">*</span>
+            </label>
+            <input type="tel" id="parent_phone" name="parent_phone" required
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all"
+                   placeholder="081234567890">
+          </div>
+
+          <div>
+            <label for="parent_email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Email Orang Tua
+            </label>
+            <input type="email" id="parent_email" name="parent_email"
+                   class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all"
+                   placeholder="orangtua@email.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Bottom Bar -->
+      <div class="flex items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/90 shadow-sm">
+        <a href="dashboard.html" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+          ← Kembali ke Dashboard
+        </a>
+
+        <div class="flex items-center gap-3">
+          <button type="submit" id="submit-btn"
+                  class="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-600/20 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all flex items-center gap-2">
+            <span id="btn-text">Simpan Biodata</span>
+            <svg id="btn-spinner" class="hidden animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+          <a href="dokumen.html" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors">
+            <span>Upload Berkas Dokumen</span>
+            <i class="fi fi-rr-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Scripts -->
+  <script src="../../shared/js/supabase-config.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+
+  <script>
+    if (!requireAuth('siswa,siswa_aktif,calon_siswa')) {}
+
+    async function initPage() {
+      const user = getCurrentUser() || {};
+      const isSiswaAktif = (user.role && user.role.code === 'siswa_aktif') || user.role === 'siswa_aktif';
+
+      const studentMenu = isSiswaAktif ? [
+        { href: 'dashboard.html', label: '📊 Dashboard' },
+        { href: 'biodata.html', label: '👤 Biodata Siswa' },
+        { href: 'akademik.html', label: '🎓 Rapor & Akademik' },
+        { href: 'spp.html', label: '💳 Tagihan SPP' },
+        { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
+      ] : [
+        { href: 'dashboard.html', label: '📊 Status PPDB' },
+        { href: 'biodata.html', label: '📝 Lengkapi Biodata' },
+        { href: 'dokumen.html', label: '📁 Upload Dokumen' }
+      ];
+
+      Shell.init({
+        menu: studentMenu,
+        active: 'biodata.html',
+        portalLabel: isSiswaAktif ? 'Portal Siswa Aktif' : 'Portal Calon Siswa (PPDB)',
+        title: 'Biodata Siswa',
+        subtitle: 'Lengkapi identitas diri dan keluarga'
+      });
+
+      // Load existing data
+      try {
+        const res = await apiCall('siswa', 'get_profile');
+        if (res.success && res.data) {
+          const s = res.data;
+          document.getElementById('full_name').value = s.full_name || s.name || user.full_name || '';
+          document.getElementById('nickname').value = s.nickname || '';
+          document.getElementById('gender').value = s.gender || '';
+          document.getElementById('birth_place').value = s.birth_place || '';
+          if (s.birth_date) document.getElementById('birth_date').value = s.birth_date.split('T')[0];
+          document.getElementById('address').value = s.address || '';
+          document.getElementById('father_name').value = s.father_name || '';
+          document.getElementById('mother_name').value = s.mother_name || '';
+          document.getElementById('parent_phone').value = s.parent_phone || s.phone || user.phone || '';
+          document.getElementById('parent_email').value = s.parent_email || user.email || '';
+        }
+      } catch (err) {
+        console.error('Error fetching student profile:', err);
+      }
+    }
+
+    document.getElementById('biodata-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+
+      btn.disabled = true;
+      btnText.textContent = 'Menyimpan...';
+      spinner.classList.remove('hidden');
+
+      const payload = {
+        full_name: document.getElementById('full_name').value.trim(),
+        name: document.getElementById('full_name').value.trim(),
+        nickname: document.getElementById('nickname').value.trim(),
+        gender: document.getElementById('gender').value,
+        birth_place: document.getElementById('birth_place').value.trim(),
+        birth_date: document.getElementById('birth_date').value,
+        address: document.getElementById('address').value.trim(),
+        father_name: document.getElementById('father_name').value.trim(),
+        mother_name: document.getElementById('mother_name').value.trim(),
+        parent_phone: document.getElementById('parent_phone').value.trim(),
+        parent_email: document.getElementById('parent_email').value.trim()
+      };
+
+      try {
+        const res = await apiCall('siswa', 'update_biodata', payload);
+        if (res.success) {
+          showToast('Biodata berhasil disimpan!', 'success');
+          const saveStatus = document.getElementById('save-status');
+          saveStatus.classList.remove('hidden');
+          saveStatus.classList.add('flex');
+        } else {
+          showToast(res.message || 'Gagal menyimpan biodata', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan koneksi', 'error');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Simpan Biodata';
+        spinner.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

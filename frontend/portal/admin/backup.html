@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backup - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
+      <h2 class="text-base font-semibold text-gray-900">Daftar Backup</h2>
+      <button onclick="createBackup()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">+ Buat Backup</button>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4 text-sm text-blue-800">
+      <div class="font-medium mb-1">Tentang backup</div>
+      <ul class="list-disc list-inside space-y-0.5 text-xs">
+        <li>Backup menyalin seluruh sheet sebagai file CSV ke Google Drive.</li>
+        <li>Backup disimpan di folder khusus Drive (lihat Config.gs).</li>
+        <li>Retention otomatis: hanya simpan 3 bulan terakhir.</li>
+      </ul>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Folder</th><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">File</th><th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th></tr>
+          </thead>
+          <tbody id="backups-tbody" class="bg-white divide-y divide-gray-200"><tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'backup.html',
+      portalLabel: 'Portal Admin',
+      title: 'Backup & Restore',
+      subtitle: 'Cadangkan database ke Google Drive',
+      showRefresh: true,
+      onRefresh: loadBackups
+    });
+
+    async function loadBackups() {
+      Shell.hideError();
+      const stopSpin = Shell.startRefresh();
+      const tbody = document.getElementById('backups-tbody');
+      tbody.innerHTML = Shell.skeletonRows(4, 3);
+
+      try {
+        const res = await apiCall('backup', 'backups');
+        if (!res.success) {
+          Shell.showError(res.message || 'Gagal memuat daftar backup');
+          tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-red-600">${res.message || 'Gagal'}</td></tr>`;
+          return;
+        }
+        const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.backups)) || []);
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">Belum ada backup</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(b => `
+          <tr>
+            <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap tabular-nums">${formatDateTime(b.created_at)}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 min-w-0"><span class="truncate block max-w-xs font-mono">${b.folder_name || '-'}</span></td>
+            <td class="px-4 py-3 text-sm text-gray-600 tabular-nums whitespace-nowrap">${b.file_count || '-'} file</td>
+            <td class="px-4 py-3 text-sm whitespace-nowrap space-x-3">
+              <a href="${b.folder_url || '#'}" target="_blank" class="text-primary-700 hover:text-primary-900 font-medium">Buka Drive</a>
+              <button onclick="restoreBackup('${b.id}')" class="text-yellow-700 hover:text-yellow-900 font-medium">Restore</button>
+            </td>
+          </tr>`).join('');
+      } catch (e) {
+        Shell.showError('Tidak dapat terhubung ke server.');
+      } finally {
+        stopSpin();
+      }
+    }
+
+    async function createBackup() {
+      if (!confirm('Buat backup sekarang? Proses ini dapat memakan waktu.')) return;
+      const btn = event.target;
+      btn.disabled = true; btn.textContent = 'Membuat...';
+      const res = await apiCall('backup', 'create');
+      showToast(res.message, res.success ? 'success' : 'error');
+      btn.disabled = false; btn.textContent = '+ Buat Backup';
+      if (res.success) loadBackups();
+    }
+
+    async function restoreBackup(id) {
+      if (!confirm('Restore data dari backup ini? Tindakan ini akan menimpa sheet saat ini. Lanjutkan?')) return;
+      const res = await apiCall('backup', 'restore', { id });
+      showToast(res.message, res.success ? 'success' : 'error');
+    }
+
+    loadBackups();
+  </script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Yayasan Samarinda - PAUD & TK. Membangun generasi cerdas, berkarakter, dan berakhlak mulia.">
+  <meta name="keywords" content="yayasan samarinda, PAUD, TK, sekolah, pendidikan">
+  <title>Beranda - Yayasan Samarinda</title>
+
+  <!-- Tailwind via CDN (development) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons (Official Font Icons) -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+  <style>
+    /* Hero Carousel Animations */
+    .hero-slide {
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out, transform 8s linear;
+      transform: scale(1.05);
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .hero-slide.active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 1;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(12, 74, 110, 0.9), rgba(12, 74, 110, 0.4));
+      z-index: 2;
+    }
+    
+    /* Scroll Reveal Animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .blur-reveal {
+      opacity: 0;
+      filter: blur(10px);
+      transform: scale(0.95);
+      transition: all 1.2s cubic-bezier(0.5, 0, 0, 1);
+    }
+    .blur-reveal.active {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+    .delay-100 { transition-delay: 100ms; }
+    .delay-200 { transition-delay: 200ms; }
+    .delay-300 { transition-delay: 300ms; }
+  </style>
+</head>
+<body class="font-sans bg-white text-gray-800 antialiased">
+
+  <div id="site-header"></div>
+
+  <!-- ============ HERO CAROUSEL SECTION ============ -->
+  <section class="relative overflow-hidden bg-primary-950 text-white min-h-[500px] lg:min-h-[580px] flex items-center">
+    <!-- Slider Images Container (Controlled via JS) -->
+    <div id="hero-slider-container" class="absolute inset-0">
+      <!-- Fallback Image / First Slide -->
+      <div class="hero-slide active bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2000&auto=format&fit=crop');"></div>
+      <div class="hero-slide bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2000&auto=format&fit=crop');"></div>
+      <div class="hero-slide bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2000&auto=format&fit=crop');"></div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 w-full">
+      <div class="max-w-3xl reveal">
+        <!-- Status Notice (Clean Institutional, No Gimmicky Blinking Lights) -->
+        <div id="hero-ppdb-status-badge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-6 shadow-sm">
+          <i class="fi fi-rr-bullhorn text-xs text-sky-300"></i>
+          <span id="hero-ppdb-status-text">Penerimaan Siswa Baru TA 2026/2027 Sedang Dibuka</span>
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] mb-6 drop-shadow-lg text-balance tracking-tight">
+          Membangun Generasi Cerdas &amp; Berkarakter
+        </h1>
+        <p class="text-base sm:text-lg text-sky-100/90 mb-8 leading-relaxed drop-shadow-md text-pretty max-w-2xl font-normal">
+          Yayasan Samarinda menaungi jenjang PAUD dan TK dengan pendekatan holistik
+          yang mengintegrasikan akademik, karakter, dan pengembangan potensi anak secara menyeluruh.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3.5">
+          <a id="hero-ppdb-cta-btn" href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded-xl shadow-lg shadow-black/25 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            <i class="fi fi-rr-paper-plane text-base"></i>
+            <span id="hero-ppdb-cta-text">Daftar PPDB Online</span>
+          </a>
+          <a href="#program-pendidikan" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold border border-white/30 rounded-xl active:scale-[0.98] transition-all">
+            <i class="fi fi-rr-book-open-cover text-sm"></i>
+            <span>Jelajahi Program Belajar</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS / QUICK INFO ============ -->
+  <section class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <i class="fi fi-sr-user-graduate text-2xl"></i>
+          </div>
+          <div>
+            <div id="stat-students-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">250+</div>
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">Siswa Aktif</div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-sky-50 text-primary-600 flex items-center justify-center shrink-0">
+            <i class="fi fi-sr-chalkboard-user text-2xl"></i>
+          </div>
+          <div>
+            <div id="stat-teachers-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">24</div>
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">Tenaga Pendidik</div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <i class="fi fi-sr-school text-2xl"></i>
+          </div>
+          <div>
+            <div id="stat-classes-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">12</div>
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">Rombongan Belajar</div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+            <i class="fi fi-sr-trophy-star text-2xl"></i>
+          </div>
+          <div>
+            <div id="stat-years-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">15</div>
+            <div class="text-xs sm:text-sm text-slate-500 font-medium">Tahun Mengabdi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIAKAD ACCESS SECTION ============ -->
+  <section class="py-14 bg-slate-50 border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Sistem Informasi</p>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Sistem Informasi Akademik (SIAKAD)</h2>
+        <p class="text-slate-600 text-sm mt-2">Akses layanan akademik terpadu untuk Administrator Sekolah dan Siswa.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <!-- SIAKAD Admin -->
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mb-5 border border-slate-200">
+            <i class="fi fi-rr-shield-check text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-1.5">SIAKAD Administrator</h3>
+          <p class="text-slate-600 mb-5 leading-relaxed text-xs">Pengelolaan data akademik, verifikasi berkas pendaftaran PPDB, dan administrasi sekolah.</p>
+          <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
+            <span>Akses SIAKAD Admin</span>
+            <i class="fi fi-rr-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+
+        <!-- SIAKAD Siswa -->
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mb-5 border border-slate-200">
+            <i class="fi fi-rr-graduation-cap text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-1.5">SIAKAD Siswa</h3>
+          <p class="text-slate-600 mb-5 leading-relaxed text-xs">Akses data akademik, pantau status pendaftaran PPDB online, dan administrasi siswa.</p>
+          <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
+            <span>Akses SIAKAD Siswa</span>
+            <i class="fi fi-rr-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROGRAM PENDIDIKAN ============ -->
+  <section id="program-pendidikan" class="py-16 sm:py-20 scroll-mt-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Program Pendidikan</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto reveal">
+          Kami menyediakan dua jenjang pendidikan yang disesuaikan dengan tahap perkembangan anak.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 lg:gap-8">
+        <!-- PAUD -->
+        <div class="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 reveal delay-100">
+          <div class="w-14 h-14 bg-sky-100 text-primary-700 rounded-2xl flex items-center justify-center mb-5">
+            <i class="fi fi-sr-shapes text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">PAUD (Pendidikan Anak Usia Dini)</h3>
+          <p class="text-gray-600 mb-5 leading-relaxed text-sm">
+            Untuk anak usia 2-4 tahun. Fokus pada stimulasi tumbuh kembang optimal melalui
+            bermain sambil belajar dengan kurikulum yang menyenangkan dan penuh kasih sayang.
+          </p>
+          <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600">
+            <li class="flex items-start gap-2.5">
+              <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+              <span>6 Aspek Perkembangan Holistik</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+              <span>Pendekatan Sentra &amp; Bermain Edukatif</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+              <span>Kelas Kecil &amp; Pengasuhan Ramah Anak (Maks 15 Siswa)</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- TK -->
+        <div class="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 reveal delay-200">
+          <div class="w-14 h-14 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center mb-5">
+            <i class="fi fi-sr-backpack text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">TK (Taman Kanak-kanak)</h3>
+          <p class="text-gray-600 mb-5 leading-relaxed text-sm">
+            Untuk anak usia 4-6 tahun. Persiapan masuk sekolah dasar dengan penguatan
+            kemandirian, sosial-emosional, nilai-nilai adab Islami, dan kesiapan calistung dasar yang menyenangkan.
+          </p>
+          <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600">
+            <li class="flex items-start gap-2.5">
+              <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
+              <span>Calistung Dasar Berbasis Cerita &amp; Permainan</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
+              <span>Project-Based Learning &amp; Eksplorasi Kreatif</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
+              <span>Ekstrakurikuler Seni Musik, Tahfidz &amp; Olahraga Motorik</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISI MISI ============ -->
+  <section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div class="reveal">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Visi</h2>
+          <p class="text-lg text-gray-700 leading-relaxed">
+            Menjadi lembaga pendidikan anak usia dini yang unggul dalam membentuk
+            generasi berkarakter, cerdas, dan berakhlak mulia di era modern.
+          </p>
+        </div>
+        <div class="reveal delay-200">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Misi</h2>
+          <ol class="space-y-3 text-gray-700">
+            <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">1</span> Menyelenggarakan pendidikan yang holistik dan integratif.</li>
+            <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">2</span> Mengembangkan potensi anak secara optimal di seluruh aspek perkembangan.</li>
+            <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">3</span> Menanamkan nilai-nilai karakter Islami dan kebangsaan sejak dini.</li>
+            <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">4</span> Membangun kemitraan strategis dengan orang tua dan masyarakat.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BERITA TERBARU ============ -->
+  <section class="py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">Berita Terbaru</h2>
+          <p class="text-gray-600">Update kegiatan dan informasi terkini dari yayasan.</p>
+        </div>
+        <a href="berita.html" class="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary-700 hover:text-primary-800">
+          Lihat Semua
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div id="latest-news" class="grid md:grid-cols-3 gap-6">
+        <!-- Loading skeleton -->
+        <div class="animate-pulse">
+          <div class="bg-gray-200 h-48 rounded-lg mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+        </div>
+        <div class="animate-pulse">
+          <div class="bg-gray-200 h-48 rounded-lg mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+        </div>
+        <div class="animate-pulse">
+          <div class="bg-gray-200 h-48 rounded-lg mb-4"></div>
+          <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PPDB CTA ============ -->
+  <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-16 sm:py-20 relative overflow-hidden border-t border-primary-800/40">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <h2 id="bottom-ppdb-title" class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-balance">Penerimaan Peserta Didik Baru 2026/2027</h2>
+      <p id="bottom-ppdb-desc" class="text-base sm:text-lg text-primary-100/90 mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
+        Daftarkan putra-putri Anda secara online. Proses mudah, transparan, dan terintegrasi langsung dengan verifikasi sekolah.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3.5 justify-center">
+        <a id="bottom-ppdb-cta-btn" href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary-600 text-white font-bold rounded-lg hover:bg-primary-500 hover:scale-[1.02] active:scale-[0.98] transition shadow-lg shadow-black/20">
+          <i class="fi fi-rr-paper-plane text-white"></i>
+          <span id="bottom-ppdb-cta-text">Isi Formulir Pendaftaran</span>
+        </a>
+        <a href="ppdb/status.html" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 border border-white/20 active:scale-[0.98] transition backdrop-blur-sm">
+          <i class="fi fi-rr-search text-xs"></i>
+          <span>Tracking Status PPDB</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <div id="site-footer"></div>
+
+  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
+  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+  <script src="js/public-shell.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    injectSiteChrome({ activeKey: 'home', basePath: './' });
+
+    // Scroll Reveal Animation Observer
+    document.addEventListener('DOMContentLoaded', () => {
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+      };
+
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.reveal, .blur-reveal').forEach(el => {
+        revealObserver.observe(el);
+      });
+
+      // Dynamic Hero Carousel from web_settings
+      async function initHeroCarousel() {
+        const sliderContainer = document.getElementById('hero-slider-container');
+        try {
+          if (typeof window.apiCall === 'function') {
+            const res = await window.apiCall('web_settings', 'get');
+            if (res && res.success && res.data && Array.isArray(res.data.hero_images) && res.data.hero_images.length > 0) {
+              sliderContainer.innerHTML = res.data.hero_images.map((img, i) => `
+                <div class="hero-slide ${i === 0 ? 'active' : ''} bg-cover bg-center" style="background-image: url('${img.url}');"></div>
+              `).join('');
+            }
+          }
+        } catch (_) {}
+
+        const slides = sliderContainer.querySelectorAll('.hero-slide');
+        if (slides.length <= 1) return;
+
+        let currentSlide = 0;
+        setInterval(() => {
+          slides[currentSlide].classList.remove('active');
+          currentSlide = (currentSlide + 1) % slides.length;
+          slides[currentSlide].classList.add('active');
+        }, 5000);
+      }
+
+      initHeroCarousel();
+
+      // Dynamic PPDB Period Status Sync
+      async function syncPpdbStatus() {
+        try {
+          if (typeof window.apiCall !== 'function') return;
+          const res = await window.apiCall('ppdb', 'period');
+          if (res && res.success && res.data) {
+            const p = res.data;
+            const isClosed = (p.status === 'closed' || p.status === 'inactive' || p.status === 'ditutup');
+            const academicYear = p.academic_year || '2026/2027';
+
+            const statusBadge = document.getElementById('hero-ppdb-status-badge');
+            const statusText = document.getElementById('hero-ppdb-status-text');
+            const heroBtn = document.getElementById('hero-ppdb-cta-btn');
+            const heroBtnText = document.getElementById('hero-ppdb-cta-text');
+
+            const bottomTitle = document.getElementById('bottom-ppdb-title');
+            const bottomDesc = document.getElementById('bottom-ppdb-desc');
+            const bottomBtn = document.getElementById('bottom-ppdb-cta-btn');
+            const bottomBtnText = document.getElementById('bottom-ppdb-cta-text');
+
+            if (isClosed) {
+              if (statusBadge) {
+                statusBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-900/60 backdrop-blur-md border border-slate-700/60 text-xs font-semibold text-slate-300 mb-6 shadow-sm';
+                statusBadge.innerHTML = `<i class="fi fi-rr-lock text-xs text-slate-400"></i><span id="hero-ppdb-status-text">Pendaftaran PPDB TA ${academicYear} Saat Ini Ditutup</span>`;
+              }
+              if (heroBtn) {
+                heroBtn.href = 'ppdb.html';
+                if (heroBtnText) heroBtnText.textContent = 'Lihat Informasi PPDB';
+              }
+              if (bottomTitle) {
+                bottomTitle.textContent = `Penerimaan Peserta Didik Baru TA ${academicYear}`;
+              }
+              if (bottomDesc) {
+                bottomDesc.textContent = 'Pendaftaran online untuk periode ini belum dibuka atau sedang dalam tahap seleksi/rekapitulasi. Silakan pantau pengumuman dan jadwal seleksi.';
+              }
+              if (bottomBtn) {
+                bottomBtn.href = 'ppdb.html';
+                if (bottomBtnText) bottomBtnText.textContent = 'Cek Informasi & Jadwal';
+              }
+            } else {
+              if (statusBadge) {
+                statusBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-6 shadow-sm';
+                statusBadge.innerHTML = `<i class="fi fi-rr-bullhorn text-xs text-sky-300"></i><span id="hero-ppdb-status-text">Penerimaan Siswa Baru TA ${academicYear} Sedang Dibuka</span>`;
+              }
+              if (bottomTitle) {
+                bottomTitle.textContent = `Penerimaan Peserta Didik Baru TA ${academicYear}`;
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('Could not sync PPDB status:', err);
+        }
+      }
+
+      // Dynamic Live Stats Sync (Sinkronisasi Otomatis dengan Data Guru, Siswa Aktif & Kelas Yayasan)
+      async function syncLiveStats() {
+        try {
+          if (typeof window.apiCall !== 'function') return;
+          const res = await window.apiCall('schools', 'get');
+          if (res && res.success && res.data && res.data.stats) {
+            const st = res.data.stats;
+            const stuEl = document.getElementById('stat-students-count');
+            const teaEl = document.getElementById('stat-teachers-count');
+            const clsEl = document.getElementById('stat-classes-count');
+            const yrEl = document.getElementById('stat-years-count');
+
+            if (stuEl && st.total_students != null) {
+              stuEl.textContent = st.total_students + (st.total_students >= 250 ? '+' : '');
+            }
+            if (teaEl && st.total_teachers != null) {
+              teaEl.textContent = st.total_teachers;
+            }
+            if (clsEl && st.total_classes != null) {
+              clsEl.textContent = st.total_classes;
+            }
+            if (yrEl && st.years_serving != null) {
+              yrEl.textContent = st.years_serving;
+            }
+          }
+        } catch (err) {
+          console.warn('Could not sync live stats:', err);
+        }
+      }
+
+      syncPpdbStatus();
+      syncLiveStats();
+    });
+  </script>
+</body>
+</html>

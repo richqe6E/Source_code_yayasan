@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Agenda kegiatan akademik, outing class, parenting, dan kalender pendidikan Yayasan Samarinda.">
+  <title>Agenda Kegiatan - Yayasan Samarinda</title>
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Flaticon Uicons -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: {
+              50:  '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              950: '#082F49'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-primary-500 selection:text-white">
+
+  <!-- Header Placeholder (Zero-Layout Shift pinned) -->
+  <div id="site-header"></div>
+
+  <!-- Hero Header Section -->
+  <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-14 sm:py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 text-balance">
+        Agenda Kegiatan
+      </h1>
+      <p class="text-base sm:text-lg text-primary-100 max-w-2xl mx-auto leading-relaxed text-pretty">
+        Jadwal kalender pendidikan, kegiatan santri, dan agenda resmi Yayasan Samarinda.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div id="events-list" class="space-y-4 sm:space-y-5">
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-6 text-center text-slate-400 text-xs animate-pulse">
+        Memuat agenda kegiatan...
+      </div>
+    </div>
+  </main>
+
+  <!-- Site Footer Placeholder -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
+  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
+  <script src="js/public-shell.js"></script>
+  <script>
+    injectSiteChrome({ activeKey: 'events', basePath: './' });
+
+    function formatEventDate(dateStr) {
+      if (!dateStr) return { day: '01', month: 'BLN', year: '2026', full: '' };
+      try {
+        const d = new Date(dateStr);
+        return {
+          day: d.toLocaleDateString('id-ID', { day: '2-digit' }),
+          month: d.toLocaleDateString('id-ID', { month: 'short' }).toUpperCase(),
+          year: d.getFullYear(),
+          full: d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+        };
+      } catch (_) {
+        return { day: '01', month: 'BLN', year: '2026', full: dateStr };
+      }
+    }
+
+    async function loadEvents() {
+      const list = document.getElementById('events-list');
+      let items = [];
+      try {
+        if (typeof apiCall === 'function') {
+          const res = await apiCall('events', 'list', { per_page: 30 });
+          if (res && res.success && Array.isArray(res.data)) {
+            items = res.data;
+          }
+        }
+      } catch (err) {
+        console.warn('API events:', err);
+      }
+
+      if (!items || items.length === 0) {
+        items = [
+          {
+            id: '1',
+            title: 'Pekan Ceria Ramadhan & Pawai Menyambut Bulan Suci 1447 H',
+            location: 'Halaman Utama Yayasan Samarinda',
+            event_date: new Date(Date.now() + 86400000 * 5).toISOString(),
+            description: 'Pawai santri cilik dengan busana muslim kreatif mengelilingi rute aman lingkungan sekolah diiringi rebana.'
+          },
+          {
+            id: '2',
+            title: 'Parenting Akbar & Konsultasi Tumbuh Kembang Semester Genap',
+            location: 'Aula Al-Ihsan Yayasan Samarinda',
+            event_date: new Date(Date.now() + 86400000 * 12).toISOString(),
+            description: 'Diskusi bersama pakar psikologi anak dan pembagian lembar observasi perkembangan ananda periode triwulan.'
+          },
+          {
+            id: '3',
+            title: 'Khataman Al-Qur\'an & Imtihan Santri TPQ Angkatan X',
+            location: 'Masjid Nurul Huda Samarinda',
+            event_date: new Date(Date.now() + 86400000 * 25).toISOString(),
+            description: 'Uji publik hafalan Juz 30 dan surat pilihan santri binaan TPQ di hadapan para orang tua dan asatidz.'
+          }
+        ];
+      }
+
+      list.innerHTML = items.map(ev => {
+        const d = formatEventDate(ev.event_date || ev.start_date || ev.created_at);
+        return `
+          <article class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col sm:flex-row gap-5 sm:gap-7 items-start group">
+            <!-- Kolom Tanggal (Sesuai Brand Color Yayasan) -->
+            <div class="sm:w-28 shrink-0 flex sm:flex-col items-baseline sm:items-start gap-2 sm:gap-0.5 sm:border-r sm:border-slate-100 sm:pr-6">
+              <span class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight tabular-nums leading-none group-hover:text-primary-700 transition-colors">${d.day}</span>
+              <span class="text-xs font-bold text-primary-700 uppercase tracking-wider sm:mt-1">${d.month} ${d.year}</span>
+            </div>
+
+            <!-- Konten Agenda (Lega, Rapi, & Nyaman Dibaca) -->
+            <div class="flex-1 min-w-0">
+              <!-- Metadata: Waktu & Lokasi -->
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-500 mb-2.5">
+                <span class="inline-flex items-center gap-1.5 font-medium text-slate-700">
+                  <i class="fi fi-rr-clock text-xs text-primary-600"></i>
+                  <span>08.00 - 11.30 WITA</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 text-slate-600">
+                  <i class="fi fi-rr-marker text-xs text-primary-600"></i>
+                  <span>${ev.location || 'Halaman Utama Yayasan Samarinda'}</span>
+                </span>
+              </div>
+
+              <!-- Judul Agenda -->
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-primary-700 transition-colors leading-snug mb-2 text-balance">
+                ${ev.title}
+              </h2>
+
+              <!-- Deskripsi Agenda -->
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty">
+                ${ev.description || ''}
+              </p>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    loadEvents();
+  </script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen User - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: { primary: { 50:'#F0F9FF',100:'#E0F2FE',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } }
+      }}
+    }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-3">
+        <h2 class="text-base font-semibold text-gray-900">Daftar User</h2>
+        <button onclick="openUserModal()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">+ Tambah User</button>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <input id="filter-search" type="text" placeholder="Cari nama/email..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+        <select id="filter-role" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+          <option value="">Semua Role</option>
+          <option value="super_admin">Super Admin</option>
+          <option value="admin_tu">Admin TU</option>
+          <option value="guru">Guru</option>
+          <option value="orang_tua">Orang Tua</option>
+          <option value="pendaftar">Pendaftar</option>
+        </select>
+        <button onclick="loadUsers()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">Filter</button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">User</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Role</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody" class="bg-white divide-y divide-gray-200">
+            <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Memuat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="users-pagination" class="px-4 py-3 border-t border-gray-200 flex justify-between items-center text-sm text-gray-600"></div>
+    </div>
+  </main>
+
+  <div id="user-modal" class="hidden fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 id="modal-title" class="text-base font-semibold">Tambah User</h3>
+        <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+      </div>
+      <form id="user-form" class="p-5 space-y-3">
+        <input type="hidden" id="user-id">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap *</label>
+          <input id="form-fullname" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+          <input id="form-email" type="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+          <select id="form-role" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="admin_tu">Admin TU</option>
+            <option value="guru">Guru</option>
+            <option value="orang_tua">Orang Tua</option>
+            <option value="pendaftar">Pendaftar</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">No HP</label>
+          <input id="form-phone" type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password <span id="password-hint" class="text-xs text-gray-500"></span></label>
+          <input id="form-password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="form-active" type="checkbox" checked class="rounded">
+          <label for="form-active" class="text-sm text-gray-700">Aktif</label>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-md hover:bg-primary-700">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'users.html',
+      portalLabel: 'Portal Admin',
+      title: 'Manajemen User',
+      subtitle: 'Kelola akun pengguna sistem',
+      showRefresh: true,
+      onRefresh: loadUsers
+    });
+
+    let currentPage = 1;
+    let totalPages = 1;
+
+    function renderPagination() {
+      const el = document.getElementById('users-pagination');
+      if (totalPages <= 1) { el.innerHTML = '<span class="text-gray-500">Halaman 1 dari 1</span>'; return; }
+      const prevDisabled = currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100';
+      const nextDisabled = currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100';
+      el.innerHTML = `
+        <span>Halaman ${currentPage} dari ${totalPages}</span>
+        <div class="flex gap-2">
+          <button onclick="goToPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} class="px-3 py-1 border border-gray-300 rounded ${prevDisabled}">‹ Sebelumnya</button>
+          <button onclick="goToPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} class="px-3 py-1 border border-gray-300 rounded ${nextDisabled}">Selanjutnya ›</button>
+        </div>`;
+    }
+
+    function goToPage(p) {
+      if (p < 1 || p > totalPages) return;
+      currentPage = p;
+      loadUsers();
+    }
+
+    async function loadUsers() {
+      Shell.hideError();
+      const stopSpin = Shell.startRefresh();
+      const search = document.getElementById('filter-search').value.trim();
+      const role = document.getElementById('filter-role').value;
+      const params = { page: currentPage, per_page: 50 };
+      if (search) params.search = search;
+      if (role) {
+        params.role = role;
+        params.role_id = ROLE_CODE_TO_ID[role] || role;
+      }
+
+      const tbody = document.getElementById('users-tbody');
+      tbody.innerHTML = Shell.skeletonRows(5, 4);
+
+      try {
+        const res = await apiCall('users', 'list', params);
+        if (!res.success) {
+          Shell.showError(res.message || 'Gagal memuat daftar user');
+          tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-sm text-red-600">${res.message || 'Gagal memuat'}</td></tr>`;
+          renderPagination();
+          return;
+        }
+
+        const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.users)) || []);
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Tidak ada data</td></tr>';
+          renderPagination();
+          return;
+        }
+
+        const total = (res.raw && res.raw.total) || (res.data && res.data.total) || (res.meta && res.meta.total) || items.length;
+        const perPage = 50;
+        totalPages = Math.max(1, Math.ceil(total / perPage));
+        renderPagination();
+
+        tbody.innerHTML = items.map(u => {
+          const roleInfo = ROLE_MAP[u.role_id] || ROLE_MAP[u.role_code] || ROLE_MAP[u.role] || { code: 'other', name: u.role_name || u.role || '-' };
+          const rCode = roleInfo.code;
+          const rName = roleInfo.name;
+          const isActive = (u.status === 'active' || u.is_active === true || u.is_active === 'TRUE');
+          return `
+          <tr>
+            <td class="px-4 py-3 min-w-0">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 text-xs font-semibold shrink-0">${u.full_name ? u.full_name.charAt(0) : 'U'}</div>
+                <div class="text-sm font-medium text-gray-900 truncate">${u.full_name || '-'}</div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">${u.email}</td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs font-medium rounded ${roleBadge(rCode)}">${rName}</span></td>
+            <td class="px-4 py-3">${isActive ? '<span class="text-green-700 text-sm font-medium">Aktif</span>' : '<span class="text-gray-500 text-sm">Nonaktif</span>'}</td>
+            <td class="px-4 py-3 text-sm whitespace-nowrap">
+              <button onclick="editUser('${u.id}')" class="text-primary-700 hover:text-primary-900 mr-3 font-medium">Edit</button>
+              ${isActive ? `<button onclick="toggleUser('${u.id}', false)" class="text-red-700 hover:text-red-900 font-medium">Nonaktifkan</button>` : `<button onclick="toggleUser('${u.id}', true)" class="text-green-700 hover:text-green-900 font-medium">Aktifkan</button>`}
+            </td>
+          </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        Shell.showError('Tidak dapat terhubung ke server.');
+      } finally {
+        stopSpin();
+      }
+    }
+
+    const ROLE_MAP = {
+      'ROLE-001': { code: 'super_admin', name: 'Super Admin' },
+      'ROLE-002': { code: 'admin_tu', name: 'Admin TU' },
+      'ROLE-003': { code: 'guru', name: 'Guru' },
+      'ROLE-004': { code: 'orang_tua', name: 'Orang Tua' },
+      'ROLE-005': { code: 'pendaftar', name: 'Pendaftar' },
+      'super_admin': { code: 'super_admin', name: 'Super Admin' },
+      'admin_tu': { code: 'admin_tu', name: 'Admin TU' },
+      'guru': { code: 'guru', name: 'Guru' },
+      'orang_tua': { code: 'orang_tua', name: 'Orang Tua' },
+      'pendaftar': { code: 'pendaftar', name: 'Pendaftar' }
+    };
+
+    const ROLE_CODE_TO_ID = {
+      super_admin: 'ROLE-001',
+      admin_tu: 'ROLE-002',
+      guru: 'ROLE-003',
+      orang_tua: 'ROLE-004',
+      pendaftar: 'ROLE-005'
+    };
+
+    function roleBadge(role) {
+      const map = {
+        super_admin: 'bg-red-100 text-red-700',
+        admin_tu: 'bg-purple-100 text-purple-700',
+        guru: 'bg-green-100 text-green-700',
+        orang_tua: 'bg-blue-100 text-blue-700',
+        pendaftar: 'bg-gray-100 text-gray-700'
+      };
+      return map[role] || 'bg-gray-100 text-gray-700';
+    }
+
+    function openUserModal(user = null) {
+      document.getElementById('user-modal').classList.remove('hidden');
+      document.getElementById('user-form').reset();
+      document.getElementById('user-id').value = '';
+      document.getElementById('password-hint').textContent = '';
+      if (user) {
+        document.getElementById('modal-title').textContent = 'Edit User';
+        document.getElementById('user-id').value = user.id;
+        document.getElementById('form-fullname').value = user.full_name || '';
+        document.getElementById('form-email').value = user.email || '';
+        const rCode = user.role_code || (user.role && user.role.code ? user.role.code : user.role) || 'admin_tu';
+        document.getElementById('form-role').value = rCode;
+        document.getElementById('form-phone').value = user.phone || '';
+        document.getElementById('form-active').checked = (user.status === 'active' || !!user.is_active);
+        document.getElementById('password-hint').textContent = '(kosongkan jika tidak diubah)';
+      } else {
+        document.getElementById('modal-title').textContent = 'Tambah User';
+        document.getElementById('form-active').checked = true;
+      }
+    }
+
+    function closeUserModal() {
+      document.getElementById('user-modal').classList.add('hidden');
+    }
+
+    async function editUser(id) {
+      const res = await apiCall('users', 'get', { id });
+      if (res.success) openUserModal(res.data);
+      else showToast(res.message, 'error');
+    }
+
+    async function toggleUser(id, activate) {
+      if (!confirm(`${activate ? 'Aktifkan' : 'Nonaktifkan'} user ini?`)) return;
+      const res = await apiCall('users', activate ? 'activate' : 'deactivate', { id });
+      showToast(res.message, res.success ? 'success' : 'error');
+      if (res.success) loadUsers();
+    }
+
+    document.getElementById('user-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('user-id').value;
+      const roleVal = document.getElementById('form-role').value;
+      const isActive = document.getElementById('form-active').checked;
+      const data = {
+        full_name: document.getElementById('form-fullname').value,
+        email: document.getElementById('form-email').value,
+        role: roleVal,
+        role_id: ROLE_CODE_TO_ID[roleVal] || roleVal,
+        phone: document.getElementById('form-phone').value,
+        status: isActive ? 'active' : 'inactive'
+      };
+      const pwd = document.getElementById('form-password').value;
+      if (pwd) data.password = pwd;
+
+      const res = await apiCall('users', id ? 'update' : 'create', id ? { id, ...data } : data);
+      showToast(res.message || (res.success ? 'User berhasil disimpan' : 'Gagal menyimpan user'), res.success ? 'success' : 'error');
+      if (res.success) {
+        closeUserModal();
+        loadUsers();
+      }
+    });
+
+    document.getElementById('filter-search').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        currentPage = 1;
+        loadUsers();
+      }
+    });
+
+    document.getElementById('filter-role').addEventListener('change', () => {
+      currentPage = 1;
+      loadUsers();
+    });
+
+    document.getElementById('filter-search').addEventListener('input', () => {
+      // debounce ringan untuk pencarian instan tanpa Enter
+      clearTimeout(window.__userSearchT);
+      window.__userSearchT = setTimeout(() => { currentPage = 1; loadUsers(); }, 350);
+    });
+
+    loadUsers();
+  </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Log - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { primary: { 50:'#F0F9FF',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' } } } } }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <input id="filter-user" type="text" placeholder="User ID / Email" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+        <select id="filter-module" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+          <option value="">Semua Modul</option>
+          <option value="auth">Auth</option><option value="users">Users</option><option value="students">Siswa</option>
+          <option value="ppdb">PPDB</option><option value="payments">Pembayaran</option><option value="attendance">Presensi</option>
+        </select>
+        <select id="filter-action" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+          <option value="">Semua Aksi</option>
+          <option value="login">Login</option><option value="logout">Logout</option><option value="create">Create</option>
+          <option value="update">Update</option><option value="delete">Delete</option><option value="approve">Approve</option>
+        </select>
+        <input id="filter-from" type="date" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+        <button onclick="loadLogs()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">Filter</button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Waktu</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">User</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Modul</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Detail</th>
+            </tr>
+          </thead>
+          <tbody id="logs-tbody" class="bg-white divide-y divide-gray-200"><tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+      <div class="px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-sm" id="logs-pagination"></div>
+    </div>
+  </main>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'logs.html',
+      portalLabel: 'Portal Admin',
+      title: 'Activity Log',
+      subtitle: 'Audit trail aktivitas pengguna sistem',
+      showRefresh: true,
+      onRefresh: loadLogs
+    });
+
+    let currentPage = 1;
+
+    async function loadLogs() {
+      Shell.hideError();
+      const stopSpin = Shell.startRefresh();
+      const params = { page: currentPage, per_page: 50 };
+      const u = document.getElementById('filter-user').value;
+      const m = document.getElementById('filter-module').value;
+      const a = document.getElementById('filter-action').value;
+      const f = document.getElementById('filter-from').value;
+      if (u) params.user_id = u;
+      if (m) params.module = m;
+      if (a) params.action = a;
+      if (f) params.date_from = f;
+
+      const tbody = document.getElementById('logs-tbody');
+      tbody.innerHTML = Shell.skeletonRows(5, 5);
+
+      try {
+        const res = await apiCall('logs', 'list', params);
+        if (!res.success) {
+          Shell.showError(res.message || 'Gagal memuat log');
+          tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-sm text-red-600">${res.message || 'Gagal'}</td></tr>`;
+          return;
+        }
+        const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.logs)) || []);
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Tidak ada log</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(l => `
+          <tr>
+            <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap tabular-nums">${formatDateTime(l.created_at)}</td>
+            <td class="px-4 py-3 text-sm text-gray-900 min-w-0"><span class="truncate block max-w-xs">${l.user_name || l.user_email || l.user_id || '-'}</span></td>
+            <td class="px-4 py-3 text-sm text-gray-600">${l.module || '-'}</td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs rounded font-medium ${actionColor(l.action)}">${l.action}</span></td>
+            <td class="px-4 py-3 text-xs text-gray-600 max-w-xs truncate">${l.description || l.entity_id || '-'}</td>
+          </tr>`).join('');
+      } catch (e) {
+        Shell.showError('Tidak dapat terhubung ke server.');
+      } finally {
+        stopSpin();
+      }
+
+      const pag = document.getElementById('logs-pagination');
+      if (res.pagination) {
+        pag.innerHTML = `<div>Halaman ${res.pagination.page} dari ${res.pagination.total_pages} • ${res.pagination.total} log</div>
+          <div class="space-x-2">
+            <button onclick="currentPage=${res.pagination.page-1};loadLogs()" ${res.pagination.page<=1?'disabled':''} class="px-2 py-1 border border-gray-300 rounded text-sm disabled:opacity-50">Prev</button>
+            <button onclick="currentPage=${res.pagination.page+1};loadLogs()" ${res.pagination.page>=res.pagination.total_pages?'disabled':''} class="px-2 py-1 border border-gray-300 rounded text-sm disabled:opacity-50">Next</button>
+          </div>`;
+      } else { pag.innerHTML = ''; }
+    }
+
+    function actionColor(a) {
+      if (a === 'login') return 'bg-green-100 text-green-700';
+      if (a === 'logout') return 'bg-gray-100 text-gray-700';
+      if (a === 'create') return 'bg-blue-100 text-blue-700';
+      if (a === 'update') return 'bg-yellow-100 text-yellow-700';
+      if (a === 'delete') return 'bg-red-100 text-red-700';
+      if (a === 'approve') return 'bg-green-100 text-green-700';
+      if (a === 'reject') return 'bg-red-100 text-red-700';
+      return 'bg-gray-100 text-gray-700';
+    }
+
+    loadLogs();
+  </script>
+</body>
+</html>

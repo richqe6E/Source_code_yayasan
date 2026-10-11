@@ -1,0 +1,62 @@
+id,code,module,action,description,created_at,created_by,updated_at,updated_by,is_deleted
+PERM-2026-00001,auth.login,auth,login,"Login ke sistem",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00002,auth.logout,auth,logout,"Logout dari sistem",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00003,user.create,user,create,"Buat user baru",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00004,user.read,user,read,"Lihat data user",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00005,user.update,user,update,"Ubah data user",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00006,user.delete,user,delete,"Hapus/deaktivasi user",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00007,user.manage_role,user,manage,"Atur role dan permission user",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00008,student.create,student,create,"Tambah siswa baru",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00009,student.read.all,student,read,"Lihat data semua siswa",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00010,student.read.own,student,read,"Lihat data siswa (anaknya sendiri)",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00011,student.update,student,update,"Ubah data siswa",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00012,student.delete,student,delete,"Hapus data siswa",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00013,parent.create,parent,create,"Tambah data orang tua",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00014,parent.read,parent,read,"Lihat data orang tua",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00015,parent.update,parent,update,"Ubah data orang tua",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00016,teacher.create,teacher,create,"Tambah data guru",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00017,teacher.read,teacher,read,"Lihat data guru",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00018,teacher.update,teacher,update,"Ubah data guru",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00019,class.create,class,create,"Tambah kelas baru",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00020,class.read,class,read,"Lihat data kelas",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00021,class.update,class,update,"Ubah data kelas",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00022,ppdb.period.manage,ppdb,manage,"Atur periode PPDB (buka/tutup)",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00023,ppdb.register,ppdb,create,"Submit pendaftaran PPDB",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00024,ppdb.read.own,ppdb,read,"Lihat status pendaftaran sendiri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00025,ppdb.read.all,ppdb,read,"Lihat semua pendaftaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00026,ppdb.verify,ppdb,verify,"Verifikasi data pendaftaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00027,ppdb.accept,ppdb,approve,"Terima pendaftaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00028,ppdb.reject,ppdb,approve,"Tolak pendaftaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00029,ppdb.convert,ppdb,manage,"Konversi pendaftar menjadi siswa aktif",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00030,attendance.create,attendance,create,"Input presensi harian",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00031,attendance.read.all,attendance,read,"Lihat presensi semua siswa",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00032,attendance.read.own,attendance,read,"Lihat presensi anak sendiri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00033,development.create,development,create,"Input catatan perkembangan anak",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00034,development.read.all,development,read,"Lihat perkembangan semua siswa",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00035,development.read.own,development,read,"Lihat perkembangan anak sendiri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00036,payment.invoice.create,payment,create,"Buat tagihan SPP",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00037,payment.invoice.read.all,payment,read,"Lihat semua tagihan",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00038,payment.invoice.read.own,payment,read,"Lihat tagihan anak sendiri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00039,payment.upload_proof,payment,create,"Upload bukti pembayaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00040,payment.verify,payment,verify,"Verifikasi pembayaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00041,payment.reject,payment,approve,"Tolak pembayaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00042,payment.report,payment,read,"Lihat rekap pembayaran",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00043,announcement.create,announcement,create,"Buat pengumuman",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00044,announcement.read,announcement,read,"Lihat pengumuman",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00045,announcement.update,announcement,update,"Ubah pengumuman",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00046,announcement.delete,announcement,delete,"Hapus pengumuman",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00047,news.create,news,create,"Buat berita",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00048,news.read,news,read,"Lihat berita",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00049,news.update,news,update,"Ubah berita",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00050,news.delete,news,delete,"Hapus berita",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00051,event.create,event,create,"Buat agenda",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00052,event.read,event,read,"Lihat agenda",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00053,gallery.create,gallery,create,"Upload foto/video galeri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00054,gallery.read,gallery,read,"Lihat galeri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00055,file.upload,file,create,"Upload file",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00056,file.read,file,read,"Lihat/download file",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00057,notification.read.own,notification,read,"Lihat notifikasi sendiri",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00058,report.generate,report,read,"Generate laporan",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00059,audit.read,audit,read,"Lihat audit log",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00060,backup.manage,backup,manage,"Backup dan restore data",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
+PERM-2026-00061,system.settings,system,manage,"Ubah pengaturan sistem",2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE

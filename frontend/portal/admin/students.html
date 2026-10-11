@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Siswa &amp; Akademik - Yayasan Samarinda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            primary: {
+              50: '#F0F9FF', 100: '#E0F2FE', 200: '#BAE6FD', 300: '#7DD3FC',
+              400: '#38BDF8', 500: '#0EA5E9', 600: '#0284C7', 700: '#0369A1',
+              800: '#075985', 900: '#0C4A6E'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../../public/css/style.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased selection:bg-primary-500 selection:text-white">
+  <div id="app-shell"></div>
+
+  <main class="p-4 sm:p-6 lg:p-8">
+    <!-- Header Filter & Tambah Siswa -->
+    <div class="bg-white border border-gray-200/80 rounded-2xl p-5 mb-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-lg font-bold text-gray-900">Database Siswa &amp; Rekap Akademik</h2>
+            <span id="student-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">250 Siswa Aktif</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-0.5">Kelola data murid, penempatan kelas, status semester, evaluasi STPPA, dan reset akun portal siswa.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openStudentModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Tambah Siswa Baru
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-gray-100">
+        <div>
+          <label class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Pencarian</label>
+          <input id="filter-search" type="text" placeholder="Ketik nama atau NIS..." class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Kelas</label>
+          <select id="filter-class" class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+            <option value="">Semua Kelas</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Status Kenaikan</label>
+          <select id="filter-kenaikan" class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition">
+            <option value="">Semua Status Kenaikan</option>
+            <option value="Aktif">Aktif Belajar</option>
+            <option value="Naik ke TK B">Naik ke TK B</option>
+            <option value="Lulus">Lulus</option>
+            <option value="Tinggal Kelas">Tinggal Kelas</option>
+          </select>
+        </div>
+        <div class="flex items-end gap-2">
+          <button onclick="loadStudents()" class="flex-1 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl transition">
+            Terapkan Filter
+          </button>
+          <button onclick="resetFilters()" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-medium rounded-xl transition">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabel Siswa -->
+    <div class="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200/80">
+          <thead class="bg-gray-50/75">
+            <tr>
+              <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">NIS &amp; Murid</th>
+              <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kelas &amp; Semester</th>
+              <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status Kenaikan</th>
+              <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kontak Ortu</th>
+              <th class="px-4 py-3.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Akun Portal</th>
+              <th class="px-4 py-3.5 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi Kelola</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody" class="bg-white divide-y divide-gray-100">
+            <tr><td colspan="6" class="px-4 py-10 text-center text-xs text-gray-500">Memuat data siswa...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Tambah / Edit Siswa -->
+  <div id="student-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <div>
+          <h3 id="modal-title" class="text-base font-bold text-gray-900">Tambah Siswa Baru</h3>
+          <p class="text-xs text-gray-500">Isi data identitas siswa dan penempatan akademik</p>
+        </div>
+        <button type="button" onclick="closeStudentModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="student-form" class="p-6 space-y-4">
+        <input type="hidden" id="student-id">
+        
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nomor Induk Siswa (NIS) *</label>
+            <input id="form-nis" type="text" required placeholder="Mis. 2026001" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <span class="text-[10px] text-gray-500 mt-1 block">NIS digunakan sebagai ID Login siswa di Portal Siswa.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap Siswa *</label>
+            <input id="form-name" type="text" required placeholder="Nama lengkap sesuai akta" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Kelamin *</label>
+            <select id="form-gender" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Lahir *</label>
+            <input id="form-birthdate" type="date" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <span class="text-[10px] text-gray-500 mt-1 block">Tanggal lahir adalah password awal bawaan siswa.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Tempat Lahir</label>
+            <input id="form-birthplace" type="text" placeholder="Samarinda" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Agama</label>
+            <input id="form-religion" type="text" placeholder="Islam" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-gray-100">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-3">Status Kelas &amp; Progres Akademik</h4>
+          <div class="grid sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Kelas Sekarang *</label>
+              <select id="form-class" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <option value="">Pilih Kelas</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Semester Aktif</label>
+              <select id="form-semester" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <option value="Semester 1 (Ganjil)">Semester 1 (Ganjil)</option>
+                <option value="Semester 2 (Genap)">Semester 2 (Genap)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Status Kenaikan</label>
+              <select id="form-kenaikan" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <option value="Aktif">Aktif Belajar</option>
+                <option value="Naik ke TK B">Naik ke TK B</option>
+                <option value="Lulus">Lulus</option>
+                <option value="Tinggal Kelas">Tinggal Kelas</option>
+                <option value="Siswa Baru">Siswa Baru</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-gray-100">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 mb-3">Kontak Orang Tua &amp; Alamat</h4>
+          <div class="grid sm:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Nama Orang Tua / Wali</label>
+              <input id="form-parent-name" type="text" placeholder="Nama ayah / ibu" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">No. WhatsApp Orang Tua</label>
+              <input id="form-parent-phone" type="text" placeholder="08123456789" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Alamat Tempat Tinggal</label>
+            <textarea id="form-address" rows="2" placeholder="Jl. Alamat rumah siswa..." class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="closeStudentModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
+          <button id="btn-save-student" type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">Simpan Data Siswa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Evaluasi STPPA (6 Aspek Perkembangan) -->
+  <div id="eval-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Input Evaluasi STPPA Siswa</h3>
+          <p id="eval-student-info" class="text-xs text-primary-700 font-medium">Memuat data siswa...</p>
+        </div>
+        <button type="button" onclick="closeEvalModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="eval-form" class="p-6 space-y-4">
+        <input type="hidden" id="eval-student-id">
+        
+        <div class="grid grid-cols-2 gap-3 pb-2 border-b border-gray-100">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Tahun Ajaran</label>
+            <input id="eval-academic-year" type="text" value="2026/2027" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-medium">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Semester</label>
+            <select id="eval-semester" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-medium">
+              <option value="Semester 1 (Ganjil)">Semester 1 (Ganjil)</option>
+              <option value="Semester 2 (Genap)">Semester 2 (Genap)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Penilaian 6 Aspek Perkembangan Anak:</div>
+          <p class="text-[11px] text-gray-500 mb-3">Pilihan predikat: BB (Belum Berkembang), MB (Mulai Berkembang), BSH (Berkembang Sesuai Harapan), BSB (Berkembang Sangat Baik).</p>
+
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+              <span class="text-xs font-medium text-gray-800">1. Nilai Agama &amp; Moral</span>
+              <select id="eval-aspect-agama" class="px-3 py-1 border border-gray-200 rounded-lg text-xs font-semibold bg-white">
+                <option value="BSH">BSH</option>
+                <option value="BSB">BSB</option>
+                <option value="MB">MB</option>
+                <option value="BB">BB</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+              <span class="text-xs font-medium text-gray-800">2. Fisik &amp; Motorik</span>
+              <select id="eval-aspect-motorik" class="px-3 py-1 border border-gray-200 rounded-lg text-xs font-semibold bg-white">
+                <option value="BSH">BSH</option>
+                <option value="BSB">BSB</option>
+                <option value="MB">MB</option>
+                <option value="BB">BB</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+              <span class="text-xs font-medium text-gray-800">3. Kognitif (Logika &amp; Berpikir)</span>
+              <select id="eval-aspect-kognitif" class="px-3 py-1 border border-gray-200 rounded-lg text-xs font-semibold bg-white">
+                <option value="BSH">BSH</option>
+                <option value="BSB">BSB</option>
+                <option value="MB">MB</option>
+                <option value="BB">BB</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+              <span class="text-xs font-medium text-gray-800">4. Bahasa &amp; Komunikasi</span>
+              <select id="eval-aspect-bahasa" class="px-3 py-1 border border-gray-200 rounded-lg text-xs font-semibold bg-white">
+                <option value="BSH">BSH</option>
+                <option value="BSB">BSB</option>
+                <option value="MB">MB</option>
+                <option value="BB">BB</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+              <span class="text-xs font-medium text-gray-800">5. Sosial &amp; Emosional</span>
+              <select id="eval-aspect-sosem" class="px-3 py-1 border border-gray-200 rounded-lg text-xs font-semibold bg-white">
+                <option value="BSH">BSH</option>
+                <option value="BSB">BSB</option>
+                <option value="MB">MB</option>
+                <option value="BB">BB</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+              <span class="text-xs font-medium text-gray-800">6. Seni &amp; Kreativitas</span>
+              <select id="eval-aspect-seni" class="px-3 py-1 border border-gray-200 rounded-lg text-xs font-semibold bg-white">
+                <option value="BSH">BSH</option>
+                <option value="BSB">BSB</option>
+                <option value="MB">MB</option>
+                <option value="BB">BB</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Catatan Perkembangan Guru / Wali Kelas</label>
+          <textarea id="eval-notes" rows="3" placeholder="Tuliskan catatan kemajuan dan bimbingan ananda..." class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
+          <button type="button" onclick="closeEvalModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
+          <button id="btn-save-eval" type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">Simpan Evaluasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi & Hasil Reset Password -->
+  <div id="reset-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-6">
+        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-gray-900 text-center mb-1">Reset Password Akun Siswa</h3>
+        <p class="text-xs text-gray-500 text-center mb-5">Password akan diatur ulang kembali ke <strong class="text-gray-700">Tanggal Lahir</strong> siswa. Siswa akan diwajibkan membuat password baru saat login berikutnya.</p>
+
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 mb-5 space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Nama Siswa:</span>
+            <span id="reset-student-name" class="font-bold text-gray-900">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">NIS (Username):</span>
+            <span id="reset-student-nis" class="font-mono font-bold text-primary-700">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Password Bawaan:</span>
+            <span id="reset-student-pwd" class="font-mono font-bold text-emerald-700">-</span>
+          </div>
+        </div>
+
+        <div id="reset-actions" class="flex gap-2">
+          <button type="button" onclick="closeResetModal()" class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
+          <button id="btn-do-reset" type="button" onclick="executeResetPassword()" class="flex-1 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">Ya, Reset Password</button>
+        </div>
+
+        <div id="reset-done-actions" class="hidden space-y-2">
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>Password berhasil direset! Bagikan kredensial ke siswa/ortu:</span>
+          </div>
+          <button type="button" onclick="copyResetInfo()" class="w-full px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl transition">
+            📋 Salin Info Kredensial
+          </button>
+          <a id="reset-wa-btn" href="#" target="_blank" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
+            <span>Kirim via WhatsApp</span>
+          </a>
+          <button type="button" onclick="closeResetModal()" class="w-full px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition mt-2">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script src="../../shared/js/shell.js"></script>
+  <script>
+    requireAuth('super_admin,admin_tu');
+
+    const MENU = Shell.ADMIN_MENU;
+
+    Shell.init({
+      menu: MENU,
+      active: 'students.html',
+      portalLabel: 'Portal Admin',
+      title: 'Manajemen Siswa &amp; Akademik',
+      subtitle: 'Data siswa aktif yayasan, status kenaikan, nilai perkembangan & kontrol akun portal',
+      showRefresh: true,
+      onRefresh: loadStudents
+    });
+
+    let classesCache = [];
+    let studentsCache = [];
+    let activeResetStudent = null;
+
+    async function loadClasses() {
+      try {
+        const res = await apiCall('classes', 'list', { per_page: 100 });
+        const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.classes)) || []);
+        if (res.success && items.length > 0) {
+          classesCache = items;
+          const filter = document.getElementById('filter-class');
+          const form = document.getElementById('form-class');
+          filter.innerHTML = '<option value="">Semua Kelas</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+          form.innerHTML = '<option value="">Pilih Kelas</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+          // Baca query parameter ?class_id=CLS-xxx dari URL
+          const urlParamClass = new URLSearchParams(window.location.search).get('class_id');
+          if (urlParamClass && classesCache.some(c => c.id === urlParamClass)) {
+            filter.value = urlParamClass;
+          }
+        }
+      } catch (e) {
+        console.error('Gagal ambil data kelas:', e);
+      }
+    }
+
+    async function loadStudents() {
+      Shell.hideError();
+      const stopSpin = Shell.startRefresh();
+      const search = document.getElementById('filter-search').value.toLowerCase().trim();
+      const classId = document.getElementById('filter-class').value;
+      const kenaikan = document.getElementById('filter-kenaikan').value;
+
+      const tbody = document.getElementById('students-tbody');
+      tbody.innerHTML = Shell.skeletonRows(6, 4);
+
+      try {
+        const res = await apiCall('students', 'list', { per_page: 300 });
+        if (!res.success) {
+          Shell.showError(res.message || 'Gagal memuat data siswa');
+          tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-xs text-red-600 font-medium">${res.message || 'Gagal memuat data'}</td></tr>`;
+          return;
+        }
+
+        studentsCache = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.students)) || []);
+        let filtered = [...studentsCache];
+
+        if (search) {
+          filtered = filtered.filter(s => 
+            (s.full_name && s.full_name.toLowerCase().includes(search)) ||
+            (s.nis && s.nis.toLowerCase().includes(search))
+          );
+        }
+        if (classId) {
+          filtered = filtered.filter(s => (s.class_id === classId || s.current_class_id === classId));
+        }
+        if (kenaikan) {
+          filtered = filtered.filter(s => (s.status_kenaikan === kenaikan));
+        }
+
+        const badge = document.getElementById('student-count-badge');
+        if (badge) badge.textContent = filtered.length + ' Siswa Aktif';
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-12 text-center text-xs text-gray-500">Tidak ada data siswa yang cocok dengan filter.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(s => {
+          const cls = classesCache.find(c => c.id === (s.class_id || s.current_class_id));
+          const className = (cls && cls.name) || s.kelas_sekarang || s.class_name || 'Belum diatur';
+          const semester = s.semester_sekarang || 'Semester 1 (Ganjil)';
+          const kenaikanStatus = s.status_kenaikan || 'Aktif';
+
+          // Status Badge
+          let kenaikanBadge = 'bg-blue-50 text-blue-700 border border-blue-200';
+          if (kenaikanStatus.includes('Naik') || kenaikanStatus === 'Lulus') kenaikanBadge = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+          if (kenaikanStatus.includes('Tinggal')) kenaikanBadge = 'bg-amber-50 text-amber-700 border border-amber-200';
+
+          return `
+          <tr class="hover:bg-gray-50/80 transition group">
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 font-bold text-xs flex items-center justify-center shrink-0">
+                  ${(s.full_name || 'S').charAt(0).toUpperCase()}
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-gray-900 group-hover:text-primary-700 transition">${s.full_name || '-'}</div>
+                  <div class="text-[11px] font-mono text-gray-500">NIS: <span class="font-bold text-gray-700">${s.nis || 'Belum ada NIS'}</span> • ${s.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <div class="text-xs font-semibold text-gray-800">${className}</div>
+              <div class="text-[11px] text-gray-500">${semester}</div>
+            </td>
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <span class="px-2.5 py-1 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 ${kenaikanBadge}">
+                ${kenaikanStatus}
+              </span>
+            </td>
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <div class="text-xs text-gray-900 font-medium">${s.parent_name || s.father_name || '-'}</div>
+              <div class="text-[11px] text-gray-500 font-mono">${s.parent_phone || s.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <span class="px-2 py-0.5 text-[10px] rounded-md font-semibold bg-emerald-100 text-emerald-800">
+                ${s.status === 'active' ? 'Aktif' : s.status}
+              </span>
+            </td>
+            <td class="px-4 py-3.5 whitespace-nowrap text-center space-x-1.5">
+              <button onclick="openEvalModal('${s.id}')" title="Input Nilai Perkembangan STPPA" class="px-2.5 py-1 text-[11px] font-semibold bg-primary-50 text-primary-700 border border-primary-200 rounded-lg hover:bg-primary-100 transition inline-flex items-center gap-1">
+                ⭐ Nilai STPPA
+              </button>
+              <button onclick="editStudent('${s.id}')" title="Edit Data Siswa" class="px-2.5 py-1 text-[11px] font-semibold bg-gray-50 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100 transition">
+                Edit
+              </button>
+              <button onclick="openResetModal('${s.id}')" title="Reset Password Siswa ke Tanggal Lahir" class="px-2.5 py-1 text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-lg hover:bg-amber-100 transition inline-flex items-center gap-1">
+                🔑 Reset Akun
+              </button>
+              <button onclick="deleteStudent('${s.id}')" title="Hapus Siswa" class="p-1 text-gray-400 hover:text-red-600 transition">
+                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </td>
+          </tr>`;
+        }).join('');
+      } catch (err) {
+        Shell.showError('Gagal terhubung ke database.');
+      } finally {
+        stopSpin();
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-class').value = '';
+      document.getElementById('filter-kenaikan').value = '';
+      loadStudents();
+    }
+
+    // Modal Siswa
+    function openStudentModal(student = null) {
+      document.getElementById('student-modal').classList.remove('hidden');
+      document.getElementById('student-form').reset();
+      document.getElementById('student-id').value = '';
+
+      if (student) {
+        document.getElementById('modal-title').textContent = 'Edit Data Siswa';
+        document.getElementById('student-id').value = student.id;
+        document.getElementById('form-nis').value = student.nis || '';
+        document.getElementById('form-name').value = student.full_name || '';
+        document.getElementById('form-gender').value = student.gender || 'L';
+        document.getElementById('form-birthdate').value = student.birth_date || '';
+        document.getElementById('form-birthplace').value = student.birth_place || '';
+        document.getElementById('form-religion').value = student.religion || '';
+        document.getElementById('form-class').value = student.current_class_id || student.class_id || '';
+        document.getElementById('form-semester').value = student.semester_sekarang || 'Semester 1 (Ganjil)';
+        document.getElementById('form-kenaikan').value = student.status_kenaikan || 'Aktif';
+        document.getElementById('form-parent-name').value = student.parent_name || '';
+        document.getElementById('form-parent-phone').value = student.parent_phone || '';
+        document.getElementById('form-address').value = student.address || '';
+      } else {
+        document.getElementById('modal-title').textContent = 'Tambah Siswa Baru';
+      }
+    }
+
+    function closeStudentModal() {
+      document.getElementById('student-modal').classList.add('hidden');
+    }
+
+    async function editStudent(id) {
+      const s = studentsCache.find(x => x.id === id);
+      if (s) {
+        openStudentModal(s);
+      } else {
+        const res = await apiCall('students', 'get', { id });
+        if (res.success && res.data) openStudentModal(res.data);
+      }
+    }
+
+    async function deleteStudent(id) {
+      if (!confirm('Yakin ingin menghapus data siswa ini? Aksi ini akan menghapus catatan terkait.')) return;
+      const res = await apiCall('students', 'delete', { id });
+      showToast(res.message || 'Siswa berhasil dihapus', res.success ? 'success' : 'error');
+      if (res.success) loadStudents();
+    }
+
+    document.getElementById('student-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('student-id').value;
+      const classId = document.getElementById('form-class').value;
+      const cls = classesCache.find(c => c.id === classId);
+      const className = (cls && cls.name) || '';
+
+      const data = {
+        nis: document.getElementById('form-nis').value.trim(),
+        full_name: document.getElementById('form-name').value.trim(),
+        gender: document.getElementById('form-gender').value,
+        birth_date: document.getElementById('form-birthdate').value,
+        birth_place: document.getElementById('form-birthplace').value.trim(),
+        religion: document.getElementById('form-religion').value.trim(),
+        class_id: classId,
+        current_class_id: classId,
+        class_name: className,
+        kelas_sekarang: className,
+        semester_sekarang: document.getElementById('form-semester').value,
+        status_kenaikan: document.getElementById('form-kenaikan').value,
+        parent_name: document.getElementById('form-parent-name').value.trim(),
+        parent_phone: document.getElementById('form-parent-phone').value.trim(),
+        address: document.getElementById('form-address').value.trim()
+      };
+
+      const btn = document.getElementById('btn-save-student');
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan...';
+
+      try {
+        const res = await apiCall('students', id ? 'update' : 'create', id ? { id, ...data } : data);
+        showToast(res.message || 'Data berhasil disimpan', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeStudentModal();
+          loadStudents();
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan data siswa', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Simpan Data Siswa';
+      }
+    });
+
+    // Modal Evaluasi STPPA
+    function openEvalModal(studentId) {
+      const s = studentsCache.find(x => x.id === studentId);
+      if (!s) return;
+      document.getElementById('eval-modal').classList.remove('hidden');
+      document.getElementById('eval-student-id').value = s.id;
+      document.getElementById('eval-student-info').textContent = `${s.full_name} (${s.nis || 'NIS -'}) • Kelas: ${s.kelas_sekarang || s.class_name || '-'}`;
+      document.getElementById('eval-form').reset();
+    }
+
+    function closeEvalModal() {
+      document.getElementById('eval-modal').classList.add('hidden');
+    }
+
+    document.getElementById('eval-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById('eval-student-id').value;
+      const payload = {
+        student_id: studentId,
+        academic_year: document.getElementById('eval-academic-year').value,
+        semester: document.getElementById('eval-semester').value,
+        aspects: {
+          agama: document.getElementById('eval-aspect-agama').value,
+          motorik: document.getElementById('eval-aspect-motorik').value,
+          kognitif: document.getElementById('eval-aspect-kognitif').value,
+          bahasa: document.getElementById('eval-aspect-bahasa').value,
+          sosem: document.getElementById('eval-aspect-sosem').value,
+          seni: document.getElementById('eval-aspect-seni').value
+        },
+        notes: document.getElementById('eval-notes').value.trim()
+      };
+
+      const btn = document.getElementById('btn-save-eval');
+      btn.disabled = true;
+      btn.textContent = 'Menyimpan...';
+
+      try {
+        const res = await apiCall('students', 'save_evaluasi', payload);
+        showToast(res.message || 'Evaluasi STPPA berhasil disimpan', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeEvalModal();
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan evaluasi', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Simpan Evaluasi';
+      }
+    });
+
+    // Reset Password Siswa
+    function openResetModal(studentId) {
+      const s = studentsCache.find(x => x.id === studentId);
+      if (!s) return;
+      activeResetStudent = s;
+
+      document.getElementById('reset-student-name').textContent = s.full_name;
+      document.getElementById('reset-student-nis').textContent = s.nis || '(Belum diset)';
+      document.getElementById('reset-student-pwd').textContent = s.birth_date || '(Belum ada tgl lahir)';
+
+      document.getElementById('reset-actions').classList.remove('hidden');
+      document.getElementById('reset-done-actions').classList.add('hidden');
+      document.getElementById('reset-modal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+      document.getElementById('reset-modal').classList.add('hidden');
+    }
+
+    async function executeResetPassword() {
+      if (!activeResetStudent) return;
+      const btn = document.getElementById('btn-do-reset');
+      btn.disabled = true;
+      btn.textContent = 'Mereset...';
+
+      try {
+        const res = await apiCall('students', 'reset_password', { student_id: activeResetStudent.id });
+        if (res.success) {
+          showToast(res.message, 'success');
+          document.getElementById('reset-actions').classList.add('hidden');
+          document.getElementById('reset-done-actions').classList.remove('hidden');
+
+          // Siapkan tombol WA
+          const phone = (activeResetStudent.parent_phone || '').replace(/\D/g, '');
+          const waPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
+          const msg = encodeURIComponent(
+            `Assalamu'alaikum Wr. Wb.\n\nBerikut informasi akun Portal Siswa Yayasan Samarinda untuk ananda *${activeResetStudent.full_name}*:\n` +
+            `• Website Login: ${window.location.origin}/login\n` +
+            `• NIS (Username): *${activeResetStudent.nis}*\n` +
+            `• Password Awal: *${activeResetStudent.birth_date}*\n\n` +
+            `Silakan masuk dan ikuti petunjuk untuk membuat password baru ananda. Terima kasih.`
+          );
+          document.getElementById('reset-wa-btn').href = `https://wa.me/${waPhone}?text=${msg}`;
+        } else {
+          showToast(res.message || 'Gagal mereset password', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan saat mereset akun', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Ya, Reset Password';
+      }
+    }
+
+    function copyResetInfo() {
+      if (!activeResetStudent) return;
+      const text = 
+        `AKUN PORTAL SISWA YAYASAN SAMARINDA\n` +
+        `Nama Siswa: ${activeResetStudent.full_name}\n` +
+        `NIS: ${activeResetStudent.nis}\n` +
+        `Password Awal: ${activeResetStudent.birth_date}\n` +
+        `Halaman Login: ${window.location.origin}/login`;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Kredensial berhasil disalin ke clipboard!', 'success');
+      });
+    }
+
+    (async () => {
+      await loadClasses();
+      await loadStudents();
+    })();
+  </script>
+</body>
+</html>
