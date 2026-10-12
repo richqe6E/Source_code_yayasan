@@ -241,7 +241,7 @@
                 <li class="flex items-start gap-2">
                   <i class="fi fi-rr-marker text-sky-400 shrink-0 mt-0.5"></i>
                   <div>
-                    <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition group flex items-start gap-1.5" title="Buka lokasi kampus di Google Maps">
+                    <a id="site-footer-maps-link" href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition group flex items-start gap-1.5" title="Buka lokasi kampus di Google Maps">
                       <span id="site-footer-address">Jl. Samratulangi, Sungai Keledang, Samarinda</span>
                       <i class="fi fi-rr-arrow-up-right text-[10px] text-sky-400 opacity-70 group-hover:opacity-100 transition mt-0.5"></i>
                     </a>
@@ -336,6 +336,11 @@
     const fEmail = document.getElementById('site-footer-email');
     if (fEmail) fEmail.textContent = email;
 
+    const fMapsLink = document.getElementById('site-footer-maps-link');
+    if (fMapsLink && (school.maps_url || school.maps)) {
+      fMapsLink.href = school.maps_url || school.maps;
+    }
+
     const fFb = document.getElementById('site-footer-fb');
     if (fFb) { fFb.href = fb; fFb.style.display = fb === '#' ? 'none' : 'inline-flex'; }
     const fIg = document.getElementById('site-footer-ig');
@@ -366,7 +371,10 @@
               phone: s.phone,
               email: s.email,
               address: s.address,
-              whatsapp_number: s.whatsapp,
+              campus_note: s.campus_note,
+              maps_url: s.maps_url,
+              maps_embed_url: s.maps_embed_url,
+              whatsapp_number: s.whatsapp || s.whatsapp_number,
               instagram_url: s.instagram_url,
               youtube_url: s.youtube_url,
               facebook_url: s.facebook_url,

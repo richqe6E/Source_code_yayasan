@@ -138,18 +138,18 @@
         currentResultData = r;
 
         const regNo = r.registration_number || r.registration_no || r.id || reg;
-        const childName = r.child_name || r.full_name || '-';
-        const birthDate = r.child_birth_date || r.birth_date || '';
+        const childName = r.student_name || r.child_name || r.full_name || '-';
+        const birthDate = r.student_birth_date || r.birth_date || r.child_birth_date || '';
         const createdAt = r.created_at || r.registration_date || '';
         const rawStatus = (r.status || 'pending').toLowerCase();
         const jenjang = (r.level || r.form_type || 'PAUD/TK').toUpperCase();
-        const parentName = r.father_name || r.mother_name || r.parent_name || '-';
-        const parentPhone = r.phone || r.parent_phone || r.father_phone || '-';
+        const parentName = r.parent_name || r.father_name || r.mother_name || '-';
+        const parentPhone = r.parent_phone || r.phone || r.father_phone || '-';
         const nis = r.converted_nis || r.nis || '';
         const className = r.class_name || '';
 
-        const isConverted = rawStatus === 'converted';
-        const isApproved = rawStatus === 'approved' || rawStatus === 'accepted';
+        const isConverted = rawStatus === 'converted' || Boolean(nis && (rawStatus === 'accepted' || rawStatus === 'approved'));
+        const isApproved = !isConverted && (rawStatus === 'approved' || rawStatus === 'accepted');
         const isPending = rawStatus === 'pending' || rawStatus === 'submitted' || rawStatus === 'waiting_verification';
         const isRejected = rawStatus === 'rejected';
 

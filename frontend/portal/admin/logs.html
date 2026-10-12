@@ -88,8 +88,9 @@
       const tbody = document.getElementById('logs-tbody');
       tbody.innerHTML = Shell.skeletonRows(5, 5);
 
+      let res;
       try {
-        const res = await apiCall('logs', 'list', params);
+        res = await apiCall('logs', 'list', params);
         if (!res.success) {
           Shell.showError(res.message || 'Gagal memuat log');
           tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-sm text-red-600">${res.message || 'Gagal'}</td></tr>`;
@@ -108,20 +109,20 @@
             <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs rounded font-medium ${actionColor(l.action)}">${l.action}</span></td>
             <td class="px-4 py-3 text-xs text-gray-600 max-w-xs truncate">${l.description || l.entity_id || '-'}</td>
           </tr>`).join('');
+
+        const pag = document.getElementById('logs-pagination');
+        if (res.pagination) {
+          pag.innerHTML = `<div>Halaman ${res.pagination.page} dari ${res.pagination.total_pages} • ${res.pagination.total} log</div>
+            <div class="space-x-2">
+              <button onclick="currentPage=${res.pagination.page-1};loadLogs()" ${res.pagination.page<=1?'disabled':''} class="px-2 py-1 border border-gray-300 rounded text-sm disabled:opacity-50">Prev</button>
+              <button onclick="currentPage=${res.pagination.page+1};loadLogs()" ${res.pagination.page>=res.pagination.total_pages?'disabled':''} class="px-2 py-1 border border-gray-300 rounded text-sm disabled:opacity-50">Next</button>
+            </div>`;
+        } else { pag.innerHTML = ''; }
       } catch (e) {
         Shell.showError('Tidak dapat terhubung ke server.');
       } finally {
         stopSpin();
       }
-
-      const pag = document.getElementById('logs-pagination');
-      if (res.pagination) {
-        pag.innerHTML = `<div>Halaman ${res.pagination.page} dari ${res.pagination.total_pages} • ${res.pagination.total} log</div>
-          <div class="space-x-2">
-            <button onclick="currentPage=${res.pagination.page-1};loadLogs()" ${res.pagination.page<=1?'disabled':''} class="px-2 py-1 border border-gray-300 rounded text-sm disabled:opacity-50">Prev</button>
-            <button onclick="currentPage=${res.pagination.page+1};loadLogs()" ${res.pagination.page>=res.pagination.total_pages?'disabled':''} class="px-2 py-1 border border-gray-300 rounded text-sm disabled:opacity-50">Next</button>
-          </div>`;
-      } else { pag.innerHTML = ''; }
     }
 
     function actionColor(a) {

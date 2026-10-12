@@ -81,8 +81,8 @@
               <p class="text-sm font-semibold text-slate-900 leading-relaxed" id="contact-page-address">
                 Jl. Samratulangi, Sungai Keledang, Kec. Samarinda Seberang, Kota Samarinda, Kalimantan Timur 75242
               </p>
-              <div class="text-[11px] text-primary-700 font-medium mt-1">Kampus Politeknik Negeri Samarinda (POLNES)</div>
-              <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-800 mt-2 transition">
+              <div class="text-[11px] text-primary-700 font-medium mt-1" id="contact-page-campus-note">Kampus Politeknik Negeri Samarinda (POLNES)</div>
+              <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" id="contact-page-maps-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-800 mt-2 transition">
                 <span>Buka di Google Maps</span>
                 <i class="fi fi-rr-arrow-up-right text-[10px]"></i>
               </a>
@@ -227,12 +227,12 @@
         </div>
 
         <div class="flex items-center gap-2.5 shrink-0">
-          <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-primary-600/20 active:scale-[0.98] transition">
+          <a href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" id="contact-page-maps-link-btn" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-primary-600/20 active:scale-[0.98] transition">
             <i class="fi fi-rr-map-marker text-xs"></i>
             <span>Buka di Google Maps</span>
             <i class="fi fi-rr-arrow-up-right text-[10px]"></i>
           </a>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=-0.5334528,117.1243218" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 active:scale-[0.98] transition">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=-0.5334528,117.1243218" id="contact-page-maps-directions-btn" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 active:scale-[0.98] transition">
             <i class="fi fi-rr-navigation text-xs text-primary-600"></i>
             <span>Petunjuk Arah</span>
           </a>
@@ -242,6 +242,7 @@
       <!-- Google Maps Embed Container -->
       <div class="relative w-full h-[380px] sm:h-[480px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-slate-100">
         <iframe
+          id="contact-page-maps-iframe"
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.6873539169824!2d117.12174687588383!3d-0.5334527994614271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f4bc56ac1f5%3A0x6cc39448081e9f18!2sPOLNES%20-%20Politeknik%20Negeri%20Samarinda!5e0!3m2!1sid!2sid!4v1740000000000!5m2!1sid!2sid"
           width="100%"
           height="100%"
@@ -274,15 +275,44 @@
         const cached = sessionStorage.getItem('siyayasan_school_profile');
         let school = cached ? JSON.parse(cached) : null;
         if (!school && typeof window.apiCall === 'function') {
-          const res = await window.apiCall('schools', 'get');
-          if (res && res.success && res.data) school = res.data;
+          try {
+            const setRes = await window.apiCall('web_settings', 'get');
+            if (setRes && setRes.success && setRes.data && (setRes.data.address || setRes.data.school_name)) {
+              school = setRes.data;
+            }
+          } catch (_) {}
+          if (!school) {
+            const res = await window.apiCall('schools', 'get');
+            if (res && res.success && res.data) school = res.data;
+          }
         }
         if (school) {
-          if (school.name) currentSchoolName = school.name;
-          if (school.address) document.getElementById('contact-page-address').textContent = school.address;
+          const sName = school.name || school.school_name;
+          if (sName) currentSchoolName = sName;
+          if (school.address) {
+            const el = document.getElementById('contact-page-address');
+            if (el) el.textContent = school.address;
+          }
+          if (school.campus_note) {
+            const el = document.getElementById('contact-page-campus-note');
+            if (el) el.textContent = school.campus_note;
+          }
+          if (school.maps_url) {
+            const l1 = document.getElementById('contact-page-maps-link');
+            if (l1) l1.href = school.maps_url;
+            const l2 = document.getElementById('contact-page-maps-link-btn');
+            if (l2) l2.href = school.maps_url;
+            const l3 = document.getElementById('contact-page-maps-directions-btn');
+            if (l3) l3.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(school.address || 'Politeknik Negeri Samarinda')}`;
+          }
+          if (school.maps_embed_url) {
+            const ifr = document.getElementById('contact-page-maps-iframe');
+            if (ifr) ifr.src = school.maps_embed_url;
+          }
           if (school.phone) document.getElementById('contact-page-phone').textContent = `${school.phone} (Kantor TU)`;
-          if (school.whatsapp_number) {
-            currentWaNumber = school.whatsapp_number.replace(/\D/g, '');
+          const wa = school.whatsapp_number || school.whatsapp || school.whatsapp_official;
+          if (wa) {
+            currentWaNumber = String(wa).replace(/\D/g, '');
             document.getElementById('contact-page-wa').textContent = `+${currentWaNumber} (WhatsApp Resmi)`;
             document.getElementById('contact-wa-desc').textContent = `Pesan Anda akan otomatis terhubung ke WhatsApp resmi ${currentSchoolName} (+${currentWaNumber}) untuk penanganan yang cepat dan personal.`;
           }

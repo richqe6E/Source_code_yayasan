@@ -731,7 +731,7 @@
       const inv = invoicesCache.find(x => x.id === invId);
       if (!inv) return;
       const s = studentsCache.find(x => x.id === inv.student_id) || {};
-      const parentPhone = s.father_phone || s.mother_phone || s.parent_phone || s.phone || '081234567890';
+      const parentPhone = inv.parent_phone || inv.parent_whatsapp || s.father_phone || s.mother_phone || s.parent_phone || s.phone || s.emergency_phone || '081234567890';
       const cleanPhone = String(parentPhone).replace(/\D/g, '').replace(/^0/, '62');
       const studentName = inv.student_name || s.full_name || '-';
       const nis = s.nis || '-';

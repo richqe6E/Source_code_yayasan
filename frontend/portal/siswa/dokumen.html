@@ -144,6 +144,33 @@
       </div>
     </div>
 
+  <!-- Modal Preview Lightbox Dokumen Internal -->
+  <div id="doc-preview-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 id="modal-doc-title" class="text-base font-bold text-slate-900">Pratinjau Berkas Dokumen</h3>
+          <p id="modal-doc-subtitle" class="text-xs text-slate-500">Berkas persyaratan siswa</p>
+        </div>
+        <button onclick="closeDocPreview()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold">&times;</button>
+      </div>
+      <div class="flex-1 overflow-auto flex items-center justify-center min-h-[240px] bg-slate-50 rounded-xl p-2 border border-slate-200">
+        <img id="modal-doc-img" src="" alt="Pratinjau Berkas" class="max-h-[60vh] max-w-full object-contain rounded-lg hidden">
+        <div id="modal-doc-fallback" class="text-center p-6 space-y-3 hidden">
+          <div class="w-12 h-12 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center mx-auto text-xl">📄</div>
+          <p class="text-xs text-slate-600 font-semibold" id="modal-doc-filename">Dokumen Digital</p>
+          <a id="modal-doc-open-btn" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition">
+            <span>Buka Berkas di Tab Baru</span>
+            &rarr;
+          </a>
+        </div>
+      </div>
+      <div class="flex justify-end pt-2">
+        <button onclick="closeDocPreview()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition">Tutup Pratinjau</button>
+      </div>
+    </div>
+  </div>
+
   </main>
 
   <!-- Scripts -->
@@ -233,10 +260,45 @@
       }
     }
 
+    let currentDocsCache = [];
+
+    function previewDocByIndex(idx) {
+      const d = currentDocsCache[idx];
+      if (!d || !d.file_url) return;
+      const modal = document.getElementById('doc-preview-modal');
+      const title = document.getElementById('modal-doc-title');
+      const subtitle = document.getElementById('modal-doc-subtitle');
+      const img = document.getElementById('modal-doc-img');
+      const fallback = document.getElementById('modal-doc-fallback');
+      const openBtn = document.getElementById('modal-doc-open-btn');
+      const nameEl = document.getElementById('modal-doc-filename');
+
+      title.textContent = d.file_name || 'Berkas Dokumen';
+      subtitle.textContent = `Jenis Dokumen: ${d.document_type || 'Persyaratan'}`;
+      openBtn.href = d.file_url;
+      nameEl.textContent = d.file_name || 'Dokumen Persyaratan';
+
+      const isImg = d.file_url.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(d.file_url);
+      if (isImg) {
+        img.src = d.file_url;
+        img.classList.remove('hidden');
+        fallback.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        fallback.classList.remove('hidden');
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeDocPreview() {
+      document.getElementById('doc-preview-modal')?.classList.add('hidden');
+    }
+
     async function loadDocuments() {
       try {
         const res = await apiCall('siswa', 'get_documents');
         const docs = (res.success && res.data) ? res.data : [];
+        currentDocsCache = docs;
         const tbody = document.getElementById('documents-table-body');
 
         if (docs.length === 0) {
@@ -257,7 +319,7 @@
           lainnya: 'Dokumen Tambahan'
         };
 
-        tbody.innerHTML = docs.map(d => {
+        tbody.innerHTML = docs.map((d, idx) => {
           const verifiedBadge = d.is_verified 
             ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Terverifikasi</span>'
             : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">⏳ Menunggu Review</span>';
@@ -269,9 +331,9 @@
               <td class="py-3 px-4 text-slate-500">${formatDateTime(d.created_at)}</td>
               <td class="py-3 px-4">${verifiedBadge}</td>
               <td class="py-3 px-4 text-right">
-                <a href="${d.file_url}" target="_blank" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition-colors">
+                <button type="button" onclick="previewDocByIndex(${idx})" class="px-3 py-1 bg-primary-50 hover:bg-primary-100 text-primary-700 font-bold rounded-lg text-xs transition-colors cursor-pointer">
                   Lihat Berkas
-                </a>
+                </button>
               </td>
             </tr>
           `;
@@ -280,6 +342,9 @@
         console.error('Error loading documents:', err);
       }
     }
+
+    window.previewDocByIndex = previewDocByIndex;
+    window.closeDocPreview = closeDocPreview;
 
     document.addEventListener('DOMContentLoaded', initPage);
   </script>

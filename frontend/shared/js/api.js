@@ -1622,6 +1622,19 @@
           const res = await supabaseRest(`ppdb_periods?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
           return { success: true, data: { ...(res[0] || payload), ...scheduleData }, message: 'Pengaturan gelombang & jadwal PPDB diperbarui' };
         }
+        if (action === 'update') {
+          const id = params.id;
+          const patchData = { ...params };
+          delete patchData.id;
+          delete patchData.token;
+          const res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(id)}`, 'PATCH', patchData);
+          return { success: true, data: (res && res[0]) || patchData, message: 'Data pendaftar berhasil diperbarui' };
+        }
+        if (action === 'delete') {
+          const id = params.id;
+          await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(id)}`, 'DELETE');
+          return { success: true, message: 'Data pendaftar berhasil dihapus' };
+        }
         if (action === 'approve') {
           const res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', {
             status: 'accepted',
@@ -1640,6 +1653,12 @@
           const regs = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(params.id)}&select=*`);
           if (!regs || regs.length === 0) return { success: false, message: 'Pendaftar tidak ditemukan' };
           const reg = regs[0];
+
+          // 1. Guard Idempotensi: Cegah konversi ganda
+          if (reg.status === 'converted') {
+            return { success: false, message: 'Pendaftar ini sudah pernah dikonversi menjadi siswa aktif.' };
+          }
+
           const stuId = 'STU-' + String(Date.now()).slice(-5);
           const targetClassId = params.class_id || 'CLS-001';
 
@@ -1650,22 +1669,28 @@
             if (cls && cls[0]) targetClassName = cls[0].name;
           }
 
-          // 1. Tentukan NIS Siswa (bisa input dari admin atau auto-generate)
+          // 2. Tentukan NIS Siswa (bisa input dari admin atau auto-generate)
           const studentNis = params.nis || ('2026' + String(Math.floor(1000 + Math.random() * 9000)));
 
-          // 2. Password awal dari Tanggal Lahir (Format default: YYYY-MM-DD atau DDMMYYYY)
-          let birthDateStr = reg.birth_date ? String(reg.birth_date).trim() : '2021-01-01';
+          // 3. Guard Keunikan NIS: Pastikan belum ada siswa yang memiliki NIS ini
+          const existingNis = await supabaseRest(`students?nis=eq.${encodeURIComponent(studentNis)}&select=id`);
+          if (existingNis && existingNis.length > 0) {
+            return { success: false, message: `NIS ${studentNis} sudah digunakan oleh siswa aktif lain. Silakan gunakan nomor NIS lain.` };
+          }
+
+          // 4. Password awal dari Tanggal Lahir (Format default: YYYY-MM-DD atau DDMMYYYY)
+          let birthDateStr = reg.birth_date || reg.student_birth_date ? String(reg.birth_date || reg.student_birth_date).trim() : '2021-01-01';
           let birthDatePassword = birthDateStr;
           if (birthDateStr.includes('-')) {
             const p = birthDateStr.split('-');
             if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
           }
 
-          const cleanPhone = (reg.phone || '').replace(/[^0-9]/g, '');
-          const studentEmail = reg.email || (cleanPhone ? `${studentNis}@siswa.yayasan.sch.id` : `siswa_${studentNis}@yayasan.sch.id`);
-          const studentName = reg.full_name || reg.child_name || 'Santri Baru';
+          const cleanPhone = (reg.phone || reg.parent_phone || '').replace(/[^0-9]/g, '');
+          const studentEmail = reg.email || reg.parent_email || (cleanPhone ? `${studentNis}@siswa.yayasan.sch.id` : `siswa_${studentNis}@yayasan.sch.id`);
+          const studentName = reg.student_name || reg.full_name || reg.child_name || 'Santri Baru';
 
-          // 3. Cek apakah user akun pendaftar sudah ada (dari registrasi PPDB Akun-First)
+          // 5. Cek apakah user akun pendaftar sudah ada (dari registrasi PPDB Akun-First)
           let existingUsers = await supabaseRest(`users?email=eq.${encodeURIComponent(studentEmail)}&select=*`);
           let userId = 'USR-' + studentNis;
 
@@ -1686,7 +1711,7 @@
               password_hash: birthDatePassword,
               full_name: studentName,
               name: studentName,
-              phone: reg.phone,
+              phone: reg.phone || reg.parent_phone || '',
               role: 'siswa_aktif',
               role_label: 'Siswa Aktif',
               nis: studentNis,
@@ -1697,7 +1722,7 @@
             });
           }
 
-          // 4. Buat / Update Data Siswa Aktif
+          // 6. Buat / Update Data Siswa Aktif
           const studentPayload = {
             id: stuId,
             user_id: userId,
@@ -1705,8 +1730,8 @@
             full_name: studentName,
             name: studentName,
             child_name: studentName,
-            gender: reg.gender || 'L',
-            birth_place: reg.birth_place || 'Samarinda',
+            gender: reg.gender || reg.student_gender || 'L',
+            birth_place: reg.birth_place || reg.student_birth_place || 'Samarinda',
             birth_date: birthDateStr,
             class_id: targetClassId,
             class_name: targetClassName,
@@ -1715,21 +1740,21 @@
             status_kenaikan: 'Aktif',
             status_pendaftaran: 'accepted',
             is_active: true,
-            parent_name: reg.father_name || reg.mother_name || '',
-            parent_phone: reg.phone || '',
+            parent_name: reg.parent_name || reg.father_name || reg.mother_name || '',
+            parent_phone: reg.parent_phone || reg.phone || '',
             parent_email: studentEmail,
             address: reg.address || '',
             status: 'active'
           };
           await supabaseRest('students', 'POST', studentPayload);
 
-          // 5. Update Status Registrasi PPDB
+          // 7. Update Status Registrasi PPDB menjadi 'converted'
           await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
-            status: 'accepted',
+            status: 'converted',
             notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
           });
 
-          // 6. Ringkasan Kredensial Siswa Baru
+          // 8. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' ? window.location.origin : '';
           const loginUrl = `${origin}/public/login.html`;
           const summaryText = `Akses Portal Siswa Yayasan Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${birthDatePassword} (Tanggal Lahir: DDMMYYYY)\nLink Portal: ${loginUrl}`;
@@ -1949,6 +1974,9 @@
 
           // Simpan selalu ke cache lokal agar langsung aktif
           const extPayload = {
+            campus_note: params.campus_note || '',
+            maps_url: params.maps_url || '',
+            maps_embed_url: params.maps_embed_url || '',
             whatsapp_number: params.whatsapp_number || '',
             instagram_url: params.instagram_url || '',
             youtube_url: params.youtube_url || '',

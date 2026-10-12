@@ -495,27 +495,56 @@ function handleApiRequest(apiPath, params, method) {
   if (module === 'ppdb') {
     if (action === 'submit' || action === 'register') {
       const regId = 'REG-' + new Date().getFullYear() + '-' + String(DB.ppdb_registrations.length + 1).padStart(3, '0');
+      const studentName = params.full_name || params.child_name || params.student_name || 'Santri Baru';
+      const parentName = params.parent_name || params.father_name || params.mother_name || params.guardian_name || 'Orang Tua';
+      const phoneNum = params.phone || params.parent_phone || params.father_phone || params.mother_phone || '';
+      const emailAddr = params.email || params.parent_email || '';
+      const lvl = params.level || (params.form_type === 'tpq' ? 'TPQ' : 'PAUD');
+      const photo = params.photo_url || params.child_photo_url || '';
+      const birthCert = params.birth_certificate_url || '';
+      const familyCard = params.family_card_url || '';
+
       const newReg = {
         id: regId,
         registration_number: regId,
         registration_no: regId,
-        full_name: params.full_name || params.child_name || 'Santri Baru',
-        child_name: params.child_name || params.full_name || 'Santri Baru',
+        full_name: studentName,
+        child_name: studentName,
+        student_name: studentName,
         nickname: params.nickname || '',
-        gender: params.gender || 'L',
-        birth_place: params.birth_place || 'Samarinda',
-        birth_date: params.birth_date || '2020-01-01',
+        gender: params.gender || params.student_gender || 'L',
+        student_gender: params.gender || params.student_gender || 'L',
+        birth_place: params.birth_place || params.student_birth_place || 'Samarinda',
+        student_birth_place: params.birth_place || params.student_birth_place || 'Samarinda',
+        birth_date: params.birth_date || params.student_birth_date || '2020-01-01',
+        student_birth_date: params.birth_date || params.student_birth_date || '2020-01-01',
         address: params.address || '',
-        form_type: params.form_type || 'paud',
+        form_type: params.form_type || (lvl === 'TPQ' ? 'tpq' : 'paud'),
+        level: lvl,
         period_id: params.period_id || 'PPDPER-2026',
-        period_name: 'PPDB 2026/2027 Gelombang 1',
-        father_name: params.father_name || '',
+        period_name: params.period_name || 'PPDB 2026/2027 Gelombang 1',
+        father_name: params.father_name || parentName,
         father_occupation: params.father_occupation || '',
-        father_phone: params.father_phone || '',
+        father_phone: params.father_phone || phoneNum,
         mother_name: params.mother_name || '',
         mother_occupation: params.mother_occupation || '',
         mother_phone: params.mother_phone || '',
         guardian_name: params.guardian_name || '',
+        parent_name: parentName,
+        phone: phoneNum,
+        parent_phone: phoneNum,
+        email: emailAddr,
+        parent_email: emailAddr,
+        photo_url: photo,
+        child_photo_url: photo,
+        birth_certificate_url: birthCert,
+        family_card_url: familyCard,
+        documents_url: {
+          photo: photo,
+          birth_certificate: birthCert,
+          family_card: familyCard
+        },
+        notes: params.notes || '',
         status: 'pending',
         created_at: new Date().toISOString(),
         registration_date: new Date().toISOString().split('T')[0]
@@ -541,7 +570,7 @@ function handleApiRequest(apiPath, params, method) {
         String(r.id).toLowerCase() === String(regQuery).toLowerCase()
       );
       if (!reg) {
-        return { success: false, error: { code: 'NOT_FOUND', message: 'Nomor pendaftaran tidak ditemukan' } };
+        return { success: false, message: 'Nomor pendaftaran tidak ditemukan', error: { code: 'NOT_FOUND', message: 'Nomor pendaftaran tidak ditemukan' } };
       }
       if (reg.status === 'converted') {
         const linkedStudent = DB.students.find(s => (reg.student_id && s.id === reg.student_id) || (reg.converted_nis && s.nis === reg.converted_nis) || (s.full_name === (reg.child_name || reg.full_name)));
@@ -560,6 +589,14 @@ function handleApiRequest(apiPath, params, method) {
       };
     }
 
+    if (action === 'get') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const reg = DB.ppdb_registrations.find(r => r.id === params.id || r.registration_number === params.id);
+      if (!reg) return { success: false, message: 'Pendaftar tidak ditemukan' };
+      return { success: true, data: reg };
+    }
+
     if (action === 'list') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
@@ -571,7 +608,21 @@ function handleApiRequest(apiPath, params, method) {
           list = list.filter(r => r.status === 'approved' || r.status === 'accepted' || r.status === 'verified');
         } else if (params.status === 'rejected') {
           list = list.filter(r => r.status === 'rejected');
+        } else if (params.status === 'converted') {
+          list = list.filter(r => r.status === 'converted');
         }
+      }
+      if (params.search || params.q) {
+        const q = String(params.search || params.q).toLowerCase();
+        list = list.filter(r => 
+          (r.full_name && r.full_name.toLowerCase().includes(q)) ||
+          (r.child_name && r.child_name.toLowerCase().includes(q)) ||
+          (r.registration_number && r.registration_number.toLowerCase().includes(q)) ||
+          (r.parent_name && r.parent_name.toLowerCase().includes(q))
+        );
+      }
+      if (params.form_type) {
+        list = list.filter(r => String(r.form_type).toLowerCase() === String(params.form_type).toLowerCase() || String(r.level).toLowerCase() === String(params.form_type).toLowerCase());
       }
       return {
         success: true,
@@ -605,37 +656,118 @@ function handleApiRequest(apiPath, params, method) {
       return { success: true, data: { message: 'Pendaftar ditolak', registration: reg } };
     }
 
+    if (action === 'update') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const reg = DB.ppdb_registrations.find(r => r.id === params.id || r.registration_number === params.id);
+      if (!reg) return { success: false, message: 'Pendaftar tidak ditemukan' };
+
+      if (params.full_name || params.child_name || params.student_name) {
+        const sName = params.full_name || params.child_name || params.student_name;
+        reg.full_name = sName; reg.child_name = sName; reg.student_name = sName;
+      }
+      if (params.nickname !== undefined) reg.nickname = params.nickname;
+      if (params.gender !== undefined) { reg.gender = params.gender; reg.student_gender = params.gender; }
+      if (params.birth_place !== undefined) { reg.birth_place = params.birth_place; reg.student_birth_place = params.birth_place; }
+      if (params.birth_date !== undefined) { reg.birth_date = params.birth_date; reg.student_birth_date = params.birth_date; }
+      if (params.address !== undefined) reg.address = params.address;
+      if (params.parent_name !== undefined) reg.parent_name = params.parent_name;
+      if (params.father_name !== undefined) reg.father_name = params.father_name;
+      if (params.mother_name !== undefined) reg.mother_name = params.mother_name;
+      if (params.phone !== undefined || params.parent_phone !== undefined) {
+        const p = params.phone || params.parent_phone;
+        reg.phone = p; reg.parent_phone = p; reg.father_phone = p;
+      }
+      if (params.email !== undefined || params.parent_email !== undefined) {
+        const e = params.email || params.parent_email;
+        reg.email = e; reg.parent_email = e;
+      }
+      if (params.level !== undefined) { reg.level = params.level; reg.form_type = params.level === 'TPQ' ? 'tpq' : 'paud'; }
+      if (params.notes !== undefined) reg.notes = params.notes;
+      reg.updated_at = new Date().toISOString();
+
+      return { success: true, message: 'Data pendaftar berhasil diperbarui', data: reg };
+    }
+
+    if (action === 'delete') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const idx = DB.ppdb_registrations.findIndex(r => r.id === params.id || r.registration_number === params.id);
+      if (idx === -1) return { success: false, message: 'Pendaftar tidak ditemukan' };
+      const deleted = DB.ppdb_registrations.splice(idx, 1)[0];
+      return { success: true, message: 'Data pendaftar berhasil dihapus', data: deleted };
+    }
+
     if (action === 'convert') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
       const reg = DB.ppdb_registrations.find(r => r.id === params.id || r.registration_number === params.id);
       if (!reg) return { success: false, message: 'Pendaftar tidak ditemukan' };
-      reg.status = 'converted';
+
+      // 1. Guard Idempotensi: Cegah konversi ganda untuk pendaftar yang sama
+      if (reg.status === 'converted') {
+        return { success: false, message: 'Pendaftar ini sudah pernah dikonversi menjadi siswa aktif.' };
+      }
+
       const nextSeq = DB.students.length + 1;
       const targetNis = params.nis || ('2026' + String(nextSeq).padStart(3, '0'));
+
+      // 2. Guard Keunikan NIS: Pastikan NIS belum terdaftar di data siswa aktif
+      const isNisTaken = DB.students.some(s => String(s.nis).trim() === String(targetNis).trim());
+      if (isNisTaken) {
+        return { success: false, message: `NIS ${targetNis} sudah digunakan oleh siswa aktif lain. Silakan gunakan nomor NIS lain.` };
+      }
+
       const targetClass = DB.classes.find(c => c.id === (params.class_id || 'CLS-001')) || {};
+      const studentName = reg.child_name || reg.full_name || reg.student_name || 'Santri Baru';
+      const studentBirthDate = reg.birth_date || reg.student_birth_date || '2020-01-01';
+
       const newStu = {
         id: 'STU-' + String(nextSeq).padStart(3, '0'),
         nis: targetNis,
-        full_name: reg.child_name || reg.full_name,
-        name: reg.child_name || reg.full_name,
-        child_name: reg.child_name || reg.full_name,
+        full_name: studentName,
+        name: studentName,
+        child_name: studentName,
         nickname: reg.nickname || '',
-        gender: reg.gender,
+        gender: reg.gender || reg.student_gender || 'L',
         class_id: params.class_id || 'CLS-001',
         class_name: targetClass.name || 'PAUD A - Bintang Kecil',
-        birth_place: reg.birth_place,
-        birth_date: reg.birth_date,
+        birth_place: reg.birth_place || reg.student_birth_place || 'Samarinda',
+        birth_date: studentBirthDate,
         parent_id: 'PAR-' + String(nextSeq).padStart(3, '0'),
-        parent_name: reg.father_name || reg.mother_name || '-',
-        parent_email: reg.parent_email || '',
+        parent_name: reg.parent_name || reg.father_name || reg.mother_name || '-',
+        parent_email: reg.parent_email || reg.email || '',
+        parent_phone: reg.parent_phone || reg.phone || reg.father_phone || '',
+        phone: reg.phone || reg.parent_phone || '',
+        photo_url: reg.photo_url || reg.child_photo_url || '',
+        address: reg.address || '',
         status: 'active'
       };
       DB.students.push(newStu);
+
+      // Sinkronisasi akun user portal jika belum ada
+      const existingUser = DB.users.find(u => u.nis === targetNis || (u.student_id && u.student_id === newStu.id));
+      if (!existingUser) {
+        DB.users.push({
+          id: 'USR-' + targetNis,
+          email: newStu.parent_email || `${targetNis}@siswa.yayasan.sch.id`,
+          nis: targetNis,
+          password_hash: studentBirthDate.replace(/\D/g, ''),
+          full_name: studentName,
+          name: studentName,
+          phone: newStu.parent_phone,
+          role: 'siswa_aktif',
+          role_label: 'Siswa Aktif',
+          status: 'active',
+          student_id: newStu.id
+        });
+      }
+
+      reg.status = 'converted';
       reg.converted_nis = targetNis;
       reg.student_id = newStu.id;
       reg.class_name = newStu.class_name;
-      const defaultPass = reg.birth_date ? reg.birth_date.replace(/\D/g, '') : ('ortu' + String(nextSeq).padStart(3, '0'));
+      const defaultPass = studentBirthDate ? studentBirthDate.replace(/\D/g, '') : ('ortu' + String(nextSeq).padStart(3, '0'));
       const initialCredentials = {
         student_name: newStu.full_name,
         username: targetNis,
@@ -654,8 +786,8 @@ function handleApiRequest(apiPath, params, method) {
           nis: targetNis,
           class_name: newStu.class_name,
           parent_user: {
-            email: reg.parent_email,
-            full_name: reg.father_name || reg.mother_name || '-'
+            email: newStu.parent_email,
+            full_name: newStu.parent_name
           },
           initial_credentials: initialCredentials
         }
@@ -2350,14 +2482,17 @@ function handleApiRequest(apiPath, params, method) {
       years_serving: 15
     });
 
-    if (action === 'get') {
+    if (action === 'get' || !action) {
       const school = DB.school_profile || {
         id: 'SCH-001',
         name: 'Yayasan Samarinda',
         npsn: '69912345',
         level: 'PAUD, TK, dan TPQ',
-        address: 'Jl. Pendidikan No. 123, Samarinda, Kalimantan Timur',
-        phone: '0812-3456-7890',
+        address: 'Jl. Samratulangi, Sungai Keledang, Kec. Samarinda Seberang, Kota Samarinda, Kalimantan Timur 75242',
+        campus_note: 'Kampus Politeknik Negeri Samarinda (POLNES)',
+        maps_url: 'https://maps.app.goo.gl/WtHnPhhLqqKVqEV66',
+        maps_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.6873539169824!2d117.12174687588383!3d-0.5334527994614271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f4bc56ac1f5%3A0x6cc39448081e9f18!2sPOLNES%20-%20Politeknik%20Negeri%20Samarinda!5e0!3m2!1sid!2sid!4v1740000000000!5m2!1sid!2sid',
+        phone: '(0541) 234-5678',
         whatsapp_number: '081234567890',
         email: 'info@yayasan.sch.id',
         headmaster_name: 'Ustadzah Fatimah, S.Pd.I.',
@@ -2377,6 +2512,22 @@ function handleApiRequest(apiPath, params, method) {
       if (deny) return deny;
       if (!DB.school_profile) DB.school_profile = {};
       Object.assign(DB.school_profile, params);
+
+      // Auto-sync ke DB.web_settings jika ada pembaruan
+      if (!DB.web_settings) DB.web_settings = {};
+      if (params.name) DB.web_settings.school_name = params.name;
+      if (params.address) DB.web_settings.address = params.address;
+      if (params.campus_note) DB.web_settings.campus_note = params.campus_note;
+      if (params.maps_url) DB.web_settings.maps_url = params.maps_url;
+      if (params.maps_embed_url) DB.web_settings.maps_embed_url = params.maps_embed_url;
+      if (params.phone) DB.web_settings.phone = params.phone;
+      if (params.email) DB.web_settings.email = params.email;
+      if (params.whatsapp_number) DB.web_settings.whatsapp = params.whatsapp_number;
+      if (params.facebook_url) DB.web_settings.facebook_url = params.facebook_url;
+      if (params.instagram_url) DB.web_settings.instagram_url = params.instagram_url;
+      if (params.youtube_url) DB.web_settings.youtube_url = params.youtube_url;
+      if (params.footer_bg_url) DB.web_settings.footer_bg_url = params.footer_bg_url;
+
       return { success: true, message: 'Profil yayasan berhasil diperbarui', data: DB.school_profile };
     }
   }
@@ -2396,7 +2547,10 @@ function handleApiRequest(apiPath, params, method) {
       contact_email: 'info@yayasan.sch.id',
       email: 'info@yayasan.sch.id',
       phone: '(0541) 234-5678',
-      address: 'Jl. Samratulangi, Sungai Keledang, Samarinda',
+      address: 'Jl. Samratulangi, Sungai Keledang, Kec. Samarinda Seberang, Kota Samarinda, Kalimantan Timur 75242',
+      campus_note: 'Kampus Politeknik Negeri Samarinda (POLNES)',
+      maps_url: 'https://maps.app.goo.gl/WtHnPhhLqqKVqEV66',
+      maps_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.6873539169824!2d117.12174687588383!3d-0.5334527994614271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f4bc56ac1f5%3A0x6cc39448081e9f18!2sPOLNES%20-%20Politeknik%20Negeri%20Samarinda!5e0!3m2!1sid!2sid!4v1740000000000!5m2!1sid!2sid',
       academic_year: '2026/2027',
       instagram_url: 'https://instagram.com/yayasansamarinda',
       youtube_url: 'https://youtube.com/@yayasansamarinda',
@@ -2408,7 +2562,7 @@ function handleApiRequest(apiPath, params, method) {
       ]
     };
 
-    if (action === 'get') {
+    if (action === 'get' || !action) {
       const merged = Object.assign({}, DEFAULT_SETTINGS, DB.web_settings || {});
       return { success: true, data: merged };
     }
@@ -2417,6 +2571,22 @@ function handleApiRequest(apiPath, params, method) {
       if (deny) return deny;
       if (!DB.web_settings) DB.web_settings = Object.assign({}, DEFAULT_SETTINGS);
       Object.assign(DB.web_settings, params);
+
+      // Auto-sync ke DB.school_profile
+      if (!DB.school_profile) DB.school_profile = {};
+      if (params.school_name) DB.school_profile.name = params.school_name;
+      if (params.address) DB.school_profile.address = params.address;
+      if (params.campus_note) DB.school_profile.campus_note = params.campus_note;
+      if (params.maps_url) DB.school_profile.maps_url = params.maps_url;
+      if (params.maps_embed_url) DB.school_profile.maps_embed_url = params.maps_embed_url;
+      if (params.phone) DB.school_profile.phone = params.phone;
+      if (params.email) DB.school_profile.email = params.email;
+      if (params.whatsapp) DB.school_profile.whatsapp_number = params.whatsapp;
+      if (params.facebook_url) DB.school_profile.facebook_url = params.facebook_url;
+      if (params.instagram_url) DB.school_profile.instagram_url = params.instagram_url;
+      if (params.youtube_url) DB.school_profile.youtube_url = params.youtube_url;
+      if (params.footer_bg_url) DB.school_profile.footer_bg_url = params.footer_bg_url;
+
       return { success: true, message: 'Pengaturan website berhasil disimpan', data: DB.web_settings };
     }
   }
