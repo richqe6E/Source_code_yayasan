@@ -1,7 +1,7 @@
 # 📦 DOKUMEN HANDOVER & STATUS SISTEM — SIYAYASAN V2
 
 > **PANDUAN RESMI UNTUK PENGEMBANGAN BESOK & SINGLE SOURCE OF TRUTH**  
-> Terakhir Diperbarui: **11 Oktober 2026 (Malam)**  
+> Terakhir Diperbarui: **12 Oktober 2026 (Malam)**  
 > Repositori GitHub: [https://github.com/richqe6E/Source_code_yayasan](https://github.com/richqe6E/Source_code_yayasan) (Branch `main`)  
 > Status Sistem: **✅ 100% PRODUCTION READY & LULUS PENGUJIAN END-TO-END MENYELURUH**
 
@@ -89,6 +89,21 @@ Dalam sesi pengembangan malam ini (11 Oktober 2026), seluruh poin permintaan dan
   - Baris ringkasan total (Total Data / Total Nominal).
   - Lembar tanda tangan dinas di bagian bawah spreadsheet.
   - Opsi CSV tetap disediakan dengan pengaman pemisah kolom `sep=,`.
+
+### 8. Penyempurnaan 4 Persona, Google Maps Dinamis & Sinkronisasi Repositori (12 Oktober 2026)
+- **Audit Komprehensif 4 Persona (Lulus 34/34 Skenario 100%):**
+  - Menguji alur lengkap Admin TU, Pendaftar PPDB, Siswa Mandiri, dan Pengunjung Publik via `frontend/audit-all-features.js`. Zero bug, zero regression.
+- **Integrasi Google Maps Dinamis di CMS (`cms_setting.html` & `content.html`):**
+  - Mengizinkan input visual alamat lengkap, catatan kampus, URL Google Maps, dan Iframe Embed Peta langsung dari CMS tanpa sentuh koding.
+  - Dilengkapi Live Map Preview interaktif dan tombol reset lokasi kampus POLNES.
+- **Sinkronisasi Kontak & Footer Publik (`kontak.html` & `public-shell.js`):**
+  - Halaman kontak dan tautan maps di footer otomatis membaca perubahan data yang diinput dari CMS.
+- **Modal Lightbox Pratinjau Dokumen Siswa (`dokumen.html`):**
+  - Pratinjau berkas gambar/PDF dibuka secara rapi di dalam modal lightbox in-app (mencegah file terpotong saat buka di tab baru).
+- **Peniadaan Rapor Elektronik Santri:**
+  - Evaluasi berkala santri usia dini (PAUD/TK/TPQ) diserahkan secara fisik saat pertemuan wali santri; rute rapor `akademik.html` dialihkan secara elegan ke `dashboard.html`.
+- **Sinkronisasi Repositori Penuh ke GitHub:**
+  - Seluruh 346 berkas proyek dan riwayat commit tersinkronisasi 100% ke repositori resmi [richqe6E/Source_code_yayasan](https://github.com/richqe6E/Source_code_yayasan) pada branch `main`.
 
 ---
 

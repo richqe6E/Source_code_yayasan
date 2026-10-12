@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 11 Oktober 2026 — Sesi 24 (Audit Sistem, CMS Mutual Exclusion, Backup Snapshot, Rekap Excel & Cetak Dinas) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 12 Oktober 2026 — Sesi 25 & 26 (Audit 4 Persona 100% Pass, CMS Maps Dinamis, Modal Lightbox Dokumen Siswa, Peniadaan Rapor Akademik, & Sinkronisasi Repositori GitHub) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -843,6 +843,48 @@ Total checks: 171 OK: 171 BAD: 0
 
 ---
 
+### 🗓️ Sesi 25 — Audit Menyeluruh 4 Persona (100% Pass), Integrasi Google Maps Dinamis di CMS, Lightbox Modal Arsip Dokumen Siswa, dan Restrukturisasi Portal Siswa (12 Oktober 2026, Siang)
+- **Audit Komprehensif 4 Persona (34/34 Skenario Pengujian Lulus 100%):**
+  - Mengaudit dan menguji seluruh skenario fungsional:
+    - Super Admin & Admin TU (Manajemen PPDB, verifikasi kasir SPP, CMS konten & pengaturan web, audit logs).
+    - Calon Siswa / Wali PPDB (Formulir multi-step, upload berkas persyaratan, cek status publik, download bukti pendaftaran).
+    - Siswa Aktif Mandiri (Login NIS + tgl lahir, dashboard ringkasan, konfirmasi transfer SPP, unduh kuitansi, profil biodata, dan arsip dokumen).
+    - Pengunjung Website Publik (Beranda, Profil, Berita detail, Pengumuman, Agenda, Galeri, dan Kontak).
+  - Skrip audit `frontend/audit-all-features.js` menghasilkan status **LULUS 100% (Zero Regression)**.
+- **Integrasi Google Maps Dinamis & Live Interactive Preview (`cms_setting.html` & `content.html`):**
+  - Menambahkan input dinamis di CMS Pengaturan Tampilan:
+    - Alamat Lengkap Yayasan / Kampus.
+    - Keterangan Kampus (`campus_note`).
+    - Tautan Langsung Google Maps (`maps_url`).
+    - Iframe Embed Peta Google Maps (`maps_embed_url`).
+  - Menambahkan box **Live Map Preview** interaktif di CMS dan tombol shortcut **"Reset ke Lokasi Kampus POLNES"** untuk kemudahan staf TU.
+  - Menghubungkan sinkronisasi dua arah otomatis antara `schools` dan `web_settings` di [local-api.js](file:///d:/Source_code_yayasan/frontend/local-api.js).
+- **Sinkronisasi Halaman Kontak Publik & Shell Footer (`kontak.html` & `public-shell.js`):**
+  - Seluruh elemen kartu kontak, nomor WhatsApp resmi TU, iframe embed peta, tombol "Buka di Google Maps", dan "Petunjuk Arah" otomatis membaca data CMS.
+  - Komponen footer global dinamis mengaitkan elemen `site-footer-maps-link` langsung ke tautan Google Maps yang diatur admin.
+- **Restrukturisasi Portal Siswa & Kebijakan Akademik (`dokumen.html` & `akademik.html`):**
+  - **Peniadaan Rapor Elektronik Santri:** Sesuai evaluasi kurikulum usia dini (PAUD/TK/TPQ), rapor santri (STPPA 6 Aspek) diserahkan secara fisik oleh guru saat pertemuan wali santri. Beban input nilai mata pelajaran di staf TU ditiadakan.
+  - Rute lama `akademik.html` dialihkan secara elegan ke `dashboard.html`.
+  - Berkas sertifikat, ijazah, dan rapor pindaian dikonsolidasikan ke menu **Berkas Dokumen** (`dokumen.html`).
+  - **Modal Lightbox Pratinjau Dokumen:** Menambahkan modal preview in-app untuk file gambar dan PDF pada `dokumen.html` guna mencegah berkas Base64 terpotong saat dibuka di tab baru.
+- **Penyempurnaan WhatsApp Tagihan SPP (`payments.html`):**
+  - Memprioritaskan nomor HP orang tua santri (`parent_phone` dan `parent_whatsapp`) sebelum menggunakan nomor kontak siswa.
+- **Detail Berita Publik (`detail.html`):**
+  - Memperbaiki pemuatan skrip artikel berita dengan menyertakan `supabase-config.js` dan `api.js` agar data artikel selalu tampil konsisten baik daring maupun luring.
+
+---
+
+### 🗓️ Sesi 26 — Sinkronisasi Repositori Penuh ke GitHub, Konsolidasi Dokumentasi & Final Push (12 Oktober 2026, Malam)
+- **Verifikasi Repositori & Git Workflow:**
+  - Memverifikasi 346 berkas proyek secara utuh (termasuk arsitektur frontend, portal, shared libraries, script pengujian E2E, dan database SQL).
+  - Memastikan working tree 100% bersih (`working tree clean`) tanpa file terlantar atau berkas uncommitted.
+  - Melakukan `git push origin main` yang sukses menyinkronkan seluruh commit checkpoint (`d1caf57`) ke remote GitHub resmi [richqe6E/Source_code_yayasan](https://github.com/richqe6E/Source_code_yayasan).
+- **Pembaruan Dokumen Sumber Kebenaran Tunggal (*Single Source of Truth*):**
+  - Memperbarui [PROJECT_STATUS.md](file:///d:/Source_code_yayasan/PROJECT_STATUS.md) dan [HANDOVER.md](file:///d:/Source_code_yayasan/HANDOVER.md) mencakup seluruh catatan pekerjaan Sesi 25 dan Sesi 26.
+  - Memverifikasi status branch `main` sinkron 1:1 dengan `origin/main`.
+
+---
+
 ## 6. 📁 Struktur File Penting
 
 ```
@@ -859,17 +901,17 @@ frontend/
 │   │   ├── students.html   <- Data siswa terfilter kelas
 │   │   ├── ppdb.html       <- Verifikasi & konversi registrasi
 │   │   ├── payments.html   <- Rekapitulasi SPP & verifikasi bayar
-│   │   ├── content.html    <- Berita, agenda, galeri
-│   │   ├── cms_setting.html<- Pengaturan website & latar belakang
-│   │   ├── reports.html    <- Ekspor laporan data
+│   │   ├── content.html    <- Berita, agenda, galeri & profil yayasan
+│   │   ├── cms_setting.html<- Pengaturan website, Google Maps dinamis & live preview
+│   │   ├── reports.html    <- Ekspor laporan Excel (.xls) & impor massal
 │   │   ├── logs.html       <- Audit log aktivitas
-│   │   └── backup.html     <- Cadangan data
+│   │   └── backup.html     <- Cadangan data JSON & restore database
 │   └── siswa/              <- Portal Siswa Mandiri
 │       ├── dashboard.html  <- Ringkasan akademik, kehadiran, tagihan
 │       ├── biodata.html    <- Data diri & profil siswa
-│       ├── akademik.html   <- Riwayat nilai rapor & capaian
+│       ├── akademik.html   <- Pengalihan aman ke dashboard (rapor fisik diserahkan langsung oleh guru)
 │       ├── spp.html        <- Tagihan & konfirmasi bayar mandiri
-│       └── dokumen.html    <- Berkas & kartu pelajar
+│       └── dokumen.html    <- Berkas digital & modal lightbox pratinjau dokumen
 ├── shared/
 │   ├── images/
 │   │   └── logo.png        <- Logo resmi institusi
