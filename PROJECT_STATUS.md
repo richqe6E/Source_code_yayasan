@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 13 Oktober 2026 — Sesi 27 (Pembaruan Menyeluruh Identitas Institusi, Logo Resmi, Struktur 5 Pengurus Yayasan, Kop Cetak Resmi/Excel, & Audit 100% Pass) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 13 Oktober 2026 — Sesi 29 (Sinkronisasi UI/UX Benchmark, Modernisasi Navbar Eksklusif Mobile, Rombak Profil Rata Kanan-Kiri, Penyatuan Kontak TU/WA, & Pembersihan Mutlak Aksen Hijau Sesuai Brand Yayasan) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -958,6 +958,46 @@ Total checks: 171 OK: 171 BAD: 0
 - **Verifikasi Live:**
   - Endpoint `https://siyayasan-portal.vercel.app/images/logo.png` teruji langsung berstatus **HTTP 200 OK (image/png)**.
   - Logo kubah hijau dan pena resmi yayasan tampil tajam, presisi, dan proporsional.
+
+---
+
+### 🗓️ Sesi 29 — Benchmark UI/UX Institusi, Navbar Eksklusif Mobile, Rombak Profil Rata Kanan-Kiri, Penyatuan Kontak, & Larangan Mutlak Aksen Hijau (13 Oktober 2026, Malam)
+
+**1. Pembuatan Skill Subagen Sinkronisasi UI/UX (`DESIGN_SYNC.md` & `.agents/skills/design-sync/SKILL.md`):**
+- Mengembangkan agen dan panduan desain referensi benchmark institusi pendidikan (SMAN 68 Jakarta: `sman68-jkt.my.id`).
+- Mengadopsi prinsip: Floating glassmorphism navbar, hierarki tipografi kontras, dan penataan mobile drawer eksklusif tanpa merubah/mengganggu integrasi backend, logika autentikasi, dan endpoint API.
+
+**2. Modernisasi Navbar Publik & Konsistensi Warna Murni ([frontend/public/js/public-shell.js](frontend/public/js/public-shell.js)):**
+- Menata ulang menu navigasi murni berbasis 8 halaman asli yayasan:
+  - `Beranda` (direct)
+  - `Profil` (direct)
+  - `Informasi ▾` (floating dropdown berikon: Berita, Pengumuman, Agenda, Galeri)
+  - `PPDB ▾` (floating dropdown berikon: Info PPDB, Formulir Online, Cek Status)
+  - `Kontak` (direct)
+- Mengunci konsistensi warna asli yayasan (`bg-white/95`, teks `slate-900` dan aksen `primary-700`). Menghilangkan item tambahan yang tidak ada di yayasan (beasiswa & rincian biaya yang tidak relevan).
+- **Fitur Mobile Exclusive Single-Open Accordion**: Membuka salah satu sub-navigasi di HP otomatis menutup sub-navigasi lainnya secara mulus tanpa tumpukan menu yang panjang.
+
+**3. Pemberantasan Celah Putih (*White Gap Elimination*) di Seluruh Halaman Publik:**
+- Memperbaiki perhitungan `min-height: 64px` (mobile) / `80px` (desktop) pada kontainer placeholder `#site-header` di [frontend/shared/js/page-transitions.js](frontend/shared/js/page-transitions.js) dan [frontend/public/css/style.css](frontend/public/css/style.css).
+- Celah putih (*white gap*) antara navbar dan hero banner terhapus 100% di semua halaman (Beranda, Profil, Informasi, Kontak, PPDB).
+- Menghapus sub-header strip ("Kembali ke Beranda PPDB") di [frontend/public/ppdb/status.html](frontend/public/ppdb/status.html).
+
+**4. Rombak Bagian Pengantar Profil Yayasan ([frontend/public/profil.html](frontend/public/profil.html)):**
+- **Penghapusan Total "Indikator Lembaga":** Menghapus kartu metrik buatan (14+ Tahun Pengabdian, 2 Jenjang Terpadu, 100% Guru Bersertifikasi, Akreditasi A) karena yayasan belum memiliki indikator angka formal tersebut.
+- **Kartu Eksekutif Berwibawa (*Foundation Overview Card*):** Bagian pengantar dibungkus dalam kartu putih bersih berbingkai halus (`rounded-2xl sm:rounded-3xl border-slate-200/90 shadow-sm`) yang lega dan bernapas.
+- **Format Rata Kanan-Kiri Presisi (`text-justify`):** Seluruh paragraf pengantar diformat rata kanan-kiri dengan pengaturan khusus `.text-justify { text-align: justify; text-justify: inter-word; text-align-last: left; }` di [frontend/public/css/style.css](frontend/public/css/style.css) sehingga tidak ada jarak spasi kata yang renggang dan baris penutup tetap rapi rata kiri di laptop, desktop, maupun HP.
+- **Pembersihan Kartu Bawah:** Menghapus 3 chip info bawah sesuai instruksi pengguna agar tampilan tidak terlalu padat dan memberi ruang baca yang bersih (*uncluttered*).
+
+**5. Penyatuan Kontak Telepon & WhatsApp ([frontend/public/kontak.html](frontend/public/kontak.html)):**
+- Menggabungkan nomor telepon dan WhatsApp yang bernilai sama (`0813-4714-2829`) menjadi 1 nomor terpadu resmi dengan format tipografi tabular-nums yang tegas (`0813-4714-2829`).
+- Menyediakan tombol aksi cepat (*Quick Actions*): `[Panggilan Telepon]` dan `[Chat WhatsApp]`.
+
+**6. Larangan Keras & Pembersihan Mutlak Aksen Hijau (*Zero-Green Enforcement*):**
+- **Instruksi Pengguna:** Warna hijau, titik aksen hijau (*green dot*), atau latar hijau (*green/emerald background*) diharamkan pada pengembangan website ini.
+- **Pembersihan Total:**
+  - Menghapus lencana `● Kantor TU & WhatsApp` bertitik hijau dan berlatar hijau di `kontak.html`.
+  - Mengubah tombol Chat WhatsApp ke palet biru primer yayasan (`bg-primary-50 text-primary-800`).
+  - Menghapus dan mengganti seluruh kelas `emerald`, `green`, dan `teal` pada `ppdb.html`, `ppdb/status.html`, dan `js/app.js` ke palet identitas resmi institusi (`primary-600` / `primary-800` / `slate-900`).
 
 ---
 
