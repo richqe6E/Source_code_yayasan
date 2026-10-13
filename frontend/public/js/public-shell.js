@@ -39,14 +39,14 @@
       <div id="site-topbar" class="block bg-slate-900 text-white text-xs border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row justify-between items-center gap-2 text-[11px] sm:text-xs">
           <div class="flex items-center gap-3 sm:gap-4">
-            <a id="site-top-phone" href="tel:+62541234567" class="flex items-center gap-1.5 text-slate-300 hover:text-primary-300 transition">
+            <a id="site-top-phone" href="tel:081347142829" class="flex items-center gap-1.5 text-slate-300 hover:text-primary-300 transition">
               <i class="fi fi-rr-phone-call text-xs"></i>
-              <span>(0541) 234-5678</span>
+              <span>0813-4714-2829</span>
             </a>
             <span class="w-px h-3 bg-slate-700/80 inline-block"></span>
-            <a id="site-top-email" href="mailto:info@yayasan.sch.id" class="flex items-center gap-1.5 text-slate-300 hover:text-primary-300 transition">
+            <a id="site-top-email" href="mailto:info@attarbiyyah-samarinda.sch.id" class="flex items-center gap-1.5 text-slate-300 hover:text-primary-300 transition">
               <i class="fi fi-rr-envelope text-xs"></i>
-              <span>info@yayasan.sch.id</span>
+              <span>info@attarbiyyah-samarinda.sch.id</span>
             </a>
           </div>
           <div class="flex items-center gap-2.5">
@@ -91,10 +91,10 @@
           <div class="flex justify-between items-center h-16 sm:h-20">
             <!-- Brand Logo & Nama -->
             <a href="${base}index.html" class="flex items-center gap-2.5 sm:gap-3 group min-w-0">
-              <img src="${base}images/logo.png" alt="Logo Yayasan" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
+              <img src="${base}images/logo.png" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
               <div class="min-w-0">
-                <div class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight tracking-tight truncate" id="site-header-school-name">Yayasan Samarinda</div>
-                <div class="text-[10px] sm:text-[11px] font-semibold text-primary-700 leading-tight tracking-normal">PAUD &amp; TK Terpadu</div>
+                <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight truncate" id="site-header-school-name">Yayasan At Tarbiyyah</div>
+                <div class="text-[10px] sm:text-[11px] font-semibold text-primary-700 leading-tight tracking-normal truncate">Wijaya Kusuma Samarinda</div>
               </div>
             </a>
 
@@ -150,11 +150,11 @@
                 Kontak Resmi Yayasan
               </div>
               <div class="flex items-center justify-between text-xs text-slate-600">
-                <a id="site-mobile-phone" href="tel:+62541234567" class="flex items-center gap-1.5 font-medium hover:text-primary-700 transition">
+                <a id="site-mobile-phone" href="tel:081347142829" class="flex items-center gap-1.5 font-medium hover:text-primary-700 transition">
                   <i class="fi fi-rr-phone-call text-primary-600"></i>
-                  <span>(0541) 234-5678</span>
+                  <span>0813-4714-2829</span>
                 </a>
-                <a id="site-mobile-email" href="mailto:info@yayasan-samarinda.sch.id" class="flex items-center gap-1.5 font-medium hover:text-primary-700 transition">
+                <a id="site-mobile-email" href="mailto:info@attarbiyyah-samarinda.sch.id" class="flex items-center gap-1.5 font-medium hover:text-primary-700 transition">
                   <i class="fi fi-rr-envelope text-primary-600"></i>
                   <span>Email Kami</span>
                 </a>
@@ -197,13 +197,13 @@
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
               <div class="flex items-center gap-3 mb-4">
-                <img src="${base}images/logo.png" alt="Logo Yayasan" class="w-10 h-10 object-contain drop-shadow-sm" id="site-footer-logo-img">
+                <img src="${base}images/logo.png" alt="Logo Yayasan At Tarbiyyah" class="w-10 h-10 object-contain drop-shadow-sm" id="site-footer-logo-img">
                 <div>
-                  <div class="text-white font-extrabold text-base leading-tight" id="site-footer-school-name">Yayasan Samarinda</div>
-                  <div class="text-[11px] text-sky-400 font-semibold">Pendidikan Berkualitas</div>
+                  <div class="text-white font-extrabold text-sm sm:text-base leading-tight" id="site-footer-school-name">Yayasan At Tarbiyyah</div>
+                  <div class="text-[11px] text-sky-400 font-semibold">Wijaya Kusuma Samarinda</div>
                 </div>
               </div>
-              <p class="text-xs text-slate-300 leading-relaxed mb-4 text-pretty" id="site-footer-desc">Membangun generasi cerdas, berkarakter, dan berakhlak mulia di Kota Samarinda.</p>
+              <p class="text-xs text-slate-300 leading-relaxed mb-4 text-pretty" id="site-footer-desc">Membina generasi Qur'ani, berakhlak mulia, cerdas, dan mandiri sejak usia dini di Kota Samarinda.</p>
               <div class="flex items-center gap-2.5">
                 <a id="site-footer-fb" href="https://facebook.com/yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-[#1877F2] hover:text-white border border-slate-700/70 text-slate-300 inline-flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-sm" aria-label="Facebook">
                   <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
@@ -241,19 +241,19 @@
                 <li class="flex items-start gap-2">
                   <i class="fi fi-rr-marker text-sky-400 shrink-0 mt-0.5"></i>
                   <div>
-                    <a id="site-footer-maps-link" href="https://maps.app.goo.gl/WtHnPhhLqqKVqEV66" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition group flex items-start gap-1.5" title="Buka lokasi kampus di Google Maps">
-                      <span id="site-footer-address">Jl. Samratulangi, Sungai Keledang, Samarinda</span>
+                    <a id="site-footer-maps-link" href="https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition group flex items-start gap-1.5" title="Buka lokasi kampus di Google Maps">
+                      <span id="site-footer-address">Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Samarinda 75124</span>
                       <i class="fi fi-rr-arrow-up-right text-[10px] text-sky-400 opacity-70 group-hover:opacity-100 transition mt-0.5"></i>
                     </a>
                   </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <i class="fi fi-rr-phone-call text-sky-400 shrink-0"></i>
-                  <span id="site-footer-phone">(0541) 234-5678</span>
+                  <span id="site-footer-phone">0813-4714-2829</span>
                 </li>
                 <li class="flex items-center gap-2">
                   <i class="fi fi-rr-envelope text-sky-400 shrink-0"></i>
-                  <span id="site-footer-email">info@yayasan-samarinda.sch.id</span>
+                  <span id="site-footer-email">info@attarbiyyah-samarinda.sch.id</span>
                 </li>
               </ul>
             </div>
@@ -264,11 +264,11 @@
 
   function applySchoolData(school) {
     if (!school) return;
-    const name = school.name || 'Yayasan Samarinda';
-    const phone = school.phone || '(0541) 234-5678';
-    const email = school.email || 'info@yayasan-samarinda.sch.id';
-    const address = school.address || 'Jl. Samratulangi, Sungai Keledang, Samarinda';
-    const wa = school.whatsapp_number ? `https://wa.me/${school.whatsapp_number.replace(/\D/g, '')}` : 'https://wa.me/6281234567890';
+    const name = school.name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
+    const phone = school.phone || '081347142829';
+    const email = school.email || 'info@attarbiyyah-samarinda.sch.id';
+    const address = school.address || 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu Kota Samarinda, Kalimantan Timur, Kode Pos: 75124';
+    const wa = school.whatsapp_number ? `https://wa.me/${school.whatsapp_number.replace(/\D/g, '')}` : 'https://wa.me/6281347142829';
     const ig = school.instagram_url || 'https://instagram.com/yayasansamarinda';
     const yt = school.youtube_url || 'https://youtube.com/@yayasansamarinda';
     const fb = school.facebook_url || 'https://facebook.com/yayasansamarinda';

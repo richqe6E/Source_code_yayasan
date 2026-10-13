@@ -131,7 +131,7 @@
 
     const active = opts.active || (menu[0] && menu[0].href) || '';
     const homeLink = opts.homeLink || (menu[0] && menu[0].href) || 'dashboard.html';
-    const title = opts.title || 'Yayasan Samarinda';
+    const title = opts.title || 'Yayasan At Tarbiyyah Wijaya Kusuma';
     const subtitle = opts.subtitle || '';
     const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
     const userName = (user && user.full_name) || (opts.roleLabel || 'Pengguna');
@@ -157,7 +157,7 @@
           </button>
           <a href="${homeLink}" class="flex items-center gap-2 min-w-0">
             <img src="/images/logo.png" onerror="this.src='../../images/logo.png'" alt="Logo" class="w-8 h-8 object-contain shrink-0">
-            <span class="text-sm font-bold text-gray-900 truncate">Yayasan Samarinda</span>
+            <span class="text-sm font-bold text-gray-900 truncate">Yayasan At Tarbiyyah</span>
           </a>
           <div class="flex items-center gap-2">
             ${opts.showRefresh ? `
@@ -176,7 +176,7 @@
             <a href="${homeLink}" class="flex items-center gap-2.5 min-w-0">
               <img src="/images/logo.png" onerror="this.src='../../images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
               <div class="min-w-0">
-                <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan Samarinda</div>
+                <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan At Tarbiyyah</div>
                 <div class="text-xs text-gray-500 leading-tight truncate">${opts.portalLabel || 'Portal'}</div>
               </div>
             </a>
@@ -206,7 +206,7 @@
           <a href="${homeLink}" class="flex items-center gap-2.5">
             <img src="/images/logo.png" onerror="this.src='../../images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
             <div class="min-w-0">
-              <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan Samarinda</div>
+              <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan At Tarbiyyah</div>
               <div class="text-xs text-gray-500 leading-tight truncate">${opts.portalLabel || 'Portal'}</div>
             </div>
           </a>
