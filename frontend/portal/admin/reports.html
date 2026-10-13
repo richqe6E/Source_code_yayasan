@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rekap Data &amp; Laporan - Yayasan Samarinda</title>
+  <title>Rekap Data &amp; Laporan - Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -248,10 +248,10 @@
             <img src="/images/logo.png" onerror="this.src='../../public/images/logo.png'" alt="Logo Yayasan" class="w-16 h-16 object-contain mx-auto">
           </div>
           <div class="flex-1 text-center font-serif text-black leading-tight">
-            <div class="text-base sm:text-lg font-bold tracking-wider uppercase" id="print-school-name">YAYASAN SAMARINDA</div>
+            <div class="text-base sm:text-lg font-bold tracking-wider uppercase" id="print-school-name">YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</div>
             <div class="text-xs sm:text-sm font-bold tracking-wide uppercase mt-0.5">PENDIDIKAN ANAK USIA DINI (PAUD) &amp; TK TERPADU - TPQ ULINNUHA</div>
-            <div class="text-[10px] sm:text-[11px] text-gray-800 mt-1" id="print-school-address">Alamat: Jl. Samratulangi, Sungai Keledang, Samarinda, Kalimantan Timur</div>
-            <div class="text-[10px] text-gray-700 mt-0.5" id="print-school-contact">Telepon: (0541) 234-5678 | WhatsApp: 081234567890 | Email: info@yayasan.sch.id</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-800 mt-1" id="print-school-address">Alamat: Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124</div>
+            <div class="text-[10px] text-gray-700 mt-0.5" id="print-school-contact">Telepon / WhatsApp: 081347142829 | Email: info@yayasan.sch.id</div>
           </div>
           <div class="w-20 shrink-0 hidden sm:block"></div>
         </div>
@@ -280,18 +280,18 @@
       <div id="print-signature-section" class="hidden justify-between items-start pt-8 mt-6 text-xs font-serif text-black page-break-inside-avoid">
         <div class="text-center w-56">
           <p class="font-normal text-gray-800">Mengetahui,</p>
-          <p class="font-bold text-black mt-0.5">Ketua Yayasan / Kepala Sekolah</p>
+          <p class="font-bold text-black mt-0.5">Ketua Yayasan</p>
           <div class="h-20"></div>
-          <p class="font-bold underline uppercase text-black">( ............................................ )</p>
-          <p class="text-[10px] text-gray-600 mt-0.5">NIY. 202601001</p>
+          <p class="font-bold underline uppercase text-black" id="print-sign-chairman">( Makhrus )</p>
+          <p class="text-[10px] text-gray-600 mt-0.5">Ketua Yayasan</p>
         </div>
 
         <div class="text-center w-56">
           <p class="font-normal text-gray-800" id="print-sign-place-date">Samarinda, 11 Oktober 2026</p>
-          <p class="font-bold text-black mt-0.5">Petugas Tata Usaha / Bendahara</p>
+          <p class="font-bold text-black mt-0.5">Bendahara Yayasan</p>
           <div class="h-20"></div>
-          <p class="font-bold underline uppercase text-black" id="print-sign-admin-name">( Super Administrator )</p>
-          <p class="text-[10px] text-gray-600 mt-0.5">Petugas Administrasi</p>
+          <p class="font-bold underline uppercase text-black" id="print-sign-admin-name">( Sri Pragawati )</p>
+          <p class="text-[10px] text-gray-600 mt-0.5">Bendahara Yayasan</p>
         </div>
       </div>
 
@@ -494,11 +494,11 @@
         } catch (_) {}
       }
 
-      const schoolName = (school?.school_name || school?.name || 'YAYASAN SAMARINDA').toUpperCase();
+      const schoolName = (school?.school_name || school?.name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA').toUpperCase();
       const schoolUnits = 'PENDIDIKAN ANAK USIA DINI (PAUD) & TK TERPADU - TPQ ULINNUHA';
-      const schoolAddress = school?.address || 'Jl. Samratulangi, Sungai Keledang, Samarinda, Kalimantan Timur';
-      const schoolPhone = school?.phone || '(0541) 234-5678';
-      const schoolWa = school?.whatsapp || school?.whatsapp_number || '081234567890';
+      const schoolAddress = school?.address || 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124';
+      const schoolPhone = school?.phone || '081347142829';
+      const schoolWa = school?.whatsapp || school?.whatsapp_number || '081347142829';
       const schoolEmail = school?.email || 'info@yayasan.sch.id';
 
       const titlesMap = {
@@ -729,20 +729,20 @@
       <td colspan="${rightSpan}" class="sign-title center">Samarinda, ${dateFormatted}</td>
     </tr>
     <tr>
-      <td colspan="${leftSpan}" class="bold center" style="font-size:10pt;">Ketua Yayasan / Kepala Sekolah</td>
+      <td colspan="${leftSpan}" class="bold center" style="font-size:10pt;">Mengetahui,<br>Ketua Yayasan</td>
       ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
-      <td colspan="${rightSpan}" class="bold center" style="font-size:10pt;">Petugas Tata Usaha / Bendahara</td>
+      <td colspan="${rightSpan}" class="bold center" style="font-size:10pt;">Samarinda, ${dateFormatted}<br>Bendahara Yayasan</td>
     </tr>
     <tr><td colspan="${colSpan}" style="height: 48px;"></td></tr>
     <tr>
-      <td colspan="${leftSpan}" class="sign-name center">( ............................................ )</td>
+      <td colspan="${leftSpan}" class="sign-name center">( Makhrus )</td>
       ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
-      <td colspan="${rightSpan}" class="sign-name center">( ${adminName} )</td>
+      <td colspan="${rightSpan}" class="sign-name center">( Sri Pragawati )</td>
     </tr>
     <tr>
-      <td colspan="${leftSpan}" class="sign-role center">NIY. 202601001</td>
+      <td colspan="${leftSpan}" class="sign-role center">Ketua Yayasan</td>
       ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
-      <td colspan="${rightSpan}" class="sign-role center">Petugas Administrasi Yayasan</td>
+      <td colspan="${rightSpan}" class="sign-role center">Bendahara Yayasan</td>
     </tr>
   </table>
 </body>
@@ -824,10 +824,10 @@
       }
 
       if (school) {
-        const schName = school.school_name || school.name || 'YAYASAN SAMARINDA';
-        const schAddress = school.address || 'Jl. Samratulangi, Sungai Keledang, Samarinda, Kalimantan Timur';
-        const schPhone = school.phone || '(0541) 234-5678';
-        const schWa = school.whatsapp || school.whatsapp_number || '081234567890';
+        const schName = school.school_name || school.name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
+        const schAddress = school.address || 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124';
+        const schPhone = school.phone || '081347142829';
+        const schWa = school.whatsapp || school.whatsapp_number || '081347142829';
         const schEmail = school.email || 'info@yayasan.sch.id';
 
         const nameEl = document.getElementById('print-school-name');
@@ -835,7 +835,7 @@
         const addrEl = document.getElementById('print-school-address');
         if (addrEl) addrEl.textContent = `Alamat: ${schAddress}`;
         const contEl = document.getElementById('print-school-contact');
-        if (contEl) contEl.textContent = `Telepon: ${schPhone} | WhatsApp: ${schWa} | Email: ${schEmail}`;
+        if (contEl) contEl.textContent = `Telepon / WhatsApp: ${schWa} | Email: ${schEmail}`;
       }
 
       const titlesMap = {
@@ -874,10 +874,11 @@
       const signDateEl = document.getElementById('print-sign-place-date');
       if (signDateEl) signDateEl.textContent = `Samarinda, ${dateFormatted}`;
 
-      const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
-      const adminName = (user && user.full_name) ? user.full_name : 'Super Administrator';
+      const chairmanSignEl = document.getElementById('print-sign-chairman');
+      if (chairmanSignEl) chairmanSignEl.textContent = `( Makhrus )`;
+
       const adminSignEl = document.getElementById('print-sign-admin-name');
-      if (adminSignEl) adminSignEl.textContent = `( ${adminName} )`;
+      if (adminSignEl) adminSignEl.textContent = `( Sri Pragawati )`;
 
       // Simpan document.title dan ganti sementara untuk judul PDF
       const prevTitle = document.title;
