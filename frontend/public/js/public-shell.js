@@ -553,7 +553,7 @@
       });
     }
 
-    // Mobile accordion menu handler
+    // Mobile accordion menu handler (Single-Open / Exclusive Accordion)
     const mobAccordionBtns = document.querySelectorAll('.site-mobile-accordion-btn');
     mobAccordionBtns.forEach(function (accBtn) {
       if (!accBtn.__hasClick) {
@@ -562,10 +562,29 @@
           const targetId = accBtn.getAttribute('data-target');
           const panel = document.getElementById(targetId);
           const icon = accBtn.querySelector('.site-acc-chevron');
+          const willOpen = panel && panel.classList.contains('hidden');
+
+          // Tutup otomatis semua sub-navigasi lain yang sedang terbuka
+          mobAccordionBtns.forEach(function (otherBtn) {
+            const otherTargetId = otherBtn.getAttribute('data-target');
+            const otherPanel = document.getElementById(otherTargetId);
+            const otherIcon = otherBtn.querySelector('.site-acc-chevron');
+            if (otherPanel && otherPanel !== panel) {
+              otherPanel.classList.add('hidden');
+            }
+            if (otherIcon && otherBtn !== accBtn) {
+              otherIcon.style.transform = 'rotate(0deg)';
+            }
+          });
+
+          // Buka atau tutup sub-navigasi yang diklik
           if (panel) {
-            const isHidden = panel.classList.toggle('hidden');
-            if (icon) {
-              icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+            if (willOpen) {
+              panel.classList.remove('hidden');
+              if (icon) icon.style.transform = 'rotate(180deg)';
+            } else {
+              panel.classList.add('hidden');
+              if (icon) icon.style.transform = 'rotate(0deg)';
             }
           }
         });
