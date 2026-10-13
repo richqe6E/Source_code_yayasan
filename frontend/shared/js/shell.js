@@ -156,7 +156,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
           <a href="${homeLink}" class="flex items-center gap-2 min-w-0">
-            <img src="/images/logo.png" onerror="this.src='../../images/logo.png'" alt="Logo" class="w-8 h-8 object-contain shrink-0">
+            <img src="/images/logo.png" onerror="this.onerror=null; this.src='/public/images/logo.png'" alt="Logo" class="w-8 h-8 object-contain shrink-0">
             <span class="text-sm font-bold text-gray-900 truncate">Yayasan At Tarbiyyah</span>
           </a>
           <div class="flex items-center gap-2">
@@ -174,7 +174,7 @@
         <aside class="absolute inset-y-0 left-0 w-64 bg-white shadow-xl flex flex-col pointer-events-auto">
           <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
             <a href="${homeLink}" class="flex items-center gap-2.5 min-w-0">
-              <img src="/images/logo.png" onerror="this.src='../../images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
+              <img src="/images/logo.png" onerror="this.onerror=null; this.src='/public/images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
               <div class="min-w-0">
                 <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan At Tarbiyyah</div>
                 <div class="text-xs text-gray-500 leading-tight truncate">${opts.portalLabel || 'Portal'}</div>
@@ -204,7 +204,7 @@
       <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-10">
         <div class="px-6 py-5 border-b border-gray-200">
           <a href="${homeLink}" class="flex items-center gap-2.5">
-            <img src="/images/logo.png" onerror="this.src='../../images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
+            <img src="/images/logo.png" onerror="this.onerror=null; this.src='/public/images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
             <div class="min-w-0">
               <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan At Tarbiyyah</div>
               <div class="text-xs text-gray-500 leading-tight truncate">${opts.portalLabel || 'Portal'}</div>

@@ -30,6 +30,7 @@
     { "source": "/favicon.ico", "destination": "/public/favicon.ico" },
     { "source": "/shared/(.*)", "destination": "/shared/$1" },
     { "source": "/public/(.*)", "destination": "/public/$1" },
+    { "source": "/images/(.*)", "destination": "/public/images/$1" },
     { "source": "/css/(.*)", "destination": "/public/css/$1" },
     { "source": "/js/(.*)", "destination": "/public/js/$1" },
     { "source": "/videos/(.*)", "destination": "/public/videos/$1" },
@@ -84,6 +85,18 @@
     },
     {
       "source": "/public/css/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/public/images/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]

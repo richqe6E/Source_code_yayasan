@@ -62,7 +62,7 @@
           <div class="flex justify-between items-center h-16 sm:h-20">
             <!-- Brand Logo & Nama -->
             <a href="${base}index.html" class="flex items-center gap-2.5 sm:gap-3 group min-w-0">
-              <img src="${base}images/logo.png" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
+              <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
               <div class="min-w-0">
                 <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight truncate" id="site-header-school-name">Yayasan At Tarbiyyah</div>
                 <div class="text-[10px] sm:text-[11px] font-semibold text-primary-700 leading-tight tracking-normal truncate">Wijaya Kusuma Samarinda</div>
@@ -168,7 +168,7 @@
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
               <div class="flex items-center gap-3 mb-4">
-                <img src="${base}images/logo.png" alt="Logo Yayasan At Tarbiyyah" class="w-10 h-10 object-contain drop-shadow-sm" id="site-footer-logo-img">
+                <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah" class="w-10 h-10 object-contain drop-shadow-sm" id="site-footer-logo-img">
                 <div>
                   <div class="text-white font-extrabold text-sm sm:text-base leading-tight" id="site-footer-school-name">Yayasan At Tarbiyyah</div>
                   <div class="text-[11px] text-sky-400 font-semibold">Wijaya Kusuma Samarinda</div>
@@ -254,9 +254,15 @@
     const hName = document.getElementById('site-header-school-name');
     if (hName) hName.textContent = name;
     const hLogoImg = document.getElementById('site-header-logo-img');
-    if (hLogoImg && school.logo_url) hLogoImg.src = school.logo_url;
+    if (hLogoImg && school.logo_url && typeof school.logo_url === 'string' && school.logo_url.trim()) {
+      hLogoImg.src = school.logo_url;
+      hLogoImg.onerror = function() { this.src = `${base}images/logo.png`; };
+    }
     const fLogoImg = document.getElementById('site-footer-logo-img');
-    if (fLogoImg && school.logo_url) fLogoImg.src = school.logo_url;
+    if (fLogoImg && school.logo_url && typeof school.logo_url === 'string' && school.logo_url.trim()) {
+      fLogoImg.src = school.logo_url;
+      fLogoImg.onerror = function() { this.src = `${base}images/logo.png`; };
+    }
 
     // Topbar telah dinonaktifkan: Pembaruan kontak dipusatkan pada Drawer Mobile dan Footer
 
