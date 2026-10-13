@@ -20,6 +20,13 @@ p, .prose p, .lead {
   overflow-wrap: break-word;
 }
 
+/* Justified text: clean word distribution & left-aligned trailing line */
+.text-justify {
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
+}
+
 /* Tabular figures for data, numbers, stats, and prices */
 .tabular-nums, [data-stat], .stat-value, .currency-value, time {
   font-variant-numeric: tabular-nums;
