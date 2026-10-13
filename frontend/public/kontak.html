@@ -90,16 +90,36 @@
           </div>
         </div>
 
-        <!-- Telepon & WhatsApp -->
+        <!-- Telepon & WhatsApp Resmi (Terpadu) -->
         <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
           <div class="flex items-start gap-4">
             <div class="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100/70 text-primary-700 flex items-center justify-center text-lg flex-shrink-0">
               <i class="fi fi-rr-phone-call"></i>
             </div>
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Kontak Telepon &amp; WhatsApp</h3>
-              <p class="text-sm font-semibold text-slate-900 tabular-nums" id="contact-page-phone">0813-4714-2829 (Telepon Kantor TU)</p>
-              <p class="text-sm font-bold text-primary-700 mt-1 tabular-nums" id="contact-page-wa">+62 813-4714-2829 (WhatsApp Resmi)</p>
+            <div class="flex-1">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Telepon &amp; WhatsApp Resmi</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                <a id="contact-page-phone-main" href="tel:081347142829" class="text-base font-bold text-slate-900 hover:text-primary-700 transition tabular-nums tracking-tight">
+                  0813-4714-2829
+                </a>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>Kantor TU &amp; WhatsApp</span>
+                </span>
+              </div>
+              <p id="contact-page-phone-note" class="text-xs text-slate-500 mt-1 leading-relaxed">
+                Nomor terpadu untuk panggilan telepon kantor tata usaha maupun konsultasi resmi via WhatsApp.
+              </p>
+              <div class="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-slate-100">
+                <a id="contact-page-btn-call" href="tel:081347142829" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition active:scale-[0.98]">
+                  <i class="fi fi-rr-phone-call text-[11px] text-slate-600"></i>
+                  <span>Panggilan Telepon</span>
+                </a>
+                <a id="contact-page-btn-wa" href="https://wa.me/6281347142829" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-semibold transition active:scale-[0.98]">
+                  <i class="fi fi-brands-whatsapp text-xs text-emerald-600"></i>
+                  <span>Chat WhatsApp</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -309,13 +329,46 @@
             const ifr = document.getElementById('contact-page-maps-iframe');
             if (ifr) ifr.src = school.maps_embed_url;
           }
-          if (school.phone) document.getElementById('contact-page-phone').textContent = `${school.phone} (Kantor TU)`;
-          const wa = school.whatsapp_number || school.whatsapp || school.whatsapp_official;
-          if (wa) {
-            currentWaNumber = String(wa).replace(/\D/g, '');
-            document.getElementById('contact-page-wa').textContent = `+${currentWaNumber} (WhatsApp Resmi)`;
-            document.getElementById('contact-wa-desc').textContent = `Pesan Anda akan otomatis terhubung ke WhatsApp resmi ${currentSchoolName} (+${currentWaNumber}) untuk penanganan yang cepat dan personal.`;
+          const rawPhone = school.phone || '081347142829';
+          const rawWa = school.whatsapp_number || school.whatsapp || school.whatsapp_official || rawPhone;
+          const cleanPhoneDigits = String(rawPhone).replace(/\D/g, '');
+          const cleanWaDigits = String(rawWa).replace(/\D/g, '');
+          currentWaNumber = cleanWaDigits || cleanPhoneDigits;
+
+          // Format tampilan nomor yang rapi dan terstandarisasi (contoh: 0813-4714-2829)
+          const formatIndoNumber = (num) => {
+            let s = String(num).replace(/^62/, '0');
+            if (!s.startsWith('0') && s.length >= 9) s = '0' + s;
+            if (s.length >= 10) {
+              return s.replace(/(\d{4})(\d{4})(\d+)/, '$1-$2-$3');
+            }
+            return s;
+          };
+
+          const formattedDisplay = formatIndoNumber(cleanPhoneDigits || cleanWaDigits);
+
+          const phoneMain = document.getElementById('contact-page-phone-main');
+          if (phoneMain) {
+            phoneMain.textContent = formattedDisplay;
+            phoneMain.href = `tel:${cleanPhoneDigits || cleanWaDigits}`;
           }
+
+          const btnCall = document.getElementById('contact-page-btn-call');
+          if (btnCall) {
+            btnCall.href = `tel:${cleanPhoneDigits || cleanWaDigits}`;
+          }
+
+          const btnWa = document.getElementById('contact-page-btn-wa');
+          if (btnWa) {
+            const waTarget = currentWaNumber.startsWith('0') ? '62' + currentWaNumber.slice(1) : currentWaNumber;
+            btnWa.href = `https://wa.me/${waTarget}`;
+          }
+
+          const waDesc = document.getElementById('contact-wa-desc');
+          if (waDesc) {
+            waDesc.textContent = `Pesan Anda akan otomatis terhubung ke WhatsApp resmi ${currentSchoolName} (${formattedDisplay}) untuk penanganan yang cepat dan personal.`;
+          }
+
           if (school.email) document.getElementById('contact-page-email').textContent = school.email;
         }
       } catch (_) {}
