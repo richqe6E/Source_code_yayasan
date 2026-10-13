@@ -753,7 +753,7 @@
                 <div class="space-y-1 text-slate-600">
                   <div class="flex justify-between"><span class="text-slate-400">Nama Ayah:</span><span id="rev-father-name" class="font-bold text-slate-900">-</span></div>
                   <div class="flex justify-between"><span class="text-slate-400">Nama Ibu:</span><span id="rev-mother-name" class="font-bold text-slate-900">-</span></div>
-                  <div class="flex justify-between"><span class="text-slate-400">No. WA Utama:</span><span id="rev-parent-phone" class="font-bold text-emerald-700 font-mono">-</span></div>
+                  <div class="flex justify-between"><span class="text-slate-400">No. WA Utama:</span><span id="rev-parent-phone" class="font-bold text-primary-700 font-mono">-</span></div>
                   <div class="flex justify-between"><span class="text-slate-400">Email Portal:</span><span id="rev-parent-email">-</span></div>
                 </div>
               </div>
@@ -865,7 +865,7 @@
   <!-- Modal Sukses Pendaftaran PPDB -->
   <div id="success-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-      <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+      <div class="w-16 h-16 rounded-2xl bg-primary-50 border border-primary-200 text-primary-700 flex items-center justify-center mx-auto mb-4">
         <i class="fi fi-sr-check-circle text-3xl"></i>
       </div>
       <h3 class="text-xl font-bold text-slate-900 mb-1">Pendaftaran Berhasil Dikirim!</h3>
@@ -897,13 +897,13 @@
         </div>
         <div class="flex justify-between items-center pt-1 border-t border-slate-200">
           <span class="text-slate-500 font-sans">Status Verifikasi:</span>
-          <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] font-sans border border-amber-200">⏳ Menunggu Verifikasi TU</span>
+          <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] font-sans border border-slate-200">Menunggu Verifikasi TU</span>
         </div>
       </div>
 
       <div class="space-y-2.5">
         <!-- WhatsApp Panitia Action -->
-        <a id="btn-whatsapp-confirm" href="#" target="_blank" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2">
+        <a id="btn-whatsapp-confirm" href="#" target="_blank" class="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <i class="fi fi-brands-whatsapp text-sm"></i>
           <span>Konfirmasi ke WhatsApp Panitia PPDB</span>
         </a>
@@ -1165,7 +1165,7 @@
       // Berkas Review
       const revPhoto = document.getElementById('rev-file-photo');
       if (uploadedFiles.photo) {
-        revPhoto.className = 'font-semibold text-emerald-600 flex items-center gap-1';
+        revPhoto.className = 'font-semibold text-primary-700 flex items-center gap-1';
         revPhoto.innerHTML = `<i class="fi fi-rr-check text-xs"></i> <span>${uploadedFiles.photo.name}</span>`;
       } else {
         revPhoto.className = 'font-semibold text-slate-400';
@@ -1174,7 +1174,7 @@
 
       const revBirth = document.getElementById('rev-file-birth-cert');
       if (uploadedFiles.birth_cert) {
-        revBirth.className = 'font-semibold text-emerald-600 flex items-center gap-1';
+        revBirth.className = 'font-semibold text-primary-700 flex items-center gap-1';
         revBirth.innerHTML = `<i class="fi fi-rr-check text-xs"></i> <span>${uploadedFiles.birth_cert.name}</span>`;
       } else {
         revBirth.className = 'font-semibold text-slate-400';
@@ -1183,7 +1183,7 @@
 
       const revKk = document.getElementById('rev-file-family-card');
       if (uploadedFiles.family_card) {
-        revKk.className = 'font-semibold text-emerald-600 flex items-center gap-1';
+        revKk.className = 'font-semibold text-primary-700 flex items-center gap-1';
         revKk.innerHTML = `<i class="fi fi-rr-check text-xs"></i> <span>${uploadedFiles.family_card.name}</span>`;
       } else {
         revKk.className = 'font-semibold text-slate-400';
@@ -1215,9 +1215,9 @@
             badge.textContent = String(i);
           }
         } else if (i < targetStep) {
-          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-emerald-700 font-semibold transition cursor-pointer';
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-primary-800 font-semibold transition cursor-pointer';
           if (badge) {
-            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-sm transition';
+            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-700 text-white flex items-center justify-center text-xs font-bold shadow-sm transition';
             badge.innerHTML = '<i class="fi fi-rr-check text-xs"></i>';
           }
         } else {

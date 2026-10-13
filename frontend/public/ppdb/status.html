@@ -146,7 +146,7 @@
 
         if (isConverted) {
           statusBannerHtml = `
-            <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg mb-6">
+            <div class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 rounded-2xl p-6 text-white shadow-lg mb-6">
               <div class="flex items-center gap-3 mb-3">
                 <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">🎉</div>
                 <div>
@@ -154,34 +154,34 @@
                   <h3 class="text-base sm:text-lg font-bold leading-tight mt-1">Selamat! Ananda Resmi Terdaftar sebagai Siswa Baru</h3>
                 </div>
               </div>
-              <p class="text-xs text-emerald-100 leading-relaxed mb-4">
+              <p class="text-xs text-primary-100 leading-relaxed mb-4">
                 Pendaftaran telah disetujui penuh oleh pihak yayasan dan rombongan belajar telah ditetapkan. Akun resmi Portal Siswa telah aktif.
               </p>
               
               <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 grid sm:grid-cols-2 gap-3 text-xs mb-4">
                 <div>
-                  <span class="text-emerald-200 block text-[11px] font-medium">Nomor Induk Siswa (NIS):</span>
+                  <span class="text-primary-200 block text-[11px] font-medium">Nomor Induk Siswa (NIS):</span>
                   <div class="flex items-center gap-2 mt-0.5">
                     <span class="text-lg font-bold font-mono tracking-wider">${escapeHtml(nis || 'Telah Diterbitkan')}</span>
                     ${nis ? `<button type="button" onclick="copyNis('${escapeHtml(nis)}')" class="px-2 py-0.5 bg-white/20 hover:bg-white/30 rounded text-[11px] font-sans">Salin NIS</button>` : ''}
                   </div>
                 </div>
                 <div>
-                  <span class="text-emerald-200 block text-[11px] font-medium">Kelas / Rombel Masuk:</span>
+                  <span class="text-primary-200 block text-[11px] font-medium">Kelas / Rombel Masuk:</span>
                   <span class="text-sm font-bold block mt-1">${escapeHtml(className || jenjang)}</span>
                 </div>
                 <div class="border-t border-white/20 pt-2.5 sm:col-span-2">
-                  <span class="text-emerald-200 block text-[11px] font-medium mb-1">Panduan Login ke Portal Siswa:</span>
+                  <span class="text-primary-200 block text-[11px] font-medium mb-1">Panduan Login ke Portal Siswa:</span>
                   <p class="text-xs text-white leading-relaxed">
                     <strong>Username:</strong> NIS Anda (${escapeHtml(nis)})<br>
                     <strong>Password Awal:</strong> Tanggal Lahir Siswa (${escapeHtml(birthDate || 'YYYY-MM-DD')})<br>
-                    <span class="text-[11px] text-emerald-100 italic">*Anda dapat melihat status &amp; jadwal pembayaran SPP bulanan di Portal Siswa.</span>
+                    <span class="text-[11px] text-primary-100 italic">*Anda dapat melihat status &amp; jadwal pembayaran SPP bulanan di Portal Siswa.</span>
                   </p>
                 </div>
               </div>
 
               <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="../login.html" class="flex-1 py-3 px-4 bg-white hover:bg-emerald-50 text-emerald-950 font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <a href="../login.html" class="flex-1 py-3 px-4 bg-white hover:bg-primary-50 text-primary-950 font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
                   <span>Masuk ke Portal Siswa Sekarang</span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </a>
@@ -195,23 +195,23 @@
         } else if (isApproved) {
           const waAcceptMsg = `Assalamu'alaikum Panitia PPDB Yayasan At Tarbiyyah Wijaya Kusuma Samarinda,\n\nSaya ingin konfirmasi nomor pendaftaran ${regNo} atas nama ${childName} yang telah dinyatakan DITERIMA (Lolos Seleksi).\nMohon info tahapan penerbitan NIS & jadwal daftar ulang fisik. Terima kasih.`;
           statusBannerHtml = `
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-emerald-950 mb-6">
+            <div class="bg-primary-50 border border-primary-200 rounded-2xl p-6 text-primary-950 mb-6">
               <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold">✓</div>
+                <div class="w-10 h-10 rounded-xl bg-primary-100 text-primary-800 flex items-center justify-center text-xl font-bold">✓</div>
                 <div>
-                  <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wide bg-emerald-100/70 px-2 py-0.5 rounded-full inline-block">Hasil Seleksi: DITERIMA</span>
-                  <h3 class="text-base sm:text-lg font-bold text-emerald-900 mt-0.5">🎉 Selamat! Calon Siswa Dinyatakan Lolos Seleksi</h3>
+                  <span class="text-[10px] font-bold text-primary-800 uppercase tracking-wide bg-primary-100 px-2 py-0.5 rounded-full inline-block">Hasil Seleksi: DITERIMA</span>
+                  <h3 class="text-base sm:text-lg font-bold text-primary-900 mt-0.5">🎉 Selamat! Calon Siswa Dinyatakan Lolos Seleksi</h3>
                 </div>
               </div>
-              <p class="text-xs text-emerald-800 leading-relaxed mb-4">
+              <p class="text-xs text-primary-800 leading-relaxed mb-4">
                 Berkas pendaftaran telah diverifikasi oleh Panitia PPDB dan dinyatakan <strong>DITERIMA</strong>. Tim Tata Usaha sedang menyiapkan penetapan rombongan belajar dan penerbitan Nomor Induk Siswa (NIS).
               </p>
               <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="https://wa.me/${waPhone}?text=${encodeURIComponent(waAcceptMsg)}" target="_blank" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+                <a href="https://wa.me/${waPhone}?text=${encodeURIComponent(waAcceptMsg)}" target="_blank" class="flex-1 py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
                   <i class="fi fi-brands-whatsapp text-xs"></i>
                   <span>Konfirmasi ke WhatsApp Panitia TU</span>
                 </a>
-                <button type="button" onclick="printOfficialLetter()" class="py-2.5 px-4 bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-900 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                <button type="button" onclick="printOfficialLetter()" class="py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
                   <i class="fi fi-rr-print text-xs"></i>
                   <span>Cetak Surat Pengumuman</span>
                 </button>
@@ -269,9 +269,9 @@
         }
 
         const statusBadges = {
-          converted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-800 border border-teal-200">Siswa Aktif Terdaftar</span>',
-          approved: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Diterima (Lolos Seleksi)</span>',
-          accepted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Diterima (Lolos Seleksi)</span>',
+          converted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 border border-primary-200">Siswa Aktif Terdaftar</span>',
+          approved: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 border border-primary-200">Diterima (Lolos Seleksi)</span>',
+          accepted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 border border-primary-200">Diterima (Lolos Seleksi)</span>',
           pending: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Menunggu Verifikasi TU</span>',
           submitted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Menunggu Verifikasi TU</span>',
           waiting_verification: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Menunggu Verifikasi TU</span>',

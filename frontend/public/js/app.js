@@ -267,10 +267,10 @@
 
   function showToast(message, type = 'info') {
     const colors = {
-      success: 'border-green-500 bg-green-50 text-green-800',
+      success: 'border-primary-600 bg-primary-50 text-primary-900',
       error: 'border-red-500 bg-red-50 text-red-800',
-      warning: 'border-yellow-500 bg-yellow-50 text-yellow-800',
-      info: 'border-blue-500 bg-blue-50 text-blue-800'
+      warning: 'border-amber-500 bg-amber-50 text-amber-800',
+      info: 'border-primary-500 bg-primary-50 text-primary-800'
     };
     const toast = document.createElement('div');
     toast.className = `fixed bottom-4 right-4 z-50 max-w-sm ${colors[type] || colors.info} border-l-4 rounded-r-md shadow-lg p-4 flex items-start gap-3 transition-all duration-300`;
