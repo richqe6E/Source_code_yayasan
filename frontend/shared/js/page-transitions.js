@@ -23,11 +23,18 @@
   }
 
   styleEl.textContent = `
-    /* 1. Zero Layout Shift: Reservasi ruang header sejak awal rendering */
+    /* 1. Zero Layout Shift: Reservasi ruang header presisi sesuai tinggi navbar asli (64px mobile, 80px desktop) */
     #site-header {
-      min-height: 104px;
       display: block;
-      contain: layout;
+      width: 100%;
+      min-height: 64px;
+      margin: 0;
+      padding: 0;
+    }
+    @media (min-width: 640px) {
+      #site-header {
+        min-height: 80px;
+      }
     }
 
     /* 2. Native View Transitions (Chrome 111+, Edge, Safari 18+) */

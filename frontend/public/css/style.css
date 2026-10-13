@@ -97,6 +97,14 @@ img.has-edge-outline,
   top: 0;
   z-index: 50;
   width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 64px;
+}
+@media (min-width: 640px) {
+  #site-header {
+    min-height: 80px;
+  }
 }
 
 @view-transition {
