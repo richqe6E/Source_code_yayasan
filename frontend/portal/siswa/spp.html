@@ -114,7 +114,7 @@
   <div id="rekening-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-200">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-        <h3 class="text-base font-bold text-slate-900">Rekening Resmi Yayasan Samarinda</h3>
+        <h3 class="text-base font-bold text-slate-900">Rekening Resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</h3>
         <button type="button" onclick="closeRekeningModal()" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
       </div>
       <div class="space-y-3 mb-5">
@@ -125,7 +125,7 @@
             <button type="button" onclick="copyRekening('7123456789', 'BSI')" class="text-[11px] font-bold text-primary-700 hover:underline">Salin No. Rek</button>
           </div>
           <div class="text-lg font-bold font-mono text-primary-800 tracking-wider">7123456789</div>
-          <div class="text-xs text-slate-600 mt-0.5">a.n. Yayasan Samarinda</div>
+          <div class="text-xs text-slate-600 mt-0.5">a.n. Yayasan At Tarbiyyah Wijaya Kusuma</div>
         </div>
 
         <!-- Rekening Bank Kaltimtara -->
@@ -135,14 +135,14 @@
             <button type="button" onclick="copyRekening('0012345678', 'Bank Kaltimtara')" class="text-[11px] font-bold text-primary-700 hover:underline">Salin No. Rek</button>
           </div>
           <div class="text-lg font-bold font-mono text-emerald-800 tracking-wider">0012345678</div>
-          <div class="text-xs text-slate-600 mt-0.5">a.n. Yayasan Samarinda</div>
+          <div class="text-xs text-slate-600 mt-0.5">a.n. Yayasan At Tarbiyyah Wijaya Kusuma</div>
         </div>
       </div>
       <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 mb-4 leading-relaxed">
         <strong>Petunjuk Transfer:</strong> Cantumkan <strong>NIS &amp; Nama Siswa</strong> pada berita transfer, kemudian unggah bukti transfer melalui tombol di tabel tagihan atau kirim ke WhatsApp Bendahara Sekolah.
       </div>
       <div class="flex items-center justify-between pt-1">
-        <a href="https://wa.me/6281234567891" target="_blank" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
+        <a href="https://wa.me/6281347142829" target="_blank" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
           <i class="fi fi-brands-whatsapp"></i>
           <span>Hubungi Bendahara</span>
         </a>
@@ -259,9 +259,9 @@
 
       // Update link WA Bendahara di header
       const user = getCurrentUser() || {};
-      const waMsg = `Assalamu'alaikum Bendahara Sekolah Yayasan Samarinda,\nSaya wali dari ${user.full_name || user.name || 'Siswa'} (NIS: ${user.nis || '-'}), ingin menanyakan informasi SPP. Terima kasih.`;
+      const waMsg = `Assalamu'alaikum Bendahara Sekolah Yayasan At Tarbiyyah Wijaya Kusuma Samarinda,\nSaya wali dari ${user.full_name || user.name || 'Siswa'} (NIS: ${user.nis || '-'}), ingin menanyakan informasi SPP. Terima kasih.`;
       const waBtn = document.getElementById('btn-header-wa');
-      if (waBtn) waBtn.href = `https://wa.me/6281234567891?text=${encodeURIComponent(waMsg)}`;
+      if (waBtn) waBtn.href = `https://wa.me/6281347142829?text=${encodeURIComponent(waMsg)}`;
 
       await loadSPPData();
     }
@@ -314,20 +314,20 @@
             actionBtn = `
               <div class="flex items-center justify-end gap-1.5">
                 <span class="text-amber-700 text-xs font-medium">Menunggu TU</span>
-                <a href="https://wa.me/6281234567891?text=${encodeURIComponent(waCheckMsg)}" target="_blank" title="Cek via WhatsApp" class="p-1 text-emerald-600 hover:text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition">
+                <a href="https://wa.me/6281347142829?text=${encodeURIComponent(waCheckMsg)}" target="_blank" title="Cek via WhatsApp" class="p-1 text-emerald-600 hover:text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition">
                   <i class="fi fi-brands-whatsapp text-xs"></i>
                 </a>
               </div>
             `;
           } else {
             statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Belum Bayar</span>';
-            const waPayMsg = `Assalamu'alaikum Bendahara Yayasan Samarinda, saya ingin konfirmasi pembayaran SPP:\n- Nama Siswa: ${user.full_name || user.name || '-'}\n- NIS: ${user.nis || '-'}\n- Tagihan: ${inv.month || inv.description || 'SPP'}\n- Nominal: ${formatIDR(inv.amount || 150000)}\nMohon info nomor rekening / konfirmasi pembayaran. Terima kasih.`;
+            const waPayMsg = `Assalamu'alaikum Bendahara Yayasan At Tarbiyyah Wijaya Kusuma Samarinda, saya ingin konfirmasi pembayaran SPP:\n- Nama Siswa: ${user.full_name || user.name || '-'}\n- NIS: ${user.nis || '-'}\n- Tagihan: ${inv.month || inv.description || 'SPP'}\n- Nominal: ${formatIDR(inv.amount || 150000)}\nMohon info nomor rekening / konfirmasi pembayaran. Terima kasih.`;
             actionBtn = `
               <div class="flex items-center justify-end gap-1.5">
                 <button onclick="openPayModal('${inv.id}', '${inv.month || inv.description}', ${inv.amount})" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs transition shadow-sm">
                   Upload Bukti
                 </button>
-                <a href="https://wa.me/6281234567891?text=${encodeURIComponent(waPayMsg)}" target="_blank" title="Konfirmasi via WhatsApp" class="p-1 text-emerald-600 hover:text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition">
+                <a href="https://wa.me/6281347142829?text=${encodeURIComponent(waPayMsg)}" target="_blank" title="Konfirmasi via WhatsApp" class="p-1 text-emerald-600 hover:text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition">
                   <i class="fi fi-brands-whatsapp text-xs"></i>
                 </a>
               </div>

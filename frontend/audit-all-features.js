@@ -257,7 +257,7 @@ async function runFullAudit() {
 
     // 5.1 Admin Membuat Berita Baru (Published)
     const createNews = await api('news', 'create', {
-      title: 'Audit Mutu Pembelajaran PAUD dan TK Yayasan Samarinda 2026',
+      title: 'Audit Mutu Pembelajaran PAUD dan TK Yayasan At Tarbiyyah Wijaya Kusuma Samarinda 2026',
       category: 'Akademik',
       content: 'Yayasan melaksanakan evaluasi berkala untuk memastikan mutu pendidikan islami.',
       excerpt: 'Evaluasi berkala mutu pendidikan.',
@@ -285,7 +285,7 @@ async function runFullAudit() {
     const createEvent = await api('events', 'create', {
       title: 'Pawai Santri Sambut Maulid Nabi',
       event_date: '2026-10-25',
-      location: 'Halaman Kampus Yayasan Samarinda',
+      location: 'Halaman Kampus Yayasan At Tarbiyyah Wijaya Kusuma',
       status: 'published'
     }, adminToken);
     const eventId = createEvent.body?.data?.item?.id;

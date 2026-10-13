@@ -512,7 +512,7 @@
           const phone = (activeResetStudent.parent_phone || '').replace(/\D/g, '');
           const waPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
           const msg = encodeURIComponent(
-            `Assalamu'alaikum Wr. Wb.\n\nBerikut informasi akun Portal Siswa Yayasan Samarinda untuk ananda *${activeResetStudent.full_name}*:\n` +
+            `Assalamu'alaikum Wr. Wb.\n\nBerikut informasi akun Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda untuk ananda *${activeResetStudent.full_name}*:\n` +
             `• Website Login: ${window.location.origin}/login\n` +
             `• NIS (Username): *${activeResetStudent.nis}*\n` +
             `• Password Awal: *${activeResetStudent.birth_date}*\n\n` +
@@ -533,7 +533,7 @@
     function copyResetInfo() {
       if (!activeResetStudent) return;
       const text = 
-        `AKUN PORTAL SISWA YAYASAN SAMARINDA\n` +
+        `AKUN PORTAL SISWA YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\n` +
         `Nama Siswa: ${activeResetStudent.full_name}\n` +
         `NIS: ${activeResetStudent.nis}\n` +
         `Password Awal: ${activeResetStudent.birth_date}\n` +

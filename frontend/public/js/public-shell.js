@@ -61,11 +61,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16 sm:h-20">
             <!-- Brand Logo & Nama -->
-            <a href="${base}index.html" class="flex items-center gap-2.5 sm:gap-3 group min-w-0">
+            <a href="${base}index.html" class="flex items-center gap-2.5 sm:gap-3 group min-w-0" title="YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA">
               <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
               <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight truncate" id="site-header-school-name">Yayasan At Tarbiyyah</div>
-                <div class="text-[10px] sm:text-[11px] font-semibold text-primary-700 leading-tight tracking-normal truncate">Wijaya Kusuma Samarinda</div>
+                <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight uppercase" id="site-header-school-name-top">YAYASAN AT TARBIYYAH</div>
+                <div class="text-[10px] sm:text-[11px] font-bold text-primary-700 leading-tight tracking-normal uppercase" id="site-header-school-name-sub">WIJAYA KUSUMA SAMARINDA</div>
               </div>
             </a>
 
@@ -170,8 +170,8 @@
               <div class="flex items-center gap-3 mb-4">
                 <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah" class="w-10 h-10 object-contain drop-shadow-sm" id="site-footer-logo-img">
                 <div>
-                  <div class="text-white font-extrabold text-sm sm:text-base leading-tight" id="site-footer-school-name">Yayasan At Tarbiyyah</div>
-                  <div class="text-[11px] text-sky-400 font-semibold">Wijaya Kusuma Samarinda</div>
+                  <div class="text-white font-extrabold text-sm sm:text-base leading-tight uppercase" id="site-footer-school-name">YAYASAN AT TARBIYYAH</div>
+                  <div class="text-[11px] text-sky-400 font-bold uppercase">WIJAYA KUSUMA SAMARINDA</div>
                 </div>
               </div>
               <p class="text-xs text-slate-300 leading-relaxed mb-4 text-pretty" id="site-footer-desc">Membina generasi Qur'ani, berakhlak mulia, cerdas, dan mandiri sejak usia dini di Kota Samarinda.</p>
@@ -229,13 +229,22 @@
               </ul>
             </div>
           </div>
+
+          <!-- 4. Baris Hak Cipta Bawah -->
+          <div class="mt-12 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <p>&copy; 2026 <span id="site-footer-copy-name" class="font-bold text-slate-200">YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</span>. Hak Cipta Dilindungi.</p>
+            <p class="text-[11px] text-slate-400">PAUD &bull; TK Terpadu &bull; TPQ Ulinnuha</p>
+          </div>
         </div>
       </footer>`;
   }
 
   function applySchoolData(school) {
     if (!school) return;
-    const name = school.name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
+    let name = (school.name || school.school_name || '').trim();
+    if (!name || name === 'Yayasan Samarinda' || !/AT\s*TARBIYYAH/i.test(name)) {
+      name = 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
+    }
     const phone = school.phone || '081347142829';
     const email = school.email || 'info@attarbiyyah-samarinda.sch.id';
     const address = school.address || 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu Kota Samarinda, Kalimantan Timur, Kode Pos: 75124';
@@ -250,9 +259,18 @@
       if (fBg) fBg.style.backgroundImage = `url("${school.footer_bg_url}")`;
     }
 
-    // Header updates
-    const hName = document.getElementById('site-header-school-name');
-    if (hName) hName.textContent = name;
+    // Header updates: YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA
+    const hTop = document.getElementById('site-header-school-name-top');
+    const hSub = document.getElementById('site-header-school-name-sub');
+    const hOld = document.getElementById('site-header-school-name');
+
+    if (hTop && hSub) {
+      hTop.textContent = 'YAYASAN AT TARBIYYAH';
+      hSub.textContent = 'WIJAYA KUSUMA SAMARINDA';
+    } else if (hOld) {
+      hOld.textContent = 'YAYASAN AT TARBIYYAH';
+    }
+
     const hLogoImg = document.getElementById('site-header-logo-img');
     if (hLogoImg && school.logo_url && typeof school.logo_url === 'string' && school.logo_url.trim()) {
       hLogoImg.src = school.logo_url;
@@ -285,9 +303,9 @@
 
     // Footer updates
     const fName = document.getElementById('site-footer-school-name');
-    if (fName) fName.textContent = name;
+    if (fName) fName.textContent = 'YAYASAN AT TARBIYYAH';
     const fCopy = document.getElementById('site-footer-copy-name');
-    if (fCopy) fCopy.textContent = name;
+    if (fCopy) fCopy.textContent = 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
     const fAddr = document.getElementById('site-footer-address');
     if (fAddr) fAddr.textContent = address;
     const fPhone = document.getElementById('site-footer-phone');
@@ -314,7 +332,14 @@
     // Check cached
     try {
       const cached = sessionStorage.getItem('siyayasan_school_profile');
-      if (cached) applySchoolData(JSON.parse(cached));
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && (parsed.name === 'Yayasan Samarinda' || parsed.school_name === 'Yayasan Samarinda' || !/AT\s*TARBIYYAH/i.test(parsed.name || parsed.school_name || ''))) {
+          sessionStorage.removeItem('siyayasan_school_profile');
+        } else {
+          applySchoolData(parsed);
+        }
+      }
     } catch (_) {}
 
     // Live fetch via apiCall if available, or direct Supabase REST
@@ -350,16 +375,24 @@
       if (!school) {
         const supUrl = (window.SIYAYASAN_SUPABASE && window.SIYAYASAN_SUPABASE.url) || 'https://hzrjtvmveqygparjjnom.supabase.co';
         const supKey = (window.SIYAYASAN_SUPABASE && window.SIYAYASAN_SUPABASE.anonKey) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6cmp0dm12ZXF5Z3Bhcmpqbm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNzkyNTUsImV4cCI6MjEwNDk1NTI1NX0.-aVm6RoQy2_wnmlVV7v_zcL0SXvTenVBsSRYiVj_gQE';
-        const resp = await fetch(`${supUrl}/rest/v1/schools?select=*&limit=1`, {
-          headers: { 'apikey': supKey, 'Authorization': `Bearer ${supKey}` }
-        });
-        if (resp.ok) {
-          const list = await resp.json();
-          if (Array.isArray(list) && list.length > 0) school = list[0];
-        }
+        try {
+          const resp = await fetch(`${supUrl}/rest/v1/schools?select=*&limit=1`, {
+            headers: { 'apikey': supKey, 'Authorization': `Bearer ${supKey}` }
+          });
+          if (resp.ok) {
+            const list = await resp.json();
+            if (Array.isArray(list) && list.length > 0) school = list[0];
+          }
+        } catch (_) {}
       }
 
       if (school) {
+        if (!school.name || school.name === 'Yayasan Samarinda' || !/AT\s*TARBIYYAH/i.test(school.name)) {
+          school.name = 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
+        }
+        if (!school.school_name || school.school_name === 'Yayasan Samarinda' || !/AT\s*TARBIYYAH/i.test(school.school_name)) {
+          school.school_name = 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA';
+        }
         sessionStorage.setItem('siyayasan_school_profile', JSON.stringify(school));
         applySchoolData(school);
       }

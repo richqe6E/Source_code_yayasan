@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS schools (
 
 CREATE TABLE IF NOT EXISTS web_settings (
     id VARCHAR(50) PRIMARY KEY DEFAULT 'default',
-    school_name VARCHAR(255) DEFAULT 'Yayasan Samarinda',
+    school_name VARCHAR(255) DEFAULT 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA',
     tagline VARCHAR(255) DEFAULT 'Membentuk Generasi Cerdas, Berkarakter, dan Berakhlak Mulia',
-    hero_title VARCHAR(255) DEFAULT 'Selamat Datang di Yayasan Samarinda',
+    hero_title VARCHAR(255) DEFAULT 'Membangun Generasi Cerdas & Berkarakter',
     hero_subtitle TEXT DEFAULT 'Lembaga Pendidikan Islam Terpadu: PAUD, TK, dan TPQ dengan kurikulum holistik dan berbasis nilai islami.',
     hero_images JSONB DEFAULT '[
         {"url": "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&auto=format&fit=crop&q=80", "caption": "Suasana Belajar Ceria dan Interaktif"},
@@ -361,7 +361,7 @@ CREATE TABLE IF NOT EXISTS events (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     event_date DATE NOT NULL,
-    location VARCHAR(255) DEFAULT 'Kampus Yayasan Samarinda',
+    location VARCHAR(255) DEFAULT 'Kampus Yayasan At Tarbiyyah Wijaya Kusuma',
     status VARCHAR(20) DEFAULT 'published',
     is_published BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -436,16 +436,22 @@ END $$;
 
 -- 1. Master Sekolah & CMS
 INSERT INTO schools (id, name, npsn, level, address, phone, whatsapp_number, email, headmaster_name, instagram_url, youtube_url, facebook_url) VALUES
-('SCH-001', 'Yayasan Samarinda', '69912345', 'PAUD, TK, dan TPQ', 'Jl. Pendidikan No. 123, Samarinda, Kalimantan Timur', '0812-3456-7891', '081234567891', 'info@yayasan.sch.id', 'Ustadzah Fatimah, S.Pd.I.', 'https://instagram.com/yayasansamarinda', 'https://youtube.com/@yayasansamarinda', 'https://facebook.com/yayasansamarinda')
+('SCH-001', 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA', '69912345', 'PAUD, TK, dan TPQ', 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124', '081347142829', '081347142829', 'info@attarbiyyah-samarinda.sch.id', 'Makhrus', 'https://instagram.com/yayasansamarinda', 'https://youtube.com/@yayasansamarinda', 'https://facebook.com/yayasansamarinda')
 ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    address = EXCLUDED.address,
+    phone = EXCLUDED.phone,
     whatsapp_number = EXCLUDED.whatsapp_number,
+    email = EXCLUDED.email,
+    headmaster_name = EXCLUDED.headmaster_name,
     instagram_url = EXCLUDED.instagram_url,
     youtube_url = EXCLUDED.youtube_url,
     facebook_url = EXCLUDED.facebook_url;
 
 INSERT INTO web_settings (id, school_name)
-VALUES ('default', 'Yayasan Samarinda')
-ON CONFLICT (id) DO NOTHING;
+VALUES ('default', 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA')
+ON CONFLICT (id) DO UPDATE SET
+    school_name = EXCLUDED.school_name;
 
 -- 2. Master Roles
 INSERT INTO roles (id, code, name, description) VALUES

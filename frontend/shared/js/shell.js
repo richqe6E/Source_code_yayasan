@@ -155,9 +155,9 @@
           <button type="button" onclick="Shell.openNav()" aria-label="Buka menu" class="p-2 -ml-2 rounded-md hover:bg-gray-100">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
-          <a href="${homeLink}" class="flex items-center gap-2 min-w-0">
+          <a href="${homeLink}" class="flex items-center gap-2 min-w-0" title="YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA">
             <img src="/images/logo.png" onerror="this.onerror=null; this.src='/public/images/logo.png'" alt="Logo" class="w-8 h-8 object-contain shrink-0">
-            <span class="text-sm font-bold text-gray-900 truncate">Yayasan At Tarbiyyah</span>
+            <span class="text-sm font-bold text-gray-900 truncate">Yayasan At Tarbiyyah Wijaya Kusuma</span>
           </a>
           <div class="flex items-center gap-2">
             ${opts.showRefresh ? `
@@ -203,11 +203,12 @@
 
       <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-10">
         <div class="px-6 py-5 border-b border-gray-200">
-          <a href="${homeLink}" class="flex items-center gap-2.5">
+          <a href="${homeLink}" class="flex items-center gap-2.5" title="YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA">
             <img src="/images/logo.png" onerror="this.onerror=null; this.src='/public/images/logo.png'" alt="Logo" class="w-9 h-9 object-contain shrink-0">
             <div class="min-w-0">
-              <div class="text-sm font-bold text-gray-900 leading-tight truncate">Yayasan At Tarbiyyah</div>
-              <div class="text-xs text-gray-500 leading-tight truncate">${opts.portalLabel || 'Portal'}</div>
+              <div class="text-sm font-extrabold text-gray-900 leading-tight truncate uppercase">Yayasan At Tarbiyyah</div>
+              <div class="text-[11px] font-bold text-primary-700 leading-tight truncate uppercase">Wijaya Kusuma Samarinda</div>
+              <div class="text-[10px] text-gray-500 leading-tight truncate mt-0.5">${opts.portalLabel || 'Portal'}</div>
             </div>
           </a>
         </div>

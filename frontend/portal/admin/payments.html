@@ -739,7 +739,7 @@
       const amount = formatIDR(inv.amount || 150000);
       const dueDate = inv.due_date ? formatDate(inv.due_date) : 'Tgl 10';
 
-      const msg = `Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nYth. Bapak/Ibu Orang Tua / Wali dari ananda:\n• Nama Siswa: ${studentName}\n• NIS: ${nis}\n\nKami dari Tata Usaha Yayasan Samarinda menginformasikan kewajiban iuran bulanan sbb:\n• Tagihan: ${month}\n• Nominal: ${amount}\n• Jatuh Tempo: ${dueDate}\n\nPembayaran dapat dilakukan melalui transfer rekening resmi yayasan:\n- Bank Syariah Indonesia (BSI): 7123456789\n- Bank Kaltimtara: 0012345678\na.n. Yayasan Samarinda\n\nAtau pembayaran tunai langsung di kantor Tata Usaha sekolah. Setelah transfer, bukti dapat diunggah melalui Portal Siswa atau dikirimkan via WhatsApp ini.\n\nTerima kasih atas perhatian dan kerjasamanya.`;
+      const msg = `Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nYth. Bapak/Ibu Orang Tua / Wali dari ananda:\n• Nama Siswa: ${studentName}\n• NIS: ${nis}\n\nKami dari Tata Usaha Yayasan At Tarbiyyah Wijaya Kusuma Samarinda menginformasikan kewajiban iuran bulanan sbb:\n• Tagihan: ${month}\n• Nominal: ${amount}\n• Jatuh Tempo: ${dueDate}\n\nPembayaran dapat dilakukan melalui transfer rekening resmi yayasan:\n- Bank Syariah Indonesia (BSI): 7123456789\n- Bank Kaltimtara: 0012345678\na.n. Yayasan At Tarbiyyah Wijaya Kusuma\n\nAtau pembayaran tunai langsung di kantor Tata Usaha sekolah. Setelah transfer, bukti dapat diunggah melalui Portal Siswa atau dikirimkan via WhatsApp ini.\n\nTerima kasih atas perhatian dan kerjasamanya.`;
 
       window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }

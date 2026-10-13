@@ -86,10 +86,10 @@ async function runCmsTests() {
 
     // 3. Admin Update Pengaturan Website & Media Sosial
     const updateSettingsRes = await api('web_settings', 'update', {
-      school_name: 'Yayasan Samarinda',
-      whatsapp: '081234567891',
-      phone: '(0541) 234-5678',
-      email: 'info@yayasan.sch.id',
+      school_name: 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA',
+      whatsapp: '081347142829',
+      phone: '081347142829',
+      email: 'info@attarbiyyah-samarinda.sch.id',
       instagram_url: 'https://instagram.com/yayasansamarinda',
       hero_images: [
         { url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1600', caption: 'Pentas Seni Santri Cilik 2026' }
@@ -100,14 +100,14 @@ async function runCmsTests() {
     // 4. Publik Ambil Pengaturan Website Terkini
     const publicSettings = await api('web_settings', 'get');
     assert(
-      publicSettings.body?.data?.whatsapp === '081234567891' &&
+      publicSettings.body?.data?.whatsapp === '081347142829' &&
       publicSettings.body?.data?.hero_images?.[0]?.caption === 'Pentas Seni Santri Cilik 2026',
       'Halaman Publik Menerima Update Web Settings Realtime'
     );
 
     // 5. Admin Terbitkan Berita Baru
     const newArticle = {
-      title: 'Peringatan Hari Santri Nasional di Kampus Yayasan Samarinda',
+      title: 'Peringatan Hari Santri Nasional di Kampus Yayasan At Tarbiyyah Wijaya Kusuma Samarinda',
       category: 'Prestasi',
       excerpt: 'Ratusan santri cilik memeriahkan peringatan Hari Santri dengan kirab obor islami.',
       content: 'Alhamdulillah, acara peringatan berlangsung semarak dihadiri tokoh masyarakat dan wali santri.',

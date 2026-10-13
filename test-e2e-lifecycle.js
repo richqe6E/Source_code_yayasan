@@ -153,7 +153,7 @@ async function runE2E() {
 
   // 4e. Format pesan WhatsApp
   const waCleanPhone = parentPhone.replace(/\D/g, '').replace(/^0/, '62');
-  const waText = `Assalamu'alaikum Wr. Wb. Bapak/Ibu ${regPayload.father_name},\n\nSelamat! Ananda *${regPayload.child_name}* telah DITERIMA di Yayasan Samarinda.\n\nBerikut akun Portal Orang Tua Anda:\n- Website: http://localhost:3000/login.html\n- Email: ${parentEmail}\n- Password: ${expectedPassword} (Tanggal lahir: ${birthDate})\n\nSilakan login untuk memeriksa jadwal presensi dan tagihan.\nTerima kasih.`;
+  const waText = `Assalamu'alaikum Wr. Wb. Bapak/Ibu ${regPayload.father_name},\n\nSelamat! Ananda *${regPayload.child_name}* telah DITERIMA di Yayasan At Tarbiyyah Wijaya Kusuma Samarinda.\n\nBerikut akun Portal Orang Tua Anda:\n- Website: http://localhost:3000/login.html\n- Email: ${parentEmail}\n- Password: ${expectedPassword} (Tanggal lahir: ${birthDate})\n\nSilakan login untuk memeriksa jadwal presensi dan tagihan.\nTerima kasih.`;
   const waUrl = `https://wa.me/${waCleanPhone}?text=${encodeURIComponent(waText)}`;
   console.log(`   Link WhatsApp siap kirim: ${waUrl.slice(0, 70)}...`);
 

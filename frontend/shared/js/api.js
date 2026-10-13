@@ -1757,7 +1757,7 @@
           // 8. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' ? window.location.origin : '';
           const loginUrl = `${origin}/public/login.html`;
-          const summaryText = `Akses Portal Siswa Yayasan Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${birthDatePassword} (Tanggal Lahir: DDMMYYYY)\nLink Portal: ${loginUrl}`;
+          const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${birthDatePassword} (Tanggal Lahir: DDMMYYYY)\nLink Portal: ${loginUrl}`;
 
           return {
             success: true,

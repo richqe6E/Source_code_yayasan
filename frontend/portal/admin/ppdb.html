@@ -610,9 +610,7 @@
       const className = data.class_name || s.class_name || '-';
       const studentName = s.full_name || s.name || '-';
       const creds = data.initial_credentials || {};
-      const defaultPassword = creds.default_password || creds.password_hint || 'Tanggal Lahir Siswa (DDMMYYYY)';
-      const loginUrl = creds.login_url || (window.location.origin + '/public/login.html');
-      const copyText = `AKSES PORTAL SISWA YAYASAN SAMARINDA\nNama Siswa: ${studentName}\nNIS (Username): ${nis}\nPassword Awal: ${defaultPassword}\nLink Portal: ${loginUrl}\n\n*Catatan: Segera buat kata sandi baru saat pertama kali login.`;
+      const copyText = `AKSES PORTAL SISWA YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\nNama Siswa: ${studentName}\nNIS (Username): ${nis}\nPassword Awal: ${defaultPassword}\nLink Portal: ${loginUrl}\n\n*Catatan: Segera buat kata sandi baru saat pertama kali login.`;
 
       const succModal = document.createElement('div');
       succModal.className = 'fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4';
