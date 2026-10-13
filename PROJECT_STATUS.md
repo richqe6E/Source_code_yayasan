@@ -932,6 +932,26 @@ Total checks: 171 OK: 171 BAD: 0
 
 ---
 
+### 🗓️ Sesi 28 — Penghapusan Topbar Publik, Push GitHub, & Deployment Vercel Production (13 Oktober 2026)
+
+**1. Penghapusan Bilah Atas Gelap (*Site Topbar*):**
+- Menghapus bilah atas navy/hitam di `frontend/public/js/public-shell.js` yang memuat kontak telepon, email, dan medsos sesuai permintaan pengguna.
+- Header website publik kini langsung diawali oleh Navbar putih bersih (*clean & modern sticky navbar*) yang menempel di bagian paling atas layar saat digulir.
+- Informasi kontak dan media sosial tetap tersedia lengkap dan presisi di bagian Footer, Halaman Kontak, dan Drawer Mobile.
+
+**2. Sinkronisasi Git & GitHub:**
+- Seluruh commit (`149dea8`, `19ee0ca`) telah terdorong (*pushed*) dengan aman ke remote repositori resmi [richqe6E/Source_code_yayasan](https://github.com/richqe6E/Source_code_yayasan) pada branch `main`.
+- Status branch 100% *clean* dan sinkron 1:1 dengan GitHub `origin/main`.
+
+**3. Deployment Live Vercel Production:**
+- Berhasil dideploy langsung ke Vercel Production: `https://siyayasan-portal.vercel.app` (Deployment ID: `dpl_EHZuha6ceRXZSgoTHEnJeCzvKXRX`).
+- Terverifikasi live pada domain publik:
+  - Header beranda kini tampil modern dan bersih tanpa bilah topbar gelap.
+  - Identitas resmi **YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA** aktif di seluruh halaman publik dan portal.
+  - Semua rute utama (`/`, `/profil.html`, `/kontak.html`, `/ppdb.html`, `/login.html`, logo, dan skrip) lulus uji HTTP 200 OK.
+
+---
+
 ## 6. 📁 Struktur File Penting
 
 ```
