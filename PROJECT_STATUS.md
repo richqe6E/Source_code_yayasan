@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 12 Oktober 2026 — Sesi 25 & 26 (Audit 4 Persona 100% Pass, CMS Maps Dinamis, Modal Lightbox Dokumen Siswa, Peniadaan Rapor Akademik, & Sinkronisasi Repositori GitHub) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 13 Oktober 2026 — Sesi 27 (Pembaruan Menyeluruh Identitas Institusi, Logo Resmi, Struktur 5 Pengurus Yayasan, Kop Cetak Resmi/Excel, & Audit 100% Pass) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -882,6 +882,53 @@ Total checks: 171 OK: 171 BAD: 0
 - **Pembaruan Dokumen Sumber Kebenaran Tunggal (*Single Source of Truth*):**
   - Memperbarui [PROJECT_STATUS.md](file:///d:/Source_code_yayasan/PROJECT_STATUS.md) dan [HANDOVER.md](file:///d:/Source_code_yayasan/HANDOVER.md) mencakup seluruh catatan pekerjaan Sesi 25 dan Sesi 26.
   - Memverifikasi status branch `main` sinkron 1:1 dengan `origin/main`.
+
+---
+
+### 🗓️ Sesi 27 — Pembaruan Menyeluruh Identitas Institusi, Logo Resmi, Struktur 5 Pengurus, & Dokumen Cetak/Excel (13 Oktober 2026)
+
+**Data Resmi Yayasan yang Ditetapkan:**
+- **Nama Resmi:** `YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA`
+- **Alamat Resmi:** `Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur, Kode Pos: 75124`
+- **Telepon / WhatsApp Resmi:** `081347142829` (Tautan WA: `https://wa.me/6281347142829`)
+- **Struktur Inti Pengurus Yayasan:**
+  1. Pembina: `DJOKO IRIANDONO`
+  2. Pengawas: `Suhardi`
+  3. Ketua Yayasan: `Makhrus`
+  4. Sekretaris: `Candra Gunawan`
+  5. Bendahara: `Sri Pragawati`
+- **Logo Resmi Institusi:** Menggunakan file logo resmi kubah & bulan sabit hijau yang diunggah oleh user, dikonversi ke format PNG resolusi tinggi transparan/tajam via PowerShell `System.Drawing`.
+
+**Rincian Implementasi Native & Terstruktur:**
+1. **Aset Visual & Logo (`4ff13bb`):**
+   - Menghasilkan dan memverifikasi `frontend/public/images/logo.png` dan `frontend/shared/images/logo.png` (172 KB PNG).
+2. **Mock Database & Default Handlers (`720338b`):**
+   - Memperbarui `frontend/local-api.js`: Akun USR-001 menjadi `Makhrus` (Ketua Yayasan) dan USR-002 menjadi `Sri Pragawati` (Bendahara/TU) dengan nomor telepon `081347142829`.
+   - Menyelaraskan seluruh profil sekolah default, struktur inti kepengurusan 5 orang, dan web settings.
+3. **Public Shell & Portal Shell (`911bc13`):**
+   - Memperbarui topbar, navbar header dua baris responsif (`Yayasan At Tarbiyyah` / `Wijaya Kusuma Samarinda`), drawer mobile, footer medsos SVG, dan kontak/alamat lengkap di `public-shell.js` & `shell.js`.
+4. **Halaman Publik Utama (`49b330e`):**
+   - `index.html`: Judul meta, hero section, pengantar program diselaraskan.
+   - `profil.html`: Visi misi, narasi sejarah, dan penambahan seksi bento cards baru: **"Struktur Inti Pengurus Yayasan"** (Pembina: DJOKO IRIANDONO, Pengawas: Suhardi, Ketua Yayasan: Makhrus, Sekretaris: Candra Gunawan, Bendahara: Sri Pragawati).
+   - `kontak.html`: Alamat lengkap Air Putih Samarinda Ulu, tombol WA `0813-4714-2829`, peta interaktif Google Maps Jalan Wijaya Kusuma V-A No. 38, dan navigasi GPS.
+5. **PPDB Online, Status & Halaman Publik Tambahan (`a7841c8`):**
+   - `ppdb.html`: Kop registrasi pendaftaran dan konfirmasi WhatsApp.
+   - `ppdb/status.html`: Kop surat pengumuman penerimaan, tanda tangan panitia, dan WhatsApp konsultasi.
+   - `login.html`: Identitas dan modal bantuan WhatsApp `081347142829`.
+   - `berita.html`, `berita/detail.html`, `pengumuman.html`, `agenda.html`, `galeri.html`: Penyelarasan `<title>` dan meta description.
+6. **CMS Setting, Kuitansi & Dokumen Cetak/Excel (`b07df11`):**
+   - `cms_setting.html`: Default input settings dan fungsi reset peta ("Reset ke Lokasi Kampus Wijaya Kusuma").
+   - `content.html`: Form identitas & media sosial sekolah.
+   - `reports.html`: Kop surat dinas cetak formal berstandar pendidikan, lembar pengesahan tanda tangan resmi (Mengetahui: Ketua Yayasan Makhrus, dan Bendahara Sri Pragawati), serta ekspor Excel (.xls) ber-kop dan bersignatur.
+   - `payments.html`: Kuitansi resmi SPP (cetak & popup) dan rekapitulasi SPP bertanda tangan Ketua Yayasan Makhrus & Bendahara Sri Pragawati.
+   - Penyelarasan seluruh judul tab browser pada 12 halaman portal admin dan 5 halaman portal siswa.
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **38/38 Rute Berstatus HTTP 200 OK (100% Sukses)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+- `audit-all-features.js`: **34/34 Skenario LULUS (100%)**.
 
 ---
 
