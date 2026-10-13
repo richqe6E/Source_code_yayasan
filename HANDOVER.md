@@ -119,6 +119,23 @@ Dalam sesi pengembangan malam ini (11 Oktober 2026), seluruh poin permintaan dan
 - **Penyelarasan Total:** Profil sekolah, mock database, header topbar, mobile drawer, footer SVG, peta embed Google Maps Air Putih Samarinda Ulu, formulir PPDB online, surat bukti penerimaan PPDB, kuitansi SPP, lembar pengesahan tanda tangan laporan formal, dan ekspor spreadsheet Excel `.xls`.
 - **Verifikasi 100% Pass:** Seluruh 38 rute berstatus 200 OK, 17/17 uji CMS lolos, 11/11 uji PPDB lolos, 13/13 uji SPP lolos, dan 34/34 skenario audit menyeluruh 100% lulus.
 
+### 10. Penghapusan Topbar Kontak Publik & Modern Sticky Header (13 Oktober 2026)
+- **Eliminasi Topbar Gelap:** Bilah atas navy/hitam di `public-shell.js` yang memuat kontak telepon, email, dan medsos dihapus sepenuhnya sesuai permintaan pengguna.
+- **Tampilan Header Bersih & Modern:** Halaman website publik kini langsung diawali oleh Navbar putih bersih (*clean modern sticky navbar*) yang menempel rapi saat layar digulir.
+- **Penyimpanan Kontak Terpusat:** Nomor WhatsApp (`081347142829`), email, media sosial, dan alamat resmi tetap tersedia lengkap dan presisi di bagian Footer, Halaman Kontak, dan Drawer Mobile.
+
+### 11. Deployment Live Vercel Production & Resolusi Masalah Logo (13 Oktober 2026)
+- **Live Vercel Production:** Domain [https://siyayasan-portal.vercel.app](https://siyayasan-portal.vercel.app) dideploy dan dialiaskan secara langsung ke target production (Deployment ID: `dpl_EcThoScodv8ZUdDcvccVzjhfDCNp`).
+- **Resolusi Routing Aset Gambar (`vercel.json`):**
+  - Menambahkan aturan perutean `{ "source": "/images/(.*)", "destination": "/public/images/$1" }` dan cache-control header pada `frontend/vercel.json`.
+  - Menambahkan fallback berlapis `onerror="this.onerror=null; this.src='...public/images/logo.png'"` pada tag gambar logo di header & footer `public-shell.js`, halaman login `login.html`, shell portal `shell.js`, dan kop laporan `reports.html`.
+- **Verifikasi Live Berhasil 100%:**
+  - Endpoint `https://siyayasan-portal.vercel.app/images/logo.png` teruji langsung berstatus **HTTP 200 OK (image/png)**.
+  - Logo resmi kubah hijau dan pena tampil sempurna di navbar header, footer, dan form login.
+  - Seluruh rute publik dan portal teruji 200 OK.
+- **Sinkronisasi Repositori Penuh ke GitHub:**
+  - Seluruh perubahan kode, snapshot database, dan dokumentasi telah ter-push 100% ke GitHub `origin/main` (Commit `a664568`).
+
 ---
 
 ## 3. 🔑 Kredensial Akun Pengujian Resmi

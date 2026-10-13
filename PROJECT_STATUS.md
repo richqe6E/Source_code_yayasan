@@ -944,11 +944,20 @@ Total checks: 171 OK: 171 BAD: 0
 - Status branch 100% *clean* dan sinkron 1:1 dengan GitHub `origin/main`.
 
 **3. Deployment Live Vercel Production:**
-- Berhasil dideploy langsung ke Vercel Production: `https://siyayasan-portal.vercel.app` (Deployment ID: `dpl_EHZuha6ceRXZSgoTHEnJeCzvKXRX`).
+- Berhasil dideploy langsung ke Vercel Production: `https://siyayasan-portal.vercel.app` (Deployment ID: `dpl_EHZuha6ceRXZSgoTHEnJeCzvKXRX` & `dpl_EcThoScodv8ZUdDcvccVzjhfDCNp`).
 - Terverifikasi live pada domain publik:
   - Header beranda kini tampil modern dan bersih tanpa bilah topbar gelap.
   - Identitas resmi **YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA** aktif di seluruh halaman publik dan portal.
   - Semua rute utama (`/`, `/profil.html`, `/kontak.html`, `/ppdb.html`, `/login.html`, logo, dan skrip) lulus uji HTTP 200 OK.
+
+**4. Perbaikan Routing Aset Logo & Gambar di Vercel (`a664568`):**
+- **Akar Masalah:** Konfigurasi perutean Vercel sebelumnya belum memuat rewrite rule untuk direktori `/images/`, menyebabkan pemanggilan `images/logo.png` menghasilkan HTTP 404 dan logo tampak polos/kosong di browser klien.
+- **Solusi yang Diterapkan:**
+  - Menambahkan aturan perutean `{ "source": "/images/(.*)", "destination": "/public/images/$1" }` dan cache-control header pada [frontend/vercel.json](file:///d:/Source_code_yayasan/frontend/vercel.json).
+  - Menambahkan fallback berlapis `onerror="this.onerror=null; this.src='...public/images/logo.png'"` pada tag gambar logo di header & footer `public-shell.js`, halaman login `login.html`, shell portal `shell.js`, dan kop laporan `reports.html`.
+- **Verifikasi Live:**
+  - Endpoint `https://siyayasan-portal.vercel.app/images/logo.png` teruji langsung berstatus **HTTP 200 OK (image/png)**.
+  - Logo kubah hijau dan pena resmi yayasan tampil tajam, presisi, dan proporsional.
 
 ---
 
