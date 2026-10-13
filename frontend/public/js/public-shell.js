@@ -3,6 +3,7 @@
 // in their markup, then call injectSiteChrome({ activeKey, basePath }).
 
 (function () {
+  // Navigasi Asli Website Yayasan At Tarbiyyah (Gaya Desain Floating Dropdown Berikon)
   const NAV_ITEMS = [
     { key: 'home',          href: 'index.html',        label: 'Beranda' },
     { key: 'profile',       href: 'profil.html',       label: 'Profil' },
@@ -10,80 +11,19 @@
     { key: 'announcements', href: 'pengumuman.html',   label: 'Pengumuman' },
     { key: 'events',        href: 'agenda.html',       label: 'Agenda' },
     { key: 'gallery',       href: 'galeri.html',       label: 'Galeri' },
-    { key: 'ppdb',          href: 'ppdb.html',         label: 'PPDB' },
+    { 
+      key: 'ppdb',
+      href: 'ppdb.html',
+      label: 'PPDB',
+      isDropdown: true,
+      items: [
+        { label: 'Informasi & Alur PPDB', href: 'ppdb.html', icon: 'fi fi-rr-info' },
+        { label: 'Formulir Pendaftaran Online', href: 'ppdb.html#formulir-pendaftaran', icon: 'fi fi-rr-edit' },
+        { label: 'Cek Status PPDB Online', href: 'ppdb/status.html', icon: 'fi fi-rr-search' }
+      ]
+    },
     { key: 'contact',       href: 'kontak.html',       label: 'Kontak' }
   ];
-
-  // Struktur Menu Navigasi Berjenjang (Benchmark SMAN 68 & Referensi Dropdown Berikon)
-  const NAV_MENUS = [
-    {
-      key: 'home',
-      label: 'Beranda',
-      href: 'index.html',
-      isDropdown: false
-    },
-    {
-      key: 'ppdb',
-      label: 'SPMB',
-      isDropdown: true,
-      items: [
-        { label: 'Alur & Jadwal', href: 'ppdb.html#jadwal', icon: 'fi fi-rr-calendar' },
-        { label: 'Biaya & Beasiswa', href: 'ppdb.html#biaya', icon: 'fi fi-rr-wallet' },
-        { label: 'FAQ SPMB', href: 'ppdb.html#faq', icon: 'fi fi-rr-interrogation' },
-        { label: 'Portal SPMB Resmi', href: 'ppdb.html#formulir-pendaftaran', icon: 'fi fi-rr-arrow-up-right' }
-      ]
-    },
-    {
-      key: 'profile',
-      label: 'Profil',
-      isDropdown: true,
-      items: [
-        { label: 'Tentang Yayasan', href: 'profil.html', icon: 'fi fi-rr-landmark' },
-        { label: 'Visi & Misi', href: 'profil.html#visi-misi', icon: 'fi fi-rr-bullseye-arrow' },
-        { label: 'Struktur Pengurus', href: 'profil.html#struktur', icon: 'fi fi-rr-users-alt' },
-        { label: 'Fasilitas Kampus', href: 'profil.html#fasilitas', icon: 'fi fi-rr-school' }
-      ]
-    },
-    {
-      key: 'academic',
-      label: 'Akademik',
-      isDropdown: true,
-      items: [
-        { label: 'PAUD Terpadu', href: 'profil.html#jenjang-paud', icon: 'fi fi-rr-smile' },
-        { label: 'TK Islam Terpadu', href: 'profil.html#jenjang-tk', icon: 'fi fi-rr-backpack' },
-        { label: 'TPQ Ulinnuha', href: 'profil.html#jenjang-tpq', icon: 'fi fi-rr-book-alt' },
-        { label: 'Kalender Pendidikan', href: 'agenda.html', icon: 'fi fi-rr-calendar-lines' }
-      ]
-    },
-    {
-      key: 'information',
-      label: 'Informasi',
-      isDropdown: true,
-      items: [
-        { label: 'Berita & Kegiatan', href: 'berita.html', icon: 'fi fi-rr-newspaper' },
-        { label: 'Pengumuman Resmi', href: 'pengumuman.html', icon: 'fi fi-rr-megaphone' },
-        { label: 'Galeri Dokumentasi', href: 'galeri.html', icon: 'fi fi-rr-picture' },
-        { label: 'Kontak & Alamat', href: 'kontak.html', icon: 'fi fi-rr-phone-call' }
-      ]
-    },
-    {
-      key: 'community',
-      label: 'Komunitas',
-      isDropdown: true,
-      items: [
-        { label: 'Portal Siswa & Guru', href: 'login.html', icon: 'fi fi-rr-graduation-cap' },
-        { label: 'Cek Tagihan SPP', href: 'login.html#spp', icon: 'fi fi-rr-receipt' },
-        { label: 'Layanan WhatsApp TU', href: 'kontak.html', icon: 'fi fi-rr-comment-alt' }
-      ]
-    }
-  ];
-
-  function isMenuActive(menu, activeKey) {
-    if (menu.key === activeKey) return true;
-    if (menu.key === 'academic' && (activeKey === 'events')) return true;
-    if (menu.key === 'information' && (activeKey === 'news' || activeKey === 'announcements' || activeKey === 'gallery' || activeKey === 'contact')) return true;
-    return false;
-  }
 
   function ensureUiconsLoaded() {
     if (document.getElementById('flaticon-uicons-cdn')) return;
@@ -111,38 +51,38 @@
   function buildNavbar(activeKey, base) {
     ensureUiconsLoaded();
 
-    const desktopNavHtml = NAV_MENUS.map(function (menu) {
-      const active = isMenuActive(menu, activeKey);
-      if (!menu.isDropdown) {
-        const cls = active
-          ? 'px-3.5 py-2 text-[13.5px] font-bold text-white rounded-lg transition-colors'
-          : 'px-3.5 py-2 text-[13.5px] font-medium text-slate-200/90 hover:text-white hover:bg-white/5 rounded-lg transition-colors';
-        return `<a href="${base}${menu.href}" class="${cls}">${menu.label}</a>`;
+    const desktopNavHtml = NAV_ITEMS.map(function (it) {
+      const isActive = it.key === activeKey;
+      if (!it.isDropdown) {
+        const cls = isActive
+          ? 'px-3 py-2 text-sm font-semibold text-primary-700 rounded-md bg-primary-50 transition'
+          : 'px-3 py-2 text-sm font-medium text-slate-700 hover:text-primary-700 hover:bg-slate-50 rounded-md transition';
+        return `<a href="${base}${it.href}" class="${cls}">${it.label}</a>`;
       }
 
-      // Dropdown menu trigger & floating white card (Sesuai referensi foto SMAN 68)
-      const btnCls = active
-        ? 'siy-dropdown-btn flex items-center gap-1.5 px-3.5 py-2 text-[13.5px] font-bold text-white rounded-lg transition-colors focus:outline-none'
-        : 'siy-dropdown-btn flex items-center gap-1.5 px-3.5 py-2 text-[13.5px] font-medium text-slate-200/90 hover:text-white hover:bg-white/5 rounded-lg transition-colors focus:outline-none';
-      const chevronCls = active ? 'text-white' : 'text-slate-300';
+      // Dropdown menu trigger & floating white card (Gaya desain referensi dengan konsistensi warna asli)
+      const btnCls = isActive
+        ? 'siy-dropdown-btn flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-primary-700 bg-primary-50 rounded-md transition focus:outline-none'
+        : 'siy-dropdown-btn flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 hover:text-primary-700 hover:bg-slate-50 rounded-md transition focus:outline-none';
+      const chevronCls = isActive ? 'text-primary-700' : 'text-slate-400 group-hover:text-primary-700';
 
-      const itemsHtml = menu.items.map(function (it) {
+      const itemsHtml = it.items.map(function (sub) {
         return `
-          <a href="${base}${it.href}" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold text-slate-800 hover:text-[#13383e] hover:bg-emerald-50/50 transition group/item">
-            <i class="${it.icon} text-base text-[#13383e] group-hover/item:scale-110 transition-transform shrink-0"></i>
-            <span class="group-hover/item:translate-x-0.5 transition-transform">${it.label}</span>
+          <a href="${base}${sub.href}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:text-primary-700 hover:bg-primary-50/70 transition group/item">
+            <i class="${sub.icon} text-base text-primary-600 group-hover/item:scale-110 transition-transform flex-shrink-0"></i>
+            <span class="group-hover/item:translate-x-0.5 transition-transform">${sub.label}</span>
           </a>
         `;
       }).join('');
 
       return `
-        <div class="siy-nav-dropdown group ${active ? 'is-active-nav' : ''}">
+        <div class="siy-nav-dropdown group ${isActive ? 'is-active-nav' : ''}">
           <button type="button" class="${btnCls}" aria-expanded="false" aria-haspopup="true">
-            <span>${menu.label}</span>
+            <span>${it.label}</span>
             <i class="fi fi-rr-angle-small-down text-xs ${chevronCls} siy-nav-chevron"></i>
           </button>
           <div class="siy-dropdown-menu absolute top-full left-0 pt-2 z-50">
-            <div class="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-100/90 p-2 min-w-[240px] flex flex-col gap-0.5">
+            <div class="bg-white rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-slate-100 p-2 min-w-[260px] flex flex-col gap-0.5">
               ${itemsHtml}
             </div>
           </div>
@@ -150,32 +90,32 @@
       `;
     }).join('');
 
-    const mobileNavHtml = NAV_MENUS.map(function (menu, idx) {
-      const active = isMenuActive(menu, activeKey);
-      if (!menu.isDropdown) {
-        const cls = active
-          ? 'px-3.5 py-2.5 text-sm font-bold text-white bg-white/10 rounded-xl flex items-center justify-between'
-          : 'px-3.5 py-2.5 text-sm font-medium text-slate-200 hover:text-white hover:bg-white/5 rounded-xl transition flex items-center justify-between';
-        return `<a href="${base}${menu.href}" class="${cls}"><span>${menu.label}</span><i class="fi fi-rr-angle-small-right text-slate-400"></i></a>`;
+    const mobileNavHtml = NAV_ITEMS.map(function (it, idx) {
+      const isActive = it.key === activeKey;
+      if (!it.isDropdown) {
+        const cls = isActive
+          ? 'px-3.5 py-2.5 text-sm font-semibold text-primary-700 bg-primary-50 rounded-lg flex items-center justify-between'
+          : 'px-3.5 py-2.5 text-sm font-medium text-slate-700 hover:text-primary-700 hover:bg-slate-50 rounded-lg transition flex items-center justify-between';
+        return `<a href="${base}${it.href}" class="${cls}"><span>${it.label}</span><i class="fi fi-rr-angle-small-right text-slate-400"></i></a>`;
       }
 
       const accId = `site-mob-acc-${idx}`;
-      const subItemsHtml = menu.items.map(function (it) {
+      const subItemsHtml = it.items.map(function (sub) {
         return `
-          <a href="${base}${it.href}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition">
-            <i class="${it.icon} text-sm text-emerald-400 shrink-0"></i>
-            <span>${it.label}</span>
+          <a href="${base}${sub.href}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-primary-700 hover:bg-white transition">
+            <i class="${sub.icon} text-sm text-primary-600 flex-shrink-0"></i>
+            <span>${sub.label}</span>
           </a>
         `;
       }).join('');
 
       return `
-        <div class="border-b border-white/5 last:border-0 pb-1">
-          <button type="button" class="site-mobile-accordion-btn w-full px-3.5 py-2.5 text-sm ${active ? 'font-bold text-white' : 'font-medium text-slate-200 hover:text-white'} flex items-center justify-between rounded-xl hover:bg-white/5 transition" data-target="${accId}">
-            <span>${menu.label}</span>
+        <div class="border-b border-slate-100 last:border-0 pb-1">
+          <button type="button" class="site-mobile-accordion-btn w-full px-3.5 py-2.5 text-sm ${isActive ? 'font-semibold text-primary-700 bg-primary-50' : 'font-medium text-slate-700 hover:bg-slate-50'} flex items-center justify-between rounded-lg transition" data-target="${accId}">
+            <span>${it.label}</span>
             <i class="fi fi-rr-angle-small-down text-slate-400 site-acc-chevron transition-transform duration-200"></i>
           </button>
-          <div id="${accId}" class="hidden pl-3 pr-1 py-1 flex flex-col gap-1 bg-black/20 rounded-xl my-1">
+          <div id="${accId}" class="hidden pl-3 pr-1 py-1 flex flex-col gap-1 bg-slate-50/80 rounded-lg my-1">
             ${subItemsHtml}
           </div>
         </div>
@@ -183,90 +123,90 @@
     }).join('');
 
     return `
-      <!-- Main Navbar: Dark Pine / Oceanic Green (Benchmark UI SMAN 68 & Foto Referensi) -->
-      <nav class="bg-[#13383e]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/15 transition-all duration-200">
+      <!-- Main Navbar: Putih bersih, modern, sticky, palet warna asli Yayasan At Tarbiyyah -->
+      <nav class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16 sm:h-20">
             <!-- Brand Logo & Nama -->
             <a href="${base}index.html" class="flex items-center gap-2.5 sm:gap-3 group min-w-0" title="YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA">
               <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
               <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-extrabold text-white leading-tight tracking-tight uppercase" id="site-header-school-name-top">YAYASAN AT TARBIYYAH</div>
-                <div class="text-[10px] sm:text-[11px] font-bold text-emerald-400 leading-tight tracking-normal uppercase" id="site-header-school-name-sub">WIJAYA KUSUMA SAMARINDA</div>
+                <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight uppercase" id="site-header-school-name-top">YAYASAN AT TARBIYYAH</div>
+                <div class="text-[10px] sm:text-[11px] font-bold text-primary-700 leading-tight tracking-normal uppercase" id="site-header-school-name-sub">WIJAYA KUSUMA SAMARINDA</div>
               </div>
             </a>
 
-            <!-- Desktop Nav Links with Floating White Dropdown Cards -->
+            <!-- Desktop Nav Links -->
             <div class="hidden lg:flex items-center gap-1">${desktopNavHtml}</div>
 
             <!-- Desktop Action Buttons -->
             <div class="hidden lg:flex items-center gap-2.5">
-              <a href="${base}login.html" class="px-3.5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition flex items-center gap-1.5 backdrop-blur-sm active:scale-[0.98]">
-                <i class="fi fi-rr-graduation-cap text-xs text-emerald-300"></i>
+              <a href="${base}login.html" class="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-primary-700 hover:bg-slate-100 border border-slate-200 rounded-lg transition flex items-center gap-1.5 active:scale-[0.98]">
+                <i class="fi fi-rr-graduation-cap text-xs text-slate-500"></i>
                 <span>SIAKAD</span>
               </a>
-              <a href="${base}ppdb.html#formulir-pendaftaran" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-lg shadow-emerald-950/40 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-1.5">
+              <a href="${base}ppdb.html#formulir-pendaftaran" class="px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition flex items-center gap-1.5 active:scale-[0.98]">
                 <i class="fi fi-rr-paper-plane text-xs"></i>
-                <span>Daftar SPMB</span>
+                <span>Daftar PPDB</span>
               </a>
             </div>
 
             <!-- Mobile Quick Actions & Hamburger -->
             <div class="flex lg:hidden items-center gap-2">
-              <a href="${base}login.html" class="px-2.5 py-1.5 text-[11px] font-semibold text-white bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition flex items-center gap-1 active:scale-95" title="SIAKAD">
-                <i class="fi fi-rr-graduation-cap text-[11px] text-emerald-300"></i>
+              <a href="${base}login.html" class="px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:text-primary-700 bg-slate-100 hover:bg-slate-200/70 rounded-lg border border-slate-200 transition flex items-center gap-1 active:scale-95" title="SIAKAD">
+                <i class="fi fi-rr-graduation-cap text-[11px] text-slate-600"></i>
                 <span>SIAKAD</span>
               </a>
-              <button id="site-mobile-menu-btn" class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition active:scale-95 shadow-sm" aria-label="Buka menu navigasi">
+              <button id="site-mobile-menu-btn" class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:text-primary-700 transition active:scale-95 shadow-sm" aria-label="Buka menu navigasi">
                 <i class="fi fi-rr-menu-burger text-base"></i>
               </button>
             </div>
           </div>
 
           <!-- Mobile Dropdown Menu Drawer -->
-          <div id="site-mobile-menu" class="hidden lg:hidden pb-5 pt-2 border-t border-white/10 text-white">
-            <!-- Navigation Accordion -->
+          <div id="site-mobile-menu" class="hidden lg:hidden pb-5 pt-2 border-t border-slate-100">
+            <!-- Navigation Links & Accordion -->
             <div class="flex flex-col gap-1 py-1">
               ${mobileNavHtml}
             </div>
 
             <!-- Mobile CTAs -->
-            <div class="pt-3 mt-2 border-t border-white/10 flex flex-col gap-2">
-              <a href="${base}login.html" class="px-3.5 py-2.5 text-xs font-semibold text-center text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition">
-                <i class="fi fi-rr-graduation-cap text-xs text-emerald-300"></i>
+            <div class="pt-3 mt-2 border-t border-slate-200/70 flex flex-col gap-2">
+              <a href="${base}login.html" class="px-3.5 py-2.5 text-xs font-semibold text-center text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center gap-2 active:scale-[0.98] transition">
+                <i class="fi fi-rr-graduation-cap text-xs text-slate-500"></i>
                 <span>Login SIAKAD</span>
               </a>
-              <a href="${base}ppdb.html#formulir-pendaftaran" class="px-3.5 py-2.5 text-xs font-bold text-center text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition shadow-md">
+              <a href="${base}ppdb.html#formulir-pendaftaran" class="px-3.5 py-2.5 text-xs font-semibold text-center text-white bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center gap-2 active:scale-[0.98] transition">
                 <i class="fi fi-rr-paper-plane text-xs"></i>
-                <span>Daftar SPMB Online</span>
+                <span>Daftar PPDB Online</span>
               </a>
             </div>
 
             <!-- Mobile Quick Contacts & Social Media Strip -->
-            <div class="pt-4 mt-3 border-t border-white/10 bg-black/20 rounded-xl p-3 flex flex-col gap-2.5">
-              <div class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
+            <div class="pt-4 mt-3 border-t border-slate-100 bg-slate-50/70 rounded-xl p-3 flex flex-col gap-2.5">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                 Kontak Resmi Yayasan
               </div>
-              <div class="flex items-center justify-between text-xs text-slate-200">
-                <a id="site-mobile-phone" href="tel:081347142829" class="flex items-center gap-1.5 font-medium hover:text-white transition">
-                  <i class="fi fi-rr-phone-call text-emerald-400"></i>
+              <div class="flex items-center justify-between text-xs text-slate-600">
+                <a id="site-mobile-phone" href="tel:081347142829" class="flex items-center gap-1.5 font-medium hover:text-primary-700 transition">
+                  <i class="fi fi-rr-phone-call text-primary-600"></i>
                   <span>0813-4714-2829</span>
                 </a>
-                <a id="site-mobile-email" href="mailto:info@attarbiyyah-samarinda.sch.id" class="flex items-center gap-1.5 font-medium hover:text-white transition">
-                  <i class="fi fi-rr-envelope text-emerald-400"></i>
+                <a id="site-mobile-email" href="mailto:info@attarbiyyah-samarinda.sch.id" class="flex items-center gap-1.5 font-medium hover:text-primary-700 transition">
+                  <i class="fi fi-rr-envelope text-primary-600"></i>
                   <span>Email Kami</span>
                 </a>
               </div>
-              <div class="flex items-center justify-between pt-1 border-t border-white/10 text-slate-300 text-xs">
+              <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-slate-500 text-xs">
                 <span class="text-[11px]">Media Sosial Resmi:</span>
                 <div class="flex items-center gap-2">
-                  <a id="site-mobile-fb" href="https://facebook.com/yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 inline-flex items-center justify-center text-white hover:bg-[#1877F2] transition" aria-label="Facebook">
+                  <a id="site-mobile-fb" href="https://facebook.com/yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 inline-flex items-center justify-center text-slate-600 hover:text-white hover:bg-[#1877F2] transition" aria-label="Facebook">
                     <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                   </a>
-                  <a id="site-mobile-ig" href="https://instagram.com/yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 inline-flex items-center justify-center text-white hover:bg-[#E4405F] transition" aria-label="Instagram">
+                  <a id="site-mobile-ig" href="https://instagram.com/yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 inline-flex items-center justify-center text-slate-600 hover:text-white hover:bg-[#E4405F] transition" aria-label="Instagram">
                     <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                   </a>
-                  <a id="site-mobile-yt" href="https://youtube.com/@yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-white/10 border border-white/15 inline-flex items-center justify-center text-white hover:bg-[#FF0000] transition" aria-label="YouTube">
+                  <a id="site-mobile-yt" href="https://youtube.com/@yayasansamarinda" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 inline-flex items-center justify-center text-slate-600 hover:text-white hover:bg-[#FF0000] transition" aria-label="YouTube">
                     <svg class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                   </a>
                 </div>
