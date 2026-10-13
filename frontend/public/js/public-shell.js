@@ -3,14 +3,21 @@
 // in their markup, then call injectSiteChrome({ activeKey, basePath }).
 
 (function () {
-  // Navigasi Asli Website Yayasan At Tarbiyyah (Gaya Desain Floating Dropdown Berikon)
+  // Navigasi Asli Website Yayasan At Tarbiyyah (Dikelompokkan rapi dengan gaya floating dropdown)
   const NAV_ITEMS = [
-    { key: 'home',          href: 'index.html',        label: 'Beranda' },
-    { key: 'profile',       href: 'profil.html',       label: 'Profil' },
-    { key: 'news',          href: 'berita.html',       label: 'Berita' },
-    { key: 'announcements', href: 'pengumuman.html',   label: 'Pengumuman' },
-    { key: 'events',        href: 'agenda.html',       label: 'Agenda' },
-    { key: 'gallery',       href: 'galeri.html',       label: 'Galeri' },
+    { key: 'home',    href: 'index.html',  label: 'Beranda' },
+    { key: 'profile', href: 'profil.html', label: 'Profil' },
+    { 
+      key: 'information',
+      label: 'Informasi',
+      isDropdown: true,
+      items: [
+        { label: 'Berita Terkini', href: 'berita.html', icon: 'fi fi-rr-newspaper' },
+        { label: 'Pengumuman Resmi', href: 'pengumuman.html', icon: 'fi fi-rr-megaphone' },
+        { label: 'Agenda Kegiatan', href: 'agenda.html', icon: 'fi fi-rr-calendar' },
+        { label: 'Galeri Dokumentasi', href: 'galeri.html', icon: 'fi fi-rr-picture' }
+      ]
+    },
     { 
       key: 'ppdb',
       href: 'ppdb.html',
@@ -22,8 +29,14 @@
         { label: 'Cek Status PPDB Online', href: 'ppdb/status.html', icon: 'fi fi-rr-search' }
       ]
     },
-    { key: 'contact',       href: 'kontak.html',       label: 'Kontak' }
+    { key: 'contact', href: 'kontak.html', label: 'Kontak' }
   ];
+
+  function isItemActive(it, activeKey) {
+    if (it.key === activeKey) return true;
+    if (it.key === 'information' && (activeKey === 'news' || activeKey === 'announcements' || activeKey === 'events' || activeKey === 'gallery')) return true;
+    return false;
+  }
 
   function ensureUiconsLoaded() {
     if (document.getElementById('flaticon-uicons-cdn')) return;
@@ -52,7 +65,7 @@
     ensureUiconsLoaded();
 
     const desktopNavHtml = NAV_ITEMS.map(function (it) {
-      const isActive = it.key === activeKey;
+      const isActive = isItemActive(it, activeKey);
       if (!it.isDropdown) {
         const cls = isActive
           ? 'px-3 py-2 text-sm font-semibold text-primary-700 rounded-md bg-primary-50 transition'
@@ -91,7 +104,7 @@
     }).join('');
 
     const mobileNavHtml = NAV_ITEMS.map(function (it, idx) {
-      const isActive = it.key === activeKey;
+      const isActive = isItemActive(it, activeKey);
       if (!it.isDropdown) {
         const cls = isActive
           ? 'px-3.5 py-2.5 text-sm font-semibold text-primary-700 bg-primary-50 rounded-lg flex items-center justify-between'
