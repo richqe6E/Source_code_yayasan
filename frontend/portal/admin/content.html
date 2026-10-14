@@ -108,6 +108,7 @@
     </div>
   </div>
 
+  <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
   <script src="../../shared/js/shell.js"></script>
@@ -176,13 +177,13 @@
           </div>
           <div class="bg-white border border-gray-200 rounded-lg divide-y divide-gray-200">
             ${items.map(item => {
-              const isPub = (item.status === 'published' || item.status === 'pinned' || item.is_published === true || item.is_published === 'TRUE');
+              const isPub = item.status ? (item.status === 'published' || item.status === 'pinned') : (item.is_published === true || item.is_published === 'TRUE');
               return `
               <div class="p-4 flex justify-between items-start gap-3 min-w-0">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1 min-w-0">
                     <div class="text-sm font-medium text-gray-900 truncate">${item.title}</div>
-                    <span class="px-2 py-0.5 text-xs rounded shrink-0 font-medium ${isPub ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">${isPub ? 'Published' : 'Draft'}</span>
+                    <span class="px-2 py-0.5 text-xs rounded shrink-0 font-medium ${isPub ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'}">${isPub ? 'Published' : 'Draft'}</span>
                   </div>
                   <div class="text-xs text-gray-500 truncate tabular-nums">${formatDate(item.created_at || item.published_at)}${item.event_date ? ' • ' + formatDate(item.event_date) : ''}${item.author_name ? ' • ' + item.author_name : ''}${item.category ? ' • ' + item.category : ''}</div>
                   ${item.excerpt ? `<div class="text-xs text-gray-600 mt-1 line-clamp-2">${item.excerpt}</div>` : ''}
@@ -216,9 +217,12 @@
         ${items.length === 0 ? '<div class="bg-white border border-gray-200 rounded-lg text-center text-sm text-gray-500 py-12">Belum ada foto galeri</div>' : `
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           ${items.map(g => `
-            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <div class="aspect-square bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden group relative">
+              <div class="aspect-square bg-gray-100 flex items-center justify-center text-xs text-gray-400 relative">
                 ${g.image_url ? `<img src="${g.image_url}" class="w-full h-full object-cover">` : g.title}
+                <button onclick="deleteItem('gallery', '${g.id}')" class="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md shadow text-xs" title="Hapus foto">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
               </div>
               <div class="p-2 text-xs text-gray-600 truncate">${g.title}</div>
             </div>
@@ -238,11 +242,15 @@
       if (res.success) renderTab();
     }
 
-    async function deleteItem(id) {
+    async function deleteItem(typeOrId, optionalId) {
+      let targetTab = currentTab;
+      let targetId = typeOrId;
+      if (optionalId !== undefined) {
+        targetTab = typeOrId;
+        targetId = optionalId;
+      }
       if (!confirm('Hapus konten ini?')) return;
-      // Backend handler untuk modul konten adalah `remove` (bukan `delete`).
-      // Lihat ContentService.gs: NewsHandlers.remove, AnnouncementHandlers.remove, dst.
-      const res = await apiCall(currentTab, 'remove', { id });
+      const res = await apiCall(targetTab, 'remove', { id: targetId });
       showToast(res.message || 'Konten dihapus', res.success ? 'success' : 'error');
       if (res.success) renderTab();
     }
@@ -479,7 +487,7 @@
 
             <!-- Bagian 2: Kontak WhatsApp Resmi -->
             <div class="pt-4 border-t border-gray-100">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-3 flex items-center gap-1.5">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-3 flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                 2. Kontak WhatsApp Resmi Sekolah
               </h4>

@@ -187,7 +187,16 @@
           delete cleanMeta.photo_dataurl;
           delete cleanMeta.akta_dataurl;
           delete cleanMeta.kk_dataurl;
+          delete cleanMeta.photo_url;
+          delete cleanMeta.birth_certificate_url;
+          delete cleanMeta.family_card_url;
+          delete cleanMeta.notes;
           delete cleanMeta.password;
+          cleanMeta.uploaded_files = {
+            photo_url: photoUrl || '',
+            birth_certificate_url: certUrl || '',
+            family_card_url: kkUrl || ''
+          };
 
           const studentName = params.student_name || params.full_name || params.child_name || 'Santri Baru';
           const parentName = params.parent_name || params.father_name || params.mother_name || 'Orang Tua / Wali';

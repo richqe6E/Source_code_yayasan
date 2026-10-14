@@ -394,6 +394,11 @@
     const fEmail = document.getElementById('site-footer-email');
     if (fEmail) fEmail.textContent = email;
 
+    const fDesc = document.getElementById('site-footer-desc');
+    if (fDesc && school.tagline) {
+      fDesc.textContent = school.tagline;
+    }
+
     const fMapsLink = document.getElementById('site-footer-maps-link');
     if (fMapsLink && (school.maps_url || school.maps)) {
       fMapsLink.href = school.maps_url || school.maps;

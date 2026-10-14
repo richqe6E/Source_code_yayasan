@@ -52,6 +52,7 @@
     </div>
   </main>
 
+  <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
   <script src="../../shared/js/shell.js"></script>
@@ -126,12 +127,12 @@
     }
 
     function actionColor(a) {
-      if (a === 'login') return 'bg-green-100 text-green-700';
+      if (a === 'login') return 'bg-primary-100 text-primary-700';
       if (a === 'logout') return 'bg-gray-100 text-gray-700';
       if (a === 'create') return 'bg-blue-100 text-blue-700';
       if (a === 'update') return 'bg-yellow-100 text-yellow-700';
       if (a === 'delete') return 'bg-red-100 text-red-700';
-      if (a === 'approve') return 'bg-green-100 text-green-700';
+      if (a === 'approve') return 'bg-primary-100 text-primary-700';
       if (a === 'reject') return 'bg-red-100 text-red-700';
       return 'bg-gray-100 text-gray-700';
     }

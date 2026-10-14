@@ -165,12 +165,12 @@
           <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Siswa</span>
-              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
             </div>
             <div class="text-lg font-extrabold text-slate-900" id="card-status-siswa">Siswa Aktif</div>
-            <div class="text-xs text-emerald-700 font-medium mt-1">Terdaftar Resmi di Yayasan</div>
+            <div class="text-xs text-primary-700 font-medium mt-1">Terdaftar Resmi di Yayasan</div>
           </div>
 
           <!-- Card 3: Tagihan SPP -->
@@ -298,7 +298,7 @@
                 <p class="text-[11px] text-slate-600 mt-1">Pembayaran SPP diharapkan sebelum tanggal 10 setiap bulannya melalui transfer rekening yayasan atau tunai di TU.</p>
               </div>
               <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5">PPDB Online</span>
+                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 mb-1.5">PPDB Online</span>
                 <h4 class="text-xs font-bold text-slate-900">Penerimaan Siswa Baru Dibuka</h4>
                 <p class="text-[11px] text-slate-600 mt-1">Pendaftaran calon santri PAUD, TK, dan TPQ telah dibuka. Bagikan informasi ini kepada keluarga &amp; kerabat.</p>
               </div>
@@ -379,13 +379,19 @@
 
           // Load SPP & Info
           await loadSiswaAktifData(student, user);
-        } else {
-          document.getElementById('student-meta').textContent = `Nomor Pendaftaran: ${student.id || 'REG-' + Date.now().toString().slice(-6)} • Status: Menunggu Berkas`;
+          const regNo = student.registration_number || student.reg_number || (user.username && user.username.startsWith('REG') ? user.username : '') || ('REG-' + new Date().getFullYear() + '-' + String(student.id || '').slice(-4));
+          const stDesc = (student.status_pendaftaran === 'accepted' || student.status === 'accepted' || student.status === 'approved') ? 'Diterima' : 'Menunggu Validasi';
+          document.getElementById('student-meta').textContent = `Nomor Pendaftaran: ${regNo} • Status: ${stDesc}`;
           document.getElementById('section-calon-siswa').classList.remove('hidden');
           document.getElementById('section-siswa-aktif').classList.add('hidden');
 
           // Update PPDB tracker
-          updatePPDBTracker(student);
+          let docs = [];
+          try {
+            const docsRes = await apiCall('siswa', 'get_documents');
+            docs = (docsRes && docsRes.data) || [];
+          } catch (_) {}
+          updatePPDBTracker(student, docs);
         }
 
       } catch (err) {
@@ -425,7 +431,7 @@
           } else {
             document.getElementById('card-spp').textContent = 'Rp 0';
             document.getElementById('card-spp-desc').textContent = 'Semua tagihan lunas';
-            document.getElementById('card-spp-desc').className = 'text-xs text-emerald-600 font-medium';
+            document.getElementById('card-spp-desc').className = 'text-xs text-primary-600 font-medium';
           }
 
           if (invoices.length === 0) {
@@ -439,7 +445,7 @@
               let badgeCls = 'bg-rose-50 text-rose-700 border-rose-200';
               let badgeText = 'Belum Lunas';
               if (isPaid) {
-                badgeCls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                badgeCls = 'bg-primary-50 text-primary-700 border-primary-200';
                 badgeText = 'Lunas';
               } else if (isWaiting) {
                 badgeCls = 'bg-amber-50 text-amber-700 border-amber-200';
@@ -468,23 +474,41 @@
       }
     }
 
-    function updatePPDBTracker(student) {
-      const hasBiodata = student.birth_date && student.address;
+    function updatePPDBTracker(student, docs = []) {
+      const hasBiodata = (student.birth_date || student.address) && student.full_name;
       if (hasBiodata) {
         document.getElementById('step-biodata-box').className = 'flex items-start gap-3 p-3 rounded-xl bg-primary-50/60 border border-primary-200/60';
         document.getElementById('step-biodata-icon').className = 'w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xs shrink-0';
         document.getElementById('step-biodata-icon').textContent = '✓';
-        document.getElementById('step-biodata-desc').textContent = 'Biodata terisi';
+        document.getElementById('step-biodata-desc').textContent = 'Biodata terisi lengkap';
       }
 
-      const status = student.status_pendaftaran || 'pending';
+      const docCount = (docs || []).length;
+      if (docCount >= 3) {
+        document.getElementById('step-doc-box').className = 'flex items-start gap-3 p-3 rounded-xl bg-primary-50/60 border border-primary-200/60';
+        document.getElementById('step-doc-icon').className = 'w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xs shrink-0';
+        document.getElementById('step-doc-icon').textContent = '✓';
+        document.getElementById('step-doc-desc').textContent = `${docCount} berkas terunggah lengkap`;
+      } else if (docCount > 0) {
+        document.getElementById('step-doc-box').className = 'flex items-start gap-3 p-3 rounded-xl bg-amber-50/60 border border-amber-200/60';
+        document.getElementById('step-doc-icon').className = 'w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0';
+        document.getElementById('step-doc-icon').textContent = String(docCount);
+        document.getElementById('step-doc-desc').textContent = `${docCount}/3 berkas wajib terunggah`;
+      }
+
+      const status = (student.status_pendaftaran || student.status || 'pending').toLowerCase();
       const pill = document.getElementById('ppdb-status-pill');
-      if (status === 'accepted' || status === 'lolos') {
+      if (status === 'accepted' || status === 'approved' || status === 'converted' || status === 'lolos') {
         pill.className = 'inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-primary-50 text-primary-800 border border-primary-200';
-        pill.textContent = 'Diterima Menjadi Siswa Baru';
+        pill.textContent = 'Diterima Menjadi Santri / Siswa Baru';
+        document.getElementById('step-verif-box').className = 'flex items-start gap-3 p-3 rounded-xl bg-primary-50/60 border border-primary-200/60';
+        document.getElementById('step-verif-icon').className = 'w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xs shrink-0';
+        document.getElementById('step-verif-icon').textContent = '✓';
+        document.getElementById('step-verif-desc').textContent = 'Pendaftaran Diterima';
       } else if (status === 'rejected') {
         pill.className = 'inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-red-50 text-red-800 border border-red-200';
         pill.textContent = 'Belum Lolos Seleksi';
+        document.getElementById('step-verif-desc').textContent = 'Berkas Belum Disetujui';
       } else {
         pill.className = 'inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200';
         pill.textContent = 'Menunggu Validasi Dokumen';

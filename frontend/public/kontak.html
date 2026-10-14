@@ -354,9 +354,15 @@
             btnCall.href = `tel:${cleanPhoneDigits || cleanWaDigits}`;
           }
 
+          function formatWaIntl(num) {
+            let clean = String(num || '081347142829').replace(/[^0-9]/g, '');
+            if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+            return clean;
+          }
+
           const btnWa = document.getElementById('contact-page-btn-wa');
           if (btnWa) {
-            const waTarget = currentWaNumber.startsWith('0') ? '62' + currentWaNumber.slice(1) : currentWaNumber;
+            const waTarget = formatWaIntl(currentWaNumber);
             btnWa.href = `https://wa.me/${waTarget}`;
           }
 
@@ -371,7 +377,7 @@
     }
     loadContactSchoolInfo();
 
-    document.getElementById('contact-form').addEventListener('submit', (e) => {
+    document.getElementById('contact-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('contact-name').value.trim();
       const email = document.getElementById('contact-email').value.trim();
@@ -379,13 +385,31 @@
       const topic = document.getElementById('contact-topic').value;
       const message = document.getElementById('contact-message').value.trim();
 
+      try {
+        if (typeof apiCall === 'function') {
+          await apiCall('contact', 'create', {
+            name,
+            email,
+            phone,
+            subject: topic || 'Konsultasi Website',
+            message
+          });
+        }
+      } catch (_) {}
+
+      function formatWaIntl(num) {
+        let clean = String(num || '081347142829').replace(/[^0-9]/g, '');
+        if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+        return clean;
+      }
+      const waTarget = formatWaIntl(currentWaNumber);
       const waText = `Halo Admin ${currentSchoolName},%0A%0ASaya ingin berkonsultasi melalui website resmi:%0A- *Nama:* ${encodeURIComponent(name)}%0A- *No HP:* ${encodeURIComponent(phone)}%0A- *Email:* ${encodeURIComponent(email)}%0A- *Topik:* ${encodeURIComponent(topic)}%0A- *Pesan:*%0A${encodeURIComponent(message)}`;
 
-      window.open(`https://wa.me/${currentWaNumber}?text=${waText}`, '_blank');
+      window.open(`https://wa.me/${waTarget}?text=${waText}`, '_blank');
 
       const alertBox = document.getElementById('contact-alert');
       const alertText = document.getElementById('contact-alert-text');
-      alertText.textContent = `Terima kasih, ${name}! Pesan Anda telah dialihkan ke WhatsApp resmi ${currentSchoolName} (+${currentWaNumber}).`;
+      alertText.textContent = `Terima kasih, ${name}! Pesan Anda telah dialihkan ke WhatsApp resmi ${currentSchoolName} (+${waTarget}).`;
       alertBox.classList.remove('hidden');
 
       e.target.reset();

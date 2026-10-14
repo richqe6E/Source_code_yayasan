@@ -45,7 +45,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
           <span>Nomor Rekening Yayasan</span>
         </button>
-        <a id="btn-header-wa" href="https://wa.me/6281234567891" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm shadow-emerald-600/20">
+        <a id="btn-header-wa" href="https://wa.me/6281234567891" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm shadow-sky-600/20">
           <i class="fi fi-brands-whatsapp text-sm"></i>
           <span>WA Bendahara</span>
         </a>
@@ -62,7 +62,7 @@
 
       <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Tagihan Lunas</span>
-        <div class="text-2xl font-extrabold text-emerald-600 tabular-nums" id="stat-paid-count">0 Tagihan</div>
+        <div class="text-2xl font-extrabold text-primary-600 tabular-nums" id="stat-paid-count">0 Tagihan</div>
         <span class="text-xs text-slate-500 mt-1 block">Telah diverifikasi Admin TU</span>
       </div>
 
@@ -134,7 +134,7 @@
             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bank Kaltimtara</span>
             <button type="button" onclick="copyRekening('0012345678', 'Bank Kaltimtara')" class="text-[11px] font-bold text-primary-700 hover:underline">Salin No. Rek</button>
           </div>
-          <div class="text-lg font-bold font-mono text-emerald-800 tracking-wider">0012345678</div>
+          <div class="text-lg font-bold font-mono text-primary-800 tracking-wider">0012345678</div>
           <div class="text-xs text-slate-600 mt-0.5">a.n. Yayasan At Tarbiyyah Wijaya Kusuma</div>
         </div>
       </div>
@@ -142,7 +142,7 @@
         <strong>Petunjuk Transfer:</strong> Cantumkan <strong>NIS &amp; Nama Siswa</strong> pada berita transfer, kemudian unggah bukti transfer melalui tombol di tabel tagihan atau kirim ke WhatsApp Bendahara Sekolah.
       </div>
       <div class="flex items-center justify-between pt-1">
-        <a href="https://wa.me/6281347142829" target="_blank" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
+        <a href="https://wa.me/6281347142829" target="_blank" class="text-xs font-bold text-sky-700 hover:underline flex items-center gap-1">
           <i class="fi fi-brands-whatsapp"></i>
           <span>Hubungi Bendahara</span>
         </a>
@@ -301,9 +301,9 @@
           let actionBtn = '';
 
           if (inv.status === 'paid') {
-            statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Lunas</span>';
+            statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary-50 text-primary-700 border border-primary-200">✓ Lunas</span>';
             actionBtn = `
-              <button onclick="printSppReceipt('${inv.id}')" title="Cetak kuitansi resmi" class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-semibold transition">
+              <button onclick="printSppReceipt('${inv.id}')" title="Cetak kuitansi resmi" class="inline-flex items-center gap-1 px-3 py-1 bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 rounded-lg text-xs font-semibold transition">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 <span>Cetak Kuitansi</span>
               </button>
@@ -314,7 +314,7 @@
             actionBtn = `
               <div class="flex items-center justify-end gap-1.5">
                 <span class="text-amber-700 text-xs font-medium">Menunggu TU</span>
-                <a href="https://wa.me/6281347142829?text=${encodeURIComponent(waCheckMsg)}" target="_blank" title="Cek via WhatsApp" class="p-1 text-emerald-600 hover:text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition">
+                <a href="https://wa.me/6281347142829?text=${encodeURIComponent(waCheckMsg)}" target="_blank" title="Cek via WhatsApp" class="p-1 text-sky-600 hover:text-sky-700 rounded-lg border border-sky-200 hover:bg-sky-50 transition">
                   <i class="fi fi-brands-whatsapp text-xs"></i>
                 </a>
               </div>
@@ -327,7 +327,7 @@
                 <button onclick="openPayModal('${inv.id}', '${inv.month || inv.description}', ${inv.amount})" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs transition shadow-sm">
                   Upload Bukti
                 </button>
-                <a href="https://wa.me/6281347142829?text=${encodeURIComponent(waPayMsg)}" target="_blank" title="Konfirmasi via WhatsApp" class="p-1 text-emerald-600 hover:text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-50 transition">
+                <a href="https://wa.me/6281347142829?text=${encodeURIComponent(waPayMsg)}" target="_blank" title="Konfirmasi via WhatsApp" class="p-1 text-sky-600 hover:text-sky-700 rounded-lg border border-sky-200 hover:bg-sky-50 transition">
                   <i class="fi fi-brands-whatsapp text-xs"></i>
                 </a>
               </div>
@@ -353,6 +353,25 @@
       }
     }
 
+    function angkaKeTerbilang(n) {
+      const bilangan = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
+      n = Math.floor(Math.abs(Number(n) || 0));
+      if (n === 0) return 'Nol Rupiah';
+      function toWords(num) {
+        if (num < 12) return bilangan[num];
+        if (num < 20) return toWords(num - 10) + ' Belas';
+        if (num < 100) return toWords(Math.floor(num / 10)) + ' Puluh' + (num % 10 !== 0 ? ' ' + toWords(num % 10) : '');
+        if (num < 200) return 'Seratus' + (num - 100 !== 0 ? ' ' + toWords(num - 100) : '');
+        if (num < 1000) return toWords(Math.floor(num / 100)) + ' Ratus' + (num % 100 !== 0 ? ' ' + toWords(num % 100) : '');
+        if (num < 2000) return 'Seribu' + (num - 1000 !== 0 ? ' ' + toWords(num - 1000) : '');
+        if (num < 1000000) return toWords(Math.floor(num / 1000)) + ' Ribu' + (num % 1000 !== 0 ? ' ' + toWords(num % 1000) : '');
+        if (num < 1000000000) return toWords(Math.floor(num / 1000000)) + ' Juta' + (num % 1000000 !== 0 ? ' ' + toWords(num % 1000000) : '');
+        if (num < 1000000000000) return toWords(Math.floor(num / 1000000000)) + ' Miliar' + (num % 1000000000 !== 0 ? ' ' + toWords(num % 1000000000) : '');
+        return String(num);
+      }
+      return toWords(n) + ' Rupiah';
+    }
+
     function printSppReceipt(invId) {
       const inv = invoicesCache.find(x => x.id === invId);
       if (!inv) return;
@@ -364,7 +383,7 @@
       const month = inv.month || inv.item_name || inv.description || 'SPP Bulanan';
       const amount = inv.amount || 150000;
       const paidAt = inv.paid_at ? (window.formatDate ? formatDate(inv.paid_at) : inv.paid_at) : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const paidBy = inv.paid_by || 'Transfer Bank Yayasan';
+      const paidBy = inv.payment_method || inv.paid_by || 'Transfer Bank Yayasan';
 
       const printWindow = window.open('', '_blank', 'width=750,height=800');
       if (!printWindow) {
@@ -386,7 +405,7 @@
             .kuitansi-title { text-align: center; margin-bottom: 20px; }
             .kuitansi-title h2 { margin: 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #1e293b; letter-spacing: 1px; }
             .kuitansi-num { font-size: 12px; color: #64748b; font-family: monospace; font-weight: 600; margin-top: 4px; }
-            .badge-lunas { display: inline-block; background: #ecfdf5; color: #065f46; border: 1.5px solid #a7f3d0; padding: 4px 14px; font-weight: 800; font-size: 13px; border-radius: 9999px; margin-top: 6px; }
+            .badge-lunas { display: inline-block; background: #f0f9ff; color: #0369a1; border: 1.5px solid #bae6fd; padding: 4px 14px; font-weight: 800; font-size: 13px; border-radius: 9999px; margin-top: 6px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
             td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
             td.lbl { width: 32%; font-weight: 600; color: #64748b; }
@@ -422,7 +441,7 @@
           <div class="nominal-box">
             <div>
               <div class="nominal-label">Jumlah Uang Diterima:</div>
-              <div class="terbilang"># Seratus Lima Puluh Ribu Rupiah #</div>
+              <div class="terbilang"># ${angkaKeTerbilang(amount)} #</div>
             </div>
             <div class="nominal-val">${formatIDR(amount)}</div>
           </div>

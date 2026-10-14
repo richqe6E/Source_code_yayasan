@@ -194,7 +194,7 @@
         </div>
 
         <div id="report-actions" class="hidden flex items-center flex-wrap gap-2">
-          <button onclick="exportCurrentReportToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Unduh berkas Excel rapi berformat Kop & Grid">
+          <button onclick="exportCurrentReportToExcel()" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Unduh berkas Excel rapi berformat Kop & Grid">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             <span>Unduh Excel (.xls)</span>
           </button>
@@ -322,7 +322,7 @@
       <div id="import-preview-wrap" class="hidden space-y-2">
         <div class="flex items-center justify-between text-xs font-semibold text-gray-700">
           <span id="import-preview-count">0 baris data terdeteksi</span>
-          <span class="text-emerald-600 font-bold">Siap diimpor</span>
+          <span class="text-primary-600 font-bold">Siap diimpor</span>
         </div>
         <div class="max-h-36 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50 p-2">
           <table class="min-w-full text-[11px] divide-y divide-gray-200" id="import-preview-table"></table>
@@ -338,6 +338,7 @@
     </div>
   </div>
 
+  <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
   <script src="../../shared/js/shell.js"></script>
@@ -585,7 +586,7 @@
     }
 
     /* Status Tags */
-    .status-paid { color: #047857; font-weight: bold; background-color: #D1FAE5; }
+    .status-paid { color: #0369a1; font-weight: bold; background-color: #E0F2FE; }
     .status-unpaid { color: #B91C1C; font-weight: bold; background-color: #FEE2E2; }
     .status-pending { color: #B45309; font-weight: bold; background-color: #FEF3C7; }
 

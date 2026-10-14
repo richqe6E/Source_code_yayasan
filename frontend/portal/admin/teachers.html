@@ -19,7 +19,7 @@
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-3">
         <div class="flex items-center gap-2.5">
           <h2 class="text-base font-semibold text-gray-900">Daftar Guru</h2>
-          <span id="teacher-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">24 Tenaga Pendidik</span>
+          <span id="teacher-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-100 text-primary-800">24 Tenaga Pendidik</span>
         </div>
         <button onclick="openTeacherModal()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">+ Tambah Guru</button>
       </div>
@@ -79,6 +79,7 @@
     </div>
   </div>
 
+  <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
   <script src="../../shared/js/shell.js"></script>
@@ -129,10 +130,11 @@
             <td class="px-4 py-3 text-sm font-medium text-gray-900 min-w-0"><span class="truncate block max-w-xs">${t.full_name}</span></td>
             <td class="px-4 py-3 text-sm text-gray-600 truncate">${t.email || '-'}</td>
             <td class="px-4 py-3 text-sm text-gray-600 truncate">${t.specialization || '-'}</td>
-            <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs rounded font-medium ${t.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">${t.is_active ? 'Aktif' : 'Nonaktif'}</span></td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs rounded font-medium ${t.is_active ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'}">${t.is_active ? 'Aktif' : 'Nonaktif'}</span></td>
             <td class="px-4 py-3 text-sm whitespace-nowrap">
               <button onclick="editTeacher('${t.id}')" class="text-primary-700 hover:text-primary-900 mr-3 font-medium">Edit</button>
-              <button onclick="toggleTeacher('${t.id}', ${!t.is_active})" class="${t.is_active ? 'text-red-700 hover:text-red-900' : 'text-green-700 hover:text-green-900'} font-medium">${t.is_active ? 'Nonaktifkan' : 'Aktifkan'}</button>
+              <button onclick="toggleTeacher('${t.id}', ${!t.is_active})" class="${t.is_active ? 'text-amber-700 hover:text-amber-900' : 'text-primary-700 hover:text-primary-900'} font-medium mr-3">${t.is_active ? 'Nonaktifkan' : 'Aktifkan'}</button>
+              <button onclick="deleteTeacher('${t.id}')" class="text-red-700 hover:text-red-900 font-medium">Hapus</button>
             </td>
           </tr>`).join('');
       } catch (e) {
@@ -173,6 +175,13 @@
     async function toggleTeacher(id, activate) {
       const res = await apiCall('teachers', activate ? 'activate' : 'deactivate', { id });
       showToast(res.message, res.success ? 'success' : 'error');
+      if (res.success) loadTeachers();
+    }
+
+    async function deleteTeacher(id) {
+      if (!confirm('Hapus data guru ini? Tindakan ini tidak dapat dibatalkan.')) return;
+      const res = await apiCall('teachers', 'delete', { id });
+      showToast(res.message || (res.success ? 'Data guru berhasil dihapus' : 'Gagal menghapus guru'), res.success ? 'success' : 'error');
       if (res.success) loadTeachers();
     }
 

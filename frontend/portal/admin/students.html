@@ -214,7 +214,7 @@
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500">Password Bawaan:</span>
-            <span id="reset-student-pwd" class="font-mono font-bold text-emerald-700">-</span>
+            <span id="reset-student-pwd" class="font-mono font-bold text-primary-700">-</span>
           </div>
         </div>
 
@@ -224,14 +224,14 @@
         </div>
 
         <div id="reset-done-actions" class="hidden space-y-2">
-          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs mb-3 flex items-center gap-2">
-            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <div class="p-3 bg-primary-50 border border-primary-200 rounded-xl text-primary-800 text-xs mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-primary-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span>Password berhasil direset! Bagikan kredensial ke siswa/ortu:</span>
           </div>
           <button type="button" onclick="copyResetInfo()" class="w-full px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl transition">
             📋 Salin Info Kredensial
           </button>
-          <a id="reset-wa-btn" href="#" target="_blank" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
+          <a id="reset-wa-btn" href="#" target="_blank" class="w-full px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
             <span>Kirim via WhatsApp</span>
           </a>
           <button type="button" onclick="closeResetModal()" class="w-full px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition mt-2">Tutup</button>
@@ -240,6 +240,7 @@
     </div>
   </div>
 
+  <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
   <script src="../../shared/js/shell.js"></script>
@@ -353,7 +354,7 @@
               <div class="text-[11px] text-gray-500 font-mono">${s.parent_phone || s.phone || '-'}</div>
             </td>
             <td class="px-4 py-3.5 whitespace-nowrap">
-              <span class="px-2.5 py-1 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 ${s.status === 'inactive' ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">
+              <span class="px-2.5 py-1 text-[11px] rounded-lg font-semibold inline-flex items-center gap-1 ${s.status === 'inactive' ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-primary-50 text-primary-700 border border-primary-200'}">
                 ${s.status === 'inactive' ? 'Nonaktif' : 'Aktif'}
               </span>
             </td>

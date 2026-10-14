@@ -30,10 +30,9 @@
         <select id="filter-role" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
           <option value="">Semua Role</option>
           <option value="super_admin">Super Admin</option>
-          <option value="admin_tu">Admin TU</option>
-          <option value="guru">Guru</option>
-          <option value="orang_tua">Orang Tua</option>
-          <option value="pendaftar">Pendaftar</option>
+          <option value="admin">Admin</option>
+          <option value="siswa_aktif">Siswa Aktif</option>
+          <option value="calon_siswa">Calon Siswa</option>
         </select>
         <button onclick="loadUsers()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">Filter</button>
       </div>
@@ -79,10 +78,11 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
           <select id="form-role" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option value="super_admin">Super Admin</option>
+            <option value="admin">Admin</option>
             <option value="admin_tu">Admin TU</option>
-            <option value="guru">Guru</option>
-            <option value="orang_tua">Orang Tua</option>
-            <option value="pendaftar">Pendaftar</option>
+            <option value="siswa_aktif">Siswa Aktif</option>
+            <option value="calon_siswa">Calon Siswa</option>
           </select>
         </div>
         <div>
@@ -105,6 +105,7 @@
     </div>
   </div>
 
+  <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
   <script src="../../shared/js/shell.js"></script>
@@ -196,10 +197,11 @@
             </td>
             <td class="px-4 py-3 text-sm text-gray-600 truncate">${u.email}</td>
             <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs font-medium rounded ${roleBadge(rCode)}">${rName}</span></td>
-            <td class="px-4 py-3">${isActive ? '<span class="text-green-700 text-sm font-medium">Aktif</span>' : '<span class="text-gray-500 text-sm">Nonaktif</span>'}</td>
+            <td class="px-4 py-3">${isActive ? '<span class="text-primary-700 text-sm font-medium">Aktif</span>' : '<span class="text-gray-500 text-sm">Nonaktif</span>'}</td>
             <td class="px-4 py-3 text-sm whitespace-nowrap">
-              <button onclick="editUser('${u.id}')" class="text-primary-700 hover:text-primary-900 mr-3 font-medium">Edit</button>
-              ${isActive ? `<button onclick="toggleUser('${u.id}', false)" class="text-red-700 hover:text-red-900 font-medium">Nonaktifkan</button>` : `<button onclick="toggleUser('${u.id}', true)" class="text-green-700 hover:text-green-900 font-medium">Aktifkan</button>`}
+              <button onclick="editUser('${u.id}')" class="text-primary-700 hover:text-primary-900 mr-2 font-medium">Edit</button>
+              ${isActive ? `<button onclick="toggleUser('${u.id}', false)" class="text-amber-700 hover:text-amber-900 mr-2 font-medium">Nonaktifkan</button>` : `<button onclick="toggleUser('${u.id}', true)" class="text-primary-700 hover:text-primary-900 mr-2 font-medium">Aktifkan</button>`}
+              <button onclick="deleteUser('${u.id}')" class="text-red-700 hover:text-red-900 font-medium">Hapus</button>
             </td>
           </tr>
           `;
@@ -213,32 +215,35 @@
 
     const ROLE_MAP = {
       'ROLE-001': { code: 'super_admin', name: 'Super Admin' },
-      'ROLE-002': { code: 'admin_tu', name: 'Admin TU' },
-      'ROLE-003': { code: 'guru', name: 'Guru' },
-      'ROLE-004': { code: 'orang_tua', name: 'Orang Tua' },
-      'ROLE-005': { code: 'pendaftar', name: 'Pendaftar' },
+      'ROLE-002': { code: 'admin', name: 'Admin' },
+      'ROLE-003': { code: 'siswa_aktif', name: 'Siswa Aktif' },
+      'ROLE-004': { code: 'calon_siswa', name: 'Calon Siswa' },
+      'ROLE-005': { code: 'calon_siswa', name: 'Calon Siswa' },
       'super_admin': { code: 'super_admin', name: 'Super Admin' },
-      'admin_tu': { code: 'admin_tu', name: 'Admin TU' },
-      'guru': { code: 'guru', name: 'Guru' },
-      'orang_tua': { code: 'orang_tua', name: 'Orang Tua' },
-      'pendaftar': { code: 'pendaftar', name: 'Pendaftar' }
+      'admin': { code: 'admin', name: 'Admin' },
+      'admin_tu': { code: 'admin', name: 'Admin TU' },
+      'siswa_aktif': { code: 'siswa_aktif', name: 'Siswa Aktif' },
+      'calon_siswa': { code: 'calon_siswa', name: 'Calon Siswa' },
+      'guru': { code: 'admin', name: 'Guru / Tenaga Pendidik' },
+      'orang_tua': { code: 'siswa_aktif', name: 'Orang Tua / Wali' },
+      'pendaftar': { code: 'calon_siswa', name: 'Calon Siswa' }
     };
 
     const ROLE_CODE_TO_ID = {
       super_admin: 'ROLE-001',
+      admin: 'ROLE-002',
       admin_tu: 'ROLE-002',
-      guru: 'ROLE-003',
-      orang_tua: 'ROLE-004',
-      pendaftar: 'ROLE-005'
+      siswa_aktif: 'ROLE-003',
+      calon_siswa: 'ROLE-004'
     };
 
     function roleBadge(role) {
       const map = {
         super_admin: 'bg-red-100 text-red-700',
+        admin: 'bg-purple-100 text-purple-700',
         admin_tu: 'bg-purple-100 text-purple-700',
-        guru: 'bg-green-100 text-green-700',
-        orang_tua: 'bg-blue-100 text-blue-700',
-        pendaftar: 'bg-gray-100 text-gray-700'
+        siswa_aktif: 'bg-primary-100 text-primary-700',
+        calon_siswa: 'bg-amber-100 text-amber-700'
       };
       return map[role] || 'bg-gray-100 text-gray-700';
     }
@@ -278,6 +283,13 @@
       if (!confirm(`${activate ? 'Aktifkan' : 'Nonaktifkan'} user ini?`)) return;
       const res = await apiCall('users', activate ? 'activate' : 'deactivate', { id });
       showToast(res.message, res.success ? 'success' : 'error');
+      if (res.success) loadUsers();
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Hapus akun user ini? Tindakan ini tidak dapat dibatalkan.')) return;
+      const res = await apiCall('users', 'delete', { id });
+      showToast(res.message || (res.success ? 'User berhasil dihapus' : 'Gagal menghapus user'), res.success ? 'success' : 'error');
       if (res.success) loadUsers();
     }
 

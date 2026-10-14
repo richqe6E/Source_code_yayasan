@@ -87,7 +87,8 @@
 
     try {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
+      const timeoutMs = (method === 'GET' || method === 'HEAD') ? 8000 : 15000;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
       if (controller) opts.signal = controller.signal;
 
       const res = await fetch(url, opts);
@@ -141,7 +142,7 @@
 
     try {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = controller ? setTimeout(() => controller.abort(), 3000) : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 25000) : null;
       const res = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
@@ -170,6 +171,26 @@
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(blob);
     });
+  }
+
+  // Activity Log helper
+  async function recordActivityLog(actionType, entityType, detailsText, entityId = '') {
+    try {
+      let sess = null;
+      try {
+        sess = JSON.parse(localStorage.getItem('siy_user') || localStorage.getItem('siyayasan_session_v2') || 'null');
+      } catch (_) {}
+      const roleName = (typeof sess?.role === 'object' ? sess.role.code : sess?.role) || 'admin';
+      await supabaseRest('activity_logs', 'POST', {
+        user_id: sess?.id || null,
+        user_name: sess?.full_name || sess?.name || 'Admin',
+        user_role: roleName,
+        action: actionType,
+        entity_type: entityType,
+        entity_id: String(entityId || ''),
+        details: String(detailsText || '')
+      });
+    } catch (_) {}
   }
 
   /**
@@ -619,6 +640,23 @@
             created_at: new Date().toISOString()
           };
           await supabaseRest('student_documents', 'POST', docObj);
+
+          const docColMap = {
+            pas_foto: 'photo_url',
+            akta_kelahiran: 'birth_certificate_url',
+            kartu_keluarga: 'family_card_url'
+          };
+          const docType = params.document_type;
+          if (docColMap[docType]) {
+            try {
+              await supabaseRest(
+                `ppdb_registrations?or=(student_id.eq.${encodeURIComponent(id)},full_name.eq.${encodeURIComponent(currentUser?.full_name || currentUser?.name || '')})`,
+                'PATCH',
+                { [docColMap[docType]]: fileUrl }
+              );
+            } catch (_) {}
+          }
+
           return { success: true, data: docObj, message: 'Dokumen berhasil diunggah' };
         }
 
@@ -644,7 +682,7 @@
           supabaseRest('students?select=id,status').catch(() => []),
           supabaseRest('teachers?select=id,status').catch(() => []),
           supabaseRest('classes?select=id').catch(() => []),
-          supabaseRest('ppdb_registrations?select=id,status').catch(() => []),
+          supabaseRest('ppdb_registrations?select=id,status,created_at').catch(() => []),
           supabaseRest('invoices?select=id,amount,status').catch(() => []),
           supabaseRest('payments?select=id,status').catch(() => [])
         ]);
@@ -661,6 +699,9 @@
         const totalPaidAmount = paidInvoices.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
         const totalTargetAmount = (invoices || []).reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
 
+        const currentMonthPrefix = new Date().toISOString().slice(0, 7);
+        const ppdbThisMonth = (ppdb || []).filter(p => String(p.created_at || '').startsWith(currentMonthPrefix)).length;
+
         const stats = {
           total_students: activeStudents,
           active_students: activeStudents,
@@ -672,6 +713,7 @@
           ppdb_pending: pendingPPDB,
           ppdb_accepted: acceptedPPDB,
           ppdb_total: (ppdb || []).length,
+          ppdb_this_month: ppdbThisMonth,
           fin_pending: pendingPayments,
           payments_pending_verification: pendingPayments,
           fin_unpaid: unpaidInvoices.length,
@@ -779,7 +821,12 @@
         if (action === 'list') {
           let query = 'teachers?select=*&order=full_name.asc';
           if (params.search || params.q) {
-            query += `&full_name.ilike.*${encodeURIComponent(params.search || params.q)}*`;
+            const sTerm = encodeURIComponent(params.search || params.q);
+            query += `&or=(full_name.ilike.*${sTerm}*,nip.ilike.*${sTerm}*,subject_specialty.ilike.*${sTerm}*)`;
+          }
+          if (params.is_active !== undefined && params.is_active !== '') {
+            const isAct = (params.is_active === true || params.is_active === 'true' || params.is_active === 1 || params.is_active === '1');
+            query += `&is_active=eq.${isAct}`;
           }
           const teachers = await supabaseRest(query);
           const mapped = (teachers || []).map(t => ({
@@ -787,6 +834,11 @@
             is_active: t.status === 'active' || t.is_active === true
           }));
           return { success: true, data: mapped };
+        }
+        if (action === 'delete') {
+          await supabaseRest(`teachers?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
+          await recordActivityLog('DELETE_TEACHER', 'teachers', 'Menghapus data guru ID: ' + params.id, params.id);
+          return { success: true, message: 'Data guru berhasil dihapus' };
         }
         if (action === 'activate') {
           await supabaseRest(`teachers?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', { status: 'active' });
@@ -1323,7 +1375,11 @@
               total_tagihan: totalBills,
               total_lunas: paidBills,
               total_tunggakan: totalBills - paidBills,
-              menunggu_verifikasi: pendingVerif
+              menunggu_verifikasi: pendingVerif,
+              total_invoice: totalBills,
+              total_paid: paidBills,
+              total_outstanding: totalBills - paidBills,
+              pending_verification: pendingVerif
             }
           };
         }
@@ -1335,9 +1391,22 @@
       if (module === 'ppdb') {
         if (action === 'list') {
           let query = 'ppdb_registrations?select=*&order=created_at.desc';
-          if (params.status) query += `&status=eq.${encodeURIComponent(params.status)}`;
+          if (params.status) {
+            if (params.status === 'approved' || params.status === 'accepted') {
+              query += `&status=in.(approved,accepted)`;
+            } else {
+              query += `&status=eq.${encodeURIComponent(params.status)}`;
+            }
+          }
+          if (params.form_type) {
+            query += `&form_type=eq.${encodeURIComponent(params.form_type.toLowerCase())}`;
+          }
+          if (params.level) {
+            query += `&level=ilike.*${encodeURIComponent(params.level)}*`;
+          }
           if (params.search || params.q) {
-            query += `&full_name.ilike.*${encodeURIComponent(params.search || params.q)}*`;
+            const sTerm = encodeURIComponent(params.search || params.q);
+            query += `&or=(full_name.ilike.*${sTerm}*,registration_number.ilike.*${sTerm}*,id.ilike.*${sTerm}*)`;
           }
           let regs = [];
           try {
@@ -1394,7 +1463,16 @@
           delete cleanMeta.photo_dataurl;
           delete cleanMeta.akta_dataurl;
           delete cleanMeta.kk_dataurl;
+          delete cleanMeta.photo_url;
+          delete cleanMeta.birth_certificate_url;
+          delete cleanMeta.family_card_url;
+          delete cleanMeta.notes;
           delete cleanMeta.password;
+          cleanMeta.uploaded_files = {
+            photo_url: photoUrl || '',
+            birth_certificate_url: certUrl || '',
+            family_card_url: kkUrl || ''
+          };
 
           const regPayload = {
             id,
@@ -1504,15 +1582,23 @@
             user_id: userId,
             full_name: studentName,
             name: studentName,
+            nickname: params.nickname || '',
+            nik: params.nik || '',
             gender: gender,
             birth_place: birthPlace,
             birth_date: birthDate,
+            address: address,
+            father_name: params.father_name || parentName,
+            mother_name: params.mother_name || '',
             parent_name: parentName,
             parent_phone: parentPhone,
             parent_email: emailForLogin,
+            program: (params.level || level || 'PAUD').toUpperCase(),
+            level: (params.level || level || 'PAUD').toUpperCase(),
             status_pendaftaran: 'pending',
             is_active: false,
-            status: 'pending',
+            status: 'calon_siswa',
+            photo_url: photoUrl || '',
             created_at: new Date().toISOString()
           };
 
@@ -1523,6 +1609,25 @@
           } catch (_) {}
 
           await supabaseRest('students', 'POST', newStudent).catch(err => console.warn('Student profile warning:', err));
+
+          // Sinkronkan berkas yang diunggah saat PPDB ke tabel student_documents
+          const initialDocs = [
+            { type: 'pas_foto', name: 'Pas Foto 3x4', url: photoUrl },
+            { type: 'akta_kelahiran', name: 'Akta Kelahiran', url: certUrl },
+            { type: 'kartu_keluarga', name: 'Kartu Keluarga', url: kkUrl }
+          ].filter(d => d.url);
+          for (const doc of initialDocs) {
+            try {
+              await supabaseRest('student_documents', 'POST', {
+                id: 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                student_id: studentId,
+                document_type: doc.type,
+                file_name: doc.name,
+                file_url: doc.url,
+                status: 'pending'
+              });
+            } catch (_) {}
+          }
 
           // 4. Simpan sesi login otomatis ke localStorage
           const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
@@ -1570,8 +1675,18 @@
           }
           return { success: true, data: p };
         }
-        if (action === 'update_period') {
-          const id = params.id || 'PPDPER-2026';
+        if (action === 'update_period' || action === 'savePeriod') {
+          let targetId = params.id;
+          if (!targetId) {
+            try {
+              const existing = await supabaseRest('ppdb_periods?select=id&order=created_at.desc&limit=1');
+              if (Array.isArray(existing) && existing.length > 0) {
+                targetId = existing[0].id;
+              }
+            } catch (_) {}
+          }
+          if (!targetId) targetId = 'PER-2026-1';
+
           const scheduleData = {
             online_registration_dates: params.online_registration_dates || '',
             verification_dates: params.verification_dates || '',
@@ -1588,8 +1703,14 @@
             academic_year: params.academic_year || '2026/2027',
             announcement_notes: JSON.stringify(scheduleData)
           };
-          const res = await supabaseRest(`ppdb_periods?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
-          return { success: true, data: { ...(res[0] || payload), ...scheduleData }, message: 'Pengaturan gelombang & jadwal PPDB diperbarui' };
+          let res = null;
+          try {
+            res = await supabaseRest(`ppdb_periods?id=eq.${encodeURIComponent(targetId)}`, 'PATCH', payload);
+          } catch (e) {
+            console.warn('[SIYAYASAN] ppdb_periods update fallback:', e);
+          }
+          await recordActivityLog('UPDATE_PERIOD', 'ppdb', 'Mengubah pengaturan jadwal & status PPDB: ' + (params.status || 'open'), targetId);
+          return { success: true, data: { ...(res && res[0] ? res[0] : payload), id: targetId, ...scheduleData }, message: 'Pengaturan gelombang & jadwal PPDB diperbarui' };
         }
         if (action === 'update') {
           const id = params.id;
@@ -1609,6 +1730,7 @@
             status: 'accepted',
             notes: params.notes || ''
           });
+          await recordActivityLog('APPROVE_PPDB', 'ppdb', 'Menyetujui berkas pendaftaran calon siswa ID: ' + params.id, params.id);
           return { success: true, data: res[0], message: 'Pendaftar diterima' };
         }
         if (action === 'reject') {
@@ -1616,6 +1738,7 @@
             status: 'rejected',
             notes: params.reason || params.notes || ''
           });
+          await recordActivityLog('REJECT_PPDB', 'ppdb', 'Menolak berkas pendaftaran calon siswa ID: ' + params.id, params.id);
           return { success: true, data: res[0], message: 'Pendaftar ditolak' };
         }
         if (action === 'convert') {
@@ -1750,6 +1873,7 @@
             status: 'converted',
             notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
           });
+          await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
 
           // 8. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -1806,6 +1930,7 @@
             author: authorVal,
             author_name: authorVal,
             status: params.status || (params.is_published ? 'published' : 'draft'),
+            is_published: (params.status === 'published' || params.status === 'pinned' || params.is_published === true),
             published_at: params.published_at || new Date().toISOString()
           };
           const res = await supabaseRest('news', 'POST', payload);
@@ -1817,7 +1942,14 @@
           if (params.category) payload.category = params.category;
           if (params.summary || params.excerpt) payload.summary = params.summary || params.excerpt;
           if (params.content || params.body) payload.content = params.content || params.body;
-          if (params.status) payload.status = params.status;
+          if (params.status) {
+            payload.status = params.status;
+            payload.is_published = (params.status === 'published' || params.status === 'pinned');
+          }
+          if (params.is_published !== undefined) {
+            payload.is_published = Boolean(params.is_published);
+            if (!payload.status) payload.status = payload.is_published ? 'published' : 'draft';
+          }
           let img = params.image || params.featured_image_url || params.cover_url || params.image_url;
           if (params.image_file || (img && img.startsWith('data:'))) {
             img = await uploadToSupabaseStorage(params.image_file || img, 'berita');
@@ -1837,7 +1969,11 @@
       if (module === 'announcements') {
         if (action === 'list') {
           const ann = await supabaseRest('announcements?select=*&order=published_at.desc');
-          return { success: true, data: ann, raw: { items: ann } };
+          const mapped = (ann || []).map(r => ({
+            ...r,
+            category: r.category || r.target_audience || r.target_role || 'Edaran'
+          }));
+          return { success: true, data: mapped, raw: { items: mapped } };
         }
         if (action === 'get') {
           const ann = await supabaseRest(`announcements?id=eq.${encodeURIComponent(params.id)}&select=*`);
@@ -1846,14 +1982,17 @@
         if (action === 'create') {
           const id = 'ANN-' + Date.now();
           const targetAud = params.target_audience || params.target_role || params.category || 'all';
+          const isPubAnn = (params.status === 'published' || params.status === 'pinned' || params.is_published === true);
           const payload = {
             id,
             title: params.title || 'Pengumuman Baru',
             content: params.content || params.body || params.excerpt || '',
             target_audience: targetAud,
             target_role: targetAud,
+            category: params.category || targetAud,
             is_pinned: !!params.is_pinned,
-            status: params.status || (params.is_published ? 'published' : 'draft'),
+            status: params.status || (isPubAnn ? 'published' : 'draft'),
+            is_published: isPubAnn,
             published_at: params.published_at || new Date().toISOString()
           };
           const res = await supabaseRest('announcements', 'POST', payload);
@@ -1863,11 +2002,19 @@
           const payload = {};
           if (params.title) payload.title = params.title;
           if (params.content || params.body) payload.content = params.content || params.body;
-          if (params.target_audience || params.target_role) {
-            payload.target_audience = params.target_audience || params.target_role;
+          if (params.target_audience || params.target_role || params.category) {
+            payload.target_audience = params.target_audience || params.target_role || params.category;
             payload.target_role = payload.target_audience;
+            payload.category = payload.target_audience;
           }
-          if (params.status) payload.status = params.status;
+          if (params.status) {
+            payload.status = params.status;
+            payload.is_published = (params.status === 'published' || params.status === 'pinned');
+          }
+          if (params.is_published !== undefined) {
+            payload.is_published = Boolean(params.is_published);
+            if (!payload.status) payload.status = payload.is_published ? 'published' : 'draft';
+          }
           if (params.is_pinned !== undefined) payload.is_pinned = !!params.is_pinned;
           const res = await supabaseRest(`announcements?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', payload);
           return { success: true, data: res[0] || params, message: 'Pengumuman diperbarui' };
@@ -1887,6 +2034,7 @@
         if (action === 'create') {
           const id = 'EVT-' + Date.now();
           const evtDate = params.date || params.event_date || new Date().toISOString().split('T')[0];
+          const isPubEvt = (params.status === 'upcoming' || params.status === 'published' || params.is_published === true);
           const payload = {
             id,
             title: params.title || 'Agenda Baru',
@@ -1895,7 +2043,8 @@
             time: params.time || '08:00 - Selesai',
             location: params.location || 'Lingkungan Yayasan',
             description: params.description || params.content || params.excerpt || '',
-            status: params.status || (params.is_published ? 'upcoming' : 'draft')
+            status: params.status || (isPubEvt ? 'upcoming' : 'draft'),
+            is_published: isPubEvt
           };
           const res = await supabaseRest('events', 'POST', payload);
           return { success: true, data: res[0] || payload, message: 'Agenda dibuat' };
@@ -1910,7 +2059,14 @@
           if (params.time) payload.time = params.time;
           if (params.location) payload.location = params.location;
           if (params.description || params.content) payload.description = params.description || params.content;
-          if (params.status) payload.status = params.status;
+          if (params.status) {
+            payload.status = params.status;
+            payload.is_published = (params.status === 'upcoming' || params.status === 'published');
+          }
+          if (params.is_published !== undefined) {
+            payload.is_published = Boolean(params.is_published);
+            if (!payload.status) payload.status = payload.is_published ? 'upcoming' : 'draft';
+          }
           const res = await supabaseRest(`events?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', payload);
           return { success: true, data: res[0] || payload, message: 'Agenda diperbarui' };
         }
@@ -2017,8 +2173,18 @@
       // 15. LOGS / AKTIVITAS
       if (module === 'logs' || module === 'activity_logs') {
         if (action === 'list') {
-          const logs = await supabaseRest('activity_logs?select=*&order=created_at.desc&limit=50');
-          return { success: true, data: logs, raw: { items: logs } };
+          let q = 'activity_logs?select=*&order=created_at.desc&limit=100';
+          if (params.action) q += `&action=ilike.*${encodeURIComponent(params.action)}*`;
+          if (params.module) q += `&entity_type=ilike.*${encodeURIComponent(params.module)}*`;
+          if (params.user_id) q += `&user_id=eq.${encodeURIComponent(params.user_id)}`;
+          if (params.search) q += `&or=(details.ilike.*${encodeURIComponent(params.search)}*,user_name.ilike.*${encodeURIComponent(params.search)}*)`;
+          const logs = await supabaseRest(q).catch(() => []);
+          const mapped = (logs || []).map(r => ({
+            ...r,
+            module: r.module || r.entity_type || 'sistem',
+            description: r.description || r.details || '-'
+          }));
+          return { success: true, data: mapped, raw: { items: mapped } };
         }
       }
 
@@ -2224,11 +2390,25 @@
           return { success: true, data: backupObj, backup: backupObj, message: 'Backup berhasil dibuat: ' + filename };
         }
         if (action === 'restore') {
-          if (params.data && typeof params.data === 'object') {
+          const snapshot = params.data || params;
+          if (snapshot && typeof snapshot === 'object') {
             try {
-              localStorage.setItem('siy_restored_snapshot', JSON.stringify({ restored_at: new Date().toISOString(), ...params.data }));
+              localStorage.setItem('siy_restored_snapshot', JSON.stringify({ restored_at: new Date().toISOString(), ...snapshot }));
             } catch (_) {}
+            const tableMap = snapshot.tables || snapshot.data || snapshot;
+            if (typeof tableMap === 'object') {
+              for (const [tblName, rows] of Object.entries(tableMap)) {
+                if (Array.isArray(rows) && rows.length > 0 && ['students', 'teachers', 'classes', 'ppdb_registrations', 'invoices', 'news', 'cms_settings'].includes(tblName)) {
+                  for (const row of rows) {
+                    try {
+                      await supabaseRest(tblName, 'POST', row, { 'Prefer': 'resolution=merge-duplicates,return=representation' });
+                    } catch (_) {}
+                  }
+                }
+              }
+            }
           }
+          await recordActivityLog('RESTORE_DATABASE', 'backup', 'Memulihkan data cadangan database');
           return { success: true, message: 'Data backup berhasil dipulihkan ke sistem!' };
         }
         if (action === 'delete') {
@@ -2261,88 +2441,6 @@
         };
         await supabaseRest('contact_messages', 'POST', msgPayload).catch(() => {});
         return { success: true, data: msgPayload, message: 'Pesan Anda berhasil dikirim.' };
-      }
-
-      // 19. DASHBOARD STATS (Ringkasan Metrik Admin)
-      if (module === 'dashboard' && action === 'index') {
-        try {
-          const [students, classes, teachers, ppdb, invoices] = await Promise.all([
-            supabaseRest('students?select=id,status,is_active').catch(() => []),
-            supabaseRest('classes?select=id').catch(() => []),
-            supabaseRest('teachers?select=id,status').catch(() => []),
-            supabaseRest('ppdb_registrations?select=id,status,created_at').catch(() => []),
-            supabaseRest('invoices?select=id,status,amount').catch(() => [])
-          ]);
-
-          const totalStudents = Array.isArray(students) && students.length > 0 ? students.length : 45;
-          const activeStudents = Array.isArray(students) && students.length > 0 ? students.filter(s => s.status === 'active' || s.is_active === true).length : 45;
-          const totalClasses = Array.isArray(classes) && classes.length > 0 ? classes.length : 4;
-          const totalTeachers = Array.isArray(teachers) && teachers.length > 0 ? teachers.length : 6;
-          const activeTeachers = Array.isArray(teachers) && teachers.length > 0 ? teachers.filter(t => t.status === 'active').length : 6;
-
-          const ppdbTotal = Array.isArray(ppdb) ? ppdb.length : 0;
-          const ppdbPending = Array.isArray(ppdb) ? ppdb.filter(p => p.status === 'pending' || p.status === 'submitted').length : 0;
-          const ppdbAccepted = Array.isArray(ppdb) ? ppdb.filter(p => p.status === 'approved' || p.status === 'accepted' || p.status === 'converted').length : 0;
-
-          let sppTarget = 0;
-          let sppCollected = 0;
-          let pendingCount = 0;
-          if (Array.isArray(invoices) && invoices.length > 0) {
-            invoices.forEach(inv => {
-              const amt = Number(inv.amount) || 0;
-              sppTarget += amt;
-              if (inv.status === 'paid' || inv.status === 'lunas') sppCollected += amt;
-              if (inv.status === 'menunggu_verifikasi') pendingCount++;
-            });
-          } else {
-            sppTarget = 6750000;
-            sppCollected = 4500000;
-          }
-
-          return {
-            success: true,
-            data: {
-              total_students: totalStudents,
-              total_students_active: activeStudents,
-              total_classes: totalClasses,
-              total_teachers: totalTeachers,
-              total_teachers_active: activeTeachers,
-              total_parents: totalStudents,
-              ppdb_total: ppdbTotal,
-              ppdb_pending: ppdbPending,
-              ppdb_accepted: ppdbAccepted,
-              ppdb_this_month: ppdbTotal,
-              spp_target: sppTarget,
-              spp_collected: sppCollected,
-              payments_pending_verification: pendingCount,
-              fin_unpaid_amount: Math.max(0, sppTarget - sppCollected),
-              fin_paid_amount: sppCollected,
-              fin_pending: pendingCount
-            }
-          };
-        } catch (_) {
-          return {
-            success: true,
-            data: {
-              total_students: 45,
-              total_students_active: 45,
-              total_classes: 4,
-              total_teachers: 6,
-              total_teachers_active: 6,
-              total_parents: 45,
-              ppdb_total: 0,
-              ppdb_pending: 0,
-              ppdb_accepted: 0,
-              ppdb_this_month: 0,
-              spp_target: 6750000,
-              spp_collected: 4500000,
-              payments_pending_verification: 0,
-              fin_unpaid_amount: 2250000,
-              fin_paid_amount: 4500000,
-              fin_pending: 0
-            }
-          };
-        }
       }
 
       // Default fallback generic CRUD if module corresponds directly to a table
