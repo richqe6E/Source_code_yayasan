@@ -29,6 +29,7 @@ function resolveFilePath(reqPath) {
   // Direct redirects
   if (p === '/admin' || p === '/admin/') return { redirect: '/admin/dashboard.html' };
   if (p === '/siswa' || p === '/siswa/') return { redirect: '/siswa/dashboard.html' };
+  if (p === '/siswa/akademik.html' || p === '/portal/siswa/akademik.html' || p === '/siswa/akademik') return { redirect: '/siswa/dashboard.html' };
   if (p === '/portal/admin' || p === '/portal/admin/') return { redirect: '/admin/dashboard.html' };
   if (p === '/portal/siswa' || p === '/portal/siswa/') return { redirect: '/siswa/dashboard.html' };
   if (p === '/guru' || p === '/guru/' || p === '/ortu' || p === '/ortu/' || p === '/portal/guru' || p === '/portal/ortu') return { redirect: '/login.html' };

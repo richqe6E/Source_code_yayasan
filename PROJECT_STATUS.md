@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 34 (Eksekusi Tahap 4 Gemini 4 Argon: Pembersihan Total Fitur Guru/Nilai, Sinkronisasi Skema SQL Supabase, Hardening 2-Portal E2E & Isolasi Legacy) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 35 (Eksekusi Tahap 5 Gemini 4 Argon: Final CRUD Field Mapping Siswa/Guru, Penyelarasan ALTER TABLE Master Supabase, & Eliminasi File Akademik) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1200,6 +1200,35 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
 
 ---
 
+### 🗓️ Sesi 35 — Eksekusi Tahap 5 Gemini 4 Argon: Final CRUD Field Mapping Siswa/Guru, Penyelarasan ALTER TABLE Master Supabase, & Eliminasi File Akademik (14 Oktober 2026, Siang)
+
+**Pekerjaan:** Mengimplementasikan penyempurnaan CRUD field mapping pada modul siswa dan guru di API adapter dan local mock engine, menyelaraskan blok ALTER TABLE kompatibilitas penuh ke master skema Supabase V2, serta menghapus file fisik `akademik.html` dengan proteksi routing redirect.
+
+**Rincian Perbaikan yang Diterapkan:**
+1. **Lengkapi Field Wali, Kontak, & NIK pada `students/create & update` ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Pada `action === 'create'`: Menyertakan `nik`, `parent_name`, `father_name`, `mother_name`, `parent_email`, `parent_phone`, dan `phone`.
+   - Pada `action === 'update'`: Menambahkan penanganan `nik`, `parent_name`, `father_name`, `mother_name`, `parent_phone`, `phone`, `parent_email`, serta stempel waktu `payload.updated_at = new Date().toISOString()`.
+2. **Lengkapi Field Guru & Pendidik pada `teachers/create & update` ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Pada `action === 'create'`: Mengisi field `name`, `specialization`, `start_date`, dan `joined_at` secara sinkron.
+   - Pada `action === 'update'`: Mengisi pasangan `full_name`/`name`, `position`/`specialization`, `start_date`/`joined_at`, serta `payload.updated_at = new Date().toISOString()`.
+3. **Penyelarasan Mapping `students/update` pada [frontend/local-api.js](frontend/local-api.js):**
+   - Menyinkronkan pembaruan data `nis`, `nik`, `father_name`, `mother_name`, `phone`, `parent_phone`, `parent_email`, `email`, dan `address` agar perilaku mock engine 100% identik dengan Supabase REST.
+4. **Penyelarasan Skema Master Supabase ([database/MASTER_SUPABASE_SETUP_V2.sql](database/MASTER_SUPABASE_SETUP_V2.sql)):**
+   - Menyalin blok nomor 8 (`ALTER TABLE students ...`) dan nomor 9 (`ALTER TABLE schools ...` dan `ALTER TABLE web_settings ...`) dari `patch_missing_columns.sql` ke dalam bagian `-- Migrasi Kolom Kompatibilitas Penuh`.
+5. **Penghapusan File Fisik `akademik.html` & Proteksi Perutean:**
+   - Menghapus file fisik `frontend/portal/siswa/akademik.html` sehingga struktur direktori Portal Siswa murni 4 menu (`dashboard.html`, `biodata.html`, `dokumen.html`, `spp.html`).
+   - Menambahkan aturan redirect di [frontend/dev-server.js](frontend/dev-server.js) dan [frontend/vercel.json](frontend/vercel.json) agar akses ke `/siswa/akademik.html` langsung diarahkan ke `/siswa/dashboard.html`.
+   - Memperbarui [frontend/test-routes.js](frontend/test-routes.js) menjadi 37 rute kanonikal aktif (37/37 sukses 100%).
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **37/37 Rute Lulus 100% (HTTP 200 OK)**.
+- `audit-all-features.js`: **34/34 Skenario Pengujian Lulus 100% (Zero Bug, Zero Regression)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+
+---
+
 ## 6. 📁 Struktur File Penting
 
 ```
@@ -1221,10 +1250,9 @@ frontend/
 │   │   ├── reports.html    <- Ekspor laporan Excel (.xls) & impor massal
 │   │   ├── logs.html       <- Audit log aktivitas
 │   │   └── backup.html     <- Cadangan data JSON & restore database
-│   └── siswa/              <- Portal Siswa Mandiri
+│   └── siswa/              <- Portal Siswa Mandiri (4 Menu Inti)
 │       ├── dashboard.html  <- Ringkasan akademik, kehadiran, tagihan
 │       ├── biodata.html    <- Data diri & profil siswa
-│       ├── akademik.html   <- Pengalihan aman ke dashboard (rapor fisik diserahkan langsung oleh guru)
 │       ├── spp.html        <- Tagihan & konfirmasi bayar mandiri
 │       └── dokumen.html    <- Berkas digital & modal lightbox pratinjau dokumen
 ├── shared/

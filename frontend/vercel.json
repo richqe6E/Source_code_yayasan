@@ -13,6 +13,8 @@
     { "source": "/admin/", "destination": "/admin/dashboard.html", "permanent": false },
     { "source": "/siswa", "destination": "/siswa/dashboard.html", "permanent": false },
     { "source": "/siswa/", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/siswa/akademik.html", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/portal/siswa/akademik.html", "destination": "/siswa/dashboard.html", "permanent": false },
     { "source": "/portal/admin", "destination": "/admin/dashboard.html", "permanent": false },
     { "source": "/portal/admin/", "destination": "/admin/dashboard.html", "permanent": false },
     { "source": "/portal/siswa", "destination": "/siswa/dashboard.html", "permanent": false },

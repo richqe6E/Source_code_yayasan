@@ -723,15 +723,22 @@
         }
         if (action === 'create') {
           const id = 'TEA-' + String(Date.now()).slice(-5);
+          const fullName = params.full_name || params.name || '';
+          const spec = params.specialization || params.position || 'Guru Kelas';
+          const sDate = params.start_date || params.joined_at || new Date().toISOString().slice(0, 10);
           const payload = {
             id,
             nip: params.nip || '',
-            full_name: params.full_name || params.name || '',
+            full_name: fullName,
+            name: fullName,
             gender: params.gender || 'L',
             phone: params.phone || '',
             email: params.email || '',
             education: params.education || 'S1 Pendidikan',
-            position: params.position || params.specialization || 'Guru Kelas',
+            position: params.position || spec,
+            specialization: spec,
+            start_date: sDate,
+            joined_at: sDate,
             status: params.status || (params.is_active === false ? 'inactive' : 'active')
           };
           const res = await supabaseRest('teachers', 'POST', payload);
@@ -741,14 +748,25 @@
           const id = params.id || (currentUser ? (currentUser.teacher_id || currentUser.id) : null);
           const payload = {};
           if (params.nip !== undefined) payload.nip = params.nip;
-          if (params.full_name || params.name) payload.full_name = params.full_name || params.name;
+          if (params.full_name || params.name) {
+            payload.full_name = params.full_name || params.name;
+            payload.name = payload.full_name;
+          }
           if (params.gender !== undefined) payload.gender = params.gender;
           if (params.phone !== undefined) payload.phone = params.phone;
           if (params.email !== undefined) payload.email = params.email;
           if (params.education !== undefined) payload.education = params.education;
-          if (params.position || params.specialization) payload.position = params.position || params.specialization;
+          if (params.position || params.specialization) {
+            payload.position = params.position || params.specialization;
+            payload.specialization = params.specialization || params.position;
+          }
+          if (params.start_date || params.joined_at) {
+            payload.start_date = params.start_date || params.joined_at;
+            payload.joined_at = payload.start_date;
+          }
           if (params.status) payload.status = params.status;
           if (params.is_active !== undefined) payload.status = params.is_active ? 'active' : 'inactive';
+          payload.updated_at = new Date().toISOString();
 
           if (params.avatar_file || (params.avatar && params.avatar.startsWith('data:'))) {
             const avatarUrl = await uploadToSupabaseStorage(params.avatar_file || params.avatar, 'avatar_guru');
@@ -887,10 +905,14 @@
             birth_date: params.birth_date || null,
             class_id: classId,
             class_name: className,
+            nik: params.nik || null,
             parent_id: params.parent_id || null,
-            parent_name: params.parent_name || '',
-            parent_email: params.parent_email || '',
-            parent_phone: params.parent_phone || '',
+            parent_name: params.parent_name || params.father_name || params.mother_name || '',
+            father_name: params.father_name || params.parent_name || '',
+            mother_name: params.mother_name || '',
+            parent_email: params.parent_email || params.email || '',
+            parent_phone: params.parent_phone || params.phone || '',
+            phone: params.phone || params.parent_phone || '',
             photo_url: params.photo_url || null,
             address: params.address || '',
             religion: params.religion || '',
@@ -932,6 +954,21 @@
               if (cls && cls[0]) payload.class_name = cls[0].name;
             }
           }
+          if (params.nik !== undefined) payload.nik = params.nik;
+          if (params.parent_name !== undefined) payload.parent_name = params.parent_name;
+          if (params.father_name !== undefined) {
+            payload.father_name = params.father_name;
+            if (params.parent_name === undefined) payload.parent_name = params.father_name;
+          }
+          if (params.mother_name !== undefined) payload.mother_name = params.mother_name;
+          if (params.parent_phone !== undefined || params.phone !== undefined) {
+            const ph = params.parent_phone !== undefined ? params.parent_phone : params.phone;
+            payload.parent_phone = ph;
+            payload.phone = ph;
+          }
+          if (params.parent_email !== undefined || params.email !== undefined) {
+            payload.parent_email = params.parent_email !== undefined ? params.parent_email : params.email;
+          }
           if (params.address !== undefined) payload.address = params.address;
           if (params.religion !== undefined) payload.religion = params.religion;
           if (params.entry_year !== undefined) payload.entry_year = params.entry_year;
@@ -940,6 +977,7 @@
           if (params.status_kenaikan !== undefined) payload.status_kenaikan = params.status_kenaikan;
           if (params.status !== undefined) payload.status = params.status;
           if (params.photo_url !== undefined) payload.photo_url = params.photo_url;
+          payload.updated_at = new Date().toISOString();
 
           const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
           return { success: true, data: res[0] || payload, message: 'Data siswa diperbarui' };

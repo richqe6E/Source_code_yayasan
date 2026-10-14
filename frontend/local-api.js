@@ -1053,8 +1053,20 @@ function handleApiRequest(apiPath, params, method) {
         stu.class_id = params.class_id;
         stu.class_name = (DB.classes.find(c => c.id === params.class_id) || {}).name || '';
       }
+      if (params.nis != null) stu.nis = params.nis;
+      if (params.nik != null) stu.nik = params.nik;
       if (params.parent_id != null) stu.parent_id = params.parent_id;
       if (params.parent_name != null) stu.parent_name = params.parent_name;
+      if (params.father_name != null) { stu.father_name = params.father_name; if (params.parent_name == null) stu.parent_name = params.father_name; }
+      if (params.mother_name != null) stu.mother_name = params.mother_name;
+      if (params.parent_phone != null || params.phone != null) {
+        stu.parent_phone = params.parent_phone != null ? params.parent_phone : params.phone;
+        stu.phone = stu.parent_phone;
+      }
+      if (params.parent_email != null || params.email != null) {
+        stu.parent_email = params.parent_email != null ? params.parent_email : params.email;
+      }
+      if (params.address != null) stu.address = params.address;
       if (params.birth_place != null) stu.birth_place = params.birth_place;
       if (params.birth_date != null) stu.birth_date = params.birth_date;
       if (params.status != null) stu.status = params.status;

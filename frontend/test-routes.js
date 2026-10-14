@@ -41,7 +41,6 @@ const ROUTES = [
   '/siswa/dashboard.html',
   '/siswa/biodata.html',
   '/siswa/dokumen.html',
-  '/siswa/akademik.html',
   '/siswa/spp.html'
 ];
 
