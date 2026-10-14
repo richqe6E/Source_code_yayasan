@@ -576,6 +576,8 @@ INSERT INTO ppdb_periods (id, name, academic_year, start_date, end_date, reg_sta
 ON CONFLICT (id) DO NOTHING;
 
 -- ==============================================================================
--- PESAN SUKSES
+-- PESAN SUKSES & RELOAD SCHEMA
 -- ==============================================================================
+NOTIFY pgrst, 'reload schema';
+
 SELECT 'SELURUH BACKEND SUPABASE SIYAYASAN V2 BERHASIL DISIAPKAN 100%! Penampung Storage, Tabel Relasional, RLS & Master Data Sudah Siap Digunakan.' as status_laporan;
