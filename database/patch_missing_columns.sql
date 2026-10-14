@@ -117,3 +117,8 @@ CREATE POLICY "Public Full Access on teachers" ON teachers FOR ALL TO anon, auth
 
 DROP POLICY IF EXISTS "Public Full Access on contact_messages" ON contact_messages;
 CREATE POLICY "Public Full Access on contact_messages" ON contact_messages FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+-- 11. Muat Ulang Cache Skema API Supabase Seketika
+NOTIFY pgrst, 'reload schema';
+
+SELECT 'MIGRASI PATCH SUPABASE SIYAYASAN V2 SUKSES 100%!' as status_laporan;
