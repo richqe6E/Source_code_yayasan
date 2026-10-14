@@ -9,8 +9,8 @@
 
   // Supabase Configuration
   const SUPABASE_CONFIG = window.SIYAYASAN_SUPABASE || {
-    url: 'https://hzrjtvmveqygparjjnom.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6cmp0dm12ZXF5Z3Bhcmpqbm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNzkyNTUsImV4cCI6MjEwNDk1NTI1NX0.-aVm6RoQy2_wnmlVV7v_zcL0SXvTenVBsSRYiVj_gQE',
+    url: 'https://hnkxrbmngmveoxipohtk.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhua3hyYm1uZ212ZW94aXBvaHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5MTQ5NTMsImV4cCI6MjEwNDQ5MDk1M30.S10JzbSvvEStbEJl4DFVBYniyoQkG6q7_PGg3cJI9Yo',
     storageBucket: 'siyayasan-uploads'
   };
 
@@ -24,7 +24,7 @@
     catch (e) { return null; }
   }
 
-  let isSupabaseOffline = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
+  let isSupabaseOffline = false;
 
   function normalizeApiResponse(json) {
     if (!json || typeof json !== 'object') return json;

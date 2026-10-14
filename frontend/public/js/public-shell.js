@@ -454,8 +454,8 @@
         }
       }
       if (!school) {
-        const supUrl = (window.SIYAYASAN_SUPABASE && window.SIYAYASAN_SUPABASE.url) || 'https://hzrjtvmveqygparjjnom.supabase.co';
-        const supKey = (window.SIYAYASAN_SUPABASE && window.SIYAYASAN_SUPABASE.anonKey) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6cmp0dm12ZXF5Z3Bhcmpqbm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNzkyNTUsImV4cCI6MjEwNDk1NTI1NX0.-aVm6RoQy2_wnmlVV7v_zcL0SXvTenVBsSRYiVj_gQE';
+        const supUrl = (window.SIYAYASAN_SUPABASE && window.SIYAYASAN_SUPABASE.url) || 'https://hnkxrbmngmveoxipohtk.supabase.co';
+        const supKey = (window.SIYAYASAN_SUPABASE && window.SIYAYASAN_SUPABASE.anonKey) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhua3hyYm1uZ212ZW94aXBvaHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5MTQ5NTMsImV4cCI6MjEwNDQ5MDk1M30.S10JzbSvvEStbEJl4DFVBYniyoQkG6q7_PGg3cJI9Yo';
         try {
           const resp = await fetch(`${supUrl}/rest/v1/schools?select=*&limit=1`, {
             headers: { 'apikey': supKey, 'Authorization': `Bearer ${supKey}` }
