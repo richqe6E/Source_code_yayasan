@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 35 (Eksekusi Tahap 5 Gemini 4 Argon: Final CRUD Field Mapping Siswa/Guru, Penyelarasan ALTER TABLE Master Supabase, & Eliminasi File Akademik) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 36 (Integrasi Live Supabase Cloud hnkxrbmngmveoxipohtk, Resolusi Login Vercel & Sinkronisasi Git/Deploy Otomatis) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -10,6 +10,7 @@
 | Komponen | Status | Nilai / Keterangan |
 | :--- | :---: | :--- |
 | **Repositori GitHub** | ✅ Terkoneksi & Up to Date | https://github.com/richqe6E/Source_code_yayasan (Branch `main`) |
+| **Supabase Cloud DB** | ✅ Aktif & Terverifikasi (100%) | `https://hnkxrbmngmveoxipohtk.supabase.co` (PostgreSQL & Storage) |
 | **Google Apps Script ID** | ✅ Terkoneksi (Pushed v13/v14) | `1unTcAl8cYbIJwrowkatfJNJGQUIpMOcodn768cPUrxD-i_vMRR366Paj` |
 | **Frontend Hosting** | ✅ Aktif (Vercel) | https://siyayasan-portal.vercel.app |
 | **Localhost Server** | ✅ Aktif & Portabel | `http://localhost:3000` — jalankan: `node frontend/dev-server.js` atau `start-server.cmd` |
@@ -1226,6 +1227,36 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
 - `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
 - `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
 - `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+
+---
+
+### 🗓️ Sesi 36 — Integrasi Live Supabase Cloud (Project hnkxrbmngmveoxipohtk), Penyelarasan Otentikasi Vercel, & Sinkronisasi Git/Deploy Otomatis (14 Oktober 2026, Sore)
+
+**Latar Belakang & Masalah:**
+1. **Perbedaan Tampilan Vercel vs Perkembangan Proyek Lokal:** User mendapati bahwa situs Vercel tertinggal (build 23 jam lalu) karena repository GitHub belum terhubung otomatis ke pipeline build Vercel.
+2. **Gagal Login Portal Admin di Vercel:** Saat mencoba masuk menggunakan `admin@yayasan.sch.id` dan `admin123`, proses login gagal (`failed`) akibat project Supabase lama (`hzrjtvmveqygparjjnom.supabase.co`) mengalami kendala DNS (`ENOTFOUND`), sehingga memblokir panggilan API browser.
+3. **Pemberian Kredensial Supabase Baru oleh User:** User menyuplai kredensial proyek Supabase aktif:
+   - URL: `https://hnkxrbmngmveoxipohtk.supabase.co`
+   - Anon Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhua3hyYm1uZ212ZW94aXBvaHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5MTQ5NTMsImV4cCI6MjEwNDQ5MDk1M30.S10JzbSvvEStbEJl4DFVBYniyoQkG6q7_PGg3cJI9Yo`
+   - Publishable Key: `sb_publishable_-wbXSAYyKnsHWXCYE4qwBA_N8mDPOYn`
+
+**Tindakan & Solusi yang Dilakukan:**
+1. **Koneksi Git & Vercel Pipeline:**
+   - Menghubungkan ulang repositori GitHub `richqe6E/Source_code_yayasan` ke project Vercel `siyayasan-portal` via Vercel CLI (`vercel git connect`).
+   - Melakukan force production deployment (`vercel --prod --force --yes`) dari direktori `frontend`.
+2. **Penyelarasan Kredensial Supabase ke Seluruh Berkas Frontend & Test Suite:**
+   - [frontend/shared/js/supabase-config.js](frontend/shared/js/supabase-config.js) — Diperbarui ke project URL dan anon key baru.
+   - [frontend/shared/js/api.js](frontend/shared/js/api.js) — Mengatur default `isSupabaseOffline = false` sehingga browser langsung menghubungi database Supabase aktif tanpa dipaksa ke mode offline lokal, dengan tetap mempertahankan fallback adaptif jika terjadi gangguan jaringan.
+   - [frontend/public/js/app.js](frontend/public/js/app.js) dan [frontend/public/js/public-shell.js](frontend/public/js/public-shell.js) — Sinkronisasi URL Supabase baru.
+   - [test-simulation.js](test-simulation.js), [test-e2e-supabase.js](test-e2e-supabase.js), [test-e2e-lifecycle.js](test-e2e-lifecycle.js), dan [test-supabase-adapter.js](test-supabase-adapter.js) — Seluruh skrip pengujian cloud disinkronkan ke kredensial baru.
+3. **Pengujian & Verifikasi Langsung (Live Database & Vercel):**
+   - Query akun admin pada tabel `users` mengembalikan `USR-ADMIN01` (`admin@yayasan.sch.id`, `super_admin`) dengan status HTTP 200 OK.
+   - Pengambilan 4 rombel kelas (`classes`), profil yayasan (`schools`), periode PPDB (`ppdb_periods`), serta operasi insert/delete pada `contact_messages` berhasil 100%.
+   - `test-simulation.js`: LULUS 100% (5 skenario verifikasi penuh Supabase V2 berhasil).
+   - Pengujian live endpoint Vercel membuktikan `https://siyayasan-portal.vercel.app/shared/js/supabase-config.js` menyajikan kredensial Supabase baru.
+4. **Git Versioning & Deploy Final:**
+   - Seluruh perubahan di-commit dan di-push ke GitHub repository `origin/main` (`961b32f` dan commit status).
+   - Deployment produksi Vercel berstatus `READY` pada URL kanonikal: `https://siyayasan-portal.vercel.app`.
 
 ---
 
