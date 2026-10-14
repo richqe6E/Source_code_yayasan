@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 36 (Integrasi Live Supabase Cloud hnkxrbmngmveoxipohtk, Resolusi Login Vercel & Sinkronisasi Git/Deploy Otomatis) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 37 (Remediasi Komprehensif 12 Temuan Audit BUG-01 s/d BUG-12, Zero-Green Oceanic Blue, Supabase Storage & Vercel Live Deploy) | Status: ✅ PRODUCTION & DATABASE 100% OPERASIONAL & LIVE VERIFIED (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1257,6 +1257,43 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
 4. **Git Versioning & Deploy Final:**
    - Seluruh perubahan di-commit dan di-push ke GitHub repository `origin/main` (`961b32f` dan commit status).
    - Deployment produksi Vercel berstatus `READY` pada URL kanonikal: `https://siyayasan-portal.vercel.app`.
+
+---
+
+### 🗓️ Sesi 37 — Remediasi Komprehensif 12 Temuan Audit (BUG-01 s/d BUG-12), Zero-Green Oceanic Blue, Supabase Storage & Vercel Live Deploy (14 Oktober 2026, Sore)
+
+**Latar Belakang & Ruang Lingkup:**
+Pemeriksaan dan validasi menyeluruh terhadap laporan audit komprehensif SIYAYASAN V2. Ditemukan dan diselesaikan 12 kerentanan dan inkonsistensi sistem yang dieksekusi melalui 4 batch terstruktur (Plan B: Phased Layered Implementation):
+
+**1. Batch 1: Core Engine, API Bridge & Supabase Configuration (LULUS UJI)**
+- **BUG-01 (Timeouts & Payload Sanitization):** Di [api.js](frontend/shared/js/api.js), REST timeout ditingkatkan ke 8s/15s dan storage timeout ke 25s. Menghilangkan base64 string dari `cleanMeta` JSONB payload, dipisahkan ke kolom `uploaded_files`.
+- **BUG-03 (PPDB Dynamic Period ID & State):** `update_period` menyelesaikan dynamic period ID dari tabel `ppdb_periods`. Di [ppdb.html](frontend/portal/admin/ppdb.html), status open mengecek `'open'` dan `'active'`.
+- **BUG-04 (Filter PPDB List Mapping):** Handler `ppdb/list` mendukung query filter Supabase `status=in.(approved,accepted)`, `form_type`, dan `level`.
+- **BUG-05 (KPI Keuangan):** Handler `payments/summary` mengembalikan kunci ganda (`total_invoice`, `total_paid`, `total_outstanding`, `pending_verification` di samping format bahasa Indonesia).
+- **BUG-09 (Dashboard Dead Code, Activity Logs, Backup Restore):** Menghapus 80 baris dead code dashboard duplikat di [api.js](frontend/shared/js/api.js). Helper `recordActivityLog` memetakan kolom riil Supabase (`details` dan `entity_type`). `backup/restore` melakukan upsert langsung ke PostgreSQL Supabase.
+- **BUG-11 pt. 3 (Supabase Config Injection):** Menambahkan script `<script src="../../shared/js/supabase-config.js"></script>` ke seluruh 12 file HTML Portal Admin.
+
+**2. Batch 2: PPDB End-to-End, Student Portal & Public Integrations (LULUS UJI)**
+- **BUG-01 Frontend (Public Submission):** Di [app.js](frontend/public/js/app.js), formulir publik menyimpan biodata lengkap (alamat, NIK, kontak) dan mendaftarkan dokumen ke `student_documents`.
+- **BUG-02 (Admin PPDB Convert to Student):** Di [ppdb.html](frontend/portal/admin/ppdb.html), `showConvertSuccessModal` mendefinisikan `defaultPassword` dan `loginUrl` secara tepat, memperbaiki `ReferenceError`.
+- **BUG-07 (Sinkronisasi Dokumen Siswa & Dashboard Tracker):** Upload dokumen di Portal Siswa menyinkronkan URL berkas kembali ke `ppdb_registrations`. Di [dashboard.html](frontend/portal/siswa/dashboard.html), stepper 4-tahap merender status visual secara dinamis, dan `#student-meta` menampilkan nomor registrasi resmi `REG-...`.
+- **BUG-11 pt. 1 & 2 (WhatsApp & Contact Form Persistence):** Di [kontak.html](frontend/public/kontak.html), format nomor WA dipastikan berawalan `62...`. Formulir kontak menyimpan pesan secara persisten ke tabel `contact_messages`. Di [public-shell.js](frontend/public/js/public-shell.js), tagline sekolah diinjeksi ke footer.
+
+**3. Batch 3: CMS & Operational Admin Modules (LULUS UJI)**
+- **BUG-06 (CMS Publish/Draft, Gallery Delete & Announcement Category):** Sinkronisasi dua arah untuk kolom `status` dan `is_published` pada modul berita, pengumuman, dan agenda. Di [content.html](frontend/portal/admin/content.html), status publish/draft memprioritaskan `item.status`. Ditambahkan tombol hapus galeri. Pengumuman memetakan `category` dari `target_audience`.
+- **BUG-08 (Modernisasi Role, Kelas TK/TPQ, & Filter Guru):** Di [users.html](frontend/portal/admin/users.html), filter role dan form modal disesuaikan dengan arsitektur 2 portal (`super_admin`, `admin`, `siswa_aktif`, `calon_siswa`) beserta handler `deleteUser`. Di [classes.html](frontend/portal/admin/classes.html), tingkat `TK` dan `TPQ` ditambahkan ke dropdown. Di [teachers.html](frontend/portal/admin/teachers.html), pencarian NIP dan filter keaktifan diaktifkan beserta handler `deleteTeacher`.
+- **BUG-10 (Kuitansi Resmi SPP & Terbilang Dinamis):** Di [payments.html](frontend/portal/admin/payments.html) dan [spp.html](frontend/portal/siswa/spp.html), fungsi `angkaKeTerbilang(amount)` mengonversi nominal rupiah secara dinamis, membaca kolom riil `inv.payment_method`.
+
+**4. Batch 4: Zero-Green Oceanic Blue Enforcement (LULUS UJI)**
+- **BUG-12 (Pembersihan Total Warna Hijau/Emerald/Teal):** Mengeliminasi 113 pelanggaran kelas hijau di 14 file HTML Portal Admin dan Siswa, menggantikannya dengan palet Oceanic Blue (`primary-*`, `sky-*` seperti `#0284c7`, `#0ea5e9`).
+- Badge lunas kuitansi diubah menjadi warna biru laut `#f0f9ff`/`#0369a1` dengan border `#bae6fd`.
+- Tabel laporan status di [reports.html](frontend/portal/admin/reports.html) diubah menjadi `#0369a1` / `#E0F2FE`.
+
+**5. Verifikasi Live Supabase & Deploy Vercel Production:**
+- **PostgreSQL Database:** Seluruh 16 tabel relasional aktif dan merespons `HTTP 200 OK`.
+- **Supabase Storage:** Bucket `siyayasan-uploads` dibuat di cloud Supabase dan teruji 100% (Upload 200 OK, Public CDN Read 200 OK, Delete 200 OK).
+- **Vercel Production Deploy:** Berhasil di-deploy ke `https://siyayasan-portal.vercel.app` (Deployment ID: `dpl_Fjq6V1GjmwGV7Wbj2hG2yn7AtMTR`).
+- **Test Automation Suite:** Seluruh rangkaian unit test (`test-batch-1.js`, `test-batch-2.js`, `test-batch-3.js`, `test-batch-4.js`) dan simulasi penuh (`test-simulation.js`) **LULUS 100% (GREEN)**.
 
 ---
 
