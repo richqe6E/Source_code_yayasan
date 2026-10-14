@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 32 (Eksekusi Verifikasi Tahap 2 Gemini 4 Argon: Resiliensi Catch apiCall, Eliminasi 2 ReferenceError Login, Pembersihan Base64 PPDB Metadata, & Sanitasi Keamanan password_hash) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 33 (Eksekusi Tahap 3 Final Schema & Logic Sync Gemini 4 Argon: Sinkronisasi SQL Supabase, Deduplikasi Siswa & User PPDB Convert, Normalisasi CMS & Events, Sanitasi Session password_hash) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1107,6 +1107,44 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
    - Di `frontend/shared/js/api.js` modul `users` aksi `list` dan `get`, menghapus properti `password_hash` dari objek sebelum dikembalikan ke UI untuk mencegah kebocoran hash kata sandi ke browser.
 5. **Pembaruan Snapshot Repositori:**
    - Memperbarui [codebase_snapshot_for_argon.txt](codebase_snapshot_for_argon.txt) ke versi terbaru (715 KB).
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.
+- `audit-all-features.js`: **34/34 Skenario Pengujian Lulus 100% (Zero Bug, Zero Regression)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+
+---
+
+### 🗓️ Sesi 33 — Eksekusi Tahap 3 Final Schema & Logic Sync Gemini 4 Argon (14 Oktober 2026, Siang)
+
+**Pekerjaan:** Mengimplementasikan 6 langkah perbaikan terpadu hasil audit mendalam Gemini 4 Argon (Lead System Auditor) mencakup sinkronisasi skema SQL Supabase, deduplikasi konversi siswa/user PPDB, normalisasi query konten CMS & agenda acara, serta penguatan keamanan sesi client.
+
+**Rincian 6 Perbaikan yang Diterapkan:**
+1. **Sinkronisasi Skema Database & Migrasi Patch Idempoten ([database/MASTER_SUPABASE_SETUP_V2.sql](database/MASTER_SUPABASE_SETUP_V2.sql) & [database/patch_missing_columns.sql](database/patch_missing_columns.sql)):**
+   - Menambahkan kolom `registration_no VARCHAR(100)` pada tabel `ppdb_registrations`.
+   - Menyelaraskan tabel `news` (`author` dan `author_name`), `announcements` (`target_role`, `target_audience`, `is_pinned`), serta `events` (`date`, `event_date`, `time`).
+   - Menyediakan blok migrasi SQL idempoten `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` yang siap dieksekusi langsung di Supabase SQL Editor.
+2. **Sinkronisasi Payload CMS Ganda di [frontend/shared/js/api.js](frontend/shared/js/api.js):**
+   - Pembuatan berita kini mengisi pasangan kolom `author` dan `author_name` secara bersamaan.
+   - Pembuatan & pembaruan pengumuman mengisi pasangan `target_audience` dan `target_role`.
+   - Modul agenda mengisi pasangan `date` dan `event_date` serta normalisasi array output `(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }))`.
+3. **Pencegahan Duplikasi Siswa & User saat Konversi PPDB ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Pencarian akun pendaftar yang sudah ada kini menggunakan multi-field OR query (`email.eq.${studentEmail},username.eq.${regNo},email.eq.${pendaftarEmail}`).
+   - Penggunaan kembali `userId` dan `stuId` yang sudah eksis; jika tabel `students` sudah memiliki ID tersebut, dilakukan operasi `PATCH` (bukan `POST` membabi buta).
+   - Sinkronisasi otomatis jumlah siswa aktif pada rombel target di tabel `classes` (`student_count`).
+4. **Filter Laporan Siswa Aktif & Penambahan `registration_no` ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Ekspor laporan siswa (`reports/generate`) kini terfilter presisi hanya siswa aktif (`students?status=eq.active&select=*&order=full_name.asc`).
+   - Menyertakan `registration_no: regNum` pada payload PPDB baru.
+5. **Sanitasi Kunci `password_hash` dari Penyimpanan Sesi Browser ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Menjalankan `delete userPayload.password_hash;` pada `auth/login` dan `auth/register`.
+   - Menjalankan `delete userSession.password_hash;` pada `ppdb/submitPublic`.
+   - Menjamin hash maupun sandi tidak pernah tersimpan di `localStorage` client sesuai standar OWASP.
+6. **Sinkronisasi Query Events Publik di [frontend/public/js/app.js](frontend/public/js/app.js):**
+   - Mengubah query list events publik menjadi fallback `order=event_date.asc` dengan fallback dan normalisasi atribut `date`/`event_date`.
+7. **Pembaruan Snapshot Repositori:**
+   - Memperbarui [codebase_snapshot_for_argon.txt](codebase_snapshot_for_argon.txt) ke versi terbaru (720.11 KB).
 
 **Hasil Pengujian & Verifikasi Menyeluruh:**
 - `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.

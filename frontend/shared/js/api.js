@@ -320,6 +320,7 @@
             needs_password_change: needsPasswordChange,
             student_id: studentId 
           };
+          delete userPayload.password_hash;
           const token = 'siy_' + matchedUser.id + '_' + Date.now();
 
           // Update last login
@@ -401,6 +402,7 @@
 
           const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
           const userPayload = { ...newUser, role: roleObj, student_id: studentId };
+          delete userPayload.password_hash;
           const token = 'siy_' + userId + '_' + Date.now();
 
           // Auto-persist active session
@@ -1465,6 +1467,7 @@
           const regPayload = {
             id,
             registration_number: regNum,
+            registration_no: regNum,
             student_name: studentName,
             full_name: studentName,
             child_name: studentName,
@@ -1592,6 +1595,7 @@
           // 4. Simpan sesi login otomatis ke localStorage
           const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
           const userSession = { ...newUser, role: roleObj, student_id: studentId };
+          delete userSession.password_hash;
           const token = 'siy_' + userId + '_' + Date.now();
           localStorage.setItem('siy_token', token);
           localStorage.setItem('siy_user', JSON.stringify(userSession));
@@ -1692,7 +1696,6 @@
             return { success: false, message: 'Pendaftar ini sudah pernah dikonversi menjadi siswa aktif.' };
           }
 
-          const stuId = 'STU-' + String(Date.now()).slice(-5);
           const targetClassId = params.class_id || 'CLS-001';
 
           // Ambil nama kelas
@@ -1711,7 +1714,7 @@
             return { success: false, message: `NIS ${studentNis} sudah digunakan oleh siswa aktif lain. Silakan gunakan nomor NIS lain.` };
           }
 
-          // 4. Password awal dari Tanggal Lahir (Format default: YYYY-MM-DD atau DDMMYYYY)
+          // 4. Password awal dari Tanggal Lahir (Format default: DDMMYYYY)
           let birthDateStr = reg.birth_date || reg.student_birth_date ? String(reg.birth_date || reg.student_birth_date).trim() : '2021-01-01';
           let birthDatePassword = birthDateStr;
           if (birthDateStr.includes('-')) {
@@ -1719,21 +1722,30 @@
             if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
           }
 
+          const regNo = reg.registration_number || reg.registration_no || '';
+          const pendaftarEmail = `${regNo.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
           const cleanPhone = (reg.phone || reg.parent_phone || '').replace(/[^0-9]/g, '');
           const studentEmail = reg.email || reg.parent_email || (cleanPhone ? `${studentNis}@siswa.yayasan.sch.id` : `siswa_${studentNis}@yayasan.sch.id`);
           const studentName = reg.student_name || reg.full_name || reg.child_name || 'Santri Baru';
 
-          // 5. Cek apakah user akun pendaftar sudah ada (dari registrasi PPDB Akun-First)
-          let existingUsers = await supabaseRest(`users?email=eq.${encodeURIComponent(studentEmail)}&select=*`);
-          let userId = 'USR-' + studentNis;
+          // 5. Cek apakah user akun pendaftar sudah ada (cari via email, username regNo, atau email pendaftar)
+          let existingUsers = await supabaseRest(
+            `users?or=(email.eq.${encodeURIComponent(studentEmail)},username.eq.${encodeURIComponent(regNo)},email.eq.${encodeURIComponent(pendaftarEmail)})&select=*`
+          ).catch(() => []);
+
+          let userId = (existingUsers && existingUsers[0]) ? existingUsers[0].id : ('USR-' + studentNis);
+          let stuId = (existingUsers && existingUsers[0] && existingUsers[0].student_id)
+            ? existingUsers[0].student_id
+            : ('STU-' + String(Date.now()).slice(-5));
 
           if (existingUsers && existingUsers.length > 0) {
-            userId = existingUsers[0].id;
-            await supabaseRest(`users?id=eq.${userId}`, 'PATCH', {
+            await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', {
+              email: studentEmail,
               role: 'siswa_aktif',
               role_label: 'Siswa Aktif',
               nis: studentNis,
               student_id: stuId,
+              password_hash: birthDatePassword,
               is_password_changed: false,
               status: 'active'
             });
@@ -1755,7 +1767,7 @@
             });
           }
 
-          // 6. Buat / Update Data Siswa Aktif
+          // 6. Buat atau Update Data Siswa Aktif (Tanpa Duplikasi Baris Pending)
           const studentPayload = {
             id: stuId,
             user_id: userId,
@@ -1763,6 +1775,7 @@
             full_name: studentName,
             name: studentName,
             child_name: studentName,
+            nickname: reg.nickname || null,
             gender: reg.gender || reg.student_gender || 'L',
             birth_place: reg.birth_place || reg.student_birth_place || 'Samarinda',
             birth_date: birthDateStr,
@@ -1774,12 +1787,31 @@
             status_pendaftaran: 'accepted',
             is_active: true,
             parent_name: reg.parent_name || reg.father_name || reg.mother_name || '',
+            father_name: reg.father_name || reg.parent_name || '',
+            mother_name: reg.mother_name || '',
             parent_phone: reg.parent_phone || reg.phone || '',
+            phone: reg.phone || reg.parent_phone || '',
             parent_email: studentEmail,
+            photo_url: reg.photo_url || null,
             address: reg.address || '',
             status: 'active'
           };
-          await supabaseRest('students', 'POST', studentPayload);
+
+          const existingStu = await supabaseRest(`students?id=eq.${encodeURIComponent(stuId)}&select=id`).catch(() => []);
+          if (existingStu && existingStu.length > 0) {
+            const patchStu = { ...studentPayload };
+            delete patchStu.id;
+            await supabaseRest(`students?id=eq.${encodeURIComponent(stuId)}`, 'PATCH', patchStu);
+          } else {
+            await supabaseRest('students', 'POST', studentPayload);
+          }
+
+          // Update jumlah siswa di kelas tujuan
+          if (targetClassId) {
+            supabaseRest(`students?class_id=eq.${encodeURIComponent(targetClassId)}&status=eq.active&select=id`).then(list => {
+              supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}`, 'PATCH', { student_count: (list || []).length });
+            }).catch(() => {});
+          }
 
           // 7. Update Status Registrasi PPDB menjadi 'converted'
           await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
@@ -1830,6 +1862,7 @@
           }
           const id = 'NWS-' + Date.now();
           const slug = (params.title || 'berita').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + String(Date.now()).slice(-4);
+          const authorVal = params.author || params.author_name || 'Admin Sekolah';
           const payload = {
             id,
             slug,
@@ -1838,7 +1871,8 @@
             summary: params.summary || params.excerpt || (params.content ? params.content.substring(0, 150) : ''),
             content: params.content || params.body || '',
             image: img || '',
-            author: params.author || 'Admin',
+            author: authorVal,
+            author_name: authorVal,
             status: params.status || (params.is_published ? 'published' : 'draft'),
             published_at: params.published_at || new Date().toISOString()
           };
@@ -1879,11 +1913,13 @@
         }
         if (action === 'create') {
           const id = 'ANN-' + Date.now();
+          const targetAud = params.target_audience || params.target_role || params.category || 'all';
           const payload = {
             id,
             title: params.title || 'Pengumuman Baru',
             content: params.content || params.body || params.excerpt || '',
-            target_audience: params.target_audience || params.category || 'all',
+            target_audience: targetAud,
+            target_role: targetAud,
             is_pinned: !!params.is_pinned,
             status: params.status || (params.is_published ? 'published' : 'draft'),
             published_at: params.published_at || new Date().toISOString()
@@ -1895,7 +1931,10 @@
           const payload = {};
           if (params.title) payload.title = params.title;
           if (params.content || params.body) payload.content = params.content || params.body;
-          if (params.target_audience) payload.target_audience = params.target_audience;
+          if (params.target_audience || params.target_role) {
+            payload.target_audience = params.target_audience || params.target_role;
+            payload.target_role = payload.target_audience;
+          }
           if (params.status) payload.status = params.status;
           if (params.is_pinned !== undefined) payload.is_pinned = !!params.is_pinned;
           const res = await supabaseRest(`announcements?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', payload);
@@ -1909,15 +1948,18 @@
 
       if (module === 'events') {
         if (action === 'list') {
-          const evts = await supabaseRest('events?select=*&order=date.asc');
-          return { success: true, data: evts, raw: { items: evts } };
+          const evts = await supabaseRest('events?select=*&order=event_date.asc').catch(() => supabaseRest('events?select=*'));
+          const normalizedEvts = (evts || []).map(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }));
+          return { success: true, data: normalizedEvts, raw: { items: normalizedEvts } };
         }
         if (action === 'create') {
           const id = 'EVT-' + Date.now();
+          const evtDate = params.date || params.event_date || new Date().toISOString().split('T')[0];
           const payload = {
             id,
             title: params.title || 'Agenda Baru',
-            date: params.date || params.event_date || new Date().toISOString().split('T')[0],
+            date: evtDate,
+            event_date: evtDate,
             time: params.time || '08:00 - Selesai',
             location: params.location || 'Lingkungan Yayasan',
             description: params.description || params.content || params.excerpt || '',
@@ -1929,7 +1971,10 @@
         if (action === 'update') {
           const payload = {};
           if (params.title) payload.title = params.title;
-          if (params.date || params.event_date) payload.date = params.date || params.event_date;
+          if (params.date || params.event_date) {
+            payload.date = params.date || params.event_date;
+            payload.event_date = payload.date;
+          }
           if (params.time) payload.time = params.time;
           if (params.location) payload.location = params.location;
           if (params.description || params.content) payload.description = params.description || params.content;
@@ -2054,7 +2099,7 @@
 
           if (repType === 'students') {
             headers = ['No', 'NIS', 'Nama Lengkap', 'Kelas', 'Jenis Kelamin', 'Nama Wali', 'No. HP / WA', 'Status'];
-            const stu = await supabaseRest('students?select=*').catch(() => []);
+            const stu = await supabaseRest('students?status=eq.active&select=*&order=full_name.asc').catch(() => []);
             rows = (stu || []).map((s, idx) => [
               idx + 1,
               s.nis || '-',

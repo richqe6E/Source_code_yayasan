@@ -128,8 +128,9 @@
 
       if (module === 'events') {
         if (action === 'list') {
-          const evts = await supabaseRest('events?select=*&order=date.asc');
-          return { success: true, data: evts, raw: { items: evts } };
+          const evts = await supabaseRest('events?select=*&order=event_date.asc').catch(() => supabaseRest('events?select=*'));
+          const normalizedEvts = (evts || []).map(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }));
+          return { success: true, data: normalizedEvts, raw: { items: normalizedEvts } };
         }
       }
 

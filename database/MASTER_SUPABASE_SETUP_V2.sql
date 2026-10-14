@@ -263,6 +263,7 @@ CREATE TABLE IF NOT EXISTS ppdb_periods (
 CREATE TABLE IF NOT EXISTS ppdb_registrations (
     id VARCHAR(50) PRIMARY KEY,
     registration_number VARCHAR(100) UNIQUE NOT NULL,
+    registration_no VARCHAR(100),
     student_name VARCHAR(150) NOT NULL,
     full_name VARCHAR(150),
     child_name VARCHAR(150),
@@ -352,6 +353,7 @@ CREATE TABLE IF NOT EXISTS news (
     image_url TEXT,
     image TEXT,
     featured_image_url TEXT,
+    author VARCHAR(150) DEFAULT 'Admin Sekolah',
     author_name VARCHAR(150) DEFAULT 'Admin Sekolah',
     status VARCHAR(20) DEFAULT 'published',
     is_published BOOLEAN DEFAULT TRUE,
@@ -365,6 +367,8 @@ CREATE TABLE IF NOT EXISTS announcements (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     target_role VARCHAR(50) DEFAULT 'all',
+    target_audience VARCHAR(50) DEFAULT 'all',
+    is_pinned BOOLEAN DEFAULT FALSE,
     status VARCHAR(20) DEFAULT 'published',
     is_published BOOLEAN DEFAULT TRUE,
     published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -375,7 +379,9 @@ CREATE TABLE IF NOT EXISTS events (
     id VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    event_date DATE NOT NULL,
+    date DATE DEFAULT CURRENT_DATE,
+    event_date DATE DEFAULT CURRENT_DATE,
+    time VARCHAR(50) DEFAULT '08:00 - Selesai',
     location VARCHAR(255) DEFAULT 'Kampus Yayasan At Tarbiyyah Wijaya Kusuma',
     status VARCHAR(20) DEFAULT 'published',
     is_published BOOLEAN DEFAULT TRUE,
@@ -406,6 +412,33 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 -- Views Alias untuk kompatibilitas frontend apiCall
 CREATE OR REPLACE VIEW gallery AS SELECT * FROM galleries;
 CREATE OR REPLACE VIEW logs AS SELECT * FROM activity_logs;
+
+-- Migrasi Kolom Kompatibilitas Penuh (Safe Idempotent Patch)
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS registration_no VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS full_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS child_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nickname VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nik VARCHAR(30);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_type VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS gender VARCHAR(10) DEFAULT 'L';
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_place VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_date DATE;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS father_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS mother_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS photo_url TEXT;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_certificate_url TEXT;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS family_card_url TEXT;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_metadata JSONB DEFAULT '{}'::jsonb;
+
+ALTER TABLE news ADD COLUMN IF NOT EXISTS author VARCHAR(150) DEFAULT 'Admin Sekolah';
+ALTER TABLE news ADD COLUMN IF NOT EXISTS author_name VARCHAR(150) DEFAULT 'Admin Sekolah';
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_audience VARCHAR(50) DEFAULT 'all';
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_role VARCHAR(50) DEFAULT 'all';
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS event_date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS time VARCHAR(50) DEFAULT '08:00 - Selesai';
 
 -- ==============================================================================
 -- 10. ROW LEVEL SECURITY (RLS) UNTUK AKSES API REST

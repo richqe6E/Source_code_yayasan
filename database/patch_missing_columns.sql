@@ -1,31 +1,37 @@
 -- ==============================================================================
--- SIYAYASAN V2 — PATCH MIGRASI KOLOM AMAN (TANPA HAPUS DATA)
--- Jalankan di Supabase Dashboard -> SQL Editor -> Run
--- Skrip ini TIDAK AKAN MENGHAPUS / MERUBAH data yang sudah ada, hanya menambahkan kolom baru jika belum ada.
+-- PATCH MISSING COLUMNS (SAFE IDEMPOTENT MIGRATION)
+-- Yayasan At Tarbiyyah Wijaya Kusuma Samarinda - SIYAYASAN V2
+-- Jalankan skrip ini di SQL Editor Supabase untuk memastikan seluruh kolom kompatibel
 -- ==============================================================================
 
--- 1. Tambah kolom WhatsApp & Media Sosial ke tabel schools
-ALTER TABLE schools ADD COLUMN IF NOT EXISTS whatsapp_number VARCHAR(50);
-ALTER TABLE schools ADD COLUMN IF NOT EXISTS wa_gateway_token TEXT;
-ALTER TABLE schools ADD COLUMN IF NOT EXISTS instagram_url TEXT;
-ALTER TABLE schools ADD COLUMN IF NOT EXISTS youtube_url TEXT;
-ALTER TABLE schools ADD COLUMN IF NOT EXISTS facebook_url TEXT;
+-- 1. PPDB Registrations
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS registration_no VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS full_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS child_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nickname VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nik VARCHAR(30);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_type VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS gender VARCHAR(10) DEFAULT 'L';
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_place VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_date DATE;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS father_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS mother_name VARCHAR(150);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS photo_url TEXT;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_certificate_url TEXT;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS family_card_url TEXT;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_metadata JSONB DEFAULT '{}'::jsonb;
 
--- 2. Tambah kolom content ke tabel galleries (opsional/kompatibilitas)
-ALTER TABLE galleries ADD COLUMN IF NOT EXISTS content TEXT;
+-- 2. News (Berita)
+ALTER TABLE news ADD COLUMN IF NOT EXISTS author VARCHAR(150) DEFAULT 'Admin Sekolah';
+ALTER TABLE news ADD COLUMN IF NOT EXISTS author_name VARCHAR(150) DEFAULT 'Admin Sekolah';
 
--- 3. Tambah kolom linimasa tanggal resmi ke tabel ppdb_periods
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS reg_start DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS reg_end DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS verif_start DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS verif_end DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS announcement_date DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS reenroll_start DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS reenroll_end DATE;
-ALTER TABLE ppdb_periods ADD COLUMN IF NOT EXISTS announcement_notes TEXT;
+-- 3. Announcements (Pengumuman)
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_audience VARCHAR(50) DEFAULT 'all';
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_role VARCHAR(50) DEFAULT 'all';
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE;
 
--- 4. Buat View Alias agar query 'gallery' dan 'logs' otomatis tersambung
-CREATE OR REPLACE VIEW gallery AS SELECT * FROM galleries;
-CREATE OR REPLACE VIEW logs AS SELECT * FROM activity_logs;
-
-SELECT 'Patch kolom baru berhasil diterapkan 100% tanpa ada data yang terhapus!' as status;
+-- 4. Events (Agenda Kegiatan)
+ALTER TABLE events ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS event_date DATE DEFAULT CURRENT_DATE;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS time VARCHAR(50) DEFAULT '08:00 - Selesai';
