@@ -629,11 +629,14 @@
             query += `&or=(full_name.ilike.*${kw}*,email.ilike.*${kw}*)`;
           }
           const users = await supabaseRest(query);
-          return { success: true, data: users };
+          const safeUsers = (users || []).map(({ password_hash, ...rest }) => rest);
+          return { success: true, data: safeUsers };
         }
         if (action === 'get') {
           const users = await supabaseRest(`users?id=eq.${encodeURIComponent(params.id)}&select=*`);
-          return { success: true, data: users[0] || null };
+          if (!users || users.length === 0) return { success: true, data: null };
+          const { password_hash, ...safeUser } = users[0];
+          return { success: true, data: safeUser };
         }
         if (action === 'create') {
           const id = 'USR-' + String(Date.now()).slice(-5);
@@ -1450,6 +1453,15 @@
           const address = params.address || '';
           const password = params.password || (typeof birthDate === 'string' ? birthDate.replace(/-/g, '') : '123456');
 
+          const cleanMeta = { ...params };
+          delete cleanMeta.photo_file;
+          delete cleanMeta.birth_certificate_file;
+          delete cleanMeta.family_card_file;
+          delete cleanMeta.photo_dataurl;
+          delete cleanMeta.akta_dataurl;
+          delete cleanMeta.kk_dataurl;
+          delete cleanMeta.password;
+
           const regPayload = {
             id,
             registration_number: regNum,
@@ -1483,7 +1495,7 @@
               birth_certificate: certUrl || '',
               family_card: kkUrl || ''
             },
-            form_metadata: params
+            form_metadata: cleanMeta
           };
 
           // 1. Simpan ke tabel ppdb_registrations dengan penanganan skema
@@ -1777,7 +1789,7 @@
 
           // 8. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' ? window.location.origin : '';
-          const loginUrl = `${origin}/public/login.html`;
+          const loginUrl = `${origin}/login.html`;
           const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${birthDatePassword} (Tanggal Lahir: DDMMYYYY)\nLink Portal: ${loginUrl}`;
 
           return {
@@ -2225,7 +2237,8 @@
       return { success: true, data: items, raw: { items } };
 
     } catch (err) {
-      if (!isSupabaseOffline) {
+      const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+      if (isLocalHost && !isSupabaseOffline) {
         isSupabaseOffline = true;
         const localRes = await callLocalBackend(module, action, params, method);
         if (localRes && localRes.success !== undefined) {

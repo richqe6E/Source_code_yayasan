@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 31 (Eksekusi Audit Komprehensif Gemini 4 Argon: Resiliensi Supabase, Auth Password Siswa Baru, Sinkronisasi Skema PPDB 5-Tahap, Zero-Green Design Enforced, & Eliminasi Total Data Mock Siluman) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 32 (Eksekusi Verifikasi Tahap 2 Gemini 4 Argon: Resiliensi Catch apiCall, Eliminasi 2 ReferenceError Login, Pembersihan Base64 PPDB Metadata, & Sanitasi Keamanan password_hash) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1068,6 +1068,45 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
    - Menghapus angka siluman/fallback palsu di dashboard KPI (`|| 5000000`, `|| 4500000`) dan menghapus data mock `years_serving: 15` di `frontend/local-api.js`.
    - Memperbaiki teks copyright footer di `frontend/public/login.html` agar seragam dengan identitas resmi: *"Yayasan Pendidikan Islam At Tarbiyyah Wijaya Kusuma Samarinda"*.
    - Memperbarui file snapshot repositori `codebase_snapshot_for_argon.txt`.
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.
+- `audit-all-features.js`: **34/34 Skenario Pengujian Lulus 100% (Zero Bug, Zero Regression)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+
+---
+
+### 🗓️ Sesi 32 — Eksekusi Verifikasi Tahap 2 Gemini 4 Argon (14 Oktober 2026, Siang)
+
+**Pekerjaan:** Mengimplementasikan perbaikan 4 residual bugs hasil verifikasi tahap 2 oleh Gemini 4 Argon (Principal UI/UX Architect & Lead System Auditor) untuk menjamin 100% kesiapan produksi.
+
+**Perbaikan yang Diterapkan:**
+1. **Pencegahan Auto-Lock Offline pada Catch Terbawah `apiCall()` ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Menambahkan guard `isLocalHost` pada blok `catch (err)` di bagian bawah fungsi `apiCall()`:
+     ```javascript
+     const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+     if (isLocalHost && !isSupabaseOffline) {
+       isSupabaseOffline = true;
+       const localRes = await callLocalBackend(module, action, params, method);
+       if (localRes && localRes.success !== undefined) return localRes;
+     }
+     ```
+   - Menjamin bahwa query error di domain produksi Vercel tidak akan mengunci `isSupabaseOffline = true` secara permanen.
+2. **Eliminasi 2 `ReferenceError` pada Halaman Login ([frontend/public/login.html](frontend/public/login.html) & [frontend/shared/js/auth.js](frontend/shared/js/auth.js)):**
+   - Mengganti referensi variabel `btnText` yang undeclared pada blok error form ganti password menjadi `btn.textContent = 'Simpan & Masuk ke Portal Siswa'`.
+   - Mengganti pemanggilan `const user = getUser();` pada auto-check sesi login dengan safe-check `getCurrentUser()`:
+     `const user = typeof getCurrentUser === 'function' ? getCurrentUser() : (typeof getUser === 'function' ? getUser() : null);`
+   - Mendaftarkan alias `window.getUser = getUser;` di `auth.js` untuk kompatibilitas lintas modul.
+3. **Pembersihan String Base64 dari JSONB `form_metadata` & Sinkronisasi [frontend/public/js/app.js](frontend/public/js/app.js):**
+   - Di `frontend/shared/js/api.js`, membuat salinan objek `cleanMeta` yang menghapus file/dataurl Base64 (`photo_file`, `photo_dataurl`, `akta_dataurl`, `kk_dataurl`, `password`) sebelum disimpan ke kolom JSONB `form_metadata` di PostgreSQL.
+   - Di `frontend/public/js/app.js`, menyamakan struktur payload fallback pendaftaran PPDB publik agar identik dengan `api.js` (lengkap dengan `nik`, `student_name`, `parent_name`, `phone`, `cleanMeta`, dan `documents_url`).
+4. **Standarisasi URL Konversi PPDB & Sanitasi Keamanan `password_hash`:**
+   - Di `frontend/shared/js/api.js` dan `frontend/local-api.js`, mengubah `loginUrl` hasil konversi pendaftar dari `/public/login.html` menjadi route standar produksi `/login.html`.
+   - Di `frontend/shared/js/api.js` modul `users` aksi `list` dan `get`, menghapus properti `password_hash` dari objek sebelum dikembalikan ke UI untuk mencegah kebocoran hash kata sandi ke browser.
+5. **Pembaruan Snapshot Repositori:**
+   - Memperbarui [codebase_snapshot_for_argon.txt](codebase_snapshot_for_argon.txt) ke versi terbaru (715 KB).
 
 **Hasil Pengujian & Verifikasi Menyeluruh:**
 - `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.

@@ -567,18 +567,18 @@
         } else {
           showToast(res.message || 'Gagal mengubah password', 'error');
           btn.disabled = false;
-          btnText.textContent = 'Simpan & Masuk ke SIAKAD';
+          btn.textContent = 'Simpan & Masuk ke Portal Siswa';
         }
       } catch (err) {
         showToast('Terjadi kesalahan saat memperbarui password', 'error');
         btn.disabled = false;
-        btnText.textContent = 'Simpan & Masuk ke SIAKAD';
+        btn.textContent = 'Simpan & Masuk ke Portal Siswa';
       }
     });
 
     // Auto-check jika sudah login
     if (typeof isLoggedIn === 'function' && isLoggedIn()) {
-      const user = getUser();
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : (typeof getUser === 'function' ? getUser() : null);
       if (user && user.role) {
         const redirectUrl = getPortalRedirect(user.role.code || user.role);
         // User bisa tetap logout jika sengaja membuka halaman login

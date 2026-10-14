@@ -83,6 +83,7 @@
 
   // Expose to window
   window.getToken = getToken;
+  window.getUser = getUser;
   window.getCurrentUser = getUser;
   window.setSession = setSession;
   window.clearSession = clearSession;

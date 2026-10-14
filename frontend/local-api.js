@@ -809,7 +809,7 @@ function handleApiRequest(apiPath, params, method) {
         nis: targetNis,
         default_password: defaultPass,
         password_hint: defaultPass,
-        login_url: '/public/login.html'
+        login_url: '/login.html'
       };
       return {
         success: true,

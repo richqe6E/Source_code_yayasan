@@ -178,27 +178,61 @@
 
           const id = 'REG-' + Date.now();
           const regNum = 'REG-' + new Date().getFullYear() + '-' + String(Math.floor(1000 + Math.random() * 9000));
+
+          const cleanMeta = { ...params };
+          delete cleanMeta.photo_file;
+          delete cleanMeta.birth_certificate_file;
+          delete cleanMeta.family_card_file;
+          delete cleanMeta.photo_dataurl;
+          delete cleanMeta.akta_dataurl;
+          delete cleanMeta.kk_dataurl;
+          delete cleanMeta.password;
+
+          const studentName = params.student_name || params.full_name || params.child_name || 'Santri Baru';
+          const parentName = params.parent_name || params.father_name || params.mother_name || 'Orang Tua / Wali';
+          const parentPhone = params.parent_phone || params.phone || params.father_phone || '';
+          const parentEmail = params.parent_email || params.email || '';
+          const birthPlace = params.student_birth_place || params.birth_place || 'Samarinda';
+          const birthDate = params.student_birth_date || params.birth_date || '2021-01-01';
+          const gender = params.student_gender || params.gender || 'L';
+          const level = params.level || (params.form_type === 'tpq' ? 'TPQ' : (params.form_type === 'tk' ? 'TK' : 'PAUD'));
+          const address = params.address || '';
+
           const payload = {
             id,
             registration_number: regNum,
             registration_no: regNum,
-            period_name: params.period_name || 'Tahun Ajaran 2026/2027 Gelombang 1',
-            form_type: params.form_type || 'paud',
-            full_name: params.full_name || params.child_name,
-            child_name: params.child_name || params.full_name,
+            student_name: studentName,
+            full_name: studentName,
+            child_name: studentName,
             nickname: params.nickname || '',
-            gender: params.gender || 'L',
-            birth_place: params.birth_place || 'Samarinda',
-            birth_date: params.birth_date || '2021-01-01',
-            father_name: params.father_name || '',
+            nik: params.nik || '',
+            form_type: params.form_type || (level === 'TPQ' ? 'tpq' : 'paud'),
+            student_gender: gender,
+            gender: gender,
+            student_birth_place: birthPlace,
+            birth_place: birthPlace,
+            student_birth_date: birthDate,
+            birth_date: birthDate,
+            parent_name: parentName,
+            father_name: params.father_name || parentName,
             mother_name: params.mother_name || '',
-            phone: params.phone || params.father_phone || '',
-            address: params.address || '',
+            parent_phone: parentPhone,
+            phone: parentPhone,
+            parent_email: parentEmail,
+            address: address,
+            level: level,
+            status: 'pending',
+            notes: params.notes || '',
             photo_url: photoUrl || '',
             birth_certificate_url: certUrl || '',
             family_card_url: kkUrl || '',
-            notes: params.notes || '',
-            status: 'pending'
+            documents_url: {
+              photo: photoUrl || '',
+              birth_certificate: certUrl || '',
+              family_card: kkUrl || ''
+            },
+            form_metadata: cleanMeta
           };
 
           try {
