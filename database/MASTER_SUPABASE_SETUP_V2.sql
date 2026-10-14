@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS users (
     status VARCHAR(20) DEFAULT 'active',
     avatar TEXT,
     is_password_changed BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP WITH TIME ZONE,
     student_id VARCHAR(50),
     teacher_id VARCHAR(50),
     parent_id VARCHAR(50),
@@ -521,6 +522,33 @@ BEGIN
         EXECUTE format('CREATE POLICY "Public Full Access on %I" ON %I FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);', tbl, tbl);
     END LOOP;
 END $$;
+
+-- ==============================================================================
+-- 10B. SINKRONISASI KOLOM IDEMPOTENT (UNTUK DATABASE DENGAN TABEL LAMA)
+-- ==============================================================================
+-- 1. Pastikan seluruh kolom login V2 & last_login ada di tabel users
+ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_password_changed BOOLEAN DEFAULT TRUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS student_id VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS teacher_id VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_id VARCHAR(50);
+
+-- 2. Pastikan seluruh kolom relasi & status V2 ada di tabel students
+ALTER TABLE students ADD COLUMN IF NOT EXISTS user_id VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS nisn VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS kelas_sekarang VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS semester_sekarang VARCHAR(50) DEFAULT 'Semester 1 (Ganjil)';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS status_kenaikan VARCHAR(50) DEFAULT 'Aktif';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS status_kelulusan VARCHAR(50) DEFAULT 'Belum Lulus';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS status_pendaftaran VARCHAR(30) DEFAULT 'accepted';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS father_name VARCHAR(150);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_name VARCHAR(150);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS religion VARCHAR(50) DEFAULT 'Islam';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS entry_year VARCHAR(10) DEFAULT '2026';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
 
 -- ==============================================================================
 -- 11. MASTER DATA SEED AWAL (SIAP PAKAI)

@@ -83,8 +83,38 @@ ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_occupation VARCHAR(100);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS previous_school VARCHAR(150);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS blood_type VARCHAR(10);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS hobbies TEXT;
-ALTER TABLE students ADD COLUMN IF NOT EXISTS aspirations TEXT;
 ALTER TABLE students ADD COLUMN IF NOT EXISTS joined_at DATE;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS user_id VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS nisn VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS kelas_sekarang VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS semester_sekarang VARCHAR(50) DEFAULT 'Semester 1 (Ganjil)';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS status_kenaikan VARCHAR(50) DEFAULT 'Aktif';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS status_kelulusan VARCHAR(50) DEFAULT 'Belum Lulus';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS status_pendaftaran VARCHAR(30) DEFAULT 'accepted';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS father_name VARCHAR(150);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_name VARCHAR(150);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS religion VARCHAR(50) DEFAULT 'Islam';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS entry_year VARCHAR(10) DEFAULT '2026';
+ALTER TABLE students ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+
+-- 8B. Kolom Otentikasi & Sesi Users V2
+ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_password_changed BOOLEAN DEFAULT TRUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS student_id VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS teacher_id VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_id VARCHAR(50);
+
+-- Pastikan akun Super Admin tersedia
+INSERT INTO users (id, email, password_hash, full_name, name, role, role_label, status, is_password_changed)
+VALUES ('USR-ADMIN01', 'admin@yayasan.sch.id', 'admin123', 'Administrator Yayasan', 'Administrator', 'super_admin', 'Super Admin', 'active', true)
+ON CONFLICT (id) DO UPDATE SET
+  email = EXCLUDED.email,
+  password_hash = EXCLUDED.password_hash,
+  role = EXCLUDED.role,
+  status = 'active';
 
 -- 9. Kolom Lengkap Pengaturan CMS & Identitas Yayasan (Untuk Sinkronisasi Cloud)
 ALTER TABLE schools ADD COLUMN IF NOT EXISTS campus_note TEXT;
