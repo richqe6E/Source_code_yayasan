@@ -96,10 +96,10 @@
 </head>
 <body class="font-sans bg-white text-gray-800 antialiased">
 
-  <div id="site-header"></div>
+  <div id="site-header" class="min-h-[64px] sm:min-h-[80px]"></div>
 
   <!-- ============ HERO CAROUSEL SECTION ============ -->
-  <section class="relative overflow-hidden bg-primary-950 text-white min-h-[500px] lg:min-h-[580px] flex items-center">
+  <section class="relative overflow-hidden bg-primary-950 text-white min-h-[520px] lg:min-h-[600px] flex items-center">
     <!-- Slider Images Container (Controlled via JS) -->
     <div id="hero-slider-container" class="absolute inset-0">
       <!-- Fallback Image / First Slide -->
@@ -111,67 +111,96 @@
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 w-full">
       <div class="max-w-3xl reveal">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] mb-6 drop-shadow-lg text-balance tracking-tight">
-          Membangun Generasi Cerdas &amp; Berkarakter
+        
+        <!-- Kicker Resmi (Bukan Pill Rounded-Full, Tanpa Animasi Ping/Titik Berkedip) -->
+        <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg bg-sky-950/80 border border-sky-400/30 text-sky-200 text-xs sm:text-sm font-medium mb-6 backdrop-blur-sm">
+          <i class="fi fi-rr-graduation-cap text-sky-400"></i>
+          <span>Penerimaan Santri &amp; Siswa Baru TA <strong class="tabular-nums font-semibold text-white">2026/2027</strong></span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.15] mb-6 drop-shadow-lg text-balance tracking-tight text-white">
+          Membangun Generasi Cerdas, Beradab &amp; Berkarakter Qur&#39;ani
         </h1>
-        <p class="text-base sm:text-lg text-sky-100/90 mb-8 leading-relaxed drop-shadow-md text-pretty max-w-2xl font-normal">
-          Yayasan At Tarbiyyah Wijaya Kusuma Samarinda menaungi jenjang PAUD, TK, dan TPQ dengan pendekatan holistik
-          yang mengintegrasikan nilai-nilai Qur'ani, karakter Islami, dan pengembangan potensi anak secara menyeluruh.
+        <p class="text-base sm:text-lg text-sky-100/90 mb-8 leading-relaxed drop-shadow-md text-justify max-w-2xl font-normal">
+          Yayasan At Tarbiyyah Wijaya Kusuma Samarinda menyelenggarakan pendidikan formal dan non-formal pada jenjang 
+          <strong class="font-semibold text-white">PAUD Terpadu, TK, dan TPQ</strong> melalui pendekatan holistik yang mengintegrasikan pembiasaan adab Islami, kecerdasan intelektual, dan pendampingan tumbuh kembang anak secara menyeluruh.
         </p>
-        <div class="flex flex-col sm:flex-row gap-3.5">
-          <a id="hero-ppdb-cta-btn" href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded-xl shadow-lg shadow-black/25 hover:scale-[1.02] active:scale-[0.98] transition-all">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+          <a id="hero-ppdb-cta-btn" href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-black/25 active:scale-[0.98] transition-all">
             <i class="fi fi-rr-paper-plane text-base"></i>
             <span id="hero-ppdb-cta-text">Daftar PPDB Online</span>
           </a>
-          <a href="#program-pendidikan" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold border border-white/30 rounded-xl active:scale-[0.98] transition-all">
-            <i class="fi fi-rr-book-open-cover text-sm"></i>
-            <span>Jelajahi Program Belajar</span>
+          <a href="ppdb/status.html" class="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-sm sm:text-base backdrop-blur-md active:scale-[0.98] transition-all">
+            <i class="fi fi-rr-search text-sm"></i>
+            <span>Cek Status Pendaftaran</span>
           </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ STATS / QUICK INFO ============ -->
+  <!-- ============ 3 PILAR LAYANAN CEPAT INSTITUSI (PENGGANTI STATISTIK DUMMY) ============ -->
   <section class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-            <i class="fi fi-sr-user-graduate text-2xl"></i>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <!-- Pilar 1: 3 Jenjang Pendidikan Terpadu -->
+        <a href="#program-pendidikan" class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-md hover:shadow-lg hover:border-primary-500 transition-all group flex flex-col justify-between">
           <div>
-            <div id="stat-students-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">250+</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium">Siswa Aktif</div>
+            <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+              <i class="fi fi-sr-school text-xl"></i>
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
+              <span class="tabular-nums font-semibold">3</span> Jenjang Pendidikan Terpadu
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 text-justify leading-relaxed">
+              Kurikulum berjenjang dan terstruktur meliputi PAUD Terpadu, Taman Kanak-Kanak (TK), dan Taman Pendidikan Al-Qur&#39;an (TPQ).
+            </p>
           </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-sky-50 text-primary-600 flex items-center justify-center shrink-0">
-            <i class="fi fi-sr-chalkboard-user text-2xl"></i>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-semibold text-primary-700 group-hover:translate-x-1 transition-transform">
+            <span>Pelajari Program</span>
+            <i class="fi fi-rr-arrow-right text-[10px]"></i>
           </div>
+        </a>
+
+        <!-- Pilar 2: Pendaftaran Online 5-Tahap -->
+        <a href="ppdb.html" class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-md hover:shadow-lg hover:border-primary-500 transition-all group flex flex-col justify-between">
           <div>
-            <div id="stat-teachers-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">24</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium">Tenaga Pendidik</div>
+            <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+              <i class="fi fi-sr-clipboard-check text-xl"></i>
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
+              Pendaftaran Online <span class="tabular-nums font-semibold">5</span>-Tahap
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 text-justify leading-relaxed">
+              Alur pendaftaran santri baru yang ringkas, transparan, dan dilengkapi fitur pelacakan status verifikasi berkas secara langsung.
+            </p>
           </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-            <i class="fi fi-sr-school text-2xl"></i>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-semibold text-primary-700 group-hover:translate-x-1 transition-transform">
+            <span>Informasi &amp; Daftar</span>
+            <i class="fi fi-rr-arrow-right text-[10px]"></i>
           </div>
+        </a>
+
+        <!-- Pilar 3: SIAKAD & Administrasi SPP -->
+        <a href="login.html" class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-md hover:shadow-lg hover:border-primary-500 transition-all group flex flex-col justify-between">
           <div>
-            <div id="stat-classes-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">12</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium">Rombongan Belajar</div>
+            <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+              <i class="fi fi-sr-shield-check text-xl"></i>
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
+              SIAKAD &amp; Administrasi SPP
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 text-justify leading-relaxed">
+              Portal terpadu pengelolaan biodata santri, kelengkapan berkas dokumen, tagihan SPP bulanan, serta pencetakan kuitansi resmi.
+            </p>
           </div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-            <i class="fi fi-sr-trophy-star text-2xl"></i>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs font-semibold text-primary-700 group-hover:translate-x-1 transition-transform">
+            <span>Masuk Portal SIAKAD</span>
+            <i class="fi fi-rr-arrow-right text-[10px]"></i>
           </div>
-          <div>
-            <div id="stat-years-count" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-0.5">15</div>
-            <div class="text-xs sm:text-sm text-slate-500 font-medium">Tahun Mengabdi</div>
-          </div>
-        </div>
+        </a>
+
       </div>
     </div>
   </section>
@@ -186,12 +215,14 @@
       </div>
       <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
         <!-- SIAKAD Admin -->
-        <div class="bg-white p-7 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
-          <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mb-5 border border-slate-200">
-            <i class="fi fi-rr-shield-check text-xl"></i>
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mb-5 border border-slate-200">
+              <i class="fi fi-rr-shield-check text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1.5">SIAKAD Administrator</h3>
+            <p class="text-slate-600 mb-5 leading-relaxed text-xs">Pengelolaan data akademik, verifikasi berkas pendaftaran PPDB, dan administrasi sekolah.</p>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-1.5">SIAKAD Administrator</h3>
-          <p class="text-slate-600 mb-5 leading-relaxed text-xs">Pengelolaan data akademik, verifikasi berkas pendaftaran PPDB, dan administrasi sekolah.</p>
           <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
             <span>Akses SIAKAD Admin</span>
             <i class="fi fi-rr-arrow-right text-[10px]"></i>
@@ -199,12 +230,14 @@
         </div>
 
         <!-- SIAKAD Siswa -->
-        <div class="bg-white p-7 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
-          <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mb-5 border border-slate-200">
-            <i class="fi fi-rr-graduation-cap text-xl"></i>
+        <div class="bg-white p-7 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mb-5 border border-slate-200">
+              <i class="fi fi-rr-graduation-cap text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1.5">SIAKAD Siswa</h3>
+            <p class="text-slate-600 mb-5 leading-relaxed text-xs">Kelola biodata santri, unggah berkas pendaftaran, cek tagihan &amp; konfirmasi bayar SPP, serta cetak kuitansi resmi.</p>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-1.5">SIAKAD Siswa</h3>
-          <p class="text-slate-600 mb-5 leading-relaxed text-xs">Akses data akademik, pantau status pendaftaran PPDB online, dan administrasi siswa.</p>
           <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
             <span>Akses SIAKAD Siswa</span>
             <i class="fi fi-rr-arrow-right text-[10px]"></i>
@@ -219,62 +252,111 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Program Pendidikan</h2>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto reveal">
-          Kami menyediakan dua jenjang pendidikan yang disesuaikan dengan tahap perkembangan anak.
+        <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto reveal">
+          Kami menyelenggarakan <strong class="text-slate-800">3 jenjang pendidikan terpadu</strong> untuk membentuk generasi Qur&#39;ani yang cerdas, mandiri, dan berakhlak mulia.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-6 lg:gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
         <!-- PAUD -->
-        <div class="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 reveal delay-100">
-          <div class="w-14 h-14 bg-sky-100 text-primary-700 rounded-2xl flex items-center justify-center mb-5">
-            <i class="fi fi-sr-shapes text-2xl"></i>
+        <div class="bg-white border border-gray-200 rounded-3xl p-7 sm:p-8 hover:shadow-xl transition-all duration-300 reveal delay-100 flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-sky-100 text-primary-700 rounded-2xl flex items-center justify-center mb-5">
+              <i class="fi fi-sr-shapes text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">PAUD (Pendidikan Anak Usia Dini)</h3>
+            <p class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
+              Untuk anak usia 2-4 tahun. Fokus pada stimulasi tumbuh kembang optimal melalui
+              bermain sambil belajar dengan kurikulum yang menyenangkan dan penuh kasih sayang.
+            </p>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600 mb-6">
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+                <span>6 Aspek Perkembangan Holistik</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Pendekatan Sentra &amp; Bermain Edukatif</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Kelas Kecil Ramah Anak (Maks 15 Siswa)</span>
+              </li>
+            </ul>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">PAUD (Pendidikan Anak Usia Dini)</h3>
-          <p class="text-gray-600 mb-5 leading-relaxed text-sm">
-            Untuk anak usia 2-4 tahun. Fokus pada stimulasi tumbuh kembang optimal melalui
-            bermain sambil belajar dengan kurikulum yang menyenangkan dan penuh kasih sayang.
-          </p>
-          <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600">
-            <li class="flex items-start gap-2.5">
-              <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
-              <span>6 Aspek Perkembangan Holistik</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
-              <span>Pendekatan Sentra &amp; Bermain Edukatif</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
-              <span>Kelas Kecil &amp; Pengasuhan Ramah Anak (Maks 15 Siswa)</span>
-            </li>
-          </ul>
+          <div class="pt-4 border-t border-slate-100">
+            <a href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
+              <span>Daftar PAUD Terpadu</span>
+              <i class="fi fi-rr-arrow-right text-[10px]"></i>
+            </a>
+          </div>
         </div>
 
         <!-- TK -->
-        <div class="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300 reveal delay-200">
-          <div class="w-14 h-14 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center mb-5">
-            <i class="fi fi-sr-backpack text-2xl"></i>
+        <div class="bg-white border border-gray-200 rounded-3xl p-7 sm:p-8 hover:shadow-xl transition-all duration-300 reveal delay-200 flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center mb-5">
+              <i class="fi fi-sr-backpack text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">TK (Taman Kanak-kanak)</h3>
+            <p class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
+              Untuk anak usia 4-6 tahun. Persiapan masuk sekolah dasar dengan penguatan
+              kemandirian, sosial-emosional, nilai-nilai adab Islami, dan kesiapan calistung dasar yang menyenangkan.
+            </p>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600 mb-6">
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Calistung Dasar Berbasis Cerita &amp; Permainan</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Project-Based Learning &amp; Eksplorasi Kreatif</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Ekstrakurikuler Seni, Tahfidz &amp; Motorik</span>
+              </li>
+            </ul>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">TK (Taman Kanak-kanak)</h3>
-          <p class="text-gray-600 mb-5 leading-relaxed text-sm">
-            Untuk anak usia 4-6 tahun. Persiapan masuk sekolah dasar dengan penguatan
-            kemandirian, sosial-emosional, nilai-nilai adab Islami, dan kesiapan calistung dasar yang menyenangkan.
-          </p>
-          <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600">
-            <li class="flex items-start gap-2.5">
-              <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
-              <span>Calistung Dasar Berbasis Cerita &amp; Permainan</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
-              <span>Project-Based Learning &amp; Eksplorasi Kreatif</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="fi fi-sr-check-circle text-blue-600 mt-0.5 shrink-0 text-base"></i>
-              <span>Ekstrakurikuler Seni Musik, Tahfidz &amp; Olahraga Motorik</span>
-            </li>
-          </ul>
+          <div class="pt-4 border-t border-slate-100">
+            <a href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
+              <span>Daftar TK Terpadu</span>
+              <i class="fi fi-rr-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- TPQ -->
+        <div class="bg-white border border-gray-200 rounded-3xl p-7 sm:p-8 hover:shadow-xl transition-all duration-300 reveal delay-300 flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-sky-100 text-primary-700 rounded-2xl flex items-center justify-center mb-5">
+              <i class="fi fi-sr-book-alt text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">TPQ (Taman Pendidikan Al-Qur&#39;an)</h3>
+            <p class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
+              Untuk santri usia 5-12 tahun. Pembelajaran membaca Al-Qur&#39;an metode tartil, bimbingan hafalan surat pendek (Juz 30), hafalan doa harian, dan pembiasaan ibadah praktis.
+            </p>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600 mb-6">
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Metode Tartil &amp; Bimbingan Tahfidz Juz 30</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Praktik Wudhu, Sholat &amp; Doa Sehari-hari</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-base"></i>
+                <span>Penanaman Adab &amp; Karakter Santri Qur&#39;ani</span>
+              </li>
+            </ul>
+          </div>
+          <div class="pt-4 border-t border-slate-100">
+            <a href="ppdb.html#formulir-pendaftaran" class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 hover:text-primary-800 transition">
+              <span>Daftar Santri TPQ</span>
+              <i class="fi fi-rr-arrow-right text-[10px]"></i>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -463,38 +545,7 @@
         }
       }
 
-      // Dynamic Live Stats Sync (Sinkronisasi Otomatis dengan Data Guru, Siswa Aktif & Kelas Yayasan)
-      async function syncLiveStats() {
-        try {
-          if (typeof window.apiCall !== 'function') return;
-          const res = await window.apiCall('schools', 'get');
-          if (res && res.success && res.data && res.data.stats) {
-            const st = res.data.stats;
-            const stuEl = document.getElementById('stat-students-count');
-            const teaEl = document.getElementById('stat-teachers-count');
-            const clsEl = document.getElementById('stat-classes-count');
-            const yrEl = document.getElementById('stat-years-count');
-
-            if (stuEl && st.total_students != null) {
-              stuEl.textContent = st.total_students + (st.total_students >= 250 ? '+' : '');
-            }
-            if (teaEl && st.total_teachers != null) {
-              teaEl.textContent = st.total_teachers;
-            }
-            if (clsEl && st.total_classes != null) {
-              clsEl.textContent = st.total_classes;
-            }
-            if (yrEl && st.years_serving != null) {
-              yrEl.textContent = st.years_serving;
-            }
-          }
-        } catch (err) {
-          console.warn('Could not sync live stats:', err);
-        }
-      }
-
       syncPpdbStatus();
-      syncLiveStats();
     });
   </script>
 </body>

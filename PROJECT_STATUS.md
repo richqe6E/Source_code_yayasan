@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 13 Oktober 2026 — Sesi 29 (Sinkronisasi UI/UX Benchmark, Modernisasi Navbar Eksklusif Mobile, Rombak Profil Rata Kanan-Kiri, Penyatuan Kontak TU/WA, & Pembersihan Mutlak Aksen Hijau Sesuai Brand Yayasan) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 30 (Integrasi Dual-Engine Gemini 4 Argon, Eliminasi Total Statistik Dummy Menjadi 3 Pilar Layanan Cepat, Penambahan Jenjang TPQ di Program Pendidikan, & Penegasan Alur SIAKAD) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -998,6 +998,49 @@ Total checks: 171 OK: 171 BAD: 0
   - Menghapus lencana `● Kantor TU & WhatsApp` bertitik hijau dan berlatar hijau di `kontak.html`.
   - Mengubah tombol Chat WhatsApp ke palet biru primer yayasan (`bg-primary-50 text-primary-800`).
   - Menghapus dan mengganti seluruh kelas `emerald`, `green`, dan `teal` pada `ppdb.html`, `ppdb/status.html`, dan `js/app.js` ke palet identitas resmi institusi (`primary-600` / `primary-800` / `slate-900`).
+
+---
+
+### 🗓️ Sesi 30 — Kolaborasi Dual-Engine Gemini 4 Argon: Eliminasi Total Statistik Dummy, 3 Pilar Layanan Cepat, Penambahan Jenjang TPQ, & Penegasan Alur SIAKAD (14 Oktober 2026, Pagi)
+
+**Latar Belakang & Kolaborasi:**
+Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di browser chat)** sebagai *Chief Architect & UI/UX Auditor* dan **Antigravity (di IDE)** sebagai *Implementation & Verification Engineer*. Dibuatkan panduan skill khusus [`GEMINI_ARGON_SKILL.md`](GEMINI_ARGON_SKILL.md). Gemini 4 Argon mengaudit `https://siyayasan-portal.vercel.app/` dan menghasilkan dokumen audit di [`Jawaban dari agen argon.md`](Jawaban%20dari%20agen%20argon.md) yang langsung dieksekusi oleh Antigravity.
+
+**Perbaikan & Refactoring yang Diterapkan:**
+1. **Reservasi Tinggi Navbar & Sub-Label Jenjang Resmi ([frontend/public/index.html](frontend/public/index.html) & [frontend/public/js/public-shell.js](frontend/public/js/public-shell.js)):**
+   - Menambahkan utility `min-h-[64px] sm:min-h-[80px]` inline pada kontainer `<div id="site-header">` di `index.html` untuk mengeliminasi potensi Cumulative Layout Shift (CLS).
+   - Menambahkan sub-label identitas resmi di bawah nama yayasan pada navbar: `PAUD Terpadu • TK • TPQ — Samarinda`.
+
+2. **Refaktor Hero Section ([frontend/public/index.html](frontend/public/index.html)):**
+   - Mengganti kicker badge dari bentuk pill membulat menjadi lencana institusional berwibawa: `rounded-lg bg-sky-950/80 border border-sky-400/30 text-sky-200 text-xs sm:text-sm font-medium` tanpa dot kelap-kelip.
+   - Tahun ajaran diformat tegas: `<strong class="tabular-nums font-semibold text-white">2026/2027</strong>`.
+   - Heading utama: *Membangun Generasi Cerdas, Beradab & Berkarakter Qur'ani*.
+   - Paragraf pengantar diselaraskan dengan rata kanan-kiri (`text-justify`) dan menyebutkan secara eksplisit 3 jenjang resmi: **PAUD Terpadu, TK, dan TPQ**.
+   - Dual Action CTA dioptimalkan: Tombol pendaftaran utama `Daftar PPDB Online` (`rounded-xl bg-primary-600 active:scale-[0.98]`) dan tombol sekunder `Cek Status Pendaftaran` (`ppdb/status.html`).
+
+3. **Eliminasi Total Statistik Dummy Menjadi "3 Pilar Layanan Cepat Institusi" ([frontend/public/index.html](frontend/public/index.html)):**
+   - Menghapus 4 kartu statistik dummy (*250+ Siswa, 24 Guru, 12 Rombel, 15 Tahun*) yang melanggar aturan anti-AI-slop yayasan.
+   - Menggantikannya dengan **3 Pilar Layanan Cepat Institusi** (bento cards berlatar putih dengan border halus, ikon Flaticon Uicons, tipografi rapi, dan link direct action):
+     1. **3 Jenjang Pendidikan Terpadu:** PAUD Terpadu, TK, dan TPQ -> Mengarah langsung ke `#program-pendidikan`.
+     2. **Pendaftaran Online 5-Tahap:** Alur pendaftaran santri baru terpadu -> Mengarah langsung ke `ppdb.html`.
+     3. **SIAKAD & Administrasi SPP:** Pengelolaan santri, SPP, dan kuitansi resmi -> Mengarah langsung ke `login.html`.
+   - Membersihkan fungsi usang `syncLiveStats` dari skrip `index.html`.
+
+4. **Pembaruan Seksi Program Pendidikan & Penambahan Jenjang TPQ ([frontend/public/index.html](frontend/public/index.html)):**
+   - Subjudul diubah dari *"Kami menyediakan dua jenjang..."* menjadi *"Kami menyelenggarakan 3 jenjang pendidikan terpadu..."*.
+   - Mengubah layout grid dari 2 kolom menjadi 3 kolom seimbang (`grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8`).
+   - Menambahkan kartu jenjang ke-3: **TPQ (Taman Pendidikan Al-Qur'an)** untuk santri usia 5-12 tahun lengkap dengan kurikulum tartil, tahfidz Juz 30, hafalan doa harian, dan praktik ibadah sholat.
+   - Menyediakan tombol aksi langsung di setiap kartu program (`Daftar PAUD Terpadu`, `Daftar TK Terpadu`, `Daftar Santri TPQ`).
+
+5. **Penegasan Alur SIAKAD vs Pelacakan PPDB ([frontend/public/index.html](frontend/public/index.html)):**
+   - Memperbarui deskripsi kartu **SIAKAD Siswa** menjadi: *"Kelola biodata santri, unggah berkas pendaftaran, cek tagihan & konfirmasi bayar SPP, serta cetak kuitansi resmi."* (Pemisahan tegas: pelacakan PPDB publik di `ppdb/status.html`, portal SIAKAD siswa untuk santri/wali terdaftar).
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.
+- `audit-all-features.js`: **34/34 Skenario Pengujian Lulus 100% (Zero Bug, Zero Regression)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
 
 ---
 
