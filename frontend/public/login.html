@@ -308,7 +308,7 @@
 
       <!-- Footer Copyright (Sesuai Referensi) -->
       <div class="mt-8 pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400">
-        &copy; 2026 Yayasan Pendidikan Islam Samarinda. All rights reserved.
+        &copy; 2026 Yayasan At Tarbiyyah Wijaya Kusuma Samarinda. Hak cipta dilindungi.
       </div>
     </div>
   </div>
@@ -551,7 +551,8 @@
       try {
         const res = await apiCall('auth', 'change_password', {
           user_id: pendingSessionData.user.id,
-          new_password: newPwd
+          new_password: newPwd,
+          skip_old: true
         });
 
         if (res.success) {

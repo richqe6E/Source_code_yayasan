@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 30 (Integrasi Dual-Engine Gemini 4 Argon, Eliminasi Total Statistik Dummy Menjadi 3 Pilar Layanan Cepat, Penambahan Jenjang TPQ di Program Pendidikan, & Penegasan Alur SIAKAD) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 31 (Eksekusi Audit Komprehensif Gemini 4 Argon: Resiliensi Supabase, Auth Password Siswa Baru, Sinkronisasi Skema PPDB 5-Tahap, Zero-Green Design Enforced, & Eliminasi Total Data Mock Siluman) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1034,6 +1034,40 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
 
 5. **Penegasan Alur SIAKAD vs Pelacakan PPDB ([frontend/public/index.html](frontend/public/index.html)):**
    - Memperbarui deskripsi kartu **SIAKAD Siswa** menjadi: *"Kelola biodata santri, unggah berkas pendaftaran, cek tagihan & konfirmasi bayar SPP, serta cetak kuitansi resmi."* (Pemisahan tegas: pelacakan PPDB publik di `ppdb/status.html`, portal SIAKAD siswa untuk santri/wali terdaftar).
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.
+- `audit-all-features.js`: **34/34 Skenario Pengujian Lulus 100% (Zero Bug, Zero Regression)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+
+---
+
+### 🗓️ Sesi 31 — Eksekusi Rekomendasi Audit Komprehensif Gemini 4 Argon (14 Oktober 2026)
+
+**Pekerjaan:** Mengimplementasikan perbaikan bug teknis, sinkronisasi skema database, penegakan identitas resmi, dan pembersihan residu mock berdasarkan hasil audit menyeluruh Gemini 4 Argon (Lead System Auditor).
+
+**Perbaikan & Refaktor yang Dilakukan:**
+1. **Resiliensi Supabase & Pemulihan Auto-Lock ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Memperbaiki metode `supabaseRest`: Galat kode HTTP (seperti 401 Unauthorized, 404 Not Found, atau 500 Internal Server Error) tidak lagi mengunci `isSupabaseOffline = true` secara permanen.
+   - Hanya kegagalan fisik jaringan (`TypeError / Failed to fetch`) yang mengaktifkan peralihan sementara ke mode offline, menjaga integritas transaksi live Supabase.
+2. **Perbaikan Ganti Password Siswa Baru ([frontend/public/login.html](frontend/public/login.html), [frontend/shared/js/api.js](frontend/shared/js/api.js), [frontend/local-api.js](frontend/local-api.js)):**
+   - Menangani alur aktivasi password awal siswa baru tanpa sandi lama melalui parameter `skip_old: true` dan pelacakan `user_id`.
+   - Mengupdate akun di tabel `students` sekaligus `users` di `local-api.js` agar sesi login berikutnya langsung mengenali kata sandi baru.
+3. **Penanganan Bug Runtime & Skema Cadangan ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Memperbaiki `ReferenceError: recordId is not defined` pada handler `save_evaluasi`.
+   - Memperbaiki query tabel cadangan (backup) dari nama usang `registrations` menjadi `ppdb_registrations`.
+4. **Sinkronisasi Skema PPDB 5-Tahap & Metadata ([database/MASTER_SUPABASE_SETUP_V2.sql](database/MASTER_SUPABASE_SETUP_V2.sql), [frontend/shared/js/api.js](frontend/shared/js/api.js), [frontend/public/ppdb.html](frontend/public/ppdb.html)):**
+   - Menambahkan kolom kompatibilitas (`nik`, `full_name`, `program`, `birth_place`, `birth_date`, `gender`, `parent_name`, `parent_phone`, `address`, `form_metadata`) ke tabel `ppdb_registrations`.
+   - Menyesuaikan handler submit PPDB untuk membungkus seluruh field detail formulir 5 tahap ke dalam `form_metadata` JSONB.
+   - Menyelaraskan default form PPDB ke wilayah operasional yayasan: Kecamatan **Samarinda Ulu** dan Kelurahan contoh **Air Putih**.
+   - Menyelaraskan seed kontak default pada `web_settings` dengan alamat resmi yayasan di Jl. P. Suryanata Gg. Tinggiran.
+5. **Penegakan Standar Brand Zero-Green & Pembersihan Data Siluman:**
+   - Mengubah styling alert toast sukses dari warna hijau (`emerald/green`) menjadi palet resmi **Oceanic Sky Blue** (`bg-sky-50 border-sky-200 text-sky-900`) di `frontend/shared/js/api.js`.
+   - Menghapus angka siluman/fallback palsu di dashboard KPI (`|| 5000000`, `|| 4500000`) dan menghapus data mock `years_serving: 15` di `frontend/local-api.js`.
+   - Memperbaiki teks copyright footer di `frontend/public/login.html` agar seragam dengan identitas resmi: *"Yayasan Pendidikan Islam At Tarbiyyah Wijaya Kusuma Samarinda"*.
+   - Memperbarui file snapshot repositori `codebase_snapshot_for_argon.txt`.
 
 **Hasil Pengujian & Verifikasi Menyeluruh:**
 - `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.

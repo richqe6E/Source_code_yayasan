@@ -105,7 +105,10 @@
       }
       return data;
     } catch (err) {
-      isSupabaseOffline = true;
+      const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+      if (isLocal && (err.name === 'AbortError' || err instanceof TypeError || (err.message && err.message.includes('Failed to fetch')))) {
+        isSupabaseOffline = true;
+      }
       throw err;
     }
   }
@@ -416,22 +419,24 @@
         }
 
         if (action === 'change_password') {
-          if (!currentUser) return { success: false, message: 'Harus login' };
-          const users = await supabaseRest(`users?id=eq.${currentUser.id}&select=*`);
+          const targetUserId = params.user_id || (currentUser ? currentUser.id : null);
+          if (!targetUserId) return { success: false, message: 'Harus login atau menyertakan identitas akun' };
+
+          const users = await supabaseRest(`users?id=eq.${encodeURIComponent(targetUserId)}&select=*`);
           if (!users || users.length === 0) return { success: false, message: 'User tidak ditemukan' };
           
           if (!params.skip_old && users[0].password_hash !== params.old_password) {
             return { success: false, message: 'Password lama salah' };
           }
 
-          await supabaseRest(`users?id=eq.${currentUser.id}`, 'PATCH', {
+          await supabaseRest(`users?id=eq.${encodeURIComponent(targetUserId)}`, 'PATCH', {
             password_hash: params.new_password,
             is_password_changed: true,
             updated_at: new Date().toISOString()
           });
 
-          // Update local session
-          if (currentUser) {
+          // Update local session jika user yang sedang aktif sama
+          if (currentUser && currentUser.id === targetUserId) {
             currentUser.is_password_changed = true;
             currentUser.needs_password_change = false;
             localStorage.setItem('siy_user', JSON.stringify(currentUser));
@@ -1019,6 +1024,7 @@
           };
         }
         if (action === 'save_evaluasi') {
+          const recordId = params.id || ('REC-' + Date.now());
           const studentId = params.student_id;
           const semester = params.semester || 'Semester 1';
           const academicYear = params.academic_year || '2026/2027';
@@ -1448,21 +1454,36 @@
             id,
             registration_number: regNum,
             student_name: studentName,
+            full_name: studentName,
+            child_name: studentName,
+            nickname: params.nickname || '',
+            nik: params.nik || '',
+            form_type: params.form_type || (level === 'TPQ' ? 'tpq' : 'paud'),
             student_gender: gender,
+            gender: gender,
             student_birth_place: birthPlace,
+            birth_place: birthPlace,
             student_birth_date: birthDate,
+            birth_date: birthDate,
             parent_name: parentName,
+            father_name: params.father_name || parentName,
+            mother_name: params.mother_name || '',
             parent_phone: parentPhone,
+            phone: parentPhone,
             parent_email: parentEmail,
             address: address,
             level: level,
             status: 'pending',
             notes: params.notes || '',
+            photo_url: photoUrl || '',
+            birth_certificate_url: certUrl || '',
+            family_card_url: kkUrl || '',
             documents_url: {
               photo: photoUrl || '',
               birth_certificate: certUrl || '',
               family_card: kkUrl || ''
-            }
+            },
+            form_metadata: params
           };
 
           // 1. Simpan ke tabel ppdb_registrations dengan penanganan skema
@@ -2148,7 +2169,7 @@
             supabaseRest('news?select=*').catch(() => []),
             supabaseRest('galleries?select=*').catch(() => []),
             supabaseRest('invoices?select=*').catch(() => []),
-            supabaseRest('registrations?select=*').catch(() => [])
+            supabaseRest('ppdb_registrations?select=*').catch(() => [])
           ]);
           const dStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
           const filename = `backup-yayasan-${dStr}.json`;
@@ -2229,7 +2250,7 @@
       document.body.appendChild(container);
     }
     const colors = {
-      success: 'bg-green-50 border-green-200 text-green-800',
+      success: 'bg-sky-50 border-sky-200 text-sky-900',
       error:   'bg-red-50 border-red-200 text-red-800',
       warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
       info:    'bg-blue-50 border-blue-200 text-blue-800'

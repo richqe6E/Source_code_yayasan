@@ -264,18 +264,33 @@ CREATE TABLE IF NOT EXISTS ppdb_registrations (
     id VARCHAR(50) PRIMARY KEY,
     registration_number VARCHAR(100) UNIQUE NOT NULL,
     student_name VARCHAR(150) NOT NULL,
+    full_name VARCHAR(150),
+    child_name VARCHAR(150),
+    nickname VARCHAR(100),
+    nik VARCHAR(30),
+    form_type VARCHAR(50),
     student_gender VARCHAR(10) DEFAULT 'L',
+    gender VARCHAR(10) DEFAULT 'L',
     student_birth_place VARCHAR(100),
+    birth_place VARCHAR(100),
     student_birth_date DATE,
+    birth_date DATE,
     parent_name VARCHAR(150) NOT NULL,
+    father_name VARCHAR(150),
+    mother_name VARCHAR(150),
     parent_phone VARCHAR(50) NOT NULL,
+    phone VARCHAR(50),
     parent_email VARCHAR(150),
     address TEXT,
     level VARCHAR(50) DEFAULT 'PAUD',
     period_id VARCHAR(50) REFERENCES ppdb_periods(id) ON DELETE SET NULL,
     status VARCHAR(30) DEFAULT 'pending', -- pending, accepted, rejected, review
     notes TEXT,
+    photo_url TEXT,
+    birth_certificate_url TEXT,
+    family_card_url TEXT,
     documents_url JSONB,
+    form_metadata JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -448,10 +463,14 @@ ON CONFLICT (id) DO UPDATE SET
     youtube_url = EXCLUDED.youtube_url,
     facebook_url = EXCLUDED.facebook_url;
 
-INSERT INTO web_settings (id, school_name)
-VALUES ('default', 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA')
+INSERT INTO web_settings (id, school_name, address, phone, whatsapp, email)
+VALUES ('default', 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA', 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124', '081347142829', '081347142829', 'info@attarbiyyah-samarinda.sch.id')
 ON CONFLICT (id) DO UPDATE SET
-    school_name = EXCLUDED.school_name;
+    school_name = EXCLUDED.school_name,
+    address = EXCLUDED.address,
+    phone = EXCLUDED.phone,
+    whatsapp = EXCLUDED.whatsapp,
+    email = EXCLUDED.email;
 
 -- 2. Master Roles
 INSERT INTO roles (id, code, name, description) VALUES
