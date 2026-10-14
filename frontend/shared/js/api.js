@@ -542,19 +542,6 @@
           return { success: true, data: docObj, message: 'Dokumen berhasil diunggah' };
         }
 
-        if (action === 'get_academic') {
-          let id = studentId;
-          if (!id && currentUser && currentUser.id) {
-            const res = await supabaseRest(`students?user_id=eq.${currentUser.id}&select=id`);
-            if (res && res.length > 0) id = res[0].id;
-          }
-          const [records, developments] = await Promise.all([
-            supabaseRest(`academic_records?student_id=eq.${id}&select=*&order=created_at.desc`).catch(() => []),
-            supabaseRest(`developments?student_id=eq.${id}&select=*&order=created_at.desc`).catch(() => [])
-          ]);
-          return { success: true, data: { records: records || [], developments: developments || [] } };
-        }
-
         if (action === 'get_spp') {
           let id = studentId;
           if (!id && currentUser && currentUser.id) {
@@ -574,18 +561,18 @@
       // -------------------------------------------------------------
       if (module === 'dashboard') {
         const [students, teachers, classes, ppdb, invoices, payments] = await Promise.all([
-          supabaseRest('students?select=id,status'),
-          supabaseRest('teachers?select=id,status'),
-          supabaseRest('classes?select=id'),
-          supabaseRest('ppdb_registrations?select=id,status'),
-          supabaseRest('invoices?select=id,amount,status'),
-          supabaseRest('payments?select=id,status')
+          supabaseRest('students?select=id,status').catch(() => []),
+          supabaseRest('teachers?select=id,status').catch(() => []),
+          supabaseRest('classes?select=id').catch(() => []),
+          supabaseRest('ppdb_registrations?select=id,status').catch(() => []),
+          supabaseRest('invoices?select=id,amount,status').catch(() => []),
+          supabaseRest('payments?select=id,status').catch(() => [])
         ]);
 
         const activeStudents = (students || []).filter(s => s.status === 'active').length;
         const activeTeachers = (teachers || []).filter(t => t.status === 'active').length;
         const pendingPPDB = (ppdb || []).filter(p => p.status === 'pending').length;
-        const acceptedPPDB = (ppdb || []).filter(p => p.status === 'accepted' || p.status === 'approved').length;
+        const acceptedPPDB = (ppdb || []).filter(p => p.status === 'accepted' || p.status === 'approved' || p.status === 'converted').length;
         const unpaidInvoices = (invoices || []).filter(i => i.status === 'unpaid');
         const paidInvoices = (invoices || []).filter(i => i.status === 'paid');
         const pendingPayments = (payments || []).filter(p => p.status === 'menunggu_verifikasi').length;
@@ -601,7 +588,7 @@
           total_teachers: activeTeachers,
           total_teachers_active: activeTeachers,
           total_classes: (classes || []).length,
-          total_parents: (students || []).length,
+          total_parents: activeStudents,
           ppdb_pending: pendingPPDB,
           ppdb_accepted: acceptedPPDB,
           ppdb_total: (ppdb || []).length,
@@ -645,13 +632,14 @@
           const roleLabelMap = {
             super_admin: 'Super Admin',
             admin_tu: 'Admin Tata Usaha',
-            guru: 'Guru Kelas',
-            orang_tua: 'Orang Tua / Wali'
+            siswa_aktif: 'Siswa Aktif',
+            calon_siswa: 'Calon Siswa / Pendaftar'
           };
-          const role = params.role || 'guru';
+          const role = params.role || 'admin_tu';
           const payload = {
             id,
             email: params.email,
+            nis: params.nis || null,
             password_hash: params.password || '123456',
             full_name: params.full_name || params.name,
             name: params.name || params.full_name,
@@ -662,15 +650,25 @@
             avatar: params.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
           };
           const created = await supabaseRest('users', 'POST', payload);
-          return { success: true, data: created[0] || payload, message: 'User berhasil dibuat' };
+          const { password_hash, ...safeCreated } = (created && created[0]) || payload;
+          return { success: true, data: safeCreated, message: 'User berhasil dibuat' };
         }
         if (action === 'update') {
           const id = params.id;
+          const roleLabelMap = {
+            super_admin: 'Super Admin',
+            admin_tu: 'Admin Tata Usaha',
+            siswa_aktif: 'Siswa Aktif',
+            calon_siswa: 'Calon Siswa / Pendaftar'
+          };
           const payload = { ...params };
           delete payload.id;
           delete payload.is_active;
           if (params.is_active !== undefined && !payload.status) {
             payload.status = params.is_active ? 'active' : 'inactive';
+          }
+          if (payload.role && !payload.role_label && roleLabelMap[payload.role]) {
+            payload.role_label = roleLabelMap[payload.role];
           }
           if (payload.password) {
             payload.password_hash = payload.password;
@@ -679,7 +677,8 @@
           if (payload.name && !payload.full_name) payload.full_name = payload.name;
           payload.updated_at = new Date().toISOString();
           const updated = await supabaseRest(`users?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
-          return { success: true, data: updated[0] || payload, message: 'User berhasil diperbarui' };
+          const { password_hash, ...safeUpdated } = (updated && updated[0]) || payload;
+          return { success: true, data: safeUpdated, message: 'User berhasil diperbarui' };
         }
         if (action === 'activate' || action === 'deactivate') {
           const status = action === 'activate' ? 'active' : 'inactive';
@@ -697,28 +696,6 @@
       // 4. TEACHERS
       // -------------------------------------------------------------
       if (module === 'teachers') {
-        if (action === 'me') {
-          if (!currentUser) return { success: false, message: 'Sesi tidak valid' };
-          let teachers = await supabaseRest(`teachers?user_id=eq.${currentUser.id}&select=*`);
-          if (!teachers || teachers.length === 0) {
-            teachers = await supabaseRest(`teachers?email=eq.${encodeURIComponent(currentUser.email)}&select=*`);
-          }
-          const teacher = teachers[0] || {
-            id: currentUser.teacher_id || 'TEA-001',
-            full_name: currentUser.full_name,
-            email: currentUser.email
-          };
-          const classes = await supabaseRest(`classes?teacher_id=eq.${teacher.id}&select=*`);
-          const classIds = (classes || []).map(c => c.id);
-          let students = [];
-          if (classIds.length > 0) {
-            students = await supabaseRest(`students?class_id=in.(${classIds.join(',')})&status=eq.active&select=*`);
-          }
-          return {
-            success: true,
-            data: { teacher, classes, students }
-          };
-        }
         if (action === 'list') {
           let query = 'teachers?select=*&order=full_name.asc';
           if (params.search || params.q) {
@@ -791,6 +768,10 @@
 
           const res = await supabaseRest(`teachers?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
           return { success: true, data: res[0] || payload, message: 'Data profil guru berhasil diperbarui' };
+        }
+        if (action === 'delete') {
+          await supabaseRest(`teachers?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
+          return { success: true, message: 'Data pendidik berhasil dihapus' };
         }
       }
 
@@ -869,20 +850,16 @@
         if (action === 'list') {
           let query = 'students?select=*&order=full_name.asc';
           if (params.class_id) query += `&class_id=eq.${encodeURIComponent(params.class_id)}`;
-          if (params.status) query += `&status=eq.${encodeURIComponent(params.status)}`;
+          if (params.status) {
+            query += `&status=eq.${encodeURIComponent(params.status)}`;
+          } else {
+            query += `&status=neq.pending`;
+          }
           if (params.search || params.q) {
             query += `&full_name.ilike.*${encodeURIComponent(params.search || params.q)}*`;
           }
           const students = await supabaseRest(query);
           return { success: true, data: students };
-        }
-        if (action === 'myChildren') {
-          if (!currentUser) return { success: false, message: 'Sesi habis' };
-          let query = currentUser.student_id 
-            ? `students?or=(id.eq.${encodeURIComponent(currentUser.student_id)},parent_email.eq.${encodeURIComponent(currentUser.email)},parent_id.eq.${encodeURIComponent(currentUser.parent_id || 'NONE')})&select=*`
-            : `students?or=(parent_email.eq.${encodeURIComponent(currentUser.email)},parent_id.eq.${encodeURIComponent(currentUser.parent_id || 'NONE')})&select=*`;
-          const children = await supabaseRest(query);
-          return { success: true, data: { children } };
         }
         if (action === 'get') {
           const students = await supabaseRest(`students?id=eq.${encodeURIComponent(params.id)}&select=*`);
@@ -1028,59 +1005,9 @@
             }
           };
         }
-        if (action === 'save_evaluasi') {
-          const recordId = params.id || ('REC-' + Date.now());
-          const studentId = params.student_id;
-          const semester = params.semester || 'Semester 1';
-          const academicYear = params.academic_year || '2026/2027';
-          const aspects = params.aspects || {};
-          const notes = params.notes || '';
-          
-          const aspObj = typeof aspects === 'object' ? aspects : {};
-          const payload = {
-            id: recordId,
-            student_id: studentId,
-            academic_year: academicYear,
-            semester: semester,
-            aspects_json: typeof aspects === 'string' ? aspects : JSON.stringify(aspects),
-            aspect_nam: aspObj.agama || 'BSH',
-            aspect_fisik_motorik: aspObj.motorik || 'BSH',
-            aspect_kognitif: aspObj.kognitif || 'BSH',
-            aspect_bahasa: aspObj.bahasa || 'BSH',
-            aspect_sosial_emosional: aspObj.sosem || 'BSH',
-            aspect_seni: aspObj.seni || 'BSH',
-            catatan_wali_kelas: notes,
-            teacher_notes: notes,
-            created_at: new Date().toISOString()
-          };
-          const res = await supabaseRest('academic_records', 'POST', payload);
-          return { success: true, data: res, message: 'Evaluasi perkembangan siswa berhasil disimpan' };
-        }
         if (action === 'delete') {
           await supabaseRest(`students?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
           return { success: true, message: 'Siswa berhasil dihapus' };
-        }
-      }
-
-      // -------------------------------------------------------------
-      // 7. PARENTS
-      // -------------------------------------------------------------
-      if (module === 'parent' || module === 'parents') {
-        if (action === 'me') {
-          if (!currentUser) return { success: false, message: 'Sesi habis' };
-          let parents = await supabaseRest(`parents?or=(user_id.eq.${currentUser.id},email.eq.${encodeURIComponent(currentUser.email)})&select=*`);
-          const parent = parents[0] || {
-            id: currentUser.parent_id || 'PAR-001',
-            father_name: currentUser.full_name,
-            email: currentUser.email,
-            phone: currentUser.phone
-          };
-          return { success: true, data: { parent } };
-        }
-        if (action === 'update_profile') {
-          const parentId = params.id || currentUser.parent_id || 'PAR-001';
-          const res = await supabaseRest(`parents?id=eq.${encodeURIComponent(parentId)}`, 'PATCH', params);
-          return { success: true, data: res[0] || params, message: 'Profil orang tua diperbarui' };
         }
       }
 
@@ -1281,119 +1208,6 @@
               menunggu_verifikasi: pendingVerif
             }
           };
-        }
-      }
-
-      // -------------------------------------------------------------
-      // 10. ATTENDANCE
-      // -------------------------------------------------------------
-      if (module === 'attendance') {
-        if (action === 'roster') {
-          const date = params.date || new Date().toISOString().slice(0, 10);
-          const classId = params.class_id || 'CLS-001';
-
-          const [students, attendances] = await Promise.all([
-            supabaseRest(`students?class_id=eq.${encodeURIComponent(classId)}&status=eq.active&select=*`),
-            supabaseRest(`attendance?class_id=eq.${encodeURIComponent(classId)}&date=eq.${encodeURIComponent(date)}&select=*`)
-          ]);
-
-          const attMap = {};
-          (attendances || []).forEach(a => { attMap[a.student_id] = a; });
-
-          const records = (students || []).map(s => {
-            const att = attMap[s.id];
-            return {
-              id: s.id,
-              student_id: s.id,
-              full_name: s.full_name,
-              name: s.full_name,
-              nis: s.nis,
-              status: att ? att.status : 'hadir',
-              notes: att ? att.notes : ''
-            };
-          });
-
-          return { success: true, data: records, raw: { students: records, records, existing: attendances || [] } };
-        }
-        if (action === 'submit') {
-          const records = params.records || [];
-          const date = params.date || new Date().toISOString().slice(0, 10);
-          const classId = params.class_id;
-
-          for (const r of records) {
-            const id = r.id || 'ATT-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
-            // Delete existing on same date and student
-            await supabaseRest(`attendance?student_id=eq.${encodeURIComponent(r.student_id)}&date=eq.${encodeURIComponent(date)}`, 'DELETE').catch(() => {});
-            await supabaseRest('attendance', 'POST', {
-              id,
-              student_id: r.student_id,
-              student_name: r.student_name,
-              class_id: classId,
-              date,
-              status: r.status || 'H',
-              notes: r.notes || '',
-              created_by: currentUser ? currentUser.full_name : ''
-            });
-          }
-          return { success: true, message: 'Presensi berhasil disimpan' };
-        }
-        if (action === 'history') {
-          let query = 'attendance?select=*&order=date.desc';
-          if (params.student_id) query += `&student_id=eq.${encodeURIComponent(params.student_id)}`;
-          const history = await supabaseRest(query);
-          return { success: true, data: history };
-        }
-        if (action === 'summary') {
-          const date = params.date || new Date().toISOString().slice(0, 10);
-          const atts = await supabaseRest(`attendance?date=eq.${encodeURIComponent(date)}&select=status`);
-          const counts = { H: 0, S: 0, I: 0, A: 0 };
-          (atts || []).forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
-          return { success: true, data: counts };
-        }
-      }
-
-      // -------------------------------------------------------------
-      // 11. DEVELOPMENT (RAPOR 6 ASPEK)
-      // -------------------------------------------------------------
-      if (module === 'development') {
-        if (action === 'list') {
-          let query = 'developments?select=*&order=created_at.desc';
-          if (params.student_id) query += `&student_id=eq.${encodeURIComponent(params.student_id)}`;
-          if (params.semester) query += `&semester=eq.${encodeURIComponent(params.semester)}`;
-          const devs = await supabaseRest(query);
-          return { success: true, data: devs };
-        }
-        if (action === 'upsert') {
-          const studentId = params.student_id;
-          const semester = params.semester || '1';
-          const academicYear = params.academic_year || '2026/2027';
-
-          // Check if exists
-          const existing = await supabaseRest(`developments?student_id=eq.${encodeURIComponent(studentId)}&semester=eq.${encodeURIComponent(semester)}&academic_year=eq.${encodeURIComponent(academicYear)}&select=id`);
-
-          const payload = {
-            student_id: studentId,
-            student_name: params.student_name,
-            class_id: params.class_id,
-            semester,
-            academic_year: academicYear,
-            aspect_nam: params.aspect_nam || params.nilai_agama || 'BSH',
-            aspect_fisik_motorik: params.aspect_fisik_motorik || 'BSH',
-            aspect_kognitif: params.aspect_kognitif || 'BSH',
-            aspect_bahasa: params.aspect_bahasa || 'BSH',
-            aspect_sosial_emosional: params.aspect_sosial_emosional || 'BSH',
-            aspect_seni: params.aspect_seni || 'BSH',
-            teacher_notes: params.teacher_notes || '',
-            updated_at: new Date().toISOString()
-          };
-
-          if (existing && existing.length > 0) {
-            await supabaseRest(`developments?id=eq.${existing[0].id}`, 'PATCH', payload);
-          } else {
-            payload.id = 'DEV-' + Date.now();
-            await supabaseRest('developments', 'POST', payload);
-          }
-          return { success: true, message: 'Rapor perkembangan tersimpan' };
         }
       }
 
@@ -2143,43 +1957,10 @@
               (r.status || 'pending').toUpperCase(),
               (r.registration_date || r.created_at || '').slice(0, 10)
             ]);
-          } else if (repType === 'attendance') {
-            headers = ['No', 'Tanggal', 'Nama Siswa', 'Kelas', 'Status Kehadiran', 'Catatan'];
-            const att = await supabaseRest('attendance?select=*').catch(() => []);
-            let list = att || [];
-            if (params.month) {
-              list = list.filter(a => a.date && a.date.startsWith(params.month));
-            }
-            rows = list.map((a, idx) => [
-              idx + 1,
-              a.date || '-',
-              a.student_name || '-',
-              a.class_id || '-',
-              (a.status || 'hadir').toUpperCase(),
-              a.notes || '-'
-            ]);
-          } else if (repType === 'development') {
-            headers = ['No', 'Siswa', 'Semester', 'Tahun Ajaran', 'NAM', 'Fisik Motorik', 'Kognitif', 'Bahasa', 'Sosial Emosional', 'Seni'];
-            const devs = await supabaseRest('developments?select=*').catch(() => []);
-            let list = devs || [];
-            if (params.semester) list = list.filter(d => String(d.semester) === String(params.semester));
-            if (params.year) list = list.filter(d => d.academic_year && d.academic_year.includes(params.year));
-            rows = list.map((d, idx) => [
-              idx + 1,
-              d.student_name || '-',
-              d.semester || '1',
-              d.academic_year || '2026/2027',
-              d.aspect_nam || 'Baik',
-              d.aspect_fisik_motorik || 'Baik',
-              d.aspect_kognitif || 'Baik',
-              d.aspect_bahasa || 'Baik',
-              d.aspect_sosial_emosional || 'Baik',
-              d.aspect_seni || 'Baik'
-            ]);
           } else if (repType === 'all') {
             headers = ['No', 'Modul Data', 'Jumlah Entitas Terdaftar', 'Keterangan'];
             const [stu, cls, inv, regs] = await Promise.all([
-              supabaseRest('students?select=id').catch(() => []),
+              supabaseRest('students?status=eq.active&select=id').catch(() => []),
               supabaseRest('classes?select=id').catch(() => []),
               supabaseRest('invoices?select=id').catch(() => []),
               supabaseRest('ppdb_registrations?select=id').catch(() => [])
@@ -2203,6 +1984,73 @@
             },
             message: 'Laporan berhasil dibuat'
           };
+        }
+
+        if (action === 'import_invoices') {
+          const rawItems = Array.isArray(params.items) ? params.items : [];
+          if (rawItems.length === 0) return { success: false, message: 'Tidak ada data tagihan untuk diimpor' };
+          const stuList = await supabaseRest('students?status=eq.active&select=id,nis,full_name').catch(() => []);
+          let insertedCount = 0;
+          for (let i = 0; i < rawItems.length; i++) {
+            const row = rawItems[i];
+            const stu = (stuList || []).find(s =>
+              (row.nis && s.nis && String(s.nis).trim() === String(row.nis).trim()) ||
+              (row.student_name && s.full_name && s.full_name.toLowerCase().includes(String(row.student_name).toLowerCase().trim()))
+            ) || (stuList && stuList[0]);
+            if (!stu) continue;
+            const invPayload = {
+              id: 'INV-' + Date.now() + '-' + i,
+              invoice_number: row.invoice_number || ('INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4) + '/' + (i + 1)),
+              student_id: stu.id,
+              student_name: row.student_name || stu.full_name,
+              month: row.period || row.month || 'Periode Berjalan',
+              period: row.period || row.month || '2026/2027',
+              amount: Number(row.amount) || 150000,
+              due_date: row.due_date || new Date().toISOString().slice(0, 10),
+              status: (row.status || 'unpaid').toLowerCase(),
+              description: row.description || row.item_name || 'SPP Import Excel'
+            };
+            await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
+            insertedCount++;
+          }
+          return { success: true, count: insertedCount, message: `Berhasil mengimpor ${insertedCount} data tagihan ke dalam database!` };
+        }
+
+        if (action === 'import_students') {
+          const rawItems = Array.isArray(params.items) ? params.items : [];
+          if (rawItems.length === 0) return { success: false, message: 'Tidak ada data siswa untuk diimpor' };
+          let insertedCount = 0;
+          for (let i = 0; i < rawItems.length; i++) {
+            const row = rawItems[i];
+            const stuId = 'STU-' + Date.now() + '-' + i;
+            const fullName = row.full_name || row.name || ('Siswa Baru ' + (i + 1));
+            const stuPayload = {
+              id: stuId,
+              nis: row.nis || ('2026' + String(1000 + i)),
+              full_name: fullName,
+              name: fullName,
+              child_name: fullName,
+              nickname: row.nickname || fullName.split(' ')[0],
+              gender: row.gender || 'L',
+              birth_place: row.birth_place || 'Samarinda',
+              birth_date: row.birth_date || '2020-01-01',
+              class_id: row.class_id || 'CLS-001',
+              class_name: row.class_name || 'PAUD / TK',
+              kelas_sekarang: row.class_name || 'PAUD / TK',
+              parent_name: row.parent_name || row.father_name || 'Wali Siswa',
+              father_name: row.father_name || row.parent_name || '',
+              mother_name: row.mother_name || '',
+              parent_phone: row.phone || row.parent_phone || '',
+              phone: row.phone || row.parent_phone || '',
+              parent_email: row.email || '',
+              address: row.address || 'Samarinda',
+              status: 'active',
+              is_active: true
+            };
+            await supabaseRest('students', 'POST', stuPayload).catch(() => {});
+            insertedCount++;
+          }
+          return { success: true, count: insertedCount, message: `Berhasil mengimpor ${insertedCount} data siswa ke dalam database!` };
         }
       }
 
@@ -2275,6 +2123,26 @@
           } catch (_) {}
           return { success: true, message: 'Riwayat cadangan berhasil dihapus' };
         }
+      }
+
+      // 18. CONTACT MESSAGES (Form Kontak Publik)
+      if (module === 'contact' || module === 'contact_messages') {
+        if (action === 'list') {
+          const msgs = await supabaseRest('contact_messages?select=*&order=created_at.desc').catch(() => []);
+          return { success: true, data: msgs };
+        }
+        const id = 'MSG-' + Date.now();
+        const msgPayload = {
+          id,
+          name: params.name || 'Pengunjung',
+          email: params.email || '',
+          phone: params.phone || '',
+          subject: params.subject || 'Pesan Website',
+          message: params.message || '',
+          status: 'unread'
+        };
+        await supabaseRest('contact_messages', 'POST', msgPayload).catch(() => {});
+        return { success: true, data: msgPayload, message: 'Pesan Anda berhasil dikirim.' };
       }
 
       // Default fallback generic CRUD if module corresponds directly to a table

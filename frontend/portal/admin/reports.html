@@ -125,7 +125,7 @@
     </div>
 
     <!-- Cards Grid Rekapitulasi (Clean, Uniform & Professional) -->
-    <div id="report-filter-cards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div id="report-filter-cards" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
       <!-- 1. Data Siswa -->
       <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
@@ -168,39 +168,7 @@
         </div>
       </div>
 
-      <!-- 4. Presensi Kehadiran -->
-      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
-        <div>
-          <h2 class="text-sm font-semibold text-gray-900 mb-1">Presensi &amp; Kehadiran</h2>
-          <p class="text-xs text-gray-500">Rekap kehadiran siswa di kelas bulanan (hadir, izin, sakit, alpa).</p>
-        </div>
-        <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-          <input type="month" id="rep-att-month" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs min-w-0 flex-1 focus:ring-1 focus:ring-primary-500">
-          <button onclick="generateReport('attendance')" class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition shrink-0">
-            Tampilkan
-          </button>
-        </div>
-      </div>
-
-      <!-- 5. Catatan Perkembangan (Rapor) -->
-      <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
-        <div>
-          <h2 class="text-sm font-semibold text-gray-900 mb-1">Catatan Perkembangan (Rapor)</h2>
-          <p class="text-xs text-gray-500">Rekap 6 aspek capaian perkembangan santri per semester.</p>
-        </div>
-        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 flex-wrap">
-          <select id="rep-dev-semester" class="px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-1 focus:ring-primary-500">
-            <option value="1">Sem. 1 (Ganjil)</option>
-            <option value="2">Sem. 2 (Genap)</option>
-          </select>
-          <input type="text" id="rep-dev-year" placeholder="2026" class="px-2 py-1.5 border border-gray-300 rounded-lg text-xs w-16 focus:ring-1 focus:ring-primary-500">
-          <button onclick="generateReport('development')" class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-lg transition shrink-0">
-            Tampilkan
-          </button>
-        </div>
-      </div>
-
-      <!-- 6. Ringkasan Eksekutif Yayasan -->
+      <!-- 4. Ringkasan Eksekutif Yayasan -->
       <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
         <div>
           <h2 class="text-sm font-semibold text-gray-900 mb-1">Ringkasan Eksekutif Yayasan</h2>
@@ -400,17 +368,9 @@
       const actions = document.getElementById('report-actions');
 
       const params = { report_type: type };
-      if (type === 'attendance') {
-        const m = document.getElementById('rep-att-month')?.value;
-        if (m) params.month = m;
-      } else if (type === 'payments') {
+      if (type === 'payments') {
         const m = document.getElementById('rep-pay-month')?.value;
         if (m) params.month = m;
-      } else if (type === 'development') {
-        const s = document.getElementById('rep-dev-semester')?.value;
-        const y = document.getElementById('rep-dev-year')?.value;
-        if (s) params.semester = s;
-        if (y) params.year = y;
       } else if (type === 'ppdb') {
         const y = document.getElementById('rep-ppdb-year')?.value;
         if (y) params.academic_year = y;
@@ -420,8 +380,6 @@
         students: 'Rekapitulasi Data Siswa Aktif Yayasan',
         payments: 'Rekapitulasi Keuangan & Tagihan SPP Santri',
         ppdb: 'Rekapitulasi Pendaftaran Santri Baru (PPDB Online)',
-        attendance: 'Rekapitulasi Kehadiran & Presensi Santri',
-        development: 'Rekapitulasi Catatan Perkembangan Anak (Rapor)',
         all: 'Ringkasan Eksekutif & Statistik Seluruh Unit Yayasan'
       };
 
@@ -505,8 +463,6 @@
         students: 'LAPORAN REKAPITULASI DATA SISWA AKTIF',
         payments: 'LAPORAN REKAPITULASI KEUANGAN & PEMBAYARAN SPP SANTRI',
         ppdb: 'LAPORAN REKAPITULASI PENDAFTARAN SISWA BARU (PPDB)',
-        attendance: 'LAPORAN REKAPITULASI PRESENSI & KEHADIRAN SISWA',
-        development: 'LAPORAN CATATAN PERKEMBANGAN SANTRI (RAPOR)',
         all: 'RINGKASAN EKSEKUTIF SELURUH UNIT YAYASAN'
       };
 
@@ -518,12 +474,6 @@
       let periodDesc = 'Tahun Ajaran 2026/2027';
       if (currentReportType === 'payments' && document.getElementById('rep-pay-month')?.value) {
         periodDesc = `Periode Bulan: ${document.getElementById('rep-pay-month').value}`;
-      } else if (currentReportType === 'attendance' && document.getElementById('rep-att-month')?.value) {
-        periodDesc = `Periode Bulan: ${document.getElementById('rep-att-month').value}`;
-      } else if (currentReportType === 'development') {
-        const sem = document.getElementById('rep-dev-semester')?.value === '2' ? 'Semester 2 (Genap)' : 'Semester 1 (Ganjil)';
-        const yr = document.getElementById('rep-dev-year')?.value || '2026';
-        periodDesc = `${sem} • Tahun Ajaran ${yr}/${Number(yr)+1}`;
       } else if (currentReportType === 'ppdb' && document.getElementById('rep-ppdb-year')?.value) {
         periodDesc = `Tahun Ajaran: ${document.getElementById('rep-ppdb-year').value}`;
       }
@@ -842,8 +792,6 @@
         students: 'LAPORAN REKAPITULASI DATA SISWA AKTIF',
         payments: 'LAPORAN REKAPITULASI KEUANGAN & PEMBAYARAN SPP',
         ppdb: 'LAPORAN REKAPITULASI PENDAFTARAN SISWA BARU (PPDB)',
-        attendance: 'LAPORAN REKAPITULASI PRESENSI & KEHADIRAN SISWA',
-        development: 'LAPORAN CATATAN PERKEMBANGAN SANTRI (RAPOR)',
         all: 'RINGKASAN EKSEKUTIF SELURUH UNIT YAYASAN'
       };
 
@@ -857,12 +805,8 @@
       let periodDesc = 'Tahun Ajaran 2026/2027';
       if (currentReportType === 'payments' && document.getElementById('rep-pay-month')?.value) {
         periodDesc = `Periode Bulan: ${document.getElementById('rep-pay-month').value}`;
-      } else if (currentReportType === 'attendance' && document.getElementById('rep-att-month')?.value) {
-        periodDesc = `Periode Bulan: ${document.getElementById('rep-att-month').value}`;
-      } else if (currentReportType === 'development') {
-        const sem = document.getElementById('rep-dev-semester')?.value === '2' ? 'Semester 2 (Genap)' : 'Semester 1 (Ganjil)';
-        const yr = document.getElementById('rep-dev-year')?.value || '2026';
-        periodDesc = `${sem} • Tahun Ajaran ${yr}/${Number(yr)+1}`;
+      } else if (currentReportType === 'ppdb' && document.getElementById('rep-ppdb-year')?.value) {
+        periodDesc = `Tahun Ajaran: ${document.getElementById('rep-ppdb-year').value}`;
       }
 
       const subTitleEl = document.getElementById('print-doc-subtitle');

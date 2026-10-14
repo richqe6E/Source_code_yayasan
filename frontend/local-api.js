@@ -136,46 +136,6 @@ const DB = {
     }
   ],
 
-  attendance: [
-    {
-      id: 'ATT-001',
-      student_id: 'STU-001',
-      student_name: 'Ahmad Fauzan Pratama',
-      class_id: 'CLS-001',
-      date: '2026-09-12',
-      status: 'H',
-      notes: 'Hadir tepat waktu'
-    },
-    {
-      id: 'ATT-002',
-      student_id: 'STU-001',
-      student_name: 'Ahmad Fauzan Pratama',
-      class_id: 'CLS-001',
-      date: '2026-09-11',
-      status: 'H',
-      notes: ''
-    }
-  ],
-
-  developments: [
-    {
-      id: 'DEV-001',
-      student_id: 'STU-001',
-      student_name: 'Ahmad Fauzan Pratama',
-      class_id: 'CLS-001',
-      semester: '1',
-      academic_year: '2026/2027',
-      aspect_nam: 'BSB',
-      aspect_fisik_motorik: 'BSH',
-      aspect_kognitif: 'BSB',
-      aspect_bahasa: 'BSH',
-      aspect_sosial_emosional: 'BSH',
-      aspect_seni: 'BSB',
-      teacher_notes: 'Ananda Fauzan sangat aktif dan menunjukkan hafalan surat pendek yang sangat baik.',
-      created_at: '2026-09-08'
-    }
-  ],
-
   news: [
     {
       id: 'NWS-001',
@@ -919,37 +879,6 @@ function handleApiRequest(apiPath, params, method) {
       return { success: true, message: 'Biodata berhasil diperbarui', data: targetStudent };
     }
 
-    if (action === 'get_academic') {
-      const studentId = targetStudent ? targetStudent.id : 'STU-001';
-      let developments = (DB.developments || []).filter(d => d.student_id === studentId);
-      if (developments.length === 0) {
-        developments = [
-          {
-            id: 'DEV-001',
-            student_id: studentId,
-            student_name: targetStudent ? targetStudent.full_name : 'Santri',
-            academic_year: '2026/2027',
-            semester: 'Semester 1 (Ganjil)',
-            aspect_nam: 'BSB',
-            aspect_fisik_motorik: 'BSH',
-            aspect_kognitif: 'BSB',
-            aspect_bahasa: 'BSH',
-            aspect_sosial_emosional: 'BSH',
-            aspect_seni: 'BSB',
-            teacher_notes: 'Ananda sangat aktif, memiliki daya ingat tajam dalam hafalan doa harian, dan gemar tolong-menolong dengan teman.',
-            created_at: '2026-09-15T10:00:00.000Z'
-          }
-        ];
-      }
-      return {
-        success: true,
-        data: {
-          records: [],
-          developments
-        }
-      };
-    }
-
     if (action === 'get_spp') {
       const studentId = targetStudent ? targetStudent.id : 'STU-001';
       let invoices = (DB.invoices || []).filter(i => i.student_id === studentId);
@@ -1026,23 +955,6 @@ function handleApiRequest(apiPath, params, method) {
 
   // 3. STUDENTS
   if (module === 'students') {
-      if (action === 'save_evaluasi') {
-        const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
-        if (deny) return deny;
-        if (!DB.evaluasi) DB.evaluasi = [];
-        const studentId = params.student_id;
-        const evalRecord = {
-          id: 'EVAL-' + Date.now(),
-          student_id: studentId,
-          semester: params.semester || 'Semester 1',
-          academic_year: params.academic_year || '2026/2027',
-          aspects: params.aspects || {},
-          notes: params.notes || '',
-          created_at: new Date().toISOString()
-        };
-        DB.evaluasi.push(evalRecord);
-        return { success: true, message: 'Evaluasi STPPA berhasil disimpan', data: evalRecord };
-      }
       if (action === 'reset_password') {
         const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
         if (deny) return deny;
@@ -1074,21 +986,6 @@ function handleApiRequest(apiPath, params, method) {
         }
       }
       return { success: true, data: { items: list, students: list, total: list.length, pagination: { page: 1, per_page: list.length, total: list.length } } };
-    }
-    if (action === 'myChildren') {
-      // ortu: lihat anaknya sendiri. role lain (termasuk admin): tolak (strict per-domain)
-      const deny = rbacDeny(params, ['orang_tua']);
-      if (deny) return deny;
-      const requesterEmail = (params._user_email || '').toLowerCase();
-      const requesterRole = params._user_role;
-      let list = [];
-      if (requesterRole === 'orang_tua' && requesterEmail) {
-        const requester = DB.users.find(u => u.email && u.email.toLowerCase() === requesterEmail);
-        if (requester && requester.parent_id) {
-          list = DB.students.filter(s => s.parent_id === requester.parent_id);
-        }
-      }
-      return { success: true, data: { items: list, students: list, total: list.length } };
     }
     if (action === 'get') {
       // guru boleh baca data siswa (untuk presensi/perkembangan); ortu hanya anaknya; admin selalu boleh
@@ -1233,203 +1130,6 @@ function handleApiRequest(apiPath, params, method) {
           students: myStudents
         }
       };
-    }
-  }
-
-  // 6. ATTENDANCE
-  if (module === 'attendance') {
-    // Helper untuk filter data sesuai role guru (hanya kelas binaannya)
-    const scopedClassIds = () => {
-      const reqEmail = (params._user_email || '').toLowerCase();
-      const req = DB.users.find(u => u.email && u.email.toLowerCase() === reqEmail);
-      const teacherId = req ? req.teacher_id : null;
-      return DB.classes.filter(c => c.teacher_id === teacherId).map(c => c.id);
-    };
-    const scopedStudentIds = () => {
-      const reqEmail = (params._user_email || '').toLowerCase();
-      const req = DB.users.find(u => u.email && u.email.toLowerCase() === reqEmail);
-      if (req && req.parent_id) return DB.students.filter(s => s.parent_id === req.parent_id).map(s => s.id);
-      return [];
-    };
-    if (action === 'students' || action === 'roster') {
-      // ortu/pendaftar tidak boleh akses roster
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'guru']);
-      if (deny) return deny;
-      let classId = params.class_id || 'CLS-001';
-      // guru: hanya boleh pilih kelas binaannya sendiri
-      if (params._user_role === 'guru') {
-        const myIds = scopedClassIds();
-        if (!myIds.includes(classId)) {
-          // fallback ke kelas pertama yang dibina
-          classId = myIds[0] || classId;
-          if (!myIds.includes(classId)) {
-            return { success: true, data: { items: [], students: [], existing: [] } };
-          }
-        }
-      }
-      const students = DB.students.filter(s => s.class_id === classId);
-      return {
-        success: true,
-        data: {
-          items: students,
-          students: students,
-          existing: DB.attendance.filter(a => a.date === params.date && a.class_id === classId)
-        }
-      };
-    }
-    if (action === 'save' || action === 'submit') {
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'guru']);
-      if (deny) return deny;
-      // guru: hanya boleh submit untuk kelas binaannya
-      if (params._user_role === 'guru') {
-        const myIds = scopedClassIds();
-        if (!myIds.includes(params.class_id)) {
-          return { success: false, message: 'Anda tidak memiliki akses untuk mengubah presensi kelas ini', error: { code: 'FORBIDDEN' } };
-        }
-      }
-      if (params.records && Array.isArray(params.records)) {
-        params.records.forEach(rec => {
-          DB.attendance.push({
-            id: 'ATT-' + Date.now() + Math.random(),
-            student_id: rec.student_id,
-            class_id: params.class_id || 'CLS-001',
-            date: params.date || new Date().toISOString().split('T')[0],
-            status: rec.status,
-            notes: rec.notes || ''
-          });
-        });
-      }
-      return { success: true, message: 'Presensi berhasil disimpan', data: { message: 'Presensi berhasil disimpan' } };
-    }
-    if (action === 'summary') {
-      // summary boleh untuk guru/ortu (filtered), admin (full)
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'guru', 'orang_tua']);
-      if (deny) return deny;
-      let records = DB.attendance;
-      if (params._user_role === 'guru') {
-        const myIds = scopedClassIds();
-        records = records.filter(r => myIds.includes(r.class_id));
-      } else if (params._user_role === 'orang_tua') {
-        const mySIds = scopedStudentIds();
-        records = records.filter(r => mySIds.includes(r.student_id));
-      }
-      const total = records.length;
-      const hadir = records.filter(r => r.status === 'hadir').length;
-      return {
-        success: true,
-        data: {
-          total_meetings: total,
-          hadir,
-          sakit: records.filter(r => r.status === 'sakit').length,
-          izin: records.filter(r => r.status === 'izin').length,
-          alfa: records.filter(r => r.status === 'alfa').length,
-          pct_hadir: total ? Math.round((hadir / total) * 100) : 0,
-          records
-        }
-      };
-    }
-    if (action === 'history' || action === 'getForStudent') {
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'guru', 'orang_tua']);
-      if (deny) return deny;
-      let records = DB.attendance;
-      if (params._user_role === 'guru') {
-        const myIds = scopedClassIds();
-        records = records.filter(r => myIds.includes(r.class_id));
-        if (params.student_id) records = records.filter(r => r.student_id === params.student_id);
-      } else if (params._user_role === 'orang_tua') {
-        const mySIds = scopedStudentIds();
-        if (params.student_id && !mySIds.includes(params.student_id)) {
-          return { success: false, message: 'Anda tidak memiliki akses ke data siswa ini', error: { code: 'FORBIDDEN' } };
-        }
-        records = records.filter(r => mySIds.includes(r.student_id));
-      } else if (params.student_id) {
-        records = records.filter(r => r.student_id === params.student_id);
-      }
-      return { success: true, data: { items: records, records, summary: { pct_hadir: records.length ? Math.round((records.filter(r => r.status === 'hadir').length / records.length) * 100) : 0 } } };
-    }
-  }
-
-  // 7. DEVELOPMENT (RAPOR ASPEK)
-  if (module === 'development') {
-    if (action === 'getForStudent' || action === 'list') {
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'guru', 'orang_tua']);
-      if (deny) return deny;
-      // Filter scope: guru hanya lihat siswa binaannya; ortu hanya anaknya
-      const reqEmail = (params._user_email || '').toLowerCase();
-      const req = DB.users.find(u => u.email && u.email.toLowerCase() === reqEmail);
-      let scopeStudentIds = null;
-      if (params._user_role === 'guru' && req) {
-        const myClassIds = DB.classes.filter(c => c.teacher_id === req.teacher_id).map(c => c.id);
-        scopeStudentIds = DB.students.filter(s => myClassIds.includes(s.class_id)).map(s => s.id);
-        if (params.student_id && !scopeStudentIds.includes(params.student_id)) {
-          return { success: false, message: 'Anda tidak memiliki akses ke data siswa ini', error: { code: 'FORBIDDEN' } };
-        }
-      } else if (params._user_role === 'orang_tua' && req) {
-        scopeStudentIds = DB.students.filter(s => s.parent_id === req.parent_id).map(s => s.id);
-        if (params.student_id && !scopeStudentIds.includes(params.student_id)) {
-          return { success: false, message: 'Anda tidak memiliki akses ke data siswa ini', error: { code: 'FORBIDDEN' } };
-        }
-      }
-      const dev = DB.developments.find(d => (!params.student_id || d.student_id === params.student_id) && (!scopeStudentIds || scopeStudentIds.includes(d.student_id))) || (scopeStudentIds ? null : DB.developments[0]);
-      if (!dev) return { success: true, data: { items: [], record: null, records: [] } };
-      // PENTING: hanya kembalikan field yang aman, JANGAN spread `params` (bocor field request)
-      const normalized = {
-        id: dev.id,
-        student_id: dev.student_id,
-        student_name: dev.student_name,
-        class_id: dev.class_id,
-        class_name: dev.class_name,
-        period: dev.period,
-        aspect_nam: dev.aspect_nam || dev.nam || 'BSH',
-        aspect_fisik_motorik: dev.aspect_fisik_motorik || dev.fisik_motorik || 'BSH',
-        aspect_kognitif: dev.aspect_kognitif || dev.kognitif || 'BSB',
-        aspect_bahasa: dev.aspect_bahasa || dev.bahasa || 'BSH',
-        aspect_sosial_emosional: dev.aspect_sosial_emosional || dev.sosial_emosional || 'BSH',
-        aspect_seni: dev.aspect_seni || dev.seni || 'BSB',
-        teacher_notes: dev.teacher_notes || dev.teacher_note || 'Ananda berkembang sangat baik',
-        updated_at: dev.updated_at || dev.created_at || new Date().toISOString()
-      };
-      return { success: true, data: { items: [normalized], record: normalized, records: [normalized] } };
-    }
-    if (action === 'upsert' || action === 'save') {
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu', 'guru']);
-      if (deny) return deny;
-      // guru: hanya boleh simpan catatan untuk siswa binaannya
-      if (params._user_role === 'guru') {
-        const reqEmail = (params._user_email || '').toLowerCase();
-        const req = DB.users.find(u => u.email && u.email.toLowerCase() === reqEmail);
-        const myClassIds = DB.classes.filter(c => c.teacher_id === (req ? req.teacher_id : null)).map(c => c.id);
-        const stu = DB.students.find(s => s.id === params.student_id);
-        if (!stu || !myClassIds.includes(stu.class_id)) {
-          return { success: false, message: 'Anda tidak memiliki akses untuk mengubah catatan perkembangan siswa ini', error: { code: 'FORBIDDEN' } };
-        }
-      }
-      const normalized = {
-        aspect_nam: params.aspect_nam || params.nilai_agama || params.nam || '',
-        aspect_fisik_motorik: params.aspect_fisik_motorik || params.fisik_motorik || '',
-        aspect_kognitif: params.aspect_kognitif || params.kognitif || '',
-        aspect_bahasa: params.aspect_bahasa || params.bahasa || '',
-        aspect_sosial_emosional: params.aspect_sosial_emosional || params.sosial_emosional || '',
-        aspect_seni: params.aspect_seni || params.seni || '',
-        teacher_notes: params.teacher_notes || params.teacher_note || params.catatan_guru || '',
-        updated_at: new Date().toISOString()
-      };
-      const existing = DB.developments.find(d => d.student_id === params.student_id);
-      if (existing) {
-        Object.assign(existing, normalized);
-      } else {
-        const stu = DB.students.find(s => s.id === params.student_id) || {};
-        DB.developments.push({
-          id: 'DEV-' + Date.now(),
-          student_id: params.student_id,
-          student_name: stu.full_name || stu.name || '',
-          class_id: stu.class_id || '',
-          period: params.period || 'Semester 1 2026/2027',
-          created_at: new Date().toISOString(),
-          ...normalized
-        });
-      }
-      return { success: true, message: 'Catatan perkembangan berhasil disimpan', data: { message: 'Catatan perkembangan berhasil disimpan' } };
     }
   }
 
@@ -1693,9 +1393,7 @@ function handleApiRequest(apiPath, params, method) {
     const sppTarget = totalInvoicesAmount;
     const pendingPayments = (DB.payments || []).filter(p => p.status === 'menunggu_verifikasi' || p.status === 'pending_verification' || p.status === 'pending').length;
 
-    const totalAtt = (DB.attendance || []).length;
-    const presentAtt = (DB.attendance || []).filter(a => a.status === 'H' || a.status === 'hadir').length;
-    const attPct = totalAtt > 0 ? Math.round((presentAtt / totalAtt) * 100) : 100;
+    const attPct = 100;
 
     const stats = {
       total_students: (DB.students || []).length,
@@ -1704,10 +1402,10 @@ function handleApiRequest(apiPath, params, method) {
       total_teachers: (DB.teachers || []).length,
       total_teachers_active: (DB.teachers || []).filter(t => (t.status || 'active') === 'active').length,
       total_classes: (DB.classes || []).length,
-      total_parents: (DB.parents || []).length || (DB.students || []).length,
+      total_parents: (DB.students || []).filter(s => (s.status || 'active') === 'active').length,
       ppdb_total: (DB.ppdb_registrations || []).length,
       ppdb_pending: (DB.ppdb_registrations || []).filter(r => r.status === 'pending').length,
-      ppdb_accepted: (DB.ppdb_registrations || []).filter(r => r.status === 'approved' || r.status === 'accepted').length,
+      ppdb_accepted: (DB.ppdb_registrations || []).filter(r => r.status === 'approved' || r.status === 'accepted' || r.status === 'converted').length,
       ppdb_this_month: (DB.ppdb_registrations || []).filter(r => (r.registration_date || r.created_at || '').slice(0, 7) === monthPrefix).length,
       payments_pending_verification: pendingPayments,
       fin_pending: pendingPayments,
@@ -1772,14 +1470,21 @@ function handleApiRequest(apiPath, params, method) {
       if (deny) return deny;
       const seq = DB.users.length + 1;
       const status = params.status || (params.is_active === false ? 'inactive' : 'active');
+      const roleLabelMap = {
+        super_admin: 'Super Admin',
+        admin_tu: 'Admin Tata Usaha',
+        siswa_aktif: 'Siswa Aktif',
+        calon_siswa: 'Calon Siswa / Pendaftar'
+      };
+      const role = params.role || 'admin_tu';
       const newUser = {
         id: 'USR-' + String(seq).padStart(3, '0'),
         name: params.name || params.full_name || 'User Baru',
         full_name: params.full_name || params.name || 'User Baru',
         email: params.email || ('user' + seq + '@yayasan.sch.id'),
         password: params.password || 'user123',
-        role: params.role || 'orang_tua',
-        role_label: params.role_label || 'Orang Tua / Wali',
+        role: role,
+        role_label: params.role_label || roleLabelMap[role] || 'Admin Tata Usaha',
         status: status,
         phone: params.phone || '',
         avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
@@ -2113,37 +1818,6 @@ function handleApiRequest(apiPath, params, method) {
           (r.status || 'pending').toUpperCase(),
           (r.registration_date || r.created_at || '').slice(0, 10)
         ]);
-      } else if (reportType === 'attendance') {
-        headers = ['No', 'Tanggal', 'Nama Siswa', 'Kelas', 'Status Kehadiran', 'Catatan'];
-        let list = [...(DB.attendance || [])];
-        if (params.month) {
-          list = list.filter(a => a.date && a.date.startsWith(params.month));
-        }
-        rows = list.map((a, idx) => [
-          idx + 1,
-          a.date || '-',
-          a.student_name || '-',
-          a.class_id || '-',
-          (a.status || 'hadir').toUpperCase(),
-          a.notes || '-'
-        ]);
-      } else if (reportType === 'development') {
-        headers = ['No', 'Siswa', 'Semester', 'Tahun Ajaran', 'NAM', 'Fisik Motorik', 'Kognitif', 'Bahasa', 'Sosial Emosional', 'Seni'];
-        let list = [...(DB.developments || [])];
-        if (params.semester) list = list.filter(d => String(d.semester) === String(params.semester));
-        if (params.year) list = list.filter(d => d.academic_year && d.academic_year.includes(params.year));
-        rows = list.map((d, idx) => [
-          idx + 1,
-          d.student_name || '-',
-          d.semester || '1',
-          d.academic_year || '2026/2027',
-          d.aspect_nam || 'Baik',
-          d.aspect_fisik_motorik || 'Baik',
-          d.aspect_kognitif || 'Baik',
-          d.aspect_bahasa || 'Baik',
-          d.aspect_sosial_emosional || 'Baik',
-          d.aspect_seni || 'Baik'
-        ]);
       } else if (reportType === 'all') {
         headers = ['No', 'Modul Data', 'Jumlah Entitas Terdaftar', 'Keterangan'];
         rows = [
@@ -2429,50 +2103,9 @@ function handleApiRequest(apiPath, params, method) {
     }
   }
 
-  // 18. PARENT PROFILE (portal ortu)
-  if (module === 'parent') {
-    const requesterEmail = (params._user_email || '').toLowerCase();
-    const requester = DB.users.find(u => u.email && u.email.toLowerCase() === requesterEmail);
-    if (!requester || requester.role !== 'orang_tua') {
-      return { success: false, message: 'Hanya orang tua yang dapat mengakses', error: { code: 'FORBIDDEN' } };
-    }
-    if (action === 'me') {
-      const children = DB.students.filter(s => s.parent_id === requester.parent_id);
-      const myInvoices = DB.invoices.filter(i => i.parent_id === requester.parent_id || children.some(c => c.id === i.student_id));
-      return {
-        success: true,
-        data: {
-          user: {
-            id: requester.id,
-            full_name: requester.full_name || requester.name,
-            name: requester.name,
-            email: requester.email,
-            phone: requester.phone || '',
-            avatar: requester.avatar || '',
-            role: requester.role,
-            role_label: requester.role_label,
-            parent_id: requester.parent_id,
-            student_id: requester.student_id
-          },
-          parent: {
-            id: requester.parent_id,
-            full_name: requester.full_name || requester.name,
-            phone: requester.phone || '',
-            email: requester.email,
-            address: requester.address || ''
-          },
-          children,
-          invoices: myInvoices
-        }
-      };
-    }
-    if (action === 'update_profile') {
-      if (params.full_name != null) { requester.full_name = params.full_name; requester.name = params.full_name; }
-      if (params.phone != null) requester.phone = params.phone;
-      if (params.address != null) requester.address = params.address;
-      if (params.occupation != null) requester.occupation = params.occupation;
-      return { success: true, message: 'Profil berhasil diperbarui', data: { message: 'Profil berhasil diperbarui', user: { ...requester, full_name: requester.full_name || requester.name } } };
-    }
+  // 18. CONTACT (Form Kontak Publik)
+  if (module === 'contact' || module === 'contact_messages') {
+    return { success: true, message: 'Pesan Anda berhasil dikirim.' };
   }
 
 

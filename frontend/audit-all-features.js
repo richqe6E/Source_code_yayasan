@@ -155,7 +155,7 @@ async function runFullAudit() {
     record('PPDB', 'Pelacakan Status Pengumuman Seleksi (Status: Approved)', statusApproved.body?.data?.status === 'approved');
 
     // 2.7 Admin Mengonversi Calon Siswa ke Siswa Aktif Ber-NIS
-    const customNis = '2026777';
+    const customNis = '2026' + String(Date.now()).slice(-4);
     const convertRes = await api('ppdb', 'convert', { id: regNo, class_id: 'CLS-001', nis: customNis }, adminToken);
     record('PPDB', 'Admin Konversi Calon Siswa ke Siswa Aktif Ber-NIS', convertRes.body?.success === true);
 

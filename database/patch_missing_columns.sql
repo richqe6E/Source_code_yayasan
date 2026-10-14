@@ -35,3 +35,85 @@ ALTER TABLE announcements ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FAL
 ALTER TABLE events ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS event_date DATE DEFAULT CURRENT_DATE;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS time VARCHAR(50) DEFAULT '08:00 - Selesai';
+
+-- 5. Hapus tabel rapor digital warisan jika tidak digunakan lagi
+DROP TABLE IF EXISTS academic_records CASCADE;
+DROP TABLE IF EXISTS developments CASCADE;
+DROP TABLE IF EXISTS attendance CASCADE;
+
+-- 6. Tabel Pendataan Tenaga Pendidik / Wali Kelas (Dikelola Admin TU)
+CREATE TABLE IF NOT EXISTS teachers (
+    id VARCHAR(50) PRIMARY KEY,
+    user_id VARCHAR(50),
+    nip VARCHAR(50),
+    full_name VARCHAR(150) NOT NULL,
+    name VARCHAR(150),
+    gender VARCHAR(10) DEFAULT 'L',
+    phone VARCHAR(50),
+    email VARCHAR(150),
+    education VARCHAR(100) DEFAULT 'S1 Pendidikan',
+    position VARCHAR(100) DEFAULT 'Guru Kelas',
+    specialization VARCHAR(100),
+    start_date DATE,
+    joined_at DATE,
+    avatar TEXT,
+    status VARCHAR(20) DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 7. Tabel Pesan Kontak Pengunjung Publik
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150),
+    phone VARCHAR(50),
+    subject VARCHAR(255),
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'unread',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 8. Kolom Lengkap Biodata Siswa (Untuk Edit Biodata di Portal Siswa Mandiri)
+ALTER TABLE students ADD COLUMN IF NOT EXISTS nik VARCHAR(30);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS father_phone VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_phone VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS father_occupation VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_occupation VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS previous_school VARCHAR(150);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS blood_type VARCHAR(10);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS hobbies TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS aspirations TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS joined_at DATE;
+
+-- 9. Kolom Lengkap Pengaturan CMS & Identitas Yayasan (Untuk Sinkronisasi Cloud)
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS campus_note TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS maps_url TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS maps_embed_url TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS ketua_yayasan VARCHAR(150) DEFAULT 'Makhrus';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS bendahara VARCHAR(150) DEFAULT 'Sri Pragawati';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS sekretaris VARCHAR(150) DEFAULT 'Candra Gunawan';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS pembina VARCHAR(150) DEFAULT 'DJOKO IRIANDONO';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS pengawas VARCHAR(150) DEFAULT 'Suhardi';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS footer_bg_url TEXT DEFAULT '/images/school-campus.jpg';
+
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS header_title VARCHAR(255);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS announcement_banner TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS whatsapp_official VARCHAR(50);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS contact_email VARCHAR(100);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS campus_note TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS maps_url TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS maps_embed_url TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS academic_year VARCHAR(50) DEFAULT '2026/2027';
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS footer_bg_url TEXT DEFAULT '/images/school-campus.jpg';
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS login_bg_url TEXT DEFAULT '/images/school-campus.jpg';
+
+-- 10. RLS & Policy untuk teachers dan contact_messages
+ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public Full Access on teachers" ON teachers;
+CREATE POLICY "Public Full Access on teachers" ON teachers FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public Full Access on contact_messages" ON contact_messages;
+CREATE POLICY "Public Full Access on contact_messages" ON contact_messages FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);

@@ -125,7 +125,7 @@ async function runTest() {
     assert('6. Cek status setelah diverifikasi berstatus approved', check2.body && check2.body.success && check2.body.data.status === 'approved');
 
     // 7. Admin Konversi Menjadi Siswa Aktif
-    const targetNis = '2026888';
+    const targetNis = '2026' + String(Date.now()).slice(-4);
     const convertRes = await api('ppdb', 'convert', { id: regNum, class_id: 'CLS-001', nis: targetNis }, adminToken);
     assert('7. Admin mengonversi calon siswa ke siswa aktif (convert)', convertRes.body && convertRes.body.success && convertRes.body.data.nis === targetNis);
 

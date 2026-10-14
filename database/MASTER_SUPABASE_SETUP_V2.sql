@@ -209,32 +209,41 @@ CREATE TABLE IF NOT EXISTS student_documents (
 CREATE INDEX IF NOT EXISTS idx_student_docs_student ON student_documents(student_id);
 
 -- ==============================================================================
--- 6. TABEL REKAM AKADEMIK & RAPOR EVALUASI STPPA
+-- 6. TABEL PENDATAAN TENAGA PENDIDIK & PESAN KONTAK PUBLIK
 -- ==============================================================================
 
-CREATE TABLE IF NOT EXISTS academic_records (
+-- Tabel Pendataan Tenaga Pendidik / Staf Pengajar / Wali Kelas (Dikelola Admin TU)
+CREATE TABLE IF NOT EXISTS teachers (
     id VARCHAR(50) PRIMARY KEY,
-    student_id VARCHAR(50) REFERENCES students(id) ON DELETE CASCADE,
-    academic_year VARCHAR(50) DEFAULT '2026/2027',
-    semester VARCHAR(50) DEFAULT 'Semester 1 (Ganjil)',
-    class_name VARCHAR(100),
-    aspect_nam VARCHAR(20) DEFAULT 'BSH', -- BSB, BSH, MB, BB
-    aspect_fisik_motorik VARCHAR(20) DEFAULT 'BSH',
-    aspect_kognitif VARCHAR(20) DEFAULT 'BSH',
-    aspect_bahasa VARCHAR(20) DEFAULT 'BSH',
-    aspect_sosial_emosional VARCHAR(20) DEFAULT 'BSH',
-    aspect_seni VARCHAR(20) DEFAULT 'BSH',
-    aspects_json JSONB DEFAULT '{}'::jsonb,
-    hafalan_surah TEXT,
-    catatan_wali_kelas TEXT,
-    teacher_notes TEXT,
-    status_kenaikan VARCHAR(50) DEFAULT 'Aktif',
-    status_kelulusan VARCHAR(50) DEFAULT 'Belum Lulus',
+    user_id VARCHAR(50),
+    nip VARCHAR(50),
+    full_name VARCHAR(150) NOT NULL,
+    name VARCHAR(150),
+    gender VARCHAR(10) DEFAULT 'L',
+    phone VARCHAR(50),
+    email VARCHAR(150),
+    education VARCHAR(100) DEFAULT 'S1 Pendidikan',
+    position VARCHAR(100) DEFAULT 'Guru Kelas',
+    specialization VARCHAR(100),
+    start_date DATE,
+    joined_at DATE,
+    avatar TEXT,
+    status VARCHAR(20) DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_academic_student ON academic_records(student_id);
+-- Tabel Pesan Kontak Pengunjung Publik
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150),
+    phone VARCHAR(50),
+    subject VARCHAR(255),
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'unread',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 -- ==============================================================================
 -- 7. TABEL PPDB (PERIODE & PENDAFTARAN CALON SISWA)
@@ -449,9 +458,10 @@ ALTER TABLE web_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE classes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE student_documents ENABLE ROW LEVEL SECURITY;
-ALTER TABLE academic_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ppdb_periods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ppdb_registrations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
@@ -467,8 +477,8 @@ DO $$
 DECLARE
     tbl text;
     tables text[] := ARRAY[
-        'schools', 'web_settings', 'roles', 'users', 'classes', 'students',
-        'student_documents', 'academic_records', 'ppdb_periods', 'ppdb_registrations',
+        'schools', 'web_settings', 'roles', 'users', 'classes', 'teachers', 'students',
+        'student_documents', 'contact_messages', 'ppdb_periods', 'ppdb_registrations',
         'invoices', 'payments', 'news', 'announcements', 'events', 'galleries', 'activity_logs'
     ];
 BEGIN

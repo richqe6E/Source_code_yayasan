@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 33 (Eksekusi Tahap 3 Final Schema & Logic Sync Gemini 4 Argon: Sinkronisasi SQL Supabase, Deduplikasi Siswa & User PPDB Convert, Normalisasi CMS & Events, Sanitasi Session password_hash) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 34 (Eksekusi Tahap 4 Gemini 4 Argon: Pembersihan Total Fitur Guru/Nilai, Sinkronisasi Skema SQL Supabase, Hardening 2-Portal E2E & Isolasi Legacy) | Status: ✅ PRODUCTION & LOCALHOST LIVE & VERIFIED 100% (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1145,6 +1145,51 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
    - Mengubah query list events publik menjadi fallback `order=event_date.asc` dengan fallback dan normalisasi atribut `date`/`event_date`.
 7. **Pembaruan Snapshot Repositori:**
    - Memperbarui [codebase_snapshot_for_argon.txt](codebase_snapshot_for_argon.txt) ke versi terbaru (720.11 KB).
+
+**Hasil Pengujian & Verifikasi Menyeluruh:**
+- `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.
+- `audit-all-features.js`: **34/34 Skenario Pengujian Lulus 100% (Zero Bug, Zero Regression)**.
+- `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+- `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+- `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
+
+---
+
+### 🗓️ Sesi 34 — Eksekusi Tahap 4 Gemini 4 Argon: Pembersihan Total Fitur Guru/Nilai, Sinkronisasi Skema SQL Supabase, Hardening 2-Portal E2E & Isolasi Legacy (14 Oktober 2026, Siang)
+
+**Pekerjaan:** Mengimplementasikan perbaikan total dan penataan arsitektur final 2-Portal (`Portal Admin/TU` dan `Portal Siswa Mandiri`) berdasarkan direktif eksekutif Gemini 4 Argon (Lead System Auditor). Menghapus seluruh dead-code guru, orang tua, absensi, dan rapor digital (rapor fisik diserahkan langsung oleh guru saat rapat orang tua/wali murid), menyelaraskan skema SQL Supabase dengan tabel `teachers` dan `contact_messages`, menyelaraskan `local-api.js` dan `api.js`, serta melakukan hardening pengujian E2E bebas tabrakan data.
+
+**Rincian 6 Langkah Perbaikan yang Diterapkan:**
+1. **Pembersihan Modul Laporan UI & JS ([frontend/portal/admin/reports.html](frontend/portal/admin/reports.html)):**
+   - Menghapus kartu tipe laporan `attendance` (Presensi Siswa) dan `development` (Perkembangan/Rapor STPPA) dari tampilan DOM.
+   - Mengubah tata letak grid filter laporan menjadi 4 kolom presisi (`grid sm:grid-cols-2 lg:grid-cols-4 gap-4`) yang seimbang.
+   - Membersihkan logika JS pada `generateReport`, `renderReportTable`, dan `updatePrintLayoutMeta` sehingga hanya memproses 4 tipe laporan valid: Data Siswa (`students`), Rekapitulasi SPP (`payments`), Registrasi PPDB (`ppdb`), dan Data Guru/Staf (`teachers`).
+2. **Verifikasi Jalur Siswa Mandiri ([frontend/portal/siswa/](frontend/portal/siswa/)):**
+   - Mempertahankan `akademik.html` sebagai redirect 0-detik ke `dashboard.html` dengan badge informasi penyerahan rapor fisik secara tatap muka pada rapat orang tua/wali murid, menjaga integritas 38/38 rute web (HTTP 200 OK).
+   - Mengonfirmasi 4 portal menu mandiri resmi siswa: `dashboard.html`, `biodata.html`, `dokumen.html`, dan `spp.html`.
+3. **Refactoring & Pembersihan Dead-Code pada [frontend/shared/js/api.js](frontend/shared/js/api.js):**
+   - `module === 'dashboard'`: Menambahkan proteksi `.catch(() => [])` pada seluruh `Promise.all` REST Supabase, menyesuaikan metrik `total_parents: activeStudents`, dan menyertakan status `'converted'` pada `acceptedPPDB`.
+   - `module === 'users'`: Membatasi `role` hanya pada 4 role resmi institusi (`super_admin`, `admin_tu`, `siswa_aktif`, `calon_siswa`), menetapkan default `admin_tu`, dan memfilter `password_hash` dari respons payload.
+   - `module === 'students'`: Menerapkan filter status bawaan `&status=neq.pending` pada `action === 'list'`. Menghapus dead-code `myChildren` dan `save_evaluasi`.
+   - `module === 'teachers'`: Menghapus dead-code `action === 'me'` dan menambahkan `action === 'delete'` via Supabase REST.
+   - Menghapus endpoint usang: `siswa/get_academic`, `module === 'parent'`, `module === 'parents'`, `module === 'attendance'`, `module === 'development'`.
+   - Menghapus cabang `attendance` dan `development` pada `reports/generate`.
+   - Menambahkan handler resmi: `reports/import_invoices`, `reports/import_students`, dan `contact` / `contact_messages` publik.
+4. **Penyelarasan Mock Backend Engine ([frontend/local-api.js](frontend/local-api.js)):**
+   - Menghapus array dummy `attendance` dan `developments` dari objek in-memory `DB`.
+   - Menghapus dead-code `siswa/get_academic`, `students/save_evaluasi`, `students/myChildren`, `module === 'attendance'`, dan `module === 'development'`.
+   - Memperbarui `dashboard` agar menggunakan persentase kehadiran default 100%, `total_parents: activeStudents`, dan menyertakan status `converted`.
+   - Memperbarui `users/create` dengan default role `admin_tu`.
+   - Menghapus handler laporan `attendance` dan `development`.
+   - Mengganti `module === 'parent'` dengan modul publik `contact` yang merespons sukses pengiriman pesan kontak.
+5. **Sinkronisasi Skema SQL Supabase & Migrasi Idempoten ([database/](database/)):**
+   - Memindahkan `database/supabase_schema.sql` lama ke `.legacy_backup/supabase_schema.sql` untuk mencegah referensi skema usang.
+   - Memperbarui [database/MASTER_SUPABASE_SETUP_V2.sql](database/MASTER_SUPABASE_SETUP_V2.sql): Mengganti tabel `academic_records` dengan tabel `teachers` dan `contact_messages`, memperbarui array aktivasi RLS untuk menyertakan kedua tabel baru.
+   - Memperbarui [database/patch_missing_columns.sql](database/patch_missing_columns.sql): Menambahkan script DROP tabel usang (`academic_records`, `developments`, `attendance`), pembuatan tabel `teachers` dan `contact_messages`, penambahan kolom patch pada `students`, `schools`, dan `web_settings`, serta RLS policies yang aman.
+6. **Hardening Uji Otomatis & Pembaruan Snapshot:**
+   - Menjadikan nomor NIS hasil konversi PPDB pada [frontend/audit-all-features.js](frontend/audit-all-features.js) dan [frontend/test-ppdb-e2e.js](frontend/test-ppdb-e2e.js) bersifat dinamis berbasis timestamp (`'2026' + String(Date.now()).slice(-4)`), mengeliminasi tabrakan unik pada uji coba berulang tanpa merestart server.
+   - Memperbarui snapshot repositori [codebase_snapshot_for_argon.txt](codebase_snapshot_for_argon.txt).
+   - Seluruh 5 test suite lulus 100% (113 dari 113 skenario pengujian berhasil tanpa kegagalan).
 
 **Hasil Pengujian & Verifikasi Menyeluruh:**
 - `test-routes.js`: **38/38 Rute Lulus 100% (HTTP 200 OK)**.

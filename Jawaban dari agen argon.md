@@ -1,613 +1,482 @@
 ================================================================================
-EXECUTABLE DIRECTIVE TAHAP 3 (FINAL SCHEMA & LOGIC SYNC) — SIYAYASAN V2
+EXECUTABLE DIRECTIVE TAHAP 4: PEMBERSIHAN TOTAL FITUR GURU/NILAI & FIX CELAH E2E
 Dari   : Lead System Auditor (Gemini 4 Argon)
 Untuk  : Antigravity IDE Coding Agent
-Tujuan : Menuntaskan sinkronisasi kolom SQL Supabase, deduplikasi konversi PPDB,
-         filter laporan siswa aktif, dan sanitasi password_hash di sesi lokal.
+Konteks: Portal Guru serta seluruh fitur Nilai / Rapor Evaluasi Digital /
+         Presensi Guru TELAH DITIADAKAN. Sistem hanya menggunakan Arsitektur
+         2-Portal Resmi (Portal Admin/TU & Portal Siswa Mandiri untuk Biodata,
+         Dokumen, dan Pembayaran SPP).
 ================================================================================
 
-Tolong eksekusi 6 langkah perbaikan spesifik di bawah ini secara berurutan.
-Setiap langkah sudah dilengkapi blok kode lama dan kode penggantinya secara presisi:
+Tolong eksekusi 6 langkah perbaikan teknis di bawah ini secara menyeluruh:
 
 --------------------------------------------------------------------------------
-LANGKAH 1: SINKRONISASI TABEL & PATCH SQL DI database/MASTER_SUPABASE_SETUP_V2.sql
+LANGKAH 1: HAPUS SISA HALAMAN & MENU NILAI/AKADEMIK DI PORTAL SISWA & ADMIN
 --------------------------------------------------------------------------------
-Target File: `database/MASTER_SUPABASE_SETUP_V2.sql`
+Target File:
+- `frontend/portal/siswa/akademik.html`
+- `frontend/portal/siswa/dashboard.html`
+- `frontend/portal/siswa/biodata.html`
+- `frontend/portal/siswa/dokumen.html`
+- `frontend/portal/siswa/spp.html`
+- `frontend/portal/admin/students.html`
+- `frontend/portal/admin/reports.html`
 
-1A. Pada definisi `CREATE TABLE IF NOT EXISTS ppdb_registrations`, tambahkan kolom `registration_no VARCHAR(100),` tepat di bawah `registration_number`:
+Aksi Spesifik:
+1. Hapus atau pindahkan `frontend/portal/siswa/akademik.html` ke `.legacy_backup/`
+   (atau ubah menjadi redirect langsung ke `dashboard.html`).
+2. Pada seluruh halaman di `frontend/portal/siswa/` (`dashboard.html`, `biodata.html`,
+   `dokumen.html`, `spp.html`), hapus item navigasi sidebar/menu yang mengarah ke
+   `akademik.html` serta hapus kartu/widget "Nilai / Rapor / Evaluasi STPPA / Presensi"
+   di `siswa/dashboard.html`. Pastikan menu Portal Siswa hanya terdiri dari 4 menu inti:
+   - `dashboard.html` (Ringkasan & Status)
+   - `biodata.html` (Biodata Santri)
+   - `dokumen.html` (Berkas Dokumen)
+   - `spp.html` (Tagihan & Pembayaran SPP)
+3. Pada `frontend/portal/admin/students.html`, hapus tombol/modal "Input Evaluasi /
+   Nilai STPPA" (`save_evaluasi`) jika masih ada di tabel aksi siswa.
+4. Pada `frontend/portal/admin/reports.html`, hapus opsi filter jenis laporan
+   "Perkembangan / Nilai (development)" dan "Presensi (attendance)". Fokuskan
+   laporan hanya pada: Data Siswa Aktif (`students`), Keuangan SPP (`payments`),
+   Pendaftar PPDB (`ppdb`), dan Ringkasan Semua Modul (`all`).
+
+--------------------------------------------------------------------------------
+LANGKAH 2: BERSIHKAN ENDPOINT GURU/NILAI & PERBAIKI ROLE USER DI api.js
+--------------------------------------------------------------------------------
+Target File: `frontend/shared/js/api.js`
+
+2A. Perbaiki `module === 'dashboard'` agar tidak crash jika salah satu tabel gagal
+    dan tidak menghitung siswa `pending` sebagai wali murid aktif:
 [CARI]:
-CREATE TABLE IF NOT EXISTS ppdb_registrations (
-    id VARCHAR(50) PRIMARY KEY,
-    registration_number VARCHAR(100) UNIQUE NOT NULL,
-    student_name VARCHAR(150) NOT NULL,
+      if (module === 'dashboard') {
+        const [students, teachers, classes, ppdb, invoices, payments] = await Promise.all([
+          supabaseRest('students?select=id,status'),
+          supabaseRest('teachers?select=id,status'),
+          supabaseRest('classes?select=id'),
+          supabaseRest('ppdb_registrations?select=id,status'),
+          supabaseRest('invoices?select=id,amount,status'),
+          supabaseRest('payments?select=id,status')
+        ]);
+
+        const activeStudents = (students || []).filter(s => s.status === 'active').length;
+        const activeTeachers = (teachers || []).filter(t => t.status === 'active').length;
+        const pendingPPDB = (ppdb || []).filter(p => p.status === 'pending').length;
+        const acceptedPPDB = (ppdb || []).filter(p => p.status === 'accepted' || p.status === 'approved').length;
+        const unpaidInvoices = (invoices || []).filter(i => i.status === 'unpaid');
+        const paidInvoices = (invoices || []).filter(i => i.status === 'paid');
+        const pendingPayments = (payments || []).filter(p => p.status === 'menunggu_verifikasi').length;
+
+        const totalUnpaidAmount = unpaidInvoices.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+        const totalPaidAmount = paidInvoices.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+        const totalTargetAmount = (invoices || []).reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+
+        const stats = {
+          total_students: activeStudents,
+          active_students: activeStudents,
+          total_students_active: activeStudents,
+          total_teachers: activeTeachers,
+          total_teachers_active: activeTeachers,
+          total_classes: (classes || []).length,
+          total_parents: (students || []).length,
 
 [GANTI DENGAN]:
-CREATE TABLE IF NOT EXISTS ppdb_registrations (
-    id VARCHAR(50) PRIMARY KEY,
-    registration_number VARCHAR(100) UNIQUE NOT NULL,
-    registration_no VARCHAR(100),
-    student_name VARCHAR(150) NOT NULL,
+      if (module === 'dashboard') {
+        const [students, teachers, classes, ppdb, invoices, payments] = await Promise.all([
+          supabaseRest('students?select=id,status').catch(() => []),
+          supabaseRest('teachers?select=id,status').catch(() => []),
+          supabaseRest('classes?select=id').catch(() => []),
+          supabaseRest('ppdb_registrations?select=id,status').catch(() => []),
+          supabaseRest('invoices?select=id,amount,status').catch(() => []),
+          supabaseRest('payments?select=id,status').catch(() => [])
+        ]);
 
-1B. Pada definisi `CREATE TABLE IF NOT EXISTS news`, `announcements`, dan `events`, samakan kolom dengan yang dipanggil oleh `api.js` dan `app.js`:
+        const activeStudents = (students || []).filter(s => s.status === 'active').length;
+        const activeTeachers = (teachers || []).filter(t => t.status === 'active').length;
+        const pendingPPDB = (ppdb || []).filter(p => p.status === 'pending').length;
+        const acceptedPPDB = (ppdb || []).filter(p => p.status === 'accepted' || p.status === 'approved' || p.status === 'converted').length;
+        const unpaidInvoices = (invoices || []).filter(i => i.status === 'unpaid');
+        const paidInvoices = (invoices || []).filter(i => i.status === 'paid');
+        const pendingPayments = (payments || []).filter(p => p.status === 'menunggu_verifikasi').length;
+
+        const totalUnpaidAmount = unpaidInvoices.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+        const totalPaidAmount = paidInvoices.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+        const totalTargetAmount = (invoices || []).reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+
+        const stats = {
+          total_students: activeStudents,
+          active_students: activeStudents,
+          total_students_active: activeStudents,
+          total_teachers: activeTeachers,
+          total_teachers_active: activeTeachers,
+          total_classes: (classes || []).length,
+          total_parents: activeStudents,
+
+2B. Perbaiki `module === 'users'` -> `create` & `update` agar hanya memakai 4 Role
+    Resmi (`super_admin`, `admin_tu`, `siswa_aktif`, `calon_siswa`) dan menghapus
+    `password_hash` dari response:
 [CARI]:
-CREATE TABLE IF NOT EXISTS news (
+        if (action === 'create') {
+          const id = 'USR-' + String(Date.now()).slice(-5);
+          const roleLabelMap = {
+            super_admin: 'Super Admin',
+            admin_tu: 'Admin Tata Usaha',
+            guru: 'Guru Kelas',
+            orang_tua: 'Orang Tua / Wali'
+          };
+          const role = params.role || 'guru';
+          const payload = {
+            id,
+            email: params.email,
+            password_hash: params.password || '123456',
+            full_name: params.full_name || params.name,
+            name: params.name || params.full_name,
+            phone: params.phone || '',
+            role,
+            role_label: roleLabelMap[role] || role,
+            status: params.status || 'active',
+            avatar: params.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
+          };
+          const created = await supabaseRest('users', 'POST', payload);
+          return { success: true, data: created[0] || payload, message: 'User berhasil dibuat' };
+        }
+        if (action === 'update') {
+          const id = params.id;
+          const payload = { ...params };
+          delete payload.id;
+          delete payload.is_active;
+          if (params.is_active !== undefined && !payload.status) {
+            payload.status = params.is_active ? 'active' : 'inactive';
+          }
+          if (payload.password) {
+            payload.password_hash = payload.password;
+            delete payload.password;
+          }
+          if (payload.name && !payload.full_name) payload.full_name = payload.name;
+          payload.updated_at = new Date().toISOString();
+          const updated = await supabaseRest(`users?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
+          return { success: true, data: updated[0] || payload, message: 'User berhasil diperbarui' };
+        }
+
+[GANTI DENGAN]:
+        if (action === 'create') {
+          const id = 'USR-' + String(Date.now()).slice(-5);
+          const roleLabelMap = {
+            super_admin: 'Super Admin',
+            admin_tu: 'Admin Tata Usaha',
+            siswa_aktif: 'Siswa Aktif',
+            calon_siswa: 'Calon Siswa / Pendaftar'
+          };
+          const role = params.role || 'admin_tu';
+          const payload = {
+            id,
+            email: params.email,
+            nis: params.nis || null,
+            password_hash: params.password || '123456',
+            full_name: params.full_name || params.name,
+            name: params.name || params.full_name,
+            phone: params.phone || '',
+            role,
+            role_label: roleLabelMap[role] || role,
+            status: params.status || 'active',
+            avatar: params.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
+          };
+          const created = await supabaseRest('users', 'POST', payload);
+          const { password_hash, ...safeCreated } = (created && created[0]) || payload;
+          return { success: true, data: safeCreated, message: 'User berhasil dibuat' };
+        }
+        if (action === 'update') {
+          const id = params.id;
+          const roleLabelMap = {
+            super_admin: 'Super Admin',
+            admin_tu: 'Admin Tata Usaha',
+            siswa_aktif: 'Siswa Aktif',
+            calon_siswa: 'Calon Siswa / Pendaftar'
+          };
+          const payload = { ...params };
+          delete payload.id;
+          delete payload.is_active;
+          if (params.is_active !== undefined && !payload.status) {
+            payload.status = params.is_active ? 'active' : 'inactive';
+          }
+          if (payload.role && !payload.role_label && roleLabelMap[payload.role]) {
+            payload.role_label = roleLabelMap[payload.role];
+          }
+          if (payload.password) {
+            payload.password_hash = payload.password;
+            delete payload.password;
+          }
+          if (payload.name && !payload.full_name) payload.full_name = payload.name;
+          payload.updated_at = new Date().toISOString();
+          const updated = await supabaseRest(`users?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
+          const { password_hash, ...safeUpdated } = (updated && updated[0]) || payload;
+          return { success: true, data: safeUpdated, message: 'User berhasil diperbarui' };
+        }
+
+2C. Pada `module === 'students'` -> `action === 'list'`, filter otomatis baris
+    `status=neq.pending` agar calon siswa PPDB yang belum diterima tidak masuk ke
+    tabel Siswa Aktif Admin:
+[CARI]:
+      if (module === 'students') {
+        if (action === 'list') {
+          let query = 'students?select=*&order=full_name.asc';
+          if (params.class_id) query += `&class_id=eq.${encodeURIComponent(params.class_id)}`;
+          if (params.status) query += `&status=eq.${encodeURIComponent(params.status)}`;
+
+[GANTI DENGAN]:
+      if (module === 'students') {
+        if (action === 'list') {
+          let query = 'students?select=*&order=full_name.asc';
+          if (params.class_id) query += `&class_id=eq.${encodeURIComponent(params.class_id)}`;
+          if (params.status) {
+            query += `&status=eq.${encodeURIComponent(params.status)}`;
+          } else {
+            query += `&status=neq.pending`;
+          }
+
+2D. Hapus blok dead-code warisan Portal Guru & Nilai di `frontend/shared/js/api.js`:
+    - Hapus aksi `if (action === 'get_academic')` di dalam `module === 'siswa'`.
+    - Hapus aksi `if (action === 'me')` di dalam `module === 'teachers'` (karena tidak ada lagi login Portal Guru; sisakan hanya `list`, `get`, `create`, `update`, `activate`, `deactivate`, dan tambahkan `delete` untuk keperluan Admin mengelola data staf pengajar/wali kelas).
+    - Hapus aksi `if (action === 'myChildren')` dan `if (action === 'save_evaluasi')` di dalam `module === 'students'`.
+    - Hapus seluruh blok `if (module === 'parent' || module === 'parents')`, `if (module === 'attendance')`, dan `if (module === 'development')`.
+    - Pada `if (module === 'reports')` -> `action === 'generate'`, hapus cabang `else if (repType === 'attendance')` dan `else if (repType === 'development')`, serta pada cabang `repType === 'all'` ubah query siswa menjadi `supabaseRest('students?status=eq.active&select=id').catch(() => [])`.
+
+--------------------------------------------------------------------------------
+LANGKAH 3: TAMBAHKAN HANDLER CONTACT, IMPORT EXCEL & TEACHER DELETE DI api.js
+--------------------------------------------------------------------------------
+Target File: `frontend/shared/js/api.js`
+
+3A. Di dalam `if (module === 'teachers')`, tambahkan aksi `delete` (agar tombol
+    hapus data pendidik di `admin/teachers.html` berfungsi di Supabase, sama seperti
+    di `local-api.js`):
+```javascript
+        if (action === 'delete') {
+          await supabaseRest(`teachers?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
+          return { success: true, message: 'Data pendidik berhasil dihapus' };
+        }
+3B. Di dalam if (module === 'reports'), tambahkan handler import_invoices dan
+import_students (setelah blok if (action === 'generate')):
+
+JavaScript
+        if (action === 'import_invoices') {
+          const rawItems = Array.isArray(params.items) ? params.items : [];
+          if (rawItems.length === 0) return { success: false, message: 'Tidak ada data tagihan untuk diimpor' };
+          const stuList = await supabaseRest('students?status=eq.active&select=id,nis,full_name').catch(() => []);
+          let insertedCount = 0;
+          for (let i = 0; i < rawItems.length; i++) {
+            const row = rawItems[i];
+            const stu = (stuList || []).find(s =>
+              (row.nis && s.nis && String(s.nis).trim() === String(row.nis).trim()) ||
+              (row.student_name && s.full_name && s.full_name.toLowerCase().includes(String(row.student_name).toLowerCase().trim()))
+            ) || (stuList && stuList[0]);
+            if (!stu) continue;
+            const invPayload = {
+              id: 'INV-' + Date.now() + '-' + i,
+              invoice_number: row.invoice_number || ('INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4) + '/' + (i + 1)),
+              student_id: stu.id,
+              student_name: row.student_name || stu.full_name,
+              month: row.period || row.month || 'Periode Berjalan',
+              period: row.period || row.month || '2026/2027',
+              amount: Number(row.amount) || 150000,
+              due_date: row.due_date || new Date().toISOString().slice(0, 10),
+              status: (row.status || 'unpaid').toLowerCase(),
+              description: row.description || row.item_name || 'SPP Import Excel'
+            };
+            await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
+            insertedCount++;
+          }
+          return { success: true, count: insertedCount, message: `Berhasil mengimpor ${insertedCount} data tagihan ke dalam database!` };
+        }
+
+        if (action === 'import_students') {
+          const rawItems = Array.isArray(params.items) ? params.items : [];
+          if (rawItems.length === 0) return { success: false, message: 'Tidak ada data siswa untuk diimpor' };
+          let insertedCount = 0;
+          for (let i = 0; i < rawItems.length; i++) {
+            const row = rawItems[i];
+            const stuId = 'STU-' + Date.now() + '-' + i;
+            const fullName = row.full_name || row.name || ('Siswa Baru ' + (i + 1));
+            const stuPayload = {
+              id: stuId,
+              nis: row.nis || ('2026' + String(1000 + i)),
+              full_name: fullName,
+              name: fullName,
+              child_name: fullName,
+              nickname: row.nickname || fullName.split(' ')[0],
+              gender: row.gender || 'L',
+              birth_place: row.birth_place || 'Samarinda',
+              birth_date: row.birth_date || '2020-01-01',
+              class_id: row.class_id || 'CLS-001',
+              class_name: row.class_name || 'PAUD / TK',
+              kelas_sekarang: row.class_name || 'PAUD / TK',
+              parent_name: row.parent_name || row.father_name || 'Wali Siswa',
+              father_name: row.father_name || row.parent_name || '',
+              mother_name: row.mother_name || '',
+              parent_phone: row.phone || row.parent_phone || '',
+              phone: row.phone || row.parent_phone || '',
+              parent_email: row.email || '',
+              address: row.address || 'Samarinda',
+              status: 'active',
+              is_active: true
+            };
+            await supabaseRest('students', 'POST', stuPayload).catch(() => {});
+            insertedCount++;
+          }
+          return { success: true, count: insertedCount, message: `Berhasil mengimpor ${insertedCount} data siswa ke dalam database!` };
+        }
+3C. Tambahkan handler if (module === 'contact') di frontend/shared/js/api.js
+(sebelum baris fallback terakhir const items = await supabaseRest(...)) agar
+pengiriman form di kontak.html tidak gagal dengan HTTP 404:
+
+JavaScript
+      // 18. CONTACT MESSAGES (Form Kontak Publik)
+      if (module === 'contact' || module === 'contact_messages') {
+        if (action === 'list') {
+          const msgs = await supabaseRest('contact_messages?select=*&order=created_at.desc').catch(() => []);
+          return { success: true, data: msgs };
+        }
+        const id = 'MSG-' + Date.now();
+        const msgPayload = {
+          id,
+          name: params.name || 'Pengunjung',
+          email: params.email || '',
+          phone: params.phone || '',
+          subject: params.subject || 'Pesan Website',
+          message: params.message || '',
+          status: 'unread'
+        };
+        await supabaseRest('contact_messages', 'POST', msgPayload).catch(() => {});
+        return { success: true, data: msgPayload, message: 'Pesan Anda berhasil dikirim.' };
+      }
+LANGKAH 4: BERSIHKAN SISA FITUR GURU/NILAI DI frontend/local-api.js
+Target File: frontend/local-api.js
+
+Aksi Spesifik:
+
+Hapus array dummy attendance dan developments dari objek DB.
+
+Hapus blok endpoint warisan Portal Guru/Ortu:
+
+if (action === 'get_academic') pada module === 'siswa'
+
+if (action === 'save_evaluasi') dan if (action === 'myChildren') pada module === 'students'
+
+if (module === 'attendance')
+
+if (module === 'development')
+
+if (module === 'parent')
+
+Cabang else if (reportType === 'attendance') dan else if (reportType === 'development') pada module === 'reports'.
+
+Pada module === 'users' -> action === 'create', ubah default role dari
+params.role || 'orang_tua' menjadi params.role || 'admin_tu'.
+
+Tambahkan handler if (module === 'contact') di local-api.js yang mengembalikan
+{ success: true, message: 'Pesan Anda berhasil dikirim.' }.
+
+LANGKAH 5: SINKRONKAN TABEL & KOLOM DI MASTER_SUPABASE_SETUP_V2.sql & PATCH SQL
+Target File:
+
+database/MASTER_SUPABASE_SETUP_V2.sql
+
+database/patch_missing_columns.sql
+
+database/supabase_schema.sql
+
+Aksi Spesifik:
+
+Pindahkan atau hapus database/supabase_schema.sql (skema V1 lama yang masih
+memiliki DROP TABLE CASCADE, role guru/orang_tua, serta tabel developments
+dan attendance) ke .legacy_backup/ agar tidak pernah tidak sengaja dijalankan.
+
+Di database/MASTER_SUPABASE_SETUP_V2.sql:
+
+HAPUS bagian -- 6. TABEL REKAM AKADEMIK & RAPOR EVALUASI STPPA (CREATE TABLE IF NOT EXISTS academic_records ...) dan hapus 'academic_records' dari array tables pada bagian RLS.
+
+TAMBAHKAN tabel teachers (untuk menu Admin Data Pendidik & Wali Kelas di classes) dan tabel contact_messages (untuk form kontak.html), serta masukkan 'teachers' dan 'contact_messages' ke dalam array tables pada loop RLS.
+
+Tambahkan skrip SQL berikut ke dalam database/MASTER_SUPABASE_SETUP_V2.sql
+dan database/patch_missing_columns.sql:
+
+SQL
+-- Hapus tabel rapor digital warisan jika tidak digunakan lagi
+DROP TABLE IF EXISTS academic_records CASCADE;
+DROP TABLE IF EXISTS developments CASCADE;
+DROP TABLE IF EXISTS attendance CASCADE;
+
+-- Tabel Pendataan Tenaga Pendidik / Wali Kelas (Dikelola Admin TU)
+CREATE TABLE IF NOT EXISTS teachers (
     id VARCHAR(50) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE,
-    content TEXT NOT NULL,
-    excerpt TEXT,
-    summary TEXT,
-    category VARCHAR(100) DEFAULT 'Umum',
-    cover_url TEXT,
-    image_url TEXT,
-    image TEXT,
-    featured_image_url TEXT,
-    author_name VARCHAR(150) DEFAULT 'Admin Sekolah',
-    status VARCHAR(20) DEFAULT 'published',
-    is_published BOOLEAN DEFAULT TRUE,
-    published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    user_id VARCHAR(50),
+    nip VARCHAR(50),
+    full_name VARCHAR(150) NOT NULL,
+    name VARCHAR(150),
+    gender VARCHAR(10) DEFAULT 'L',
+    phone VARCHAR(50),
+    email VARCHAR(150),
+    education VARCHAR(100) DEFAULT 'S1 Pendidikan',
+    position VARCHAR(100) DEFAULT 'Guru Kelas',
+    specialization VARCHAR(100),
+    start_date DATE,
+    joined_at DATE,
+    avatar TEXT,
+    status VARCHAR(20) DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS announcements (
+-- Tabel Pesan Kontak Pengunjung Publik
+CREATE TABLE IF NOT EXISTS contact_messages (
     id VARCHAR(50) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    target_role VARCHAR(50) DEFAULT 'all',
-    status VARCHAR(20) DEFAULT 'published',
-    is_published BOOLEAN DEFAULT TRUE,
-    published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150),
+    phone VARCHAR(50),
+    subject VARCHAR(255),
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'unread',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS events (
-    id VARCHAR(50) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    event_date DATE NOT NULL,
-    location VARCHAR(255) DEFAULT 'Kampus Yayasan At Tarbiyyah Wijaya Kusuma',
-    status VARCHAR(20) DEFAULT 'published',
-    is_published BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Kolom Lengkap Biodata Siswa (Untuk Edit Biodata di Portal Siswa Mandiri)
+ALTER TABLE students ADD COLUMN IF NOT EXISTS nik VARCHAR(30);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS father_phone VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_phone VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS father_occupation VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_occupation VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS previous_school VARCHAR(150);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS blood_type VARCHAR(10);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS hobbies TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS aspirations TEXT;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS joined_at DATE;
 
-[GANTI DENGAN]:
-CREATE TABLE IF NOT EXISTS news (
-    id VARCHAR(50) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE,
-    content TEXT NOT NULL,
-    excerpt TEXT,
-    summary TEXT,
-    category VARCHAR(100) DEFAULT 'Umum',
-    cover_url TEXT,
-    image_url TEXT,
-    image TEXT,
-    featured_image_url TEXT,
-    author VARCHAR(150) DEFAULT 'Admin Sekolah',
-    author_name VARCHAR(150) DEFAULT 'Admin Sekolah',
-    status VARCHAR(20) DEFAULT 'published',
-    is_published BOOLEAN DEFAULT TRUE,
-    published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Kolom Lengkap Pengaturan CMS & Identitas Yayasan (Untuk Sinkronisasi Cloud)
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS campus_note TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS maps_url TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS maps_embed_url TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS ketua_yayasan VARCHAR(150) DEFAULT 'Makhrus';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS bendahara VARCHAR(150) DEFAULT 'Sri Pragawati';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS sekretaris VARCHAR(150) DEFAULT 'Candra Gunawan';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS pembina VARCHAR(150) DEFAULT 'DJOKO IRIANDONO';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS pengawas VARCHAR(150) DEFAULT 'Suhardi';
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS footer_bg_url TEXT DEFAULT '/images/school-campus.jpg';
 
-CREATE TABLE IF NOT EXISTS announcements (
-    id VARCHAR(50) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    target_role VARCHAR(50) DEFAULT 'all',
-    target_audience VARCHAR(50) DEFAULT 'all',
-    is_pinned BOOLEAN DEFAULT FALSE,
-    status VARCHAR(20) DEFAULT 'published',
-    is_published BOOLEAN DEFAULT TRUE,
-    published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS header_title VARCHAR(255);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS announcement_banner TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS whatsapp_official VARCHAR(50);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS contact_email VARCHAR(100);
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS campus_note TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS maps_url TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS maps_embed_url TEXT;
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS academic_year VARCHAR(50) DEFAULT '2026/2027';
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS footer_bg_url TEXT DEFAULT '/images/school-campus.jpg';
+ALTER TABLE web_settings ADD COLUMN IF NOT EXISTS login_bg_url TEXT DEFAULT '/images/school-campus.jpg';
 
-CREATE TABLE IF NOT EXISTS events (
-    id VARCHAR(50) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    date DATE DEFAULT CURRENT_DATE,
-    event_date DATE DEFAULT CURRENT_DATE,
-    time VARCHAR(50) DEFAULT '08:00 - Selesai',
-    location VARCHAR(255) DEFAULT 'Kampus Yayasan At Tarbiyyah Wijaya Kusuma',
-    status VARCHAR(20) DEFAULT 'published',
-    is_published BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- RLS & Policy untuk teachers dan contact_messages
+ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
-1C. Tambahkan blok migrasi otomatis (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`) tepat sebelum bagian `-- 10. ROW LEVEL SECURITY (RLS)` di `database/MASTER_SUPABASE_SETUP_V2.sql` (dan salin juga ke `database/patch_missing_columns.sql`):
-```sql
--- Migrasi Kolom Kompatibilitas Penuh (Safe Idempotent Patch)
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS registration_no VARCHAR(100);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS full_name VARCHAR(150);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS child_name VARCHAR(150);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nickname VARCHAR(100);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nik VARCHAR(30);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_type VARCHAR(50);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS gender VARCHAR(10) DEFAULT 'L';
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_place VARCHAR(100);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_date DATE;
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS father_name VARCHAR(150);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS mother_name VARCHAR(150);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS photo_url TEXT;
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_certificate_url TEXT;
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS family_card_url TEXT;
-ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_metadata JSONB DEFAULT '{}'::jsonb;
+DROP POLICY IF EXISTS "Public Full Access on teachers" ON teachers;
+CREATE POLICY "Public Full Access on teachers" ON teachers FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-ALTER TABLE news ADD COLUMN IF NOT EXISTS author VARCHAR(150) DEFAULT 'Admin Sekolah';
-ALTER TABLE news ADD COLUMN IF NOT EXISTS author_name VARCHAR(150) DEFAULT 'Admin Sekolah';
-ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_audience VARCHAR(50) DEFAULT 'all';
-ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_role VARCHAR(50) DEFAULT 'all';
-ALTER TABLE announcements ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE;
-ALTER TABLE events ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE;
-ALTER TABLE events ADD COLUMN IF NOT EXISTS event_date DATE DEFAULT CURRENT_DATE;
-ALTER TABLE events ADD COLUMN IF NOT EXISTS time VARCHAR(50) DEFAULT '08:00 - Selesai';
-LANGKAH 2: SINKRONISASI PAYLOAD CMS (NEWS, ANNOUNCEMENTS, EVENTS) DI api.js
-Target File: frontend/shared/js/api.js
-
-[CARI pada blok if (module === 'news') -> if (action === 'create')]:
-const payload = {
-id,
-slug,
-title: params.title || 'Berita Baru',
-category: params.category || 'Umum',
-summary: params.summary || params.excerpt || (params.content ? params.content.substring(0, 150) : ''),
-content: params.content || params.body || '',
-image: img || '',
-author: params.author || 'Admin',
-status: params.status || (params.is_published ? 'published' : 'draft'),
-published_at: params.published_at || new Date().toISOString()
-};
-
-[GANTI DENGAN]:
-const authorVal = params.author || params.author_name || 'Admin Sekolah';
-const payload = {
-id,
-slug,
-title: params.title || 'Berita Baru',
-category: params.category || 'Umum',
-summary: params.summary || params.excerpt || (params.content ? params.content.substring(0, 150) : ''),
-content: params.content || params.body || '',
-image: img || '',
-author: authorVal,
-author_name: authorVal,
-status: params.status || (params.is_published ? 'published' : 'draft'),
-published_at: params.published_at || new Date().toISOString()
-};
-
-[CARI pada blok if (module === 'announcements') -> create & update]:
-if (action === 'create') {
-const id = 'ANN-' + Date.now();
-const payload = {
-id,
-title: params.title || 'Pengumuman Baru',
-content: params.content || params.body || params.excerpt || '',
-target_audience: params.target_audience || params.category || 'all',
-is_pinned: !!params.is_pinned,
-status: params.status || (params.is_published ? 'published' : 'draft'),
-published_at: params.published_at || new Date().toISOString()
-};
-const res = await supabaseRest('announcements', 'POST', payload);
-return { success: true, data: res[0] || payload, message: 'Pengumuman diterbitkan' };
-}
-if (action === 'update') {
-const payload = {};
-if (params.title) payload.title = params.title;
-if (params.content || params.body) payload.content = params.content || params.body;
-if (params.target_audience) payload.target_audience = params.target_audience;
-if (params.status) payload.status = params.status;
-if (params.is_pinned !== undefined) payload.is_pinned = !!params.is_pinned;
-const res = await supabaseRest(announcements?id=eq.${encodeURIComponent(params.id)}, 'PATCH', payload);
-return { success: true, data: res[0] || params, message: 'Pengumuman diperbarui' };
-}
-
-[GANTI DENGAN]:
-if (action === 'create') {
-const id = 'ANN-' + Date.now();
-const targetAud = params.target_audience || params.target_role || params.category || 'all';
-const payload = {
-id,
-title: params.title || 'Pengumuman Baru',
-content: params.content || params.body || params.excerpt || '',
-target_audience: targetAud,
-target_role: targetAud,
-is_pinned: !!params.is_pinned,
-status: params.status || (params.is_published ? 'published' : 'draft'),
-published_at: params.published_at || new Date().toISOString()
-};
-const res = await supabaseRest('announcements', 'POST', payload);
-return { success: true, data: res[0] || payload, message: 'Pengumuman diterbitkan' };
-}
-if (action === 'update') {
-const payload = {};
-if (params.title) payload.title = params.title;
-if (params.content || params.body) payload.content = params.content || params.body;
-if (params.target_audience || params.target_role) {
-payload.target_audience = params.target_audience || params.target_role;
-payload.target_role = payload.target_audience;
-}
-if (params.status) payload.status = params.status;
-if (params.is_pinned !== undefined) payload.is_pinned = !!params.is_pinned;
-const res = await supabaseRest(announcements?id=eq.${encodeURIComponent(params.id)}, 'PATCH', payload);
-return { success: true, data: res[0] || params, message: 'Pengumuman diperbarui' };
-}
-
-[CARI pada blok if (module === 'events')]:
-if (module === 'events') {
-if (action === 'list') {
-const evts = await supabaseRest('events?select=*&order=date.asc');
-return { success: true, data: evts, raw: { items: evts } };
-}
-if (action === 'create') {
-const id = 'EVT-' + Date.now();
-const payload = {
-id,
-title: params.title || 'Agenda Baru',
-date: params.date || params.event_date || new Date().toISOString().split('T')[0],
-time: params.time || '08:00 - Selesai',
-location: params.location || 'Lingkungan Yayasan',
-description: params.description || params.content || params.excerpt || '',
-status: params.status || (params.is_published ? 'upcoming' : 'draft')
-};
-const res = await supabaseRest('events', 'POST', payload);
-return { success: true, data: res[0] || payload, message: 'Agenda dibuat' };
-}
-if (action === 'update') {
-const payload = {};
-if (params.title) payload.title = params.title;
-if (params.date || params.event_date) payload.date = params.date || params.event_date;
-if (params.time) payload.time = params.time;
-if (params.location) payload.location = params.location;
-if (params.description || params.content) payload.description = params.description || params.content;
-if (params.status) payload.status = params.status;
-const res = await supabaseRest(events?id=eq.${encodeURIComponent(params.id)}, 'PATCH', payload);
-return { success: true, data: res[0] || payload, message: 'Agenda diperbarui' };
-}
-
-[GANTI DENGAN]:
-if (module === 'events') {
-if (action === 'list') {
-const evts = await supabaseRest('events?select=&order=event_date.asc').catch(() => supabaseRest('events?select='));
-const normalizedEvts = (evts || []).map(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }));
-return { success: true, data: normalizedEvts, raw: { items: normalizedEvts } };
-}
-if (action === 'create') {
-const id = 'EVT-' + Date.now();
-const evtDate = params.date || params.event_date || new Date().toISOString().split('T')[0];
-const payload = {
-id,
-title: params.title || 'Agenda Baru',
-date: evtDate,
-event_date: evtDate,
-time: params.time || '08:00 - Selesai',
-location: params.location || 'Lingkungan Yayasan',
-description: params.description || params.content || params.excerpt || '',
-status: params.status || (params.is_published ? 'upcoming' : 'draft')
-};
-const res = await supabaseRest('events', 'POST', payload);
-return { success: true, data: res[0] || payload, message: 'Agenda dibuat' };
-}
-if (action === 'update') {
-const payload = {};
-if (params.title) payload.title = params.title;
-if (params.date || params.event_date) {
-payload.date = params.date || params.event_date;
-payload.event_date = payload.date;
-}
-if (params.time) payload.time = params.time;
-if (params.location) payload.location = params.location;
-if (params.description || params.content) payload.description = params.description || params.content;
-if (params.status) payload.status = params.status;
-const res = await supabaseRest(events?id=eq.${encodeURIComponent(params.id)}, 'PATCH', payload);
-return { success: true, data: res[0] || payload, message: 'Agenda diperbarui' };
-}
-
-LANGKAH 3: CEGAH DUPLIKASI BARIS SISWA & USER SAAT KONVERSI PPDB DI api.js
-Target File: frontend/shared/js/api.js (Blok module === 'ppdb' -> action === 'convert')
-
-[CARI]:
-const stuId = 'STU-' + String(Date.now()).slice(-5);
-const targetClassId = params.class_id || 'CLS-001';
-
-      // Ambil nama kelas
-      let targetClassName = 'PAUD / TK Terpadu';
-      if (targetClassId) {
-        const cls = await supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}&select=name`);
-        if (cls && cls[0]) targetClassName = cls[0].name;
-      }
-
-      // 2. Tentukan NIS Siswa (bisa input dari admin atau auto-generate)
-      const studentNis = params.nis || ('2026' + String(Math.floor(1000 + Math.random() * 9000)));
-
-      // 3. Guard Keunikan NIS: Pastikan belum ada siswa yang memiliki NIS ini
-      const existingNis = await supabaseRest(`students?nis=eq.${encodeURIComponent(studentNis)}&select=id`);
-      if (existingNis && existingNis.length > 0) {
-        return { success: false, message: `NIS ${studentNis} sudah digunakan oleh siswa aktif lain. Silakan gunakan nomor NIS lain.` };
-      }
-
-      // 4. Password awal dari Tanggal Lahir (Format default: YYYY-MM-DD atau DDMMYYYY)
-      let birthDateStr = reg.birth_date || reg.student_birth_date ? String(reg.birth_date || reg.student_birth_date).trim() : '2021-01-01';
-      let birthDatePassword = birthDateStr;
-      if (birthDateStr.includes('-')) {
-        const p = birthDateStr.split('-');
-        if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
-      }
-
-      const cleanPhone = (reg.phone || reg.parent_phone || '').replace(/[^0-9]/g, '');
-      const studentEmail = reg.email || reg.parent_email || (cleanPhone ? `${studentNis}@siswa.yayasan.sch.id` : `siswa_${studentNis}@yayasan.sch.id`);
-      const studentName = reg.student_name || reg.full_name || reg.child_name || 'Santri Baru';
-
-      // 5. Cek apakah user akun pendaftar sudah ada (dari registrasi PPDB Akun-First)
-      let existingUsers = await supabaseRest(`users?email=eq.${encodeURIComponent(studentEmail)}&select=*`);
-      let userId = 'USR-' + studentNis;
-
-      if (existingUsers && existingUsers.length > 0) {
-        userId = existingUsers[0].id;
-        await supabaseRest(`users?id=eq.${userId}`, 'PATCH', {
-          role: 'siswa_aktif',
-          role_label: 'Siswa Aktif',
-          nis: studentNis,
-          student_id: stuId,
-          is_password_changed: false,
-          status: 'active'
-        });
-      } else {
-        await supabaseRest('users', 'POST', {
-          id: userId,
-          email: studentEmail,
-          password_hash: birthDatePassword,
-          full_name: studentName,
-          name: studentName,
-          phone: reg.phone || reg.parent_phone || '',
-          role: 'siswa_aktif',
-          role_label: 'Siswa Aktif',
-          nis: studentNis,
-          student_id: stuId,
-          avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-          status: 'active',
-          is_password_changed: false
-        });
-      }
-
-      // 6. Buat / Update Data Siswa Aktif
-      const studentPayload = {
-        id: stuId,
-        user_id: userId,
-        nis: studentNis,
-        full_name: studentName,
-        name: studentName,
-        child_name: studentName,
-        gender: reg.gender || reg.student_gender || 'L',
-        birth_place: reg.birth_place || reg.student_birth_place || 'Samarinda',
-        birth_date: birthDateStr,
-        class_id: targetClassId,
-        class_name: targetClassName,
-        kelas_sekarang: targetClassName,
-        semester_sekarang: 'Semester 1',
-        status_kenaikan: 'Aktif',
-        status_pendaftaran: 'accepted',
-        is_active: true,
-        parent_name: reg.parent_name || reg.father_name || reg.mother_name || '',
-        parent_phone: reg.parent_phone || reg.phone || '',
-        parent_email: studentEmail,
-        address: reg.address || '',
-        status: 'active'
-      };
-      await supabaseRest('students', 'POST', studentPayload);
-[GANTI DENGAN]:
-const targetClassId = params.class_id || 'CLS-001';
-
-      // Ambil nama kelas
-      let targetClassName = 'PAUD / TK Terpadu';
-      if (targetClassId) {
-        const cls = await supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}&select=name`);
-        if (cls && cls[0]) targetClassName = cls[0].name;
-      }
-
-      // 2. Tentukan NIS Siswa (bisa input dari admin atau auto-generate)
-      const studentNis = params.nis || ('2026' + String(Math.floor(1000 + Math.random() * 9000)));
-
-      // 3. Guard Keunikan NIS: Pastikan belum ada siswa yang memiliki NIS ini
-      const existingNis = await supabaseRest(`students?nis=eq.${encodeURIComponent(studentNis)}&select=id`);
-      if (existingNis && existingNis.length > 0) {
-        return { success: false, message: `NIS ${studentNis} sudah digunakan oleh siswa aktif lain. Silakan gunakan nomor NIS lain.` };
-      }
-
-      // 4. Password awal dari Tanggal Lahir (Format default: DDMMYYYY)
-      let birthDateStr = reg.birth_date || reg.student_birth_date ? String(reg.birth_date || reg.student_birth_date).trim() : '2021-01-01';
-      let birthDatePassword = birthDateStr;
-      if (birthDateStr.includes('-')) {
-        const p = birthDateStr.split('-');
-        if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
-      }
-
-      const regNo = reg.registration_number || reg.registration_no || '';
-      const pendaftarEmail = `${regNo.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
-      const cleanPhone = (reg.phone || reg.parent_phone || '').replace(/[^0-9]/g, '');
-      const studentEmail = reg.email || reg.parent_email || (cleanPhone ? `${studentNis}@siswa.yayasan.sch.id` : `siswa_${studentNis}@yayasan.sch.id`);
-      const studentName = reg.student_name || reg.full_name || reg.child_name || 'Santri Baru';
-
-      // 5. Cek apakah user akun pendaftar sudah ada (cari via email, username regNo, atau email pendaftar)
-      let existingUsers = await supabaseRest(
-        `users?or=(email.eq.${encodeURIComponent(studentEmail)},username.eq.${encodeURIComponent(regNo)},email.eq.${encodeURIComponent(pendaftarEmail)})&select=*`
-      ).catch(() => []);
-
-      let userId = (existingUsers && existingUsers[0]) ? existingUsers[0].id : ('USR-' + studentNis);
-      let stuId = (existingUsers && existingUsers[0] && existingUsers[0].student_id)
-        ? existingUsers[0].student_id
-        : ('STU-' + String(Date.now()).slice(-5));
-
-      if (existingUsers && existingUsers.length > 0) {
-        await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', {
-          email: studentEmail,
-          role: 'siswa_aktif',
-          role_label: 'Siswa Aktif',
-          nis: studentNis,
-          student_id: stuId,
-          password_hash: birthDatePassword,
-          is_password_changed: false,
-          status: 'active'
-        });
-      } else {
-        await supabaseRest('users', 'POST', {
-          id: userId,
-          email: studentEmail,
-          password_hash: birthDatePassword,
-          full_name: studentName,
-          name: studentName,
-          phone: reg.phone || reg.parent_phone || '',
-          role: 'siswa_aktif',
-          role_label: 'Siswa Aktif',
-          nis: studentNis,
-          student_id: stuId,
-          avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-          status: 'active',
-          is_password_changed: false
-        });
-      }
-
-      // 6. Buat atau Update Data Siswa Aktif (Tanpa Duplikasi Baris Pending)
-      const studentPayload = {
-        id: stuId,
-        user_id: userId,
-        nis: studentNis,
-        full_name: studentName,
-        name: studentName,
-        child_name: studentName,
-        nickname: reg.nickname || null,
-        gender: reg.gender || reg.student_gender || 'L',
-        birth_place: reg.birth_place || reg.student_birth_place || 'Samarinda',
-        birth_date: birthDateStr,
-        class_id: targetClassId,
-        class_name: targetClassName,
-        kelas_sekarang: targetClassName,
-        semester_sekarang: 'Semester 1',
-        status_kenaikan: 'Aktif',
-        status_pendaftaran: 'accepted',
-        is_active: true,
-        parent_name: reg.parent_name || reg.father_name || reg.mother_name || '',
-        father_name: reg.father_name || reg.parent_name || '',
-        mother_name: reg.mother_name || '',
-        parent_phone: reg.parent_phone || reg.phone || '',
-        phone: reg.phone || reg.parent_phone || '',
-        parent_email: studentEmail,
-        photo_url: reg.photo_url || null,
-        address: reg.address || '',
-        status: 'active'
-      };
-
-      const existingStu = await supabaseRest(`students?id=eq.${encodeURIComponent(stuId)}&select=id`).catch(() => []);
-      if (existingStu && existingStu.length > 0) {
-        const patchStu = { ...studentPayload };
-        delete patchStu.id;
-        await supabaseRest(`students?id=eq.${encodeURIComponent(stuId)}`, 'PATCH', patchStu);
-      } else {
-        await supabaseRest('students', 'POST', studentPayload);
-      }
-
-      // Update jumlah siswa di kelas tujuan
-      if (targetClassId) {
-        supabaseRest(`students?class_id=eq.${encodeURIComponent(targetClassId)}&status=eq.active&select=id`).then(list => {
-          supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}`, 'PATCH', { student_count: (list || []).length });
-        }).catch(() => {});
-      }
-LANGKAH 4: FILTER LAPORAN SISWA AKTIF & TAMBAHKAN registration_no DI api.js
-Target File: frontend/shared/js/api.js
-
-4A. Pada ppdb/submitPublic, tambahkan registration_no: regNum, ke dalam regPayload:
-[CARI]:
-const regPayload = {
-id,
-registration_number: regNum,
-student_name: studentName,
-
-[GANTI DENGAN]:
-const regPayload = {
-id,
-registration_number: regNum,
-registration_no: regNum,
-student_name: studentName,
-
-4B. Pada reports/generate (repType === 'students'), filter hanya siswa berstatus active:
-[CARI]:
-if (repType === 'students') {
-headers = ['No', 'NIS', 'Nama Lengkap', 'Kelas', 'Jenis Kelamin', 'Nama Wali', 'No. HP / WA', 'Status'];
-const stu = await supabaseRest('students?select=*').catch(() => []);
-
-[GANTI DENGAN]:
-if (repType === 'students') {
-headers = ['No', 'NIS', 'Nama Lengkap', 'Kelas', 'Jenis Kelamin', 'Nama Wali', 'No. HP / WA', 'Status'];
-const stu = await supabaseRest('students?status=eq.active&select=*&order=full_name.asc').catch(() => []);
-
-LANGKAH 5: SANITASI password_hash DARI SESSION LOGIN DI api.js
-Target File: frontend/shared/js/api.js
-
-5A. Pada auth/login:
-[CARI]:
-const userPayload = {
-...matchedUser,
-role: roleObj,
-needs_password_change: needsPasswordChange,
-student_id: studentId
-};
-const token = 'siy_' + matchedUser.id + '_' + Date.now();
-
-[GANTI DENGAN]:
-const userPayload = {
-...matchedUser,
-role: roleObj,
-needs_password_change: needsPasswordChange,
-student_id: studentId
-};
-delete userPayload.password_hash;
-const token = 'siy_' + matchedUser.id + '_' + Date.now();
-
-5B. Pada auth/register:
-[CARI]:
-const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
-const userPayload = { ...newUser, role: roleObj, student_id: studentId };
-const token = 'siy_' + userId + '_' + Date.now();
-
-[GANTI DENGAN]:
-const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
-const userPayload = { ...newUser, role: roleObj, student_id: studentId };
-delete userPayload.password_hash;
-const token = 'siy_' + userId + '_' + Date.now();
-
-5C. Pada ppdb/submitPublic:
-[CARI]:
-const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
-const userSession = { ...newUser, role: roleObj, student_id: studentId };
-const token = 'siy_' + userId + '_' + Date.now();
-
-[GANTI DENGAN]:
-const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
-const userSession = { ...newUser, role: roleObj, student_id: studentId };
-delete userSession.password_hash;
-const token = 'siy_' + userId + '_' + Date.now();
-
-LANGKAH 6: SINKRONKAN QUERY EVENTS DI frontend/public/js/app.js
-Target File: frontend/public/js/app.js
-
-[CARI]:
-if (module === 'events') {
-if (action === 'list') {
-const evts = await supabaseRest('events?select=*&order=date.asc');
-return { success: true, data: evts, raw: { items: evts } };
-}
-}
-
-[GANTI DENGAN]:
-if (module === 'events') {
-if (action === 'list') {
-const evts = await supabaseRest('events?select=&order=event_date.asc').catch(() => supabaseRest('events?select='));
-const normalizedEvts = (evts || []).map(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }));
-return { success: true, data: normalizedEvts, raw: { items: normalizedEvts } };
-}
-}
+DROP POLICY IF EXISTS "Public Full Access on contact_messages" ON contact_messages;
+CREATE POLICY "Public Full Access on contact_messages" ON contact_messages FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
