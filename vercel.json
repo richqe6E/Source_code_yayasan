@@ -1,0 +1,107 @@
+{
+  "version": 2,
+  "name": "siyayasan-portal",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "builds": [
+    { "src": "frontend/public/**/*", "use": "@vercel/static" },
+    { "src": "frontend/portal/**/*", "use": "@vercel/static" },
+    { "src": "frontend/shared/**/*", "use": "@vercel/static" }
+  ],
+  "redirects": [
+    { "source": "/admin", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/admin/", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/siswa", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/siswa/", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/siswa/akademik.html", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/portal/siswa/akademik.html", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/portal/admin", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/portal/admin/", "destination": "/admin/dashboard.html", "permanent": false },
+    { "source": "/portal/siswa", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/portal/siswa/", "destination": "/siswa/dashboard.html", "permanent": false },
+    { "source": "/guru", "destination": "/login.html", "permanent": false },
+    { "source": "/guru/(.*)", "destination": "/login.html", "permanent": false },
+    { "source": "/ortu", "destination": "/login.html", "permanent": false },
+    { "source": "/ortu/(.*)", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/guru", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/guru/(.*)", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/ortu", "destination": "/login.html", "permanent": false },
+    { "source": "/portal/ortu/(.*)", "destination": "/login.html", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/frontend/public/favicon.ico" },
+    { "source": "/shared/(.*)", "destination": "/frontend/shared/$1" },
+    { "source": "/public/(.*)", "destination": "/frontend/public/$1" },
+    { "source": "/images/(.*)", "destination": "/frontend/public/images/$1" },
+    { "source": "/css/(.*)", "destination": "/frontend/public/css/$1" },
+    { "source": "/js/(.*)", "destination": "/frontend/public/js/$1" },
+    { "source": "/videos/(.*)", "destination": "/frontend/public/videos/$1" },
+    { "source": "/assets/(.*)", "destination": "/frontend/public/assets/$1" },
+    { "source": "/admin/(.*)", "destination": "/frontend/portal/admin/$1" },
+    { "source": "/siswa/(.*)", "destination": "/frontend/portal/siswa/$1" },
+    { "source": "/portal/(.*)", "destination": "/frontend/portal/$1" },
+    { "source": "/ppdb/form-paud.html", "destination": "/frontend/public/ppdb/form-paud.html" },
+    { "source": "/ppdb/form-tpq.html", "destination": "/frontend/public/ppdb/form-tpq.html" },
+    { "source": "/ppdb/status.html", "destination": "/frontend/public/ppdb/status.html" },
+    { "source": "/ppdb/(.*)", "destination": "/frontend/public/ppdb/$1" },
+    { "source": "/berita/(.*)", "destination": "/frontend/public/berita/detail.html" },
+    { "source": "/form-paud.html", "destination": "/frontend/public/ppdb/form-paud.html" },
+    { "source": "/form-tpq.html", "destination": "/frontend/public/ppdb/form-tpq.html" },
+    { "source": "/status.html", "destination": "/frontend/public/ppdb/status.html" },
+    { "source": "/", "destination": "/frontend/public/index.html" },
+    { "source": "/index.html", "destination": "/frontend/public/index.html" },
+    { "source": "/index", "destination": "/frontend/public/index.html" },
+    { "source": "/profil.html", "destination": "/frontend/public/profil.html" },
+    { "source": "/profil", "destination": "/frontend/public/profil.html" },
+    { "source": "/berita.html", "destination": "/frontend/public/berita.html" },
+    { "source": "/berita", "destination": "/frontend/public/berita.html" },
+    { "source": "/galeri.html", "destination": "/frontend/public/galeri.html" },
+    { "source": "/galeri", "destination": "/frontend/public/galeri.html" },
+    { "source": "/kontak.html", "destination": "/frontend/public/kontak.html" },
+    { "source": "/kontak", "destination": "/frontend/public/kontak.html" },
+    { "source": "/ppdb.html", "destination": "/frontend/public/ppdb.html" },
+    { "source": "/ppdb", "destination": "/frontend/public/ppdb.html" },
+    { "source": "/register.html", "destination": "/frontend/public/register.html" },
+    { "source": "/register", "destination": "/frontend/public/register.html" },
+    { "source": "/login.html", "destination": "/frontend/public/login.html" },
+    { "source": "/login", "destination": "/frontend/public/login.html" },
+    { "source": "/pengumuman.html", "destination": "/frontend/public/pengumuman.html" },
+    { "source": "/pengumuman", "destination": "/frontend/public/pengumuman.html" },
+    { "source": "/agenda.html", "destination": "/frontend/public/agenda.html" },
+    { "source": "/agenda", "destination": "/frontend/public/agenda.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/shared/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/public/css/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/public/images/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/public/videos/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    }
+  ]
+}
