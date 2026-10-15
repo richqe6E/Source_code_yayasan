@@ -1656,8 +1656,13 @@
           return { success: true, data: { registration: regs[0] }, registration: regs[0] };
         }
         if (action === 'period') {
-          const periods = await supabaseRest('ppdb_periods?select=*&order=created_at.desc');
-          const p = periods && periods[0] ? { ...periods[0] } : null;
+          let p = null;
+          try {
+            const periods = await supabaseRest('ppdb_periods?select=*&order=created_at.desc');
+            p = periods && periods[0] ? { ...periods[0] } : null;
+          } catch (e) {
+            console.warn('[SIYAYASAN] ppdb_periods read fallback:', e);
+          }
           if (p) {
             let extra = {};
             if (p.announcement_notes) {
@@ -1672,6 +1677,25 @@
               if (cached) Object.assign(extra, JSON.parse(cached));
             } catch (_) {}
             Object.assign(p, extra);
+            try {
+              if (p.status) localStorage.setItem('siy_ppdb_status', p.status);
+            } catch (_) {}
+          } else {
+            p = {
+              id: 'PER-2026-1',
+              status: 'open',
+              academic_year: '2026/2027',
+              online_registration_dates: '1 Jan - 31 Jul 2026',
+              verification_dates: '1 - 5 Agustus 2026',
+              announcement_dates: '10 Agustus 2026',
+              re_registration_dates: '12 - 20 Agustus 2026'
+            };
+            try {
+              const cachedStatus = localStorage.getItem('siy_ppdb_status');
+              if (cachedStatus) p.status = cachedStatus;
+              const cachedSched = localStorage.getItem('siy_ppdb_schedule');
+              if (cachedSched) Object.assign(p, JSON.parse(cachedSched));
+            } catch (_) {}
           }
           return { success: true, data: p };
         }
@@ -1695,6 +1719,7 @@
             notes: params.notes || ''
           };
           try {
+            if (params.status) localStorage.setItem('siy_ppdb_status', params.status);
             localStorage.setItem('siy_ppdb_schedule', JSON.stringify(scheduleData));
           } catch (_) {}
 

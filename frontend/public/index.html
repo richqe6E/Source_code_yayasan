@@ -535,8 +535,19 @@
                 if (bottomBtnText) bottomBtnText.textContent = 'Cek Informasi & Jadwal';
               }
             } else {
+              if (heroBtn) {
+                heroBtn.href = 'ppdb.html#formulir-pendaftaran';
+                if (heroBtnText) heroBtnText.textContent = 'Daftar PPDB Online';
+              }
               if (bottomTitle) {
                 bottomTitle.textContent = `Penerimaan Peserta Didik Baru TA ${academicYear}`;
+              }
+              if (bottomDesc) {
+                bottomDesc.textContent = 'Daftarkan putra-putri Anda secara online. Proses mudah, transparan, dan terintegrasi langsung dengan verifikasi sekolah.';
+              }
+              if (bottomBtn) {
+                bottomBtn.href = 'ppdb.html#formulir-pendaftaran';
+                if (bottomBtnText) bottomBtnText.textContent = 'Isi Formulir Pendaftaran';
               }
             }
           }

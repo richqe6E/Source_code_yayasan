@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 14 Oktober 2026 (Sesi 37 — Remediasi 12 Temuan Audit BUG-01 s/d BUG-12, Zero-Green Oceanic Blue, Supabase Storage & Vercel Live Deploy)  
+**Terakhir Diperbarui:** 15 Oktober 2026 (Sesi 38 — Penyembunyian Kartu Formulir PPDB Saat Pendaftaran Ditutup & Sinkronisasi Buka/Tutup Admin Portal)  
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (Vercel & Supabase Cloud).
 
 ---
@@ -29,6 +29,8 @@ Sistem Informasi Manajemen & Portal Website Yayasan (PAUD, TK, TPQ Samarinda) di
    - **Database:** Menggunakan 16 tabel relasional PostgreSQL di Supabase Cloud (`users`, `students`, `teachers`, `classes`, `invoices`, `payments`, `ppdb_registrations`, `ppdb_periods`, `student_documents`, `news`, `announcements`, `events`, `galleries`, `schools`, `activity_logs`, `contact_messages`).
    - **Storage:** Bucket `siyayasan-uploads` aktif dengan kebijakan public access untuk file bukti transfer, foto profil, dokumen santri, dan aset konten.
    - **Graceful Fallback:** Jika koneksi Supabase terputus, sistem otomatis berpindah ke `localStorage` tanpa menimbulkan crash layar.
+5. **Visibilitas Kartu Formulir PPDB Dinamis Berbasis Status Admin:**
+   - **Keputusan:** Saat admin menutup pendaftaran PPDB (`status = closed`), kartu formulir pendaftaran diri (`#formulir-pendaftaran`) disembunyikan sepenuhnya dari website publik, dan digantikan oleh kartu pemberitahuan pendaftaran ditutup beserta linimasa jadwal. Saat admin membuka kembali PPDB (`status = open`), kartu formulir otomatis muncul kembali.
 
 ---
 

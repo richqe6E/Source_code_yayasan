@@ -82,9 +82,9 @@
       </p>
 
       <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <a href="#formulir-pendaftaran" class="px-6 py-3 bg-white text-primary-900 hover:bg-primary-50 text-sm font-bold rounded-lg shadow-lg shadow-black/10 transition flex items-center gap-2">
-          <i class="fi fi-rr-edit text-base text-primary-700"></i>
-          <span>Isi Formulir Pendaftaran</span>
+        <a id="hero-reg-btn" href="#formulir-pendaftaran" class="px-6 py-3 bg-white text-primary-900 hover:bg-primary-50 text-sm font-bold rounded-lg shadow-lg shadow-black/10 transition flex items-center gap-2">
+          <i id="hero-reg-btn-icon" class="fi fi-rr-edit text-base text-primary-700"></i>
+          <span id="hero-reg-btn-text">Isi Formulir Pendaftaran</span>
         </a>
         <a href="ppdb/status.html" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 text-sm font-bold rounded-lg backdrop-blur-md transition flex items-center gap-2">
           <i class="fi fi-rr-search text-base text-sky-300"></i>
@@ -106,6 +106,16 @@
       <p id="ppdb-closed-msg" class="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed mb-4">
         Mohon maaf, saat ini pendaftaran online sedang ditutup. Silakan periksa linimasa jadwal resmi di bawah ini.
       </p>
+      <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+        <a href="#jadwal-linimasa" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 active:scale-[0.98] text-white rounded-lg text-xs font-bold transition shadow-sm">
+          <i class="fi fi-rr-calendar"></i>
+          <span>Lihat Linimasa Jadwal &amp; Persyaratan</span>
+        </a>
+        <a href="ppdb/status.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg text-xs font-bold transition">
+          <i class="fi fi-rr-search text-sky-600"></i>
+          <span>Cek Status Pendaftaran Sebelumnya</span>
+        </a>
+      </div>
     </div>
 
     <!-- Master Form Pendaftaran Terpadu (Multi-Tahap / Wizard) -->
@@ -806,7 +816,7 @@
     </section>
 
     <!-- Persyaratan & Jadwal Penting PPDB -->
-    <div class="grid lg:grid-cols-2 gap-6 mb-12">
+    <div id="jadwal-linimasa" class="grid lg:grid-cols-2 gap-6 mb-12 scroll-mt-24">
       <!-- Persyaratan -->
       <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
@@ -1278,6 +1288,12 @@
 
     // Submit PPDB Registration
     async function submitPpdbRegistration() {
+      const formSection = document.getElementById('formulir-pendaftaran');
+      if (formSection && formSection.classList.contains('hidden')) {
+        alert('Mohon maaf, pendaftaran online PPDB saat ini sedang ditutup oleh pihak sekolah.');
+        return;
+      }
+
       const check = document.getElementById('f-statement-check');
       if (!check.checked) {
         alert('Harap centang pernyataan keabsahan data sebelum mengirim formulir pendaftaran.');
@@ -1564,6 +1580,25 @@
       printWindow.document.close();
     }
 
+    // Immediate pre-render check dari cache status untuk menghindari visual layout shift
+    try {
+      const cachedStatus = localStorage.getItem('siy_ppdb_status');
+      if (cachedStatus === 'closed' || cachedStatus === 'inactive' || cachedStatus === 'ditutup') {
+        const preForm = document.getElementById('formulir-pendaftaran');
+        const preCard = document.getElementById('ppdb-closed-card');
+        const preBtn = document.getElementById('hero-reg-btn');
+        const preBtnText = document.getElementById('hero-reg-btn-text');
+        const preBtnIcon = document.getElementById('hero-reg-btn-icon');
+        if (preForm) preForm.classList.add('hidden');
+        if (preCard) preCard.classList.remove('hidden');
+        if (preBtn) {
+          preBtn.href = '#jadwal-linimasa';
+          if (preBtnText) preBtnText.textContent = 'Lihat Linimasa Jadwal';
+          if (preBtnIcon) preBtnIcon.className = 'fi fi-rr-calendar text-base text-primary-700';
+        }
+      }
+    } catch (_) {}
+
     // Periksa status periode dari database/web_settings dan update linimasa
     async function checkPpdbPeriod() {
       try {
@@ -1602,19 +1637,55 @@
           }
 
           const badge = document.getElementById('ppdb-badge');
+          const formSection = document.getElementById('formulir-pendaftaran');
+          const closedCard = document.getElementById('ppdb-closed-card');
+          const heroRegBtn = document.getElementById('hero-reg-btn');
+          const heroRegBtnText = document.getElementById('hero-reg-btn-text');
+          const heroRegBtnIcon = document.getElementById('hero-reg-btn-icon');
+
           if (isClosed) {
-            document.getElementById('ppdb-closed-card').classList.remove('hidden');
+            // Sembunyikan kartu formulir pendaftaran
+            if (formSection) formSection.classList.add('hidden');
+            // Tampilkan kartu pemberitahuan pendaftaran ditutup
+            if (closedCard) closedCard.classList.remove('hidden');
+
+            if (heroRegBtn) {
+              heroRegBtn.href = '#jadwal-linimasa';
+              if (heroRegBtnText) heroRegBtnText.textContent = 'Lihat Linimasa Jadwal';
+              if (heroRegBtnIcon) heroRegBtnIcon.className = 'fi fi-rr-calendar text-base text-primary-700';
+            }
+
             if (badge) {
               badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-900/60 backdrop-blur-md border border-slate-700/60 text-xs font-semibold text-slate-300 mb-4 shadow-sm';
               badge.innerHTML = `<i class="fi fi-rr-lock text-xs text-slate-400"></i><span id="ppdb-badge-text">Pendaftaran PPDB Ditutup</span>`;
             }
-          } else if (badge) {
-            badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-4 shadow-sm';
-            badge.innerHTML = `<i class="fi fi-rr-bullhorn text-xs text-sky-300"></i><span id="ppdb-badge-text">PPDB Online Tahun Ajaran ${academicYear}</span>`;
+
+            if (window.location.hash === '#formulir-pendaftaran') {
+              const target = closedCard || document.getElementById('jadwal-linimasa');
+              if (target) {
+                setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
+              }
+            }
+          } else {
+            // Tampilkan kartu formulir pendaftaran
+            if (formSection) formSection.classList.remove('hidden');
+            // Sembunyikan kartu pemberitahuan pendaftaran ditutup
+            if (closedCard) closedCard.classList.add('hidden');
+
+            if (heroRegBtn) {
+              heroRegBtn.href = '#formulir-pendaftaran';
+              if (heroRegBtnText) heroRegBtnText.textContent = 'Isi Formulir Pendaftaran';
+              if (heroRegBtnIcon) heroRegBtnIcon.className = 'fi fi-rr-edit text-base text-primary-700';
+            }
+
+            if (badge) {
+              badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-4 shadow-sm';
+              badge.innerHTML = `<i class="fi fi-rr-bullhorn text-xs text-sky-300"></i><span id="ppdb-badge-text">PPDB Online Tahun Ajaran ${academicYear}</span>`;
+            }
           }
         }
       } catch (e) {
-        // Biarkan formulir terbuka sebagai default
+        // Biarkan formulir terbuka sebagai default jika terjadi gangguan jaringan
       }
     }
 

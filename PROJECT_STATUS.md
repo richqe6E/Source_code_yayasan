@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 14 Oktober 2026 — Sesi 37 (Remediasi Komprehensif 12 Temuan Audit BUG-01 s/d BUG-12, Zero-Green Oceanic Blue, Supabase Storage & Vercel Live Deploy) | Status: ✅ PRODUCTION & DATABASE 100% OPERASIONAL & LIVE VERIFIED (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 15 Oktober 2026 — Sesi 38 (Penyembunyian Kartu Formulir PPDB Saat Ditutup & Sinkronisasi Buka/Tutup Admin Portal) | Status: ✅ PRODUCTION & DATABASE 100% OPERASIONAL & LIVE VERIFIED (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1294,6 +1294,37 @@ Pemeriksaan dan validasi menyeluruh terhadap laporan audit komprehensif SIYAYASA
 - **Supabase Storage:** Bucket `siyayasan-uploads` dibuat di cloud Supabase dan teruji 100% (Upload 200 OK, Public CDN Read 200 OK, Delete 200 OK).
 - **Vercel Production Deploy:** Berhasil di-deploy ke `https://siyayasan-portal.vercel.app` (Deployment ID: `dpl_Fjq6V1GjmwGV7Wbj2hG2yn7AtMTR`).
 - **Test Automation Suite:** Seluruh rangkaian unit test (`test-batch-1.js`, `test-batch-2.js`, `test-batch-3.js`, `test-batch-4.js`) dan simulasi penuh (`test-simulation.js`) **LULUS 100% (GREEN)**.
+
+---
+
+### 🗓️ Sesi 38 — Penyembunyian Kartu Formulir PPDB Saat Pendaftaran Ditutup & Sinkronisasi Buka/Tutup dari Portal Admin (15 Oktober 2026)
+
+**Latar Belakang & Permintaan Pengguna:**
+Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB Belum Dibuka"* muncul di halaman publik, namun kartu formulir pendaftaran diri di bawahnya masih terbuka dan dapat diisi. Pengguna meminta:
+1. Ketika PPDB ditutup, kartu formulir pendaftaran harus ikut disembunyikan sepenuhnya dari pandangan publik/calon santri, dan hanya keterangan penutupan & linimasa yang tampil.
+2. Status ini dipicu secara dinamis dari portal admin (Pengaturan Periode PPDB: Buka vs Tutup).
+3. Ketika admin membuka pendaftaran di portal admin, kartu formulir pendaftaran otomatis tampil kembali.
+4. Kode lain harus tetap dipertahankan tanpa ada efek samping (zero regression).
+
+**Perubahan yang Diterapkan:**
+1. **Halaman Publik PPDB ([frontend/public/ppdb.html](frontend/public/ppdb.html)):**
+   - Menambahkan pengontrol visibilitas dinamis: saat `isClosed` bernilai `true`, kartu formulir `#formulir-pendaftaran` diberikan kelas `hidden` dan kartu `#ppdb-closed-card` ditampilkan. Saat `isClosed` bernilai `false` (Buka), kartu formulir ditampilkan kembali (`classList.remove('hidden')`) dan `#ppdb-closed-card` disembunyikan.
+   - Tombol hero utama `#hero-reg-btn` kini bersifat dinamis: saat pendaftaran dibuka bertuliskan *"Isi Formulir Pendaftaran"* (link ke `#formulir-pendaftaran`), dan saat ditutup berganti menjadi *"Lihat Linimasa Jadwal"* (link ke `#jadwal-linimasa`).
+   - Penambahan tautan tombol aksi cepat di dalam kartu penutupan `#ppdb-closed-card` (*Lihat Linimasa Jadwal & Persyaratan* dan *Cek Status Pendaftaran Sebelumnya*).
+   - Penambahan penanganan hash URL (`#formulir-pendaftaran`) saat kondisi ditutup agar otomatis melakukan *smooth scroll* ke kartu penutupan/linimasa.
+   - Penambahan *pre-render check* sinkron dari cache lokal `localStorage.getItem('siy_ppdb_status')` untuk mengeliminasi kedipan tampilan (*layout shift*).
+   - Penambahan proteksi pertahanan pada fungsi `submitPpdbRegistration()` agar menolak submit jika form dalam status tersembunyi/ditutup.
+2. **Sinkronisasi Beranda Publik ([frontend/public/index.html](frontend/public/index.html)):**
+   - Melengkapi cabang `else` pada fungsi `syncPpdbStatus()` sehingga tombol hero dan CTA bawah kembali menampilkan *"Daftar PPDB Online"* dan *"Isi Formulir Pendaftaran"* dengan tautan aktif ke `#formulir-pendaftaran` ketika admin membuka periode PPDB.
+3. **Penyelarasan API Adapter ([frontend/shared/js/api.js](frontend/shared/js/api.js)):**
+   - Menyimpan `siy_ppdb_status` ke `localStorage` pada aksi `period` dan `update_period`, serta menyediakan fallback period object yang tangguh jika koneksi jaringan offline.
+4. **Pengujian & Verifikasi:**
+   - Dibuat pengujian unit otomatis `test-ppdb-visibility.js`: **15 dari 15 pengujian LULUS (100%)**.
+   - `test-routes.js`: **37/37 Rute LULUS (HTTP 200 OK)**.
+   - `audit-all-features.js`: **34/34 Skenario Pengujian LULUS (100%)**.
+   - `test-ppdb-e2e.js`: **11/11 Skenario LULUS (100%)**.
+   - `test-cms-e2e.js`: **17/17 Skenario LULUS (100%)**.
+   - `test-spp-e2e.js`: **13/13 Skenario LULUS (100%)**.
 
 ---
 
