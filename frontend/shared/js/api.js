@@ -606,6 +606,13 @@
           delete payload.student_id;
           delete payload.id;
           const res = await supabaseRest(`students?id=eq.${id}`, 'PATCH', payload);
+
+          // Sinkronkan nama lengkap ke tabel users
+          const newName = payload.full_name || payload.name;
+          if (newName && currentUser && currentUser.id) {
+            await supabaseRest(`users?id=eq.${currentUser.id}`, 'PATCH', { full_name: newName }).catch(() => {});
+          }
+
           return { success: true, data: res, message: 'Biodata berhasil diperbarui' };
         }
 

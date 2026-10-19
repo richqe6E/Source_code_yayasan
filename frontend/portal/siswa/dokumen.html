@@ -117,8 +117,9 @@
           <h2 class="text-base font-bold text-slate-900">Daftar Dokumen Terunggah</h2>
           <p class="text-xs text-slate-500">Arsip berkas persyaratan yang tersimpan di sistem</p>
         </div>
-        <button onclick="loadDocuments()" class="text-xs font-bold text-brand-700 hover:text-brand-800">
-          Refresh Daftar
+        <button id="btn-refresh-docs" onclick="loadDocuments()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-primary-700 text-xs font-semibold rounded-lg shadow-sm transition active:scale-95">
+          <svg id="btn-refresh-docs-icon" class="w-3.5 h-3.5 text-slate-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M19.418 15A8.003 8.003 0 014 12m0 0V7m0 5h5m11 4v-5h-.581M4.582 9A8.003 8.003 0 0120 12m0 0v5m0-5h-5"/></svg>
+          <span id="btn-refresh-docs-text">Perbarui Daftar</span>
         </button>
       </div>
 
@@ -187,14 +188,14 @@
       const isSiswaAktif = (user.role && user.role.code === 'siswa_aktif') || user.role === 'siswa_aktif';
 
       const studentMenu = isSiswaAktif ? [
-        { href: 'dashboard.html', label: '📊 Dashboard' },
-        { href: 'biodata.html', label: '👤 Biodata Siswa' },
-        { href: 'spp.html', label: '💳 Tagihan SPP' },
-        { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
+        { href: 'dashboard.html', label: 'Dashboard' },
+        { href: 'biodata.html', label: 'Biodata Santri' },
+        { href: 'spp.html', label: 'Tagihan SPP' },
+        { href: 'dokumen.html', label: 'Berkas Dokumen' }
       ] : [
-        { href: 'dashboard.html', label: '📊 Status PPDB' },
-        { href: 'biodata.html', label: '📝 Lengkapi Biodata' },
-        { href: 'dokumen.html', label: '📁 Upload Dokumen' }
+        { href: 'dashboard.html', label: 'Status PPDB' },
+        { href: 'biodata.html', label: 'Lengkapi Biodata' },
+        { href: 'dokumen.html', label: 'Upload Dokumen' }
       ];
 
       Shell.init({
@@ -295,6 +296,13 @@
     }
 
     async function loadDocuments() {
+      const btn = document.getElementById('btn-refresh-docs');
+      const icon = document.getElementById('btn-refresh-docs-icon');
+      const text = document.getElementById('btn-refresh-docs-text');
+      if (icon) icon.classList.add('animate-spin');
+      if (text) text.textContent = 'Memuat...';
+      if (btn) btn.disabled = true;
+
       try {
         const res = await apiCall('siswa', 'get_documents');
         const docs = (res.success && res.data) ? res.data : [];
@@ -340,6 +348,12 @@
         }).join('');
       } catch (err) {
         console.error('Error loading documents:', err);
+      } finally {
+        setTimeout(() => {
+          if (icon) icon.classList.remove('animate-spin');
+          if (text) text.textContent = 'Perbarui Daftar';
+          if (btn) btn.disabled = false;
+        }, 400);
       }
     }
 

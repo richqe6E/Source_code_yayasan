@@ -94,12 +94,26 @@
     }
   ];
 
+  const STUDENT_ICONS = {
+    'dashboard.html': `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>`,
+    'biodata.html': `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>`,
+    'spp.html': `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>`,
+    'dokumen.html': `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`
+  };
+
   const DEFAULT_ICON = `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16"/></svg>`;
+
+  function cleanMenuLabel(label) {
+    if (!label) return '';
+    return label.replace(/^[\p{Emoji}\p{Extended_Pictographic}\u200d\uFE0F\s]+/u, '').trim();
+  }
 
   function getMenuIcon(m) {
     if (m.icon) return m.icon;
     const found = ADMIN_MENU.find(item => item.href === m.href);
-    return (found && found.icon) || DEFAULT_ICON;
+    if (found && found.icon) return found.icon;
+    if (m.href && STUDENT_ICONS[m.href]) return STUDENT_ICONS[m.href];
+    return DEFAULT_ICON;
   }
 
   function renderDesktopNav(menu, active) {
@@ -107,7 +121,7 @@
       const isActive = m.href === active || (active && active.endsWith(m.href));
       const cls = isActive ? 'siy-nav-item siy-nav-active' : 'siy-nav-item';
       const icon = getMenuIcon(m);
-      return `<a href="${m.href}" class="${cls}">${icon}<span>${m.label}</span></a>`;
+      return `<a href="${m.href}" class="${cls}">${icon}<span>${cleanMenuLabel(m.label)}</span></a>`;
     }).join('');
   }
 
@@ -116,7 +130,7 @@
       const isActive = m.href === active || (active && active.endsWith(m.href));
       const cls = isActive ? 'siy-nav-item siy-nav-active' : 'siy-nav-item';
       const icon = getMenuIcon(m);
-      return `<a href="${m.href}" class="${cls}" onclick="Shell.closeNav()">${icon}<span>${m.label}</span></a>`;
+      return `<a href="${m.href}" class="${cls}" onclick="Shell.closeNav()">${icon}<span>${cleanMenuLabel(m.label)}</span></a>`;
     }).join('');
   }
 
@@ -161,10 +175,12 @@
           </a>
           <div class="flex items-center gap-2">
             ${opts.showRefresh ? `
-            <button onclick="Shell.refresh()" aria-label="Refresh" class="p-2 rounded-md hover:bg-gray-100">
-              <svg id="siy-refresh-icon" class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M19.418 15A8.003 8.003 0 014 12m0 0V7m0 5h5m11 4v-5h-.581M4.582 9A8.003 8.003 0 0120 12m0 0v5m0-5h-5"/></svg>
+            <button onclick="Shell.refresh()" aria-label="Refresh Halaman" class="p-2 rounded-lg text-slate-700 hover:text-primary-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition active:scale-95">
+              <svg id="siy-refresh-icon" class="w-4 h-4 text-slate-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M19.418 15A8.003 8.003 0 014 12m0 0V7m0 5h5m11 4v-5h-.581M4.582 9A8.003 8.003 0 0120 12m0 0v5m0-5h-5"/></svg>
             </button>` : ''}
-            ${userAvatarHtml}
+            <button type="button" onclick="Shell.openProfileModal()" class="flex items-center gap-1.5 p-1 rounded-lg hover:bg-slate-100 transition active:scale-95 text-left focus:outline-none" title="Ubah Nama & Foto Profil">
+              ${userAvatarHtml}
+            </button>
           </div>
         </div>
       </header>
@@ -186,12 +202,13 @@
           </div>
           <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">${renderMobileNav(menu, active)}</nav>
           <div class="px-3 py-3 border-t border-gray-200">
-            <div class="flex items-center gap-2.5 px-2 py-2 mb-2 rounded-md bg-gray-50">
+            <div onclick="Shell.openProfileModal()" class="flex items-center gap-2.5 px-2.5 py-2 mb-2 rounded-xl bg-gray-50 hover:bg-sky-50 border border-gray-100 hover:border-sky-200 transition cursor-pointer active:scale-95 group" title="Ubah Nama & Foto Profil">
               ${userAvatarHtml}
               <div class="min-w-0 flex-1">
-                <div class="text-xs font-bold text-gray-900 truncate">${userName}</div>
-                <div class="text-[10px] text-gray-500 capitalize truncate">${userRoleLabel}</div>
+                <div class="text-xs font-bold text-gray-900 group-hover:text-primary-700 truncate">${userName}</div>
+                <div class="text-[10px] text-gray-500 capitalize truncate">${userRoleLabel} • Edit Profil</div>
               </div>
+              <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-primary-600 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </div>
             <button onclick="logout()" class="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 rounded-md">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -214,12 +231,13 @@
         </div>
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">${renderDesktopNav(menu, active)}</nav>
         <div class="px-3 py-3 border-t border-gray-200">
-          <div class="flex items-center gap-2.5 px-2 py-2 mb-2 rounded-md bg-gray-50">
+          <div onclick="Shell.openProfileModal()" class="flex items-center gap-2.5 px-2.5 py-2 mb-2 rounded-xl bg-gray-50 hover:bg-sky-50 border border-gray-100 hover:border-sky-200 transition cursor-pointer active:scale-95 group" title="Ubah Nama & Foto Profil">
             ${userAvatarHtml}
             <div class="min-w-0 flex-1">
-              <div class="text-xs font-bold text-gray-900 truncate">${userName}</div>
-              <div class="text-[10px] text-gray-500 capitalize truncate">${userRoleLabel}</div>
+              <div class="text-xs font-bold text-gray-900 group-hover:text-primary-700 truncate">${userName}</div>
+              <div class="text-[10px] text-gray-500 capitalize truncate">${userRoleLabel} • Edit Profil</div>
             </div>
+            <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-primary-600 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
           </div>
           <button onclick="logout()" class="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 rounded-md">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -237,14 +255,14 @@
             </div>
             <div class="flex items-center gap-3 shrink-0">
               ${opts.showRefresh ? `
-              <button onclick="Shell.refresh()" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50">
-                <svg id="siy-refresh-icon-desktop" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M19.418 15A8.003 8.003 0 014 12m0 0V7m0 5h5m11 4v-5h-.581M4.582 9A8.003 8.003 0 0120 12m0 0v5m0-5h-5"/></svg>
-                Refresh
+              <button onclick="Shell.refresh()" aria-label="Refresh Halaman" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-primary-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm transition active:scale-95">
+                <svg id="siy-refresh-icon-desktop" class="w-4 h-4 text-slate-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M19.418 15A8.003 8.003 0 014 12m0 0V7m0 5h5m11 4v-5h-.581M4.582 9A8.003 8.003 0 0120 12m0 0v5m0-5h-5"/></svg>
+                <span>Refresh</span>
               </button>` : ''}
-              <div class="flex items-center gap-2">
+              <button type="button" onclick="Shell.openProfileModal()" class="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-100 transition active:scale-95 text-left focus:outline-none" title="Ubah Nama & Foto Profil">
                 ${userAvatarHtml}
-                <span class="text-sm font-medium text-gray-700 hidden lg:inline truncate">${userName}</span>
-              </div>
+                <span class="text-xs font-bold text-slate-800 hover:text-primary-700 hidden lg:inline truncate">${userName}</span>
+              </button>
             </div>
           </div>
         </header>
@@ -331,9 +349,127 @@
     return () => icons.forEach(i => i.classList.remove('animate-spin'));
   }
   function refresh() {
+    const stopSpin = startRefresh();
+    hideError();
     if (typeof state.onRefresh === 'function') {
-      hideError();
-      state.onRefresh();
+      try {
+        const res = state.onRefresh();
+        if (res && typeof res.then === 'function') {
+          res.finally(() => stopSpin());
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      setTimeout(stopSpin, 500);
+    } else {
+      setTimeout(() => {
+        window.location.reload();
+      }, 200);
+    }
+  }
+
+  let selectedAvatarDataUrl = '';
+
+  function openProfileModal() {
+    let modal = document.getElementById('siy-profile-modal');
+    const user = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
+    const currentName = (user && (user.full_name || user.name)) || '';
+    const currentAvatar = user && (user.avatar_url || user.photo_url || user.avatar);
+    selectedAvatarDataUrl = '';
+
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'siy-profile-modal';
+      modal.className = 'fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+          <h3 class="text-base font-bold text-slate-900">Ubah Profil &amp; Foto</h3>
+          <button type="button" onclick="Shell.closeProfileModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold leading-none">&times;</button>
+        </div>
+        <div class="flex flex-col items-center mb-4">
+          <div class="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary-500 shadow-sm bg-slate-100 mb-2">
+            <img id="sp-preview" src="${currentAvatar || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(currentName || 'User') + '&background=0284c7&color=fff')}" class="w-full h-full object-cover" alt="Preview Foto">
+          </div>
+          <label class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-primary-700 text-xs font-semibold rounded-lg cursor-pointer transition border border-sky-200 flex items-center gap-1.5 active:scale-95">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Ganti Foto Profil</span>
+            <input type="file" id="sp-file" accept="image/*" class="hidden" onchange="Shell.handleAvatarFileChange(this)">
+          </label>
+        </div>
+        <div class="space-y-3 mb-5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap *</label>
+            <input type="text" id="sp-name" value="${currentName.replace(/"/g, '&quot;')}" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-medium">
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="Shell.closeProfileModal()" class="flex-1 py-2 text-xs font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition">Batal</button>
+          <button type="button" id="sp-btn-save" onclick="Shell.saveProfile()" class="flex-1 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-sm transition active:scale-95">Simpan Profil</button>
+        </div>
+      </div>
+    `;
+    modal.classList.remove('hidden');
+  }
+
+  function closeProfileModal() {
+    const modal = document.getElementById('siy-profile-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function handleAvatarFileChange(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e => {
+      selectedAvatarDataUrl = e.target.result;
+      const preview = document.getElementById('sp-preview');
+      if (preview) preview.src = selectedAvatarDataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function saveProfile() {
+    const nameInput = document.getElementById('sp-name');
+    const newName = nameInput ? nameInput.value.trim() : '';
+    if (!newName) {
+      if (typeof window.showToast === 'function') window.showToast('Nama tidak boleh kosong', 'warning');
+      return;
+    }
+    const btn = document.getElementById('sp-btn-save');
+    if (btn) { btn.disabled = true; btn.textContent = 'Menyimpan...'; }
+
+    try {
+      let curUser = (typeof window.getCurrentUser === 'function') ? window.getCurrentUser() : null;
+      if (!curUser) {
+        try { curUser = JSON.parse(localStorage.getItem('siy_user') || '{}'); } catch (_) { curUser = {}; }
+      }
+      curUser.full_name = newName;
+      curUser.name = newName;
+      if (selectedAvatarDataUrl) {
+        curUser.avatar_url = selectedAvatarDataUrl;
+        curUser.photo_url = selectedAvatarDataUrl;
+      }
+      localStorage.setItem('siy_user', JSON.stringify(curUser));
+
+      if (typeof window.apiCall === 'function') {
+        await window.apiCall('auth', 'update_profile', {
+          user_id: curUser.id,
+          full_name: newName,
+          avatar_url: selectedAvatarDataUrl || curUser.avatar_url
+        }).catch(() => {});
+      }
+
+      closeProfileModal();
+      if (typeof window.showToast === 'function') window.showToast('Profil berhasil diperbarui!', 'success');
+      setTimeout(() => window.location.reload(), 300);
+    } catch (err) {
+      if (typeof window.showToast === 'function') window.showToast('Gagal memperbarui profil: ' + err.message, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = 'Simpan Profil'; }
     }
   }
 
@@ -363,5 +499,9 @@
     el.textContent = (val === null || val === undefined || val === '') ? '-' : val;
   }
 
-  window.Shell = { init, openNav, closeNav, refresh, showError, hideError, startRefresh, skeleton, skeletonRows, setText, ADMIN_MENU };
+  window.Shell = { 
+    init, openNav, closeNav, refresh, showError, hideError, startRefresh, 
+    skeleton, skeletonRows, setText, ADMIN_MENU,
+    openProfileModal, closeProfileModal, handleAvatarFileChange, saveProfile 
+  };
 })();

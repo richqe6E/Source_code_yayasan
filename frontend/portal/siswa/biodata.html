@@ -191,14 +191,14 @@
       const isSiswaAktif = (user.role && user.role.code === 'siswa_aktif') || user.role === 'siswa_aktif';
 
       const studentMenu = isSiswaAktif ? [
-        { href: 'dashboard.html', label: '📊 Dashboard' },
-        { href: 'biodata.html', label: '👤 Biodata Siswa' },
-        { href: 'spp.html', label: '💳 Tagihan SPP' },
-        { href: 'dokumen.html', label: '📁 Berkas Dokumen' }
+        { href: 'dashboard.html', label: 'Dashboard' },
+        { href: 'biodata.html', label: 'Biodata Santri' },
+        { href: 'spp.html', label: 'Tagihan SPP' },
+        { href: 'dokumen.html', label: 'Berkas Dokumen' }
       ] : [
-        { href: 'dashboard.html', label: '📊 Status PPDB' },
-        { href: 'biodata.html', label: '📝 Lengkapi Biodata' },
-        { href: 'dokumen.html', label: '📁 Upload Dokumen' }
+        { href: 'dashboard.html', label: 'Status PPDB' },
+        { href: 'biodata.html', label: 'Lengkapi Biodata' },
+        { href: 'dokumen.html', label: 'Upload Dokumen' }
       ];
 
       Shell.init({
@@ -258,9 +258,26 @@
         const res = await apiCall('siswa', 'update_biodata', payload);
         if (res.success) {
           showToast('Biodata berhasil disimpan!', 'success');
+
+          // Sinkronkan data pengguna lokal agar header & sidebar langsung terbarui
+          let curUser = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+          if (!curUser) {
+            try { curUser = JSON.parse(localStorage.getItem('siy_user') || '{}'); } catch (_) { curUser = {}; }
+          }
+          curUser.full_name = payload.full_name;
+          curUser.name = payload.full_name;
+          localStorage.setItem('siy_user', JSON.stringify(curUser));
+
           const saveStatus = document.getElementById('save-status');
-          saveStatus.classList.remove('hidden');
-          saveStatus.classList.add('flex');
+          if (saveStatus) {
+            saveStatus.classList.remove('hidden');
+            saveStatus.classList.add('flex');
+          }
+
+          // Segarkan tampilan nama tanpa flash
+          setTimeout(() => {
+            window.location.reload();
+          }, 600);
         } else {
           showToast(res.message || 'Gagal menyimpan biodata', 'error');
         }
