@@ -235,6 +235,7 @@
 
     let currentTab = 'all';
     let currentPeriod = null;
+    let currentPpdbItems = [];
 
     async function loadPpdbPeriod() {
       try {
@@ -332,6 +333,7 @@
           return;
         }
         const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.registrations)) || []);
+        currentPpdbItems = items;
         if (items.length === 0) {
           tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-sm text-gray-500">Tidak ada data pendaftaran</td></tr>';
           return;
@@ -532,6 +534,10 @@
     }
 
     async function convertReg(id) {
+      // Ambil data pendaftar untuk mengetahui jenjang pilihan
+      const applicant = (currentPpdbItems || []).find(x => String(x.id) === String(id)) || {};
+      const targetJenjang = (applicant.level || applicant.form_type || applicant.jenjang || '').toUpperCase().trim();
+
       // Ambil daftar kelas untuk dropdown tujuan
       let classes = [];
       try {
@@ -546,7 +552,40 @@
       }
 
       const defaultNis = '2026' + String(Math.floor(1000 + Math.random() * 9000));
-      const optionsHtml = classes.map(c => `<option value="${c.id}">${c.name} (${c.level || ''})</option>`).join('');
+
+      // Filter kelas yang cocok dengan jenjang pendaftar
+      const matchingClasses = classes.filter(c => {
+        const cLevel = (c.level || c.grade_level || c.name || '').toUpperCase();
+        if (targetJenjang.includes('PAUD') || targetJenjang.includes('KB')) {
+          return cLevel.includes('PAUD') || cLevel.includes('KB') || cLevel.includes('BERMAIN');
+        }
+        if (targetJenjang.includes('TK A') || targetJenjang.includes('TKA')) {
+          return cLevel.includes('TK A') || cLevel.includes('TKA');
+        }
+        if (targetJenjang.includes('TK B') || targetJenjang.includes('TKB')) {
+          return cLevel.includes('TK B') || cLevel.includes('TKB');
+        }
+        if (targetJenjang.includes('TK')) return cLevel.includes('TK');
+        if (targetJenjang.includes('TPQ')) return cLevel.includes('TPQ');
+        return false;
+      });
+
+      const otherClasses = classes.filter(c => !matchingClasses.includes(c));
+
+      let optionsHtml = '';
+      if (matchingClasses.length > 0) {
+        optionsHtml += `<optgroup label="Sesuai Jenjang (${targetJenjang || 'Pendaftar'})">`;
+        optionsHtml += matchingClasses.map((c, i) => `<option value="${c.id}" ${i === 0 ? 'selected' : ''}>${c.name} (${c.level || targetJenjang})</option>`).join('');
+        optionsHtml += `</optgroup>`;
+      }
+      if (otherClasses.length > 0) {
+        optionsHtml += `<optgroup label="Pilihan Kelas Lainnya">`;
+        optionsHtml += otherClasses.map((c, i) => `<option value="${c.id}" ${matchingClasses.length === 0 && i === 0 ? 'selected' : ''}>${c.name} (${c.level || '-'})</option>`).join('');
+        optionsHtml += `</optgroup>`;
+      }
+      if (!optionsHtml) {
+        optionsHtml = classes.map(c => `<option value="${c.id}">${c.name} (${c.level || ''})</option>`).join('');
+      }
 
       const modal = document.createElement('div');
       modal.className = 'fixed inset-0 z-50 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4';
@@ -558,7 +597,7 @@
           </div>
           <div class="p-5 space-y-4">
             <p class="text-xs text-gray-600 leading-relaxed">
-              Pendaftar akan diaktifkan menjadi <strong>Siswa Aktif</strong>. Akun Portal Siswa otomatis aktif dengan username berupa <strong>NIS</strong> dan kata sandi awal berupa <strong>Tanggal Lahir</strong>.
+              Pendaftar akan diaktifkan menjadi <strong>Siswa Aktif</strong>. Akun Portal Siswa otomatis aktif dengan username berupa <strong>NIS</strong> dan kata sandi awal berupa <strong>Tanggal Lahir</strong> atau password pendaftaran.
             </p>
             <div>
               <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Nomor Induk Siswa (NIS) *</label>
@@ -566,9 +605,16 @@
               <span class="text-[11px] text-gray-400">NIS ini digunakan siswa untuk login ke Portal Siswa.</span>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Kelas Tujuan *</label>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Kelas Tujuan (Jenjang: ${targetJenjang || '-'}) *</label>
               <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
             </div>
+            <label class="flex items-start gap-2.5 p-3 rounded-xl bg-sky-50 border border-sky-200 cursor-pointer">
+              <input type="checkbox" id="cm-auto-spp" checked class="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+              <span class="text-xs text-slate-700">
+                <strong class="font-bold text-slate-900 block">Terbitkan Tagihan SPP Bulan Pertama Otomatis</strong>
+                Buat tagihan SPP awal sebesar <span class="font-semibold text-primary-700">Rp 150.000</span> agar langsung muncul di Portal Siswa.
+              </span>
+            </label>
             <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
               <button id="cm-cancel" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Batal</button>
               <button id="cm-ok" class="px-5 py-2 bg-primary-600 text-white text-xs font-bold rounded-lg hover:bg-primary-700 shadow-md shadow-primary-600/20">Aktivasi Siswa</button>
@@ -583,6 +629,7 @@
       modal.querySelector('#cm-ok').onclick = async () => {
         const classId = modal.querySelector('#cm-class').value;
         const nis = modal.querySelector('#cm-nis').value.trim();
+        const autoSpp = modal.querySelector('#cm-auto-spp') ? modal.querySelector('#cm-auto-spp').checked : true;
         if (!classId) { showToast('Pilih kelas terlebih dahulu', 'warning'); return; }
         if (!nis) { showToast('Masukkan NIS siswa', 'warning'); return; }
 
@@ -590,7 +637,7 @@
         okBtn.disabled = true; okBtn.textContent = 'Mengaktifkan...';
 
         try {
-          const res = await apiCall('ppdb', 'convert', { id, class_id: classId, nis });
+          const res = await apiCall('ppdb', 'convert', { id, class_id: classId, nis, auto_spp: autoSpp });
           if (res.success && res.data) {
             close();
             showConvertSuccessModal(res.data);
@@ -602,8 +649,6 @@
         } catch (e) {
           showToast('Gagal mengaktifkan siswa', 'error');
           okBtn.disabled = false; okBtn.textContent = 'Aktivasi Siswa';
-        }
-      };
     }
 
     function showConvertSuccessModal(data) {
