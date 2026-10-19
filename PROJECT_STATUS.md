@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 19 Oktober 2026 — Sesi 40 (Remediasi Komprehensif Direktif Audit Agen Argon, Integrasi Full TDD & Verifikasi Regresi 100%) | Status: ✅ PRODUCTION & DATABASE 100% OPERASIONAL & LIVE VERIFIED (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 19 Oktober 2026 — Sesi 41 (Penyelesaian Komprehensif 17 Temuan Audit Pengguna: Bug Kritis, UX Portal & Profil 1-Klik, Eliminasi Fallback Dummy, Jam Operasional Dinamis, Accordion PPDB, & Single Source of Truth Visi Misi / Bagan Pohon Organisasi) | Status: ✅ PRODUCTION & LIVE VERIFIED 100% GREEN (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1404,6 +1404,38 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 8. **Task 8 — Pengujian Regresi Menyeluruh (Full Regression Suite):**
    - Seluruh 7 suite pengujian unit baru LULUS 100%.
    - Seluruh 6 suite integrasi/E2E lama LULUS 100% (`audit-all-features.js`: 34/34 skenario; `test-routes.js`: 37/37 rute HTTP 200 OK; `test-ppdb-e2e.js`: 11/11; `test-cms-e2e.js`: 17/17; `test-spp-e2e.js`: 13/13; `test-simulation.js`: 5/5).
+
+---
+
+### 🗓️ Sesi 41 — Remediasi 17 Temuan Audit Pengguna, TDD 4 Batch & Penyelarasan Total Profil Institusi (19 Oktober 2026, Sore)
+
+**Fokus Utama:** Menyelesaikan 17 poin temuan audit pengguna mengenai portal admin, portal siswa, website publik, eliminasi mutlak fallback data dummy bawaan saat konten dikosongkan, penambahan pengaturan jam operasional dinamis, accordion berkas PPDB buka-tutup, dan sinkronisasi Single Source of Truth profil yayasan (Visi Misi, Sejarah, Program, Kurikulum, & Bagan Pohon Organisasi).
+
+**Pelaksanaan Berbasis 4 Batch TDD (Test-Driven Development):**
+1. **Batch 1 (Bug Kritis & Keamanan) — Commit `4607f13`:**
+   - **SyntaxError PPDB Admin:** Memperbaiki penutupan fungsi `convertPpdbToStudentDirect()` di `frontend/portal/admin/ppdb.html`.
+   - **Kueri Dokumen Santri:** Menghapus kueri kolom fiktif `student_nis.eq` di `frontend/shared/js/api.js` yang memicu HTTP 400 Bad Request, digantikan kueri murni berbasis `student_id`.
+   - **Isolasi Role Login & Bantuan Kontekstual:** Menolak login silang admin di tab siswa dan sebaliknya di `frontend/public/login.html`, serta menampilkan petunjuk modal bantuan kontekstual.
+   - Pengujian: `tests/test-batch-1-critical.js` LULUS 100%.
+2. **Batch 2 (UX Portal, Profil 1-Klik & Navigasi) — Commit `5335d5c`:**
+   - **Tombol Refresh Modern:** Menambahkan tombol refresh interaktif dengan putaran animasi 360°, active tactile state, dan border di `frontend/shared/js/shell.js` dan `frontend/portal/siswa/dokumen.html`.
+   - **Ikon Navigasi Siswa Resmi:** Memasang mapping `STUDENT_ICONS` di `shell.js` dan membersihkan emoji duplikat di menu siswa.
+   - **Modal Profil 1-Klik:** Memasang `Shell.openProfileModal()` yang memfasilitasi ganti nama dan upload foto avatar langsung dari klik nama di header portal.
+   - **Sinkronisasi Nama Siswa:** Menyinkronkan perubahan nama pada biodata langsung ke `localStorage.siy_user` dan tabel database.
+   - Pengujian: `tests/test-batch-2-portal-ux.js` LULUS 100%.
+3. **Batch 3 (Eliminasi Fallback Dummy, Standarisasi Terminologi, Jam Operasional Dinamis, & Accordion PPDB) — Commit `d4d0e54`:**
+   - **Eliminasi Fallback Dummy:** Menghapus logika `if (!items.length) items = [ dummy ]` di `agenda.html`, `berita.html`, `pengumuman.html`, dan `galeri.html`, kini menampilkan *Empty State* resmi saat konten dikosongkan admin.
+   - **Standarisasi Terminologi:** Mengganti seluruh istilah "Kampus" menjadi "Gedung Utama Yayasan" / "Lokasi Yayasan" di `cms_setting.html`, `content.html`, `kontak.html`, dan `agenda.html`.
+   - **Jam Operasional Dinamis:** Menambahkan form pengaturan Jam Operasional Pelayanan Kantor di `cms_setting.html` dan sinkronisasi dinamis ke kartu jam kerja di `kontak.html`.
+   - **Accordion Persyaratan PPDB:** Membangun accordion interaktif buka-tutup dengan indikator panah rotasi chevron pada halaman utama `frontend/public/ppdb.html`.
+   - Pengujian: `tests/test-batch-3-cms-fallback.js` LULUS 100%.
+4. **Batch 4 (Penyelarasan Total Profil & Beranda Utama — Single Source of Truth) — Commit `b417948`:**
+   - **Admin CMS Profil Institusi:** Menambahkan form pengelolaan Visi & Misi, Sejarah Yayasan, Program Pendidikan, Kurikulum Unggulan, dan Struktur Organisasi di `frontend/portal/admin/content.html`.
+   - **Single Source of Truth Visi & Misi:** Mengintegrasikan pembaruan admin agar otomatis menyinkronkan teks visi dan butir misi secara serentak ke Beranda (`index.html`) dan Profil (`profil.html`).
+   - **Diagram Pohon Organisasi (Org Tree Chart):** Membangun bagan hierarki kepengurusan berbasis kartu putih bersih dan aksen Oceanic Blue (`#0284c7`, `#0ea5e9`, `#0369a1`) di `frontend/public/profil.html`, menghubungkan Pembina, Pengawas, Ketua Yayasan, Sekretaris, Bendahara, Kepala PAUD/TK, dan Koordinator TPQ secara elegan dan responsive.
+   - **Data Propagation:** Menjaga sinkronisasi di `frontend/shared/js/api.js` untuk tabel `schools`, `web_settings`, dan cache `siy_school_ext`.
+   - Pengujian: `tests/test-batch-4-profile-alignment.js` LULUS 100%.
+5. **Verifikasi Regresi Penuh:** Seluruh 16 suite pengujian unit dan integrasi berjalan 100% LULUS tanpa kegagalan.
 
 ---
 

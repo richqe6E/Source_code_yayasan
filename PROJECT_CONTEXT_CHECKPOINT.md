@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 40 — Remediasi Komprehensif Direktif Audit Agen Argon, Integrasi Full TDD & Verifikasi Regresi 100%)  
+**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 41 — Remediasi 17 Temuan Audit Pengguna, TDD 4 Batch & Penyelarasan Total Profil Institusi)  
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (Vercel & Supabase Cloud).
 
 ---
@@ -66,8 +66,39 @@ Seluruh 12 temuan dari laporan audit telah diremediasi secara tuntas melalui **P
 
 ---
 
+## 🛠️ 3.1. Remediasi 17 Temuan Audit Pengguna (Sesi 41 — TDD 4 Batch)
+1. **Batch 1 (Bug Kritis & Keamanan — Commit `4607f13`):**
+   - SyntaxError pada `ppdb.html` diperbaiki.
+   - Kueri dokumen santri di `api.js` dibersihkan dari kolom fiktif `student_nis.eq`.
+   - Isolasi role login di `login.html` mencegah tab siswa dimasuki email admin dan sebaliknya, plus modal bantuan kontekstual.
+   - Uji unit: `tests/test-batch-1-critical.js` 100% LULUS.
+2. **Batch 2 (UX Portal, Profil 1-Klik & Navigasi — Commit `5335d5c`):**
+   - Tombol refresh modern 360° tactile state di `shell.js` dan `dokumen.html`.
+   - Ikon resmi siswa `STUDENT_ICONS` di `shell.js` dan emoji duplikat dibersihkan.
+   - Modal profil 1-klik di header portal untuk ganti nama dan upload avatar seketika.
+   - Sinkronisasi instan nama santri di `biodata.html` ke `localStorage.siy_user` dan database.
+   - Uji unit: `tests/test-batch-2-portal-ux.js` 100% LULUS.
+3. **Batch 3 (Eliminasi Fallback Dummy, Standarisasi Terminologi, Jam Operasional Dinamis, & Accordion PPDB — Commit `d4d0e54`):**
+   - Logika pemaksaan data dummy saat konten kosong dihapus total di `agenda.html`, `berita.html`, `pengumuman.html`, dan `galeri.html`; diganti *Empty State* resmi.
+   - Istilah "Kampus" distandarkan menjadi "Gedung Utama Yayasan" / "Lokasi Yayasan".
+   - Form Jam Operasional Pelayanan Kantor di `cms_setting.html` disinkronkan ke `kontak.html`.
+   - Accordion persyaratan & kelengkapan berkas PPDB interaktif buka-tutup dengan animasi chevron di `ppdb.html`.
+   - Uji unit: `tests/test-batch-3-cms-fallback.js` 100% LULUS.
+4. **Batch 4 (Penyelarasan Total Profil & Beranda — Single Source of Truth — Commit `b417948`):**
+   - Form CMS Profil Lengkap di `content.html` (Visi, Misi, Budaya, Sejarah, Program Pendidikan, Kurikulum Unggulan, Struktur Organisasi).
+   - Single Source of Truth Visi & Misi serentak ke Beranda (`index.html`) dan Profil (`profil.html`).
+   - Bagan Pohon Organisasi (*Org Tree Chart*) visual 4 level berdesain elegan putih bersih aksen Oceanic Blue di `profil.html`.
+   - Propagasi data instan via `api.js` (Supabase `schools`, `web_settings`, dan cache `siy_school_ext`).
+   - Uji unit: `tests/test-batch-4-profile-alignment.js` 100% LULUS.
+
+---
+
 ## 📊 4. Hasil Uji Otomatis & Status Operasional
 Semua test suite dan verifikasi live telah dijalankan dengan hasil **100% LULUS**:
+- `tests/test-batch-1-critical.js`: **LULUS 100%** (Remediasi bug sintaks PPDB, kueri dokumen santri, & isolasi role login)
+- `tests/test-batch-2-portal-ux.js`: **LULUS 100%** (Tombol refresh 360°, ikon resmi siswa, modal profil 1-klik, & sync nama)
+- `tests/test-batch-3-cms-fallback.js`: **LULUS 100%** (Eliminasi fallback dummy, standardisasi istilah kampus, jam operasional, & accordion PPDB)
+- `tests/test-batch-4-profile-alignment.js`: **LULUS 100%** (CMS profil lengkap, Single Source of Truth Visi Misi, & bagan pohon organisasi)
 - `tests/test-nis-status-flow.js`: **LULUS 100%** (Resolusi NIS calon siswa & warna tombol login kontras)
 - `tests/test-auth-password-flow.js`: **LULUS 100%** (Harmonisasi sandi pendaftaran & multi-format validator)
 - `tests/test-ppdb-class-filter.js`: **LULUS 100%** (Filter kelas berjenjang otomatis pada modal admin)
