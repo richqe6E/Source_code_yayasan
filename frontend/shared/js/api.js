@@ -1941,7 +1941,29 @@
           });
           await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
 
-          // 8. Ringkasan Kredensial Siswa Baru
+          // 8. Terbitkan Otomatis Tagihan SPP Bulan Pertama (Jika auto_spp aktif)
+          if (params.auto_spp !== false) {
+            const currentYear = new Date().getFullYear();
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const currentMonthName = monthNames[new Date().getMonth()];
+            const invNumber = `INV/${currentYear}/${String(Math.floor(1000 + Math.random() * 9000))}`;
+            const invDueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+            const invPayload = {
+              id: 'INV-' + String(Date.now()).slice(-6),
+              invoice_number: invNumber,
+              student_id: stuId,
+              student_name: studentName,
+              month: currentMonthName,
+              period: `${currentYear}/${currentYear + 1}`,
+              amount: 150000,
+              due_date: invDueDate,
+              status: 'unpaid',
+              description: `SPP Bulan ${currentMonthName} ${currentYear} (Santri Baru)`
+            };
+            await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
+          }
+
+          // 9. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' ? window.location.origin : '';
           const loginUrl = `${origin}/login.html`;
           const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${birthDatePassword} (Tanggal Lahir: DDMMYYYY)\nLink Portal: ${loginUrl}`;
