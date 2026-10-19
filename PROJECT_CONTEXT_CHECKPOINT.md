@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 15 Oktober 2026 (Sesi 39 — Verifikasi Penuh End-to-End, Audit Integritas Data & Sinkronisasi Git Up-to-Date)  
+**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 40 — Remediasi Komprehensif Direktif Audit Agen Argon, Integrasi Full TDD & Verifikasi Regresi 100%)  
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (Vercel & Supabase Cloud).
 
 ---
@@ -68,6 +68,13 @@ Seluruh 12 temuan dari laporan audit telah diremediasi secara tuntas melalui **P
 
 ## 📊 4. Hasil Uji Otomatis & Status Operasional
 Semua test suite dan verifikasi live telah dijalankan dengan hasil **100% LULUS**:
+- `tests/test-nis-status-flow.js`: **LULUS 100%** (Resolusi NIS calon siswa & warna tombol login kontras)
+- `tests/test-auth-password-flow.js`: **LULUS 100%** (Harmonisasi sandi pendaftaran & multi-format validator)
+- `tests/test-ppdb-class-filter.js`: **LULUS 100%** (Filter kelas berjenjang otomatis pada modal admin)
+- `tests/test-teachers-classes-flow.js`: **LULUS 100%** (Query guru aktif skema riil & dropdown wali kelas lengkap)
+- `tests/test-admin-student-docs.js`: **LULUS 100%** (Pratinjau berkas dokumen santri di modal detail admin)
+- `tests/test-auto-invoice-flow.js`: **LULUS 100%** (Otomatisasi penerbitan invoice SPP bulan pertama siswa baru)
+- `tests/test-content-consistency.js`: **LULUS 100%** (Konsistensi rentang usia PAUD/TK/TPQ & overline tipografi profil)
 - `test-batch-1.js`: **LULUS 100%** (8 subtes adapter & timeout)
 - `test-batch-2.js`: **LULUS 100%** (8 subtes alur PPDB & dokumen)
 - `test-batch-3.js`: **LULUS 100%** (12 subtes konsistensi admin & siswa)
@@ -76,13 +83,14 @@ Semua test suite dan verifikasi live telah dijalankan dengan hasil **100% LULUS*
 - `audit-all-features.js`: **LULUS 100%** (34/34 skenario fitur penuh 2 portal)
 - `test-ppdb-visibility.js`: **LULUS 100%** (15/15 subtes visibilitas kartu buka/tutup)
 - `test-routes.js`: **LULUS 100%** (37/37 rute berstatus HTTP 200 OK)
+- `test-ppdb-e2e.js`: **LULUS 100%** (11/11 skenario alur PPDB hingga siswa login)
+- `test-cms-e2e.js`: **LULUS 100%** (17/17 skenario konten CMS)
+- `test-spp-e2e.js`: **LULUS 100%** (13/13 skenario sistem pembayaran SPP)
 - **Supabase Cloud Live Test:**
   - 16 Tabel Database: `HTTP 200 OK`
   - Storage Bucket `siyayasan-uploads`: `Upload 200 OK`, `Public Read 200 OK`, `Delete 200 OK`.
 - **Vercel Production:**
   - URL: `https://siyayasan-portal.vercel.app` (Status: Ready)
-- **GitHub Sync:**
-  - Branch `main` up-to-date 100% (`56fd2d1`)
 
 ---
 

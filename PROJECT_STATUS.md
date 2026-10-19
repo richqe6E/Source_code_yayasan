@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
 
-*Terakhir Diperbarui: 15 Oktober 2026 — Sesi 39 (Verifikasi Menyeluruh Fitur, Pengujian E2E & Sinkronisasi GitHub 100% Up-to-Date) | Status: ✅ PRODUCTION & DATABASE 100% OPERASIONAL & LIVE VERIFIED (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 19 Oktober 2026 — Sesi 40 (Remediasi Komprehensif Direktif Audit Agen Argon, Integrasi Full TDD & Verifikasi Regresi 100%) | Status: ✅ PRODUCTION & DATABASE 100% OPERASIONAL & LIVE VERIFIED (GitHub: richqe6E/Source_code_yayasan)*
 
 ---
 
@@ -1351,6 +1351,59 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
      - `tests/test-batch-1.js` s/d `test-batch-4.js`: Lulus 100% termasuk penegakan aturan Zero-Green (Oceanic Blue).
 3. **Verifikasi Sinkronisasi GitHub:**
    - Dipastikan git remote `origin/main` sinkron 100% dengan `git status` clean dan commit terakhir `56fd2d1` (*chore: add root vercel.json*).
+
+---
+
+### 🗓️ Sesi 40 — Remediasi Komprehensif Direktif Audit Agen Argon & Integrasi TDD (19 Oktober 2026)
+
+**Latar Belakang & Analisis Direktif:**
+1. Pengguna meminta penelaahan menyeluruh atas laporan audit Agen Argon (`directive_antigravity_siyayasan_v2.md`) dengan batasan ketat: tidak melakukan perubahan yang melanggar arsitektur 2-portal resmi atau reaktivasi modul usang di `.legacy_backup/`, serta mematuhi aturan Zero-Green (Oceanic Blue: `#0284c7`).
+2. **Klarifikasi & Verifikasi Fakta Source Code:**
+   - Halaman modul pembayaran siswa adalah `frontend/portal/siswa/spp.html`, bukan `pembayaran.html`.
+   - Teks `"14+ Tahun Pengabdian"` tidak ada di kode (hanya badge `"Perjalanan Sejak 2010"` di `profil.html`).
+   - Kicker pill di `index.html` dan micro-interactions (`active:scale-95`) pada SIAKAD navbar sudah terpasang rapi di sesi sebelumnya.
+3. Disusun dokumen perencanaan terstruktur di `docs/superpowers/plans/2026-10-19-audit-remediation-directive.md` dengan metodologi Test-Driven Development (TDD).
+
+**Pekerjaan & Perubahan yang Diterapkan (8 Tugas Tuntas):**
+1. **Task 1 — Binding NIS & Resolusi Status Calon Siswa (Commit `fd486fb`):**
+   - File: `frontend/public/ppdb/status.html`, `frontend/shared/js/api.js`.
+   - Memperbaiki binding tampilan NIS calon siswa saat status diterima/terkonversi (`res.data.nis || res.data.student_nis || res.data.user_id`).
+   - Memperbaiki query filter fallback `students` di `api.js` agar mencari calon siswa yang baru dikonversi.
+   - Mengganti class CSS invalid `text-primary-950` pada tombol login SIAKAD di kartu status menjadi `text-primary-900` dengan font bold agar teks terlihat kontras dan jelas (tidak blank putih).
+   - Pengujian: `tests/test-nis-status-flow.js` LULUS 100%.
+2. **Task 2 — Harmonisasi Password PPDB & Multi-Format Validator (Commit `d5a2970`):**
+   - File: `frontend/shared/js/api.js`, `frontend/public/login.html`.
+   - Mengintegrasikan penyimpanan custom password (`registration.initial_password` / `password_hash`) saat admin melakukan konversi santri baru di `api.js`.
+   - Memperbarui validator autentikasi di `api.js` agar fleksibel memverifikasi multi-format password santri (format tanggal lahir `DDMMYYYY`, `YYYY-MM-DD`, maupun password kustom yang dibuat saat pendaftaran).
+   - Memperbarui modal bantuan lupa password di `login.html` untuk menginformasikan opsi sandi tanggal lahir maupun sandi pendaftaran mandiri.
+   - Pengujian: `tests/test-auth-password-flow.js` LULUS 100%.
+3. **Task 3 — Filter Rombel Berjenjang pada Modal Konversi PPDB (Commit `f82a73a`):**
+   - File: `frontend/portal/admin/ppdb.html`.
+   - Menyempurnakan pemuatan daftar kelas pada modal konversi admin dengan mengelompokkan opsi `<optgroup>` secara otomatis berdasarkan jenjang pendaftar (`PAUD`, `TK`, `TPQ`).
+   - Pengujian: `tests/test-ppdb-class-filter.js` LULUS 100%.
+4. **Task 4 — Query Guru Aktif & Dropdown Wali Kelas Rombel (Commit `4fce851`):**
+   - File: `frontend/shared/js/api.js`, `frontend/portal/admin/classes.html`.
+   - Memperbaiki filter query tabel guru di `api.js` dengan menggunakan kolom riil skema Supabase `status = 'active'`, menggantikan `is_active=eq.true` yang menyebabkan PostgREST mengembalikan array kosong / error.
+   - Memperkaya dropdown pemilihan Wali Kelas di `classes.html` dengan menampilkan nama guru lengkap beserta NIP.
+   - Pengujian: `tests/test-teachers-classes-flow.js` LULUS 100%.
+5. **Task 5 — Panel Pratinjau Dokumen Santri di Admin (Commit `f9a5417`):**
+   - File: `frontend/shared/js/api.js`, `frontend/portal/admin/students.html`.
+   - Menambahkan action handler `documents` pada modul students di `api.js` untuk mengambil berkas digital santri (`student_documents` / metadata lampiran).
+   - Menambahkan visualisasi pratinjau dokumen (Pas Foto, Kartu Keluarga, Akta Kelahiran) lengkap dengan tombol unduh/buka dokumen pada modal detail santri di `students.html`.
+   - Pengujian: `tests/test-admin-student-docs.js` LULUS 100%.
+6. **Task 6 — Otomatisasi Tagihan SPP Bulan Pertama Santri Baru (Commit `26fcf3b`):**
+   - File: `frontend/shared/js/api.js`, `frontend/portal/admin/ppdb.html`.
+   - Menambahkan opsi centang otomatis *"Terbitkan Tagihan SPP Bulan Pertama Otomatis"* pada modal konversi admin (`#cm-auto-spp`).
+   - Menambahkan generator invoice SPP perdana otomatis di `api.js` saat santri diaktifkan (nominal standar Rp 150.000, nomor invoice berformat `INV/2026/XXXX`, tanggal jatuh tempo tanggal 10 bulan berjalan, status `unpaid`).
+   - Pengujian: `tests/test-auto-invoice-flow.js` LULUS 100%.
+7. **Task 7 — Konsistensi Rentang Usia & Tipografi Profil Lembaga (Commit `8074627`):**
+   - File: `frontend/public/profil.html`, `tests/test-content-consistency.js`.
+   - Menstandarkan rincian rentang usia unit pendidikan secara presisi: PAUD (2–4 Tahun), TK A/B (4–6 Tahun), dan TPQ (5–12 Tahun).
+   - Mengganti pill rounded-full badge pada pengantar sejarah profil dengan tipografi overline formal uppercase tracking-widest yang selaras dengan estetika editorial institusi pendidikan Islam modern.
+   - Pengujian: `tests/test-content-consistency.js` LULUS 100%.
+8. **Task 8 — Pengujian Regresi Menyeluruh (Full Regression Suite):**
+   - Seluruh 7 suite pengujian unit baru LULUS 100%.
+   - Seluruh 6 suite integrasi/E2E lama LULUS 100% (`audit-all-features.js`: 34/34 skenario; `test-routes.js`: 37/37 rute HTTP 200 OK; `test-ppdb-e2e.js`: 11/11; `test-cms-e2e.js`: 17/17; `test-spp-e2e.js`: 13/13; `test-simulation.js`: 5/5).
 
 ---
 
