@@ -817,30 +817,121 @@
 
     <!-- Persyaratan & Jadwal Penting PPDB -->
     <div id="jadwal-linimasa" class="grid lg:grid-cols-2 gap-6 mb-12 scroll-mt-24">
-      <!-- Persyaratan -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <i class="fi fi-rr-document-signed text-brand-600"></i>
-          <span>Persyaratan Berkas PPDB</span>
-        </h3>
-        <ul class="space-y-3 text-xs sm:text-sm text-slate-600">
-          <li class="flex items-start gap-2.5">
-            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
-            <span>Usia sesuai jenjang (PAUD: 2-4 tahun, TK A: 4-5 tahun, TK B: 5-6 tahun).</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
-            <span>Foto / Scan Akta Kelahiran anak.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
-            <span>Foto / Scan Kartu Keluarga (KK).</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <i class="fi fi-sr-check-circle text-brand-600 mt-0.5 shrink-0"></i>
-            <span>Pas foto anak (dapat diunggah langsung di Portal Siswa setelah mendaftar).</span>
-          </li>
-        </ul>
+      <!-- Persyaratan & Kelengkapan Berkas (Accordion Buka-Tutup Interaktif) -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm" id="accordion-persyaratan-ppdb">
+        <div class="border-b border-slate-100 pb-3 mb-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fi fi-rr-document-signed text-primary-600"></i>
+              <span>Persyaratan &amp; Kelengkapan Berkas PPDB</span>
+            </h3>
+            <span class="text-[11px] font-semibold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200">
+              Interaktif
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            Klik kategori di bawah untuk membuka dan menutup rincian berkas persyaratan.
+          </p>
+        </div>
+
+        <div class="space-y-3" id="ppdb-requirements-accordion">
+          <!-- Accordion Item 1: Dokumen Identitas Utama -->
+          <div class="border border-primary-300 bg-primary-50/20 rounded-xl transition overflow-hidden" id="acc-item-1">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-1')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-lg bg-primary-100 text-primary-700 font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-900">Dokumen Pokok Calon Siswa (Akta Kelahiran &amp; KK)</span>
+              </div>
+              <svg class="w-4 h-4 text-slate-500 accordion-chevron transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
+              <div class="flex items-start gap-2">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+                <span><strong>Akta Kelahiran:</strong> Scan atau foto lembar asli yang terbaca jelas (memuat nama lengkap, tempat/tanggal lahir, dan nama orang tua).</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+                <span><strong>Kartu Keluarga (KK):</strong> Scan atau foto KK terbaru yang memuat Nomor Induk Kependudukan (NIK 16 digit) ananda dan orang tua.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion Item 2: Pas Foto Siswa -->
+          <div class="border border-slate-200 rounded-xl transition overflow-hidden bg-white" id="acc-item-2">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-2')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-900">Pas Foto Formal Anak Didik</span>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content hidden px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
+              <div class="flex items-start gap-2">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+                <span>Pas foto setengah badan dengan pakaian rapi, sopan, atau busana muslim/muslimah.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+                <span>Format file gambar JPG atau PNG (maksimal 5 MB) dengan resolusi yang tajam.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion Item 3: Batasan Usia per Jenjang -->
+          <div class="border border-slate-200 rounded-xl transition overflow-hidden bg-white" id="acc-item-3">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-3')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-900">Ketentuan Usia Masuk per Jenjang Pendidikan</span>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content hidden px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span class="font-bold text-slate-800 block">PAUD Terpadu:</span>
+                  <span class="text-slate-500">Usia 2 - 4 Tahun</span>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span class="font-bold text-slate-800 block">TK Kelompok A:</span>
+                  <span class="text-slate-500">Usia 4 - 5 Tahun</span>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span class="font-bold text-slate-800 block">TK Kelompok B:</span>
+                  <span class="text-slate-500">Usia 5 - 6 Tahun</span>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                  <span class="font-bold text-slate-800 block">TPQ Al-Quran:</span>
+                  <span class="text-slate-500">Usia 6+ Tahun / Santri Baru</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion Item 4: Fleksibilitas Berkas -->
+          <div class="border border-slate-200 rounded-xl transition overflow-hidden bg-white" id="acc-item-4">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-4')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">4</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-900">Fleksibilitas Pengunggahan &amp; Verifikasi</span>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content hidden px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
+              <p>
+                Anda dapat mengunggah berkas sekarang pada Langkah 4 formulir di atas, atau melengkapinya kemudian dengan login ke <strong>Portal Siswa Mandiri</strong>. Verifikator TU Yayasan akan memeriksa dokumen dan memberikan status validasi secara transparan.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Jadwal Resmi Dinamis -->
@@ -947,6 +1038,36 @@
 
   <script>
     injectSiteChrome({ activeKey: 'ppdb', basePath: './' });
+
+    function togglePpdbAccordion(id) {
+      const item = document.getElementById(id);
+      if (!item) return;
+      const content = item.querySelector('.accordion-content');
+      const chevron = item.querySelector('.accordion-chevron');
+      if (!content) return;
+      const isExpanded = !content.classList.contains('hidden');
+      
+      if (isExpanded) {
+        content.classList.add('hidden');
+        if (chevron) {
+          chevron.classList.remove('rotate-180');
+          chevron.classList.remove('text-slate-500');
+          chevron.classList.add('text-slate-400');
+        }
+        item.classList.remove('border-primary-300', 'bg-primary-50/20');
+        item.classList.add('border-slate-200', 'bg-white');
+      } else {
+        content.classList.remove('hidden');
+        if (chevron) {
+          chevron.classList.add('rotate-180');
+          chevron.classList.remove('text-slate-400');
+          chevron.classList.add('text-slate-500');
+        }
+        item.classList.remove('border-slate-200', 'bg-white');
+        item.classList.add('border-primary-300', 'bg-primary-50/20');
+      }
+    }
+    window.togglePpdbAccordion = togglePpdbAccordion;
 
     let currentStep = 1;
     let selectedJenjang = 'PAUD';

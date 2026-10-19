@@ -77,11 +77,11 @@
               <i class="fi fi-rr-marker"></i>
             </div>
             <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Alamat Kampus Utama</h3>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Alamat Gedung Utama Yayasan</h3>
               <p class="text-sm font-semibold text-slate-900 leading-relaxed" id="contact-page-address">
                 Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu Kota Samarinda, Kalimantan Timur, Kode Pos: 75124
               </p>
-              <div class="text-[11px] text-primary-700 font-medium mt-1" id="contact-page-campus-note">Kampus Utama Air Putih, Samarinda Ulu</div>
+              <div class="text-[11px] text-primary-700 font-medium mt-1" id="contact-page-campus-note">Gedung Utama Yayasan, Samarinda Ulu</div>
               <a href="https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124" id="contact-page-maps-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-800 mt-2 transition">
                 <span>Buka di Google Maps</span>
                 <i class="fi fi-rr-arrow-up-right text-[10px]"></i>
@@ -142,22 +142,22 @@
             <i class="fi fi-rr-clock-three text-xs"></i>
             <span>Jam Operasional Pelayanan</span>
           </div>
-          <div class="space-y-1.5 text-xs text-slate-700">
+          <div class="space-y-1.5 text-xs text-slate-700" id="contact-page-op-hours">
             <div class="flex justify-between">
               <span class="font-medium">Senin - Kamis:</span>
-              <span class="font-bold tabular-nums">07.30 - 15.30 WITA</span>
+              <span class="font-bold tabular-nums" id="contact-page-hours-weekday">07.30 - 15.30 WITA</span>
             </div>
             <div class="flex justify-between">
               <span class="font-medium">Jumat:</span>
-              <span class="font-bold tabular-nums">07.30 - 11.30 WITA</span>
+              <span class="font-bold tabular-nums" id="contact-page-hours-friday">07.30 - 11.30 WITA</span>
             </div>
             <div class="flex justify-between">
               <span class="font-medium">Sabtu:</span>
-              <span class="font-bold tabular-nums">08.00 - 12.00 WITA</span>
+              <span class="font-bold tabular-nums" id="contact-page-hours-saturday">08.00 - 12.00 WITA</span>
             </div>
             <div class="flex justify-between text-slate-400 pt-1 border-t border-primary-200/60">
               <span>Minggu &amp; Hari Libur Nasional:</span>
-              <span>Tutup</span>
+              <span id="contact-page-hours-sunday">Tutup</span>
             </div>
           </div>
         </div>
@@ -231,14 +231,14 @@
     </div>
 
     <!-- Interactive Google Maps Location Section -->
-    <section class="mt-12 sm:mt-16 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-9 shadow-sm" id="lokasi-kampus">
+    <section class="mt-12 sm:mt-16 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-9 shadow-sm" id="lokasi-yayasan">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-            Lokasi Kampus di Google Maps
+            Lokasi Gedung Yayasan di Google Maps
           </h2>
           <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Kunjungi kampus kami secara langsung atau buka navigasi rute di Google Maps.
+            Kunjungi kantor yayasan kami secara langsung atau buka navigasi rute di Google Maps.
           </p>
         </div>
 
@@ -372,6 +372,23 @@
           }
 
           if (school.email) document.getElementById('contact-page-email').textContent = school.email;
+
+          if (school.operational_hours) {
+            let oph = school.operational_hours;
+            if (typeof oph === 'string') {
+              try { oph = JSON.parse(oph); } catch(_) {}
+            }
+            if (typeof oph === 'object' && oph !== null) {
+              const wd = document.getElementById('contact-page-hours-weekday');
+              if (wd && oph.weekday) wd.textContent = oph.weekday;
+              const fr = document.getElementById('contact-page-hours-friday');
+              if (fr && oph.friday) fr.textContent = oph.friday;
+              const sa = document.getElementById('contact-page-hours-saturday');
+              if (sa && oph.saturday) sa.textContent = oph.saturday;
+              const su = document.getElementById('contact-page-hours-sunday');
+              if (su && oph.sunday) su.textContent = oph.sunday;
+            }
+          }
         }
       } catch (_) {}
     }

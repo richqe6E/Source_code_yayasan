@@ -248,36 +248,7 @@
         console.warn('API fetch news:', err);
       }
 
-      // Default sample news if empty
-      if (!allNews || allNews.length === 0) {
-        allNews = [
-          {
-            id: '1',
-            title: 'Keseruan Belajar Berbagi pada Peringatan Bulan Ramadhan 1447 H',
-            category: 'Kegiatan',
-            published_at: new Date().toISOString(),
-            image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1200&auto=format&fit=crop',
-            summary: 'Santri cilik PAUD dan TK diajarkan kebiasaan berbagi takjil dan infaq ceria untuk melatih empati sosial sejak usia dini.'
-          },
-          {
-            id: '2',
-            title: 'Prestasi Juara 1 Lomba Mewarnai dan Hafalan Surat Pendek Tingkat Kota',
-            category: 'Prestasi',
-            published_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-            image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop',
-            summary: 'Alhamdulillah, ananda dari TK Terpadu Yayasan At Tarbiyyah Wijaya Kusuma meraih penghargaan dalam festival anak sholeh Samarinda.'
-          },
-          {
-            id: '3',
-            title: 'Sosialisasi Parenting: Pola Asuh Positif di Era Digital untuk Orang Tua',
-            category: 'Parenting',
-            published_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-            image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop',
-            summary: 'Kegiatan seminar interaktif menghadirkan psikolog anak membahas kiat mendampingi stimulasi gawai secara bijak.'
-          }
-        ];
-      }
-
+      allNews = allNews || [];
       applyFilterAndSearch();
     }
 

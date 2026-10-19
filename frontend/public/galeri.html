@@ -137,38 +137,18 @@
       }
 
       if (!galleryItems || galleryItems.length === 0) {
-        galleryItems = [
-          {
-            title: 'Keceriaan Belajar Mewarnai Santri TK',
-            description: 'Melatih motorik halus dan pengenalan paduan warna estetis.',
-            image_url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=800&auto=format&fit=crop'
-          },
-          {
-            title: 'Bimbingan Tahsin Al-Qur\'an Bersama Ustadzah',
-            description: 'Makharijul huruf dengan metode interaktif yang menyenangkan.',
-            image_url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800&auto=format&fit=crop'
-          },
-          {
-            title: 'Praktek Sholat Berjamaah & Doa Harian',
-            description: 'Pembiasaan ibadah praktis sejak usia dini di musholla sekolah.',
-            image_url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop'
-          },
-          {
-            title: 'Pentas Seni & Kreasi Anak Indonesia',
-            description: 'Mengasah keberanian tampil dan rasa percaya diri siswa di depan umum.',
-            image_url: 'https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=800&auto=format&fit=crop'
-          },
-          {
-            title: 'Outing Class Edukatif Mengenal Tanaman',
-            description: 'Observasi alam terbuka di kebun edukasi sekolah.',
-            image_url: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=800&auto=format&fit=crop'
-          },
-          {
-            title: 'Senam Pagi Bersama Guru dan Teman',
-            description: 'Kebugaran fisik motorik kasar anak setiap hari Jumat pagi.',
-            image_url: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=800&auto=format&fit=crop'
-          }
-        ];
+        grid.innerHTML = `
+          <div class="col-span-full py-16 px-4 text-center bg-white border border-slate-200/90 rounded-2xl shadow-sm">
+            <div class="w-16 h-16 rounded-2xl bg-sky-50 text-primary-600 flex items-center justify-center mx-auto mb-4 border border-sky-100">
+              <i class="fi fi-rr-picture text-2xl"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-800 mb-1">Belum Ada Foto Galeri</h3>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+              Saat ini belum ada dokumentasi foto kegiatan yang dipublikasikan di galeri yayasan.
+            </p>
+          </div>
+        `;
+        return;
       }
 
       grid.innerHTML = galleryItems.map((g, i) => `

@@ -113,29 +113,18 @@
       }
 
       if (!items || items.length === 0) {
-        items = [
-          {
-            id: '1',
-            title: 'Pekan Ceria Ramadhan & Pawai Menyambut Bulan Suci 1447 H',
-            location: 'Halaman Kampus Yayasan At Tarbiyyah Wijaya Kusuma',
-            event_date: new Date(Date.now() + 86400000 * 5).toISOString(),
-            description: 'Pawai santri cilik dengan busana muslim kreatif mengelilingi rute aman lingkungan sekolah diiringi rebana.'
-          },
-          {
-            id: '2',
-            title: 'Parenting Akbar & Konsultasi Tumbuh Kembang Semester Genap',
-            location: 'Aula Yayasan At Tarbiyyah Wijaya Kusuma',
-            event_date: new Date(Date.now() + 86400000 * 12).toISOString(),
-            description: 'Diskusi bersama pakar psikologi anak dan pembagian lembar observasi perkembangan ananda periode triwulan.'
-          },
-          {
-            id: '3',
-            title: 'Khataman Al-Qur\'an & Imtihan Santri TPQ Angkatan X',
-            location: 'Masjid Nurul Huda Samarinda',
-            event_date: new Date(Date.now() + 86400000 * 25).toISOString(),
-            description: 'Uji publik hafalan Juz 30 dan surat pilihan santri binaan TPQ di hadapan para orang tua dan asatidz.'
-          }
-        ];
+        list.innerHTML = `
+          <div class="col-span-full py-16 px-4 text-center bg-white border border-slate-200/90 rounded-2xl shadow-sm">
+            <div class="w-16 h-16 rounded-2xl bg-sky-50 text-primary-600 flex items-center justify-center mx-auto mb-4 border border-sky-100">
+              <i class="fi fi-rr-calendar text-2xl"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-800 mb-1">Belum Ada Agenda Kegiatan</h3>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+              Saat ini belum ada jadwal agenda atau kegiatan resmi yayasan yang dipublikasikan. Silakan periksa kembali di lain waktu.
+            </p>
+          </div>
+        `;
+        return;
       }
 
       list.innerHTML = items.map(ev => {
@@ -158,7 +147,7 @@
                 </span>
                 <span class="inline-flex items-center gap-1.5 text-slate-600">
                   <i class="fi fi-rr-marker text-xs text-primary-600"></i>
-                  <span>${ev.location || 'Halaman Kampus Yayasan At Tarbiyyah Wijaya Kusuma'}</span>
+                  <span>${ev.location || 'Gedung Utama Yayasan At Tarbiyyah Samarinda'}</span>
                 </span>
               </div>
 
