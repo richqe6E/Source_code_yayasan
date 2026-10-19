@@ -1896,7 +1896,21 @@
           // 7. Update Status Registrasi PPDB menjadi 'converted'
           await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
             status: 'converted',
+            converted_nis: studentNis,
+            nis: studentNis,
+            class_name: targetClassName,
             notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
+          }).catch(async () => {
+            await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
+              status: 'converted',
+              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`,
+              form_metadata: {
+                ...(reg.form_metadata || {}),
+                converted_nis: studentNis,
+                nis: studentNis,
+                class_name: targetClassName
+              }
+            }).catch(() => {});
           });
           await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
 

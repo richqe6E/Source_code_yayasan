@@ -131,13 +131,23 @@
         const jenjang = (r.level || r.form_type || 'PAUD/TK').toUpperCase();
         const parentName = r.parent_name || r.father_name || r.mother_name || '-';
         const parentPhone = r.parent_phone || r.phone || r.father_phone || '-';
-        const nis = r.converted_nis || r.nis || '';
-        const className = r.class_name || '';
+        let nis = r.converted_nis || r.nis || r.student_nis || (r.form_metadata && (r.form_metadata.converted_nis || r.form_metadata.nis)) || '';
+        const className = r.class_name || (r.form_metadata && r.form_metadata.class_name) || '';
 
         const isConverted = rawStatus === 'converted' || Boolean(nis && (rawStatus === 'accepted' || rawStatus === 'approved'));
         const isApproved = !isConverted && (rawStatus === 'approved' || rawStatus === 'accepted');
         const isPending = rawStatus === 'pending' || rawStatus === 'submitted' || rawStatus === 'waiting_verification';
         const isRejected = rawStatus === 'rejected';
+
+        // Fallback pencarian NIS jika pendaftar sudah berstatus converted tapi field nis masih kosong di objek registrasi
+        if (!nis && isConverted) {
+          try {
+            const stuRes = await apiCall('students', 'list', { search: regNo, per_page: 5 });
+            const sList = Array.isArray(stuRes.data) ? stuRes.data : ((stuRes.data && (stuRes.data.students || stuRes.data.items)) || []);
+            const matchStu = sList.find(s => s.reg_number === regNo || s.registration_number === regNo || (s.full_name && childName && s.full_name.toLowerCase() === childName.toLowerCase()));
+            if (matchStu && matchStu.nis) nis = String(matchStu.nis);
+          } catch (_) {}
+        }
 
         // Teks WhatsApp
         const waPhone = '6281347142829';
@@ -162,7 +172,7 @@
                 <div>
                   <span class="text-primary-200 block text-[11px] font-medium">Nomor Induk Siswa (NIS):</span>
                   <div class="flex items-center gap-2 mt-0.5">
-                    <span class="text-lg font-bold font-mono tracking-wider">${escapeHtml(nis || 'Telah Diterbitkan')}</span>
+                    <span class="text-lg font-bold font-mono tracking-wider tabular-nums">${escapeHtml(nis || 'Telah Diterbitkan')}</span>
                     ${nis ? `<button type="button" onclick="copyNis('${escapeHtml(nis)}')" class="px-2 py-0.5 bg-white/20 hover:bg-white/30 rounded text-[11px] font-sans">Salin NIS</button>` : ''}
                   </div>
                 </div>
@@ -173,17 +183,17 @@
                 <div class="border-t border-white/20 pt-2.5 sm:col-span-2">
                   <span class="text-primary-200 block text-[11px] font-medium mb-1">Panduan Login ke Portal Siswa:</span>
                   <p class="text-xs text-white leading-relaxed">
-                    <strong>Username:</strong> NIS Anda (${escapeHtml(nis)})<br>
-                    <strong>Password Awal:</strong> Tanggal Lahir Siswa (${escapeHtml(birthDate || 'YYYY-MM-DD')})<br>
+                    <strong>Username:</strong> NIS Anda (${escapeHtml(nis || 'Gunakan NIS Anda')})<br>
+                    <strong>Password Awal:</strong> Tanggal Lahir Siswa format DDMMYYYY (cth: 12052020) atau password yang Anda buat saat pendaftaran<br>
                     <span class="text-[11px] text-primary-100 italic">*Anda dapat melihat status &amp; jadwal pembayaran SPP bulanan di Portal Siswa.</span>
                   </p>
                 </div>
               </div>
 
               <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="../login.html" class="flex-1 py-3 px-4 bg-white hover:bg-primary-50 text-primary-950 font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <a href="../login.html" class="flex-1 py-3 px-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
                   <span>Masuk ke Portal Siswa Sekarang</span>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </a>
                 <button type="button" onclick="printOfficialLetter()" class="py-3 px-4 bg-white/15 hover:bg-white/25 text-white font-semibold text-xs rounded-xl border border-white/30 transition flex items-center justify-center gap-2">
                   <i class="fi fi-rr-print text-xs"></i>
@@ -195,7 +205,7 @@
         } else if (isApproved) {
           const waAcceptMsg = `Assalamu'alaikum Panitia PPDB Yayasan At Tarbiyyah Wijaya Kusuma Samarinda,\n\nSaya ingin konfirmasi nomor pendaftaran ${regNo} atas nama ${childName} yang telah dinyatakan DITERIMA (Lolos Seleksi).\nMohon info tahapan penerbitan NIS & jadwal daftar ulang fisik. Terima kasih.`;
           statusBannerHtml = `
-            <div class="bg-primary-50 border border-primary-200 rounded-2xl p-6 text-primary-950 mb-6">
+            <div class="bg-primary-50 border border-primary-200 rounded-2xl p-6 text-slate-900 mb-6">
               <div class="flex items-center gap-3 mb-2">
                 <div class="w-10 h-10 rounded-xl bg-primary-100 text-primary-800 flex items-center justify-center text-xl font-bold">✓</div>
                 <div>
