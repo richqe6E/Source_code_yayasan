@@ -165,8 +165,15 @@
             const stuRes = await apiCall('students', 'list', { search: regNo, per_page: 5 });
             const sList = Array.isArray(stuRes.data) ? stuRes.data : ((stuRes.data && (stuRes.data.students || stuRes.data.items)) || []);
             const matchStu = sList.find(s => s.reg_number === regNo || s.registration_number === regNo || (s.full_name && childName && s.full_name.toLowerCase() === childName.toLowerCase()));
-            if (matchStu && matchStu.nis) nis = String(matchStu.nis);
+            if (matchStu) {
+              if (matchStu.nis) nis = String(matchStu.nis);
+              if (!className && (matchStu.class_name || matchStu.kelas_sekarang)) className = matchStu.class_name || matchStu.kelas_sekarang;
+            }
           } catch (_) {}
+        }
+        if (currentResultData) {
+          if (nis) currentResultData.converted_nis = nis;
+          if (className) currentResultData.class_name = className;
         }
 
         // Teks WhatsApp

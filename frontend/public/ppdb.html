@@ -1326,6 +1326,9 @@
     function updateStepperUI(targetStep) {
       currentStep = targetStep;
 
+      const stepBadgeEl = document.getElementById('current-step-badge');
+      if (stepBadgeEl) stepBadgeEl.textContent = `Tahap ${targetStep} dari 5`;
+
       // Update progress bar
       const progressBar = document.getElementById('step-progress-bar');
       if (progressBar) {

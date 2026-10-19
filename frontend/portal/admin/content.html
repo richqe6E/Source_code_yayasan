@@ -177,7 +177,8 @@
           </div>
           <div class="bg-white border border-gray-200 rounded-lg divide-y divide-gray-200">
             ${items.map(item => {
-              const isPub = item.status ? (item.status === 'published' || item.status === 'pinned') : (item.is_published === true || item.is_published === 'TRUE');
+              const isPub = item.status ? (item.status === 'published' || item.status === 'pinned' || item.status === 'upcoming') : (item.is_published === true || item.is_published === 'TRUE');
+              const descPreview = item.excerpt || item.summary || item.description || '';
               return `
               <div class="p-4 flex justify-between items-start gap-3 min-w-0">
                 <div class="flex-1 min-w-0">
@@ -186,7 +187,7 @@
                     <span class="px-2 py-0.5 text-xs rounded shrink-0 font-medium ${isPub ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'}">${isPub ? 'Published' : 'Draft'}</span>
                   </div>
                   <div class="text-xs text-gray-500 truncate tabular-nums">${formatDate(item.created_at || item.published_at)}${item.event_date ? ' • ' + formatDate(item.event_date) : ''}${item.author_name ? ' • ' + item.author_name : ''}${item.category ? ' • ' + item.category : ''}</div>
-                  ${item.excerpt ? `<div class="text-xs text-gray-600 mt-1 line-clamp-2">${item.excerpt}</div>` : ''}
+                  ${descPreview ? `<div class="text-xs text-gray-600 mt-1 line-clamp-2">${descPreview}</div>` : ''}
                 </div>
                 <div class="flex gap-3 text-sm shrink-0 whitespace-nowrap">
                   <button onclick="togglePublish('${item.id}', ${!isPub})" class="text-primary-700 hover:text-primary-900 font-medium">${isPub ? 'Tarik (Draft)' : 'Terbitkan (Publish)'}</button>
@@ -231,7 +232,7 @@
     }
 
     async function togglePublish(id, shouldPublish) {
-      const newStatus = shouldPublish ? 'published' : 'draft';
+      const newStatus = shouldPublish ? (currentTab === 'events' ? 'upcoming' : 'published') : 'draft';
       const res = await apiCall(currentTab, 'update', {
         id,
         status: newStatus,
@@ -264,6 +265,8 @@
       const isEvent = currentTab === 'events';
       document.getElementById('event-date-container').classList.toggle('hidden', !isEvent);
       document.getElementById('form-event-date').required = isEvent;
+      const bodyEl = document.getElementById('form-body');
+      if (bodyEl) bodyEl.required = currentTab !== 'gallery';
 
       // Reset image picker state
       contentImgMode = 'file';

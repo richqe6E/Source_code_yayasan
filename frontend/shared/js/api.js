@@ -180,15 +180,14 @@
       try {
         sess = JSON.parse(localStorage.getItem('siy_user') || localStorage.getItem('siyayasan_session_v2') || 'null');
       } catch (_) {}
-      const roleName = (typeof sess?.role === 'object' ? sess.role.code : sess?.role) || 'admin';
       await supabaseRest('activity_logs', 'POST', {
-        user_id: sess?.id || null,
+        id: 'LOG-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+        user_id: sess?.id || 'USR-001',
         user_name: sess?.full_name || sess?.name || 'Admin',
-        user_role: roleName,
-        action: actionType,
-        entity_type: entityType,
-        entity_id: String(entityId || ''),
-        details: String(detailsText || '')
+        action: String(actionType || 'UPDATE'),
+        module: entityType || 'sistem',
+        details: String(detailsText || '') + (entityId ? ` [ID: ${entityId}]` : ''),
+        created_at: new Date().toISOString()
       });
     } catch (_) {}
   }
@@ -202,7 +201,7 @@
     // Prioritaskan local dev server di localhost atau jika Supabase offline
     if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || isSupabaseOffline)) {
       const localRes = await callLocalBackend(module, action, params, method);
-      if (localRes && localRes.success !== undefined) {
+      if (localRes && localRes.success !== undefined && !String(localRes.message || '').startsWith('Endpoint tidak dikenali:')) {
         return localRes;
       }
     }
@@ -552,44 +551,185 @@
           return { success: true, message: 'Password baru berhasil disimpan', data: { message: 'Password berhasil diperbarui' } };
         }
 
+        if (action === 'update_profile') {
+          const targetUserId = params.user_id || (currentUser ? currentUser.id : null);
+          if (!targetUserId) return { success: false, message: 'Identitas pengguna tidak ditemukan' };
+
+          let avatarUrl = params.avatar_url || params.avatar || '';
+          if (typeof avatarUrl === 'string' && avatarUrl.startsWith('data:')) {
+            avatarUrl = await uploadToSupabaseStorage(avatarUrl, 'avatar');
+          }
+
+          const newName = (params.full_name || params.name || '').trim();
+          const userPatch = { updated_at: new Date().toISOString() };
+          if (newName) {
+            userPatch.full_name = newName;
+            userPatch.name = newName;
+          }
+          if (avatarUrl) {
+            userPatch.avatar = avatarUrl;
+          }
+          if (params.phone) userPatch.phone = params.phone;
+
+          await supabaseRest(`users?id=eq.${encodeURIComponent(targetUserId)}`, 'PATCH', userPatch).catch(() => {});
+
+          const stuId = params.student_id || (currentUser ? currentUser.student_id : null);
+          if (stuId && String(stuId).startsWith('STU-')) {
+            const stuPatch = {};
+            if (newName) {
+              stuPatch.full_name = newName;
+              stuPatch.name = newName;
+              stuPatch.child_name = newName;
+            }
+            if (avatarUrl) stuPatch.photo_url = avatarUrl;
+            if (Object.keys(stuPatch).length > 0) {
+              await supabaseRest(`students?id=eq.${encodeURIComponent(stuId)}`, 'PATCH', stuPatch).catch(() => {});
+            }
+          }
+
+          if (currentUser && currentUser.id === targetUserId) {
+            if (newName) {
+              currentUser.full_name = newName;
+              currentUser.name = newName;
+            }
+            if (avatarUrl) {
+              currentUser.avatar_url = avatarUrl;
+              currentUser.avatar = avatarUrl;
+            }
+            try { localStorage.setItem('siy_user', JSON.stringify(currentUser)); } catch (_) {}
+          }
+
+          return {
+            success: true,
+            data: { user_id: targetUserId, full_name: newName, avatar_url: avatarUrl },
+            message: 'Profil berhasil diperbarui'
+          };
+        }
+
         if (action === 'logout') {
           return { success: true, data: { message: 'Logout berhasil' } };
         }
       }
 
       // -------------------------------------------------------------
-      // 1B. WEB SETTINGS (CMS HERO CAROUSEL, SOSMED, KONTAK)
+      // 1B. WEB SETTINGS (CMS HERO CAROUSEL, SOSMED, KONTAK & EXTENDED PROFILE)
       // -------------------------------------------------------------
       if (module === 'web_settings') {
+        const EXT_KEYS = [
+          'visi', 'misi', 'budaya', 'sejarah', 'program_pendidikan', 'kurikulum',
+          'operational_hours', 'struktur_organisasi', 'pembina', 'pengawas',
+          'ketua_yayasan', 'sekretaris', 'bendahara', 'headmaster_name',
+          'campus_note', 'maps_url', 'maps_embed_url', 'footer_bg_url', 'logo_url', 'tagline'
+        ];
+        const VALID_WEB_SETTINGS_COLS = [
+          'id', 'school_name', 'tagline', 'hero_title', 'hero_subtitle', 'hero_images',
+          'facebook_url', 'instagram_url', 'youtube_url', 'phone', 'whatsapp', 'email',
+          'address', 'ppdb_active_note', 'updated_at', 'header_title', 'announcement_banner',
+          'whatsapp_official', 'contact_email', 'campus_note', 'maps_url', 'maps_embed_url',
+          'academic_year', 'footer_bg_url', 'login_bg_url'
+        ];
+
         if (action === 'get') {
           let out = {};
+          let schRow = null;
           try {
-            const list = await supabaseRest('web_settings?id=eq.default&select=*');
-            if (list && list.length > 0) out = { ...list[0] };
+            const [list, sch] = await Promise.all([
+              supabaseRest('web_settings?id=eq.default&select=*').catch(() => []),
+              supabaseRest('schools?select=*&limit=1').catch(() => [])
+            ]);
+            if (sch && sch[0]) {
+              schRow = sch[0];
+              out = { ...schRow };
+              if (typeof schRow.wa_gateway_token === 'string' && schRow.wa_gateway_token.trim().startsWith('{')) {
+                try { Object.assign(out, JSON.parse(schRow.wa_gateway_token)); } catch (_) {}
+              }
+            }
+            if (list && list.length > 0) {
+              const ws = list[0];
+              Object.assign(out, ws);
+              if (typeof ws.announcement_banner === 'string' && ws.announcement_banner.trim().startsWith('{')) {
+                try { Object.assign(out, JSON.parse(ws.announcement_banner)); } catch (_) {}
+              }
+            }
           } catch (_) {}
-          if (!out.school_name) {
-            const sch = await supabaseRest('schools?select=*');
-            if (sch && sch[0]) out = { ...sch[0], ...out };
-          }
           try {
             const cachedExt = localStorage.getItem('siy_school_ext');
-            if (cachedExt) Object.assign(out, JSON.parse(cachedExt));
+            if (cachedExt) {
+              const parsedLocal = JSON.parse(cachedExt);
+              // Merge local cache for keys not yet present in cloud response
+              Object.keys(parsedLocal).forEach(k => {
+                if (out[k] === undefined || out[k] === null || out[k] === '') {
+                  out[k] = parsedLocal[k];
+                }
+              });
+            }
           } catch (_) {}
           return { success: true, data: out };
         }
         if (action === 'update') {
+          let mergedExt = {};
           try {
-            let existingExt = {};
             const raw = localStorage.getItem('siy_school_ext');
-            if (raw) existingExt = JSON.parse(raw);
-            const extPayload = {};
-            ['visi', 'misi', 'budaya', 'sejarah', 'program_pendidikan', 'kurikulum', 'operational_hours', 'struktur_organisasi', 'pembina', 'pengawas', 'ketua_yayasan', 'sekretaris', 'bendahara'].forEach(k => {
-              if (params[k] !== undefined) extPayload[k] = params[k];
-            });
-            localStorage.setItem('siy_school_ext', JSON.stringify({ ...existingExt, ...extPayload }));
+            if (raw) mergedExt = JSON.parse(raw);
           } catch (_) {}
-          const res = await supabaseRest('web_settings?id=eq.default', 'PATCH', params);
-          return { success: true, data: res, message: 'Pengaturan website berhasil disimpan' };
+
+          // Read existing cloud JSON in announcement_banner so we don't overwrite other extended fields
+          try {
+            const existingWs = await supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => []);
+            if (existingWs && existingWs[0] && typeof existingWs[0].announcement_banner === 'string' && existingWs[0].announcement_banner.trim().startsWith('{')) {
+              mergedExt = { ...JSON.parse(existingWs[0].announcement_banner), ...mergedExt };
+            }
+          } catch (_) {}
+
+          EXT_KEYS.forEach(k => {
+            if (params[k] !== undefined) mergedExt[k] = params[k];
+          });
+
+          try {
+            localStorage.setItem('siy_school_ext', JSON.stringify(mergedExt));
+          } catch (_) {}
+
+          const safeWsPayload = { updated_at: new Date().toISOString() };
+          VALID_WEB_SETTINGS_COLS.forEach(col => {
+            if (params[col] !== undefined && col !== 'id') {
+              safeWsPayload[col] = params[col];
+            }
+          });
+          if (params.name && !safeWsPayload.school_name) safeWsPayload.school_name = params.name;
+          if (params.whatsapp_number && !safeWsPayload.whatsapp) safeWsPayload.whatsapp = params.whatsapp_number;
+          safeWsPayload.announcement_banner = JSON.stringify(mergedExt);
+
+          let res = null;
+          try {
+            res = await supabaseRest('web_settings?id=eq.default', 'PATCH', safeWsPayload);
+            if (!res || res.length === 0) {
+              res = await supabaseRest('web_settings', 'POST', { id: 'default', ...safeWsPayload }).catch(() => []);
+            }
+          } catch (wsErr) {
+            console.warn('web_settings primary patch warning, retrying core cols:', wsErr);
+            const minimalWs = {
+              school_name: safeWsPayload.school_name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA',
+              phone: safeWsPayload.phone,
+              whatsapp: safeWsPayload.whatsapp,
+              email: safeWsPayload.email,
+              address: safeWsPayload.address,
+              announcement_banner: JSON.stringify(mergedExt)
+            };
+            Object.keys(minimalWs).forEach(k => minimalWs[k] === undefined && delete minimalWs[k]);
+            res = await supabaseRest('web_settings?id=eq.default', 'PATCH', minimalWs).catch(() => []);
+          }
+
+          // Sync extended JSON to schools.wa_gateway_token as well so schools/get on other devices also receives it
+          try {
+            const schSync = { wa_gateway_token: JSON.stringify(mergedExt), updated_at: new Date().toISOString() };
+            if (params.school_name || params.name) schSync.name = params.school_name || params.name;
+            if (params.phone) schSync.phone = params.phone;
+            if (params.email) schSync.email = params.email;
+            if (params.address) schSync.address = params.address;
+            await supabaseRest('schools?id=eq.SCH-001', 'PATCH', schSync).catch(() => {});
+          } catch (_) {}
+
+          return { success: true, data: { ...(res && res[0] ? res[0] : safeWsPayload), ...mergedExt }, message: 'Pengaturan website berhasil disimpan' };
         }
       }
 
@@ -597,92 +737,201 @@
       // 1C. PORTAL SISWA (BIODATA, DOKUMEN, SPP, AKADEMIK)
       // -------------------------------------------------------------
       if (module === 'siswa') {
-        const studentId = params.student_id || (currentUser ? (currentUser.student_id || currentUser.id) : null);
+        const studentId = params.student_id || (currentUser ? currentUser.student_id : null);
+
+        async function resolveCurrentStudentRecord() {
+          let stu = null;
+          if (studentId && String(studentId).startsWith('STU-')) {
+            const res = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`).catch(() => []);
+            if (res && res.length > 0) stu = res[0];
+          }
+          if (!stu && currentUser && currentUser.id) {
+            const res = await supabaseRest(`students?user_id=eq.${encodeURIComponent(currentUser.id)}&select=*`).catch(() => []);
+            if (res && res.length > 0) stu = res[0];
+          }
+          if (!stu && currentUser && currentUser.nis) {
+            const res = await supabaseRest(`students?nis=eq.${encodeURIComponent(currentUser.nis)}&select=*`).catch(() => []);
+            if (res && res.length > 0) stu = res[0];
+          }
+          if (!stu && studentId) {
+            const res = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`).catch(() => []);
+            if (res && res.length > 0) stu = res[0];
+          }
+          return stu;
+        }
 
         if (action === 'get_profile') {
-          let student = null;
-          if (currentUser && currentUser.id) {
-            const res = await supabaseRest(`students?user_id=eq.${currentUser.id}&select=*`);
-            if (res && res.length > 0) student = res[0];
-          }
-          if (!student && studentId) {
-            const res = await supabaseRest(`students?id=eq.${studentId}&select=*`);
-            if (res && res.length > 0) student = res[0];
+          let student = await resolveCurrentStudentRecord();
+          if (student && !student.registration_number && currentUser) {
+            try {
+              const regQuery = currentUser.username && String(currentUser.username).startsWith('REG')
+                ? `ppdb_registrations?registration_number=eq.${encodeURIComponent(currentUser.username)}&select=*`
+                : `ppdb_registrations?full_name=eq.${encodeURIComponent(student.full_name || currentUser.full_name || '')}&select=*`;
+              const regs = await supabaseRest(regQuery).catch(() => []);
+              if (regs && regs[0]) {
+                student.registration_number = regs[0].registration_number || regs[0].registration_no;
+                student.status_pendaftaran = regs[0].status || student.status_pendaftaran;
+                if (!student.photo_url && regs[0].photo_url) student.photo_url = regs[0].photo_url;
+              }
+            } catch (_) {}
           }
           return { success: true, data: student || {} };
         }
 
         if (action === 'update_biodata') {
-          let id = studentId;
-          if (!id && currentUser && currentUser.id) {
-            const res = await supabaseRest(`students?user_id=eq.${currentUser.id}&select=id`);
-            if (res && res.length > 0) id = res[0].id;
-          }
+          const stuRecord = await resolveCurrentStudentRecord();
+          let id = (stuRecord && stuRecord.id) || studentId;
           if (!id) return { success: false, message: 'Data siswa tidak ditemukan' };
 
           const payload = { ...params };
           delete payload.student_id;
           delete payload.id;
-          const res = await supabaseRest(`students?id=eq.${id}`, 'PATCH', payload);
+          const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
 
-          // Sinkronkan nama lengkap ke tabel users
+          // Sinkronkan nama lengkap & telepon ke tabel users
           const newName = payload.full_name || payload.name;
-          if (newName && currentUser && currentUser.id) {
-            await supabaseRest(`users?id=eq.${currentUser.id}`, 'PATCH', { full_name: newName }).catch(() => {});
+          const newPhone = payload.parent_phone || payload.phone;
+          if (currentUser && currentUser.id && (newName || newPhone)) {
+            const uPatch = {};
+            if (newName) { uPatch.full_name = newName; uPatch.name = newName; }
+            if (newPhone) uPatch.phone = newPhone;
+            await supabaseRest(`users?id=eq.${encodeURIComponent(currentUser.id)}`, 'PATCH', uPatch).catch(() => {});
           }
+
+          // Sinkronkan juga ke ppdb_registrations jika merupakan calon_siswa / memiliki data PPDB
+          try {
+            const regPatch = {};
+            if (newName) { regPatch.full_name = newName; regPatch.student_name = newName; regPatch.child_name = newName; }
+            if (payload.nickname !== undefined) regPatch.nickname = payload.nickname;
+            if (payload.gender !== undefined) { regPatch.gender = payload.gender; regPatch.student_gender = payload.gender; }
+            if (payload.birth_place !== undefined) { regPatch.birth_place = payload.birth_place; regPatch.student_birth_place = payload.birth_place; }
+            if (payload.birth_date !== undefined) { regPatch.birth_date = payload.birth_date; regPatch.student_birth_date = payload.birth_date; }
+            if (payload.father_name !== undefined) { regPatch.father_name = payload.father_name; regPatch.parent_name = payload.father_name; }
+            if (payload.mother_name !== undefined) regPatch.mother_name = payload.mother_name;
+            if (newPhone !== undefined) { regPatch.parent_phone = newPhone; regPatch.phone = newPhone; }
+            if (payload.parent_email !== undefined) regPatch.parent_email = payload.parent_email;
+            if (payload.address !== undefined) regPatch.address = payload.address;
+            if (Object.keys(regPatch).length > 0 && currentUser) {
+              const regFilter = (currentUser.username && String(currentUser.username).startsWith('REG'))
+                ? `registration_number=eq.${encodeURIComponent(currentUser.username)}`
+                : `full_name=eq.${encodeURIComponent((stuRecord && stuRecord.full_name) || currentUser.full_name || '')}`;
+              await supabaseRest(`ppdb_registrations?${regFilter}`, 'PATCH', regPatch).catch(() => {});
+            }
+          } catch (_) {}
 
           return { success: true, data: res, message: 'Biodata berhasil diperbarui' };
         }
 
         if (action === 'get_documents') {
-          let id = studentId;
-          if (!id && currentUser && currentUser.id) {
-            const res = await supabaseRest(`students?user_id=eq.${currentUser.id}&select=id`);
-            if (res && res.length > 0) id = res[0].id;
+          const stuRecord = await resolveCurrentStudentRecord();
+          let id = (stuRecord && stuRecord.id) || studentId;
+          let docs = [];
+          if (id) {
+            docs = await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.desc`).catch(() => []) || [];
           }
-          const docs = await supabaseRest(`student_documents?student_id=eq.${id}&select=*&order=created_at.desc`).catch(() => []);
+          // Fallback: jika tabel student_documents belum memiliki entri, periksa dari ppdb_registrations / stuRecord
+          if (docs.length === 0 && (stuRecord || currentUser)) {
+            try {
+              const nameLookup = (stuRecord && stuRecord.full_name) || (currentUser && currentUser.full_name) || '';
+              const regNoLookup = (stuRecord && stuRecord.registration_number) || (currentUser && currentUser.username) || '';
+              let regs = [];
+              if (regNoLookup && String(regNoLookup).startsWith('REG')) {
+                regs = await supabaseRest(`ppdb_registrations?registration_number=eq.${encodeURIComponent(regNoLookup)}&select=*`).catch(() => []);
+              }
+              if ((!regs || regs.length === 0) && nameLookup) {
+                regs = await supabaseRest(`ppdb_registrations?full_name=eq.${encodeURIComponent(nameLookup)}&select=*`).catch(() => []);
+              }
+              const r = (regs && regs[0]) || stuRecord || {};
+              if (r.photo_url) docs.push({ id: 'DOC-FOTO', student_id: id, document_type: 'pas_foto', file_name: 'Pas Foto 3x4', file_url: r.photo_url, is_verified: true, created_at: r.created_at });
+              if (r.birth_certificate_url) docs.push({ id: 'DOC-AKTA', student_id: id, document_type: 'akta_kelahiran', file_name: 'Akta Kelahiran', file_url: r.birth_certificate_url, is_verified: true, created_at: r.created_at });
+              if (r.family_card_url) docs.push({ id: 'DOC-KK', student_id: id, document_type: 'kartu_keluarga', file_name: 'Kartu Keluarga', file_url: r.family_card_url, is_verified: true, created_at: r.created_at });
+            } catch (_) {}
+          }
           return { success: true, data: docs || [] };
         }
 
         if (action === 'upload_document') {
-          let id = studentId;
-          if (!id && currentUser && currentUser.id) {
-            const res = await supabaseRest(`students?user_id=eq.${currentUser.id}&select=id`);
-            if (res && res.length > 0) id = res[0].id;
-          }
+          const stuRecord = await resolveCurrentStudentRecord();
+          let id = (stuRecord && stuRecord.id) || studentId;
           if (!id) return { success: false, message: 'Data siswa tidak ditemukan' };
+
+          const rawType = (params.document_type || 'lainnya').toLowerCase();
+          const normTypeMap = {
+            foto: 'pas_foto',
+            pas_foto: 'pas_foto',
+            kk: 'kartu_keluarga',
+            kartu_keluarga: 'kartu_keluarga',
+            akte: 'akta_kelahiran',
+            akta: 'akta_kelahiran',
+            akta_kelahiran: 'akta_kelahiran'
+          };
+          const canonicalType = normTypeMap[rawType] || rawType;
 
           let fileUrl = params.file_url;
           if (params.file) {
-            fileUrl = await uploadToSupabaseStorage(params.file, `doc_${params.document_type || 'berkas'}`);
+            fileUrl = await uploadToSupabaseStorage(params.file, `doc_${canonicalType}`);
           }
           if (!fileUrl) return { success: false, message: 'Gagal mengunggah file dokumen' };
 
-          const docObj = {
-            id: 'DOC-' + Date.now(),
-            student_id: id,
-            document_type: params.document_type || 'lainnya',
-            file_name: params.file_name || 'Berkas Dokumen',
-            file_url: fileUrl,
-            file_size: params.file_size || 0,
-            is_verified: false,
-            created_at: new Date().toISOString()
-          };
-          await supabaseRest('student_documents', 'POST', docObj);
+          // Cek apakah dokumen dengan tipe yang sama sudah ada untuk siswa ini agar tidak duplikat
+          const existingDocs = await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(id)}&select=*`).catch(() => []) || [];
+          const sameTypeDoc = existingDocs.find(d => (normTypeMap[(d.document_type || '').toLowerCase()] || d.document_type) === canonicalType && canonicalType !== 'lainnya');
+
+          let docObj;
+          if (sameTypeDoc) {
+            docObj = {
+              ...sameTypeDoc,
+              document_type: canonicalType,
+              file_name: params.file_name || sameTypeDoc.file_name || 'Berkas Dokumen',
+              file_url: fileUrl,
+              file_size: params.file_size || 0,
+              updated_at: new Date().toISOString()
+            };
+            await supabaseRest(`student_documents?id=eq.${encodeURIComponent(sameTypeDoc.id)}`, 'PATCH', {
+              document_type: canonicalType,
+              file_name: docObj.file_name,
+              file_url: fileUrl,
+              file_size: docObj.file_size,
+              updated_at: docObj.updated_at
+            }).catch(() => {});
+          } else {
+            docObj = {
+              id: 'DOC-' + Date.now(),
+              student_id: id,
+              document_type: canonicalType,
+              file_name: params.file_name || 'Berkas Dokumen',
+              file_url: fileUrl,
+              file_size: params.file_size || 0,
+              is_verified: false,
+              created_at: new Date().toISOString()
+            };
+            await supabaseRest('student_documents', 'POST', docObj);
+          }
+
+          if (canonicalType === 'pas_foto') {
+            await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', { photo_url: fileUrl }).catch(() => {});
+          }
 
           const docColMap = {
             pas_foto: 'photo_url',
+            foto: 'photo_url',
             akta_kelahiran: 'birth_certificate_url',
-            kartu_keluarga: 'family_card_url'
+            akte: 'birth_certificate_url',
+            akta: 'birth_certificate_url',
+            kartu_keluarga: 'family_card_url',
+            kk: 'family_card_url'
           };
-          const docType = params.document_type;
-          if (docColMap[docType]) {
+          const targetCol = docColMap[canonicalType] || docColMap[rawType];
+          if (targetCol) {
             try {
-              await supabaseRest(
-                `ppdb_registrations?or=(student_id.eq.${encodeURIComponent(id)},full_name.eq.${encodeURIComponent(currentUser?.full_name || currentUser?.name || '')})`,
-                'PATCH',
-                { [docColMap[docType]]: fileUrl }
-              );
+              const nameMatch = (stuRecord && stuRecord.full_name) || currentUser?.full_name || currentUser?.name || '';
+              if (nameMatch) {
+                await supabaseRest(
+                  `ppdb_registrations?full_name=eq.${encodeURIComponent(nameMatch)}`,
+                  'PATCH',
+                  { [targetCol]: fileUrl }
+                ).catch(() => {});
+              }
             } catch (_) {}
           }
 
@@ -690,14 +939,11 @@
         }
 
         if (action === 'get_spp') {
-          let id = studentId;
-          if (!id && currentUser && currentUser.id) {
-            const res = await supabaseRest(`students?user_id=eq.${currentUser.id}&select=id`);
-            if (res && res.length > 0) id = res[0].id;
-          }
+          const stuRecord = await resolveCurrentStudentRecord();
+          let id = (stuRecord && stuRecord.id) || studentId;
           const [invoices, payments] = await Promise.all([
-            supabaseRest(`invoices?student_id=eq.${id}&select=*&order=created_at.desc`).catch(() => []),
-            supabaseRest(`payments?student_id=eq.${id}&select=*&order=created_at.desc`).catch(() => [])
+            id ? supabaseRest(`invoices?student_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.desc`).catch(() => []) : [],
+            id ? supabaseRest(`payments?student_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.desc`).catch(() => []) : []
           ]);
           return { success: true, data: { invoices: invoices || [], payments: payments || [] } };
         }
@@ -732,10 +978,10 @@
         const ppdbThisMonth = (ppdb || []).filter(p => String(p.created_at || '').startsWith(currentMonthPrefix)).length;
 
         const stats = {
-          total_students: activeStudents,
+          total_students: (students || []).length || activeStudents,
           active_students: activeStudents,
           total_students_active: activeStudents,
-          total_teachers: activeTeachers,
+          total_teachers: (teachers || []).length || activeTeachers,
           total_teachers_active: activeTeachers,
           total_classes: (classes || []).length,
           total_parents: activeStudents,
@@ -961,8 +1207,19 @@
         if (action === 'list') {
           let query = 'classes?select=*&order=name.asc';
           if (params.level) query += `&level=eq.${encodeURIComponent(params.level)}`;
-          const classes = await supabaseRest(query);
-          return { success: true, data: classes };
+          const [classes, activeStu] = await Promise.all([
+            supabaseRest(query),
+            supabaseRest('students?status=eq.active&select=id,class_id').catch(() => [])
+          ]);
+          const countMap = {};
+          (activeStu || []).forEach(s => {
+            if (s.class_id) countMap[s.class_id] = (countMap[s.class_id] || 0) + 1;
+          });
+          const mappedClasses = (classes || []).map(c => ({
+            ...c,
+            student_count: countMap[c.id] !== undefined ? countMap[c.id] : (Number(c.student_count) || 0)
+          }));
+          return { success: true, data: mappedClasses };
         }
         if (action === 'get') {
           const classes = await supabaseRest(`classes?id=eq.${encodeURIComponent(params.id)}&select=*`);
@@ -1208,15 +1465,31 @@
           let studentId = params.student_id || params.id;
           const nis = params.nis;
           let docs = [];
+          let stuRow = null;
           try {
             if (!studentId && nis) {
-              const matchedStudent = await supabaseRest(`students?nis=eq.${encodeURIComponent(nis)}&select=id`);
+              const matchedStudent = await supabaseRest(`students?nis=eq.${encodeURIComponent(nis)}&select=*`);
               if (matchedStudent && matchedStudent.length > 0) {
-                studentId = matchedStudent[0].id;
+                stuRow = matchedStudent[0];
+                studentId = stuRow.id;
               }
+            } else if (studentId) {
+              const matchedStudent = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`).catch(() => []);
+              if (matchedStudent && matchedStudent.length > 0) stuRow = matchedStudent[0];
             }
             if (studentId) {
-              docs = await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(studentId)}&order=created_at.desc`) || [];
+              docs = await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(studentId)}&order=created_at.desc`).catch(() => []) || [];
+            }
+            // Fallback ke ppdb_registrations jika berkas belum tersalin ke student_documents
+            if (docs.length === 0 && stuRow) {
+              const stuName = stuRow.full_name || stuRow.name || '';
+              if (stuName) {
+                const regs = await supabaseRest(`ppdb_registrations?full_name=eq.${encodeURIComponent(stuName)}&select=*`).catch(() => []);
+                const r = (regs && regs[0]) || stuRow;
+                if (r.photo_url) docs.push({ document_type: 'pas_foto', file_name: 'Pas Foto 3x4', file_url: r.photo_url, is_verified: true });
+                if (r.birth_certificate_url) docs.push({ document_type: 'akta_kelahiran', file_name: 'Akta Kelahiran', file_url: r.birth_certificate_url, is_verified: true });
+                if (r.family_card_url) docs.push({ document_type: 'kartu_keluarga', file_name: 'Kartu Keluarga', file_url: r.family_card_url, is_verified: true });
+              }
             }
           } catch (_) { docs = []; }
           return { success: true, data: docs };
@@ -1313,11 +1586,18 @@
           return { success: true, message: 'Tagihan berhasil dihapus' };
         }
         if (action === 'mark_paid') {
+          const nowIso = new Date().toISOString();
           const updated = await supabaseRest(`invoices?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', {
             status: 'paid',
-            paid_at: new Date().toISOString(),
+            paid_at: nowIso,
             payment_method: 'tunai'
           });
+          // Selesaikan juga payment yang berstatus menunggu_verifikasi untuk invoice ini agar tidak menyangkut
+          await supabaseRest(`payments?invoice_id=eq.${encodeURIComponent(params.id)}&status=eq.menunggu_verifikasi`, 'PATCH', {
+            status: 'verified',
+            verified_by: currentUser ? currentUser.full_name : 'Admin',
+            verified_at: nowIso
+          }).catch(() => {});
           return { success: true, data: updated[0], message: 'Tagihan ditandai Lunas (Offline)' };
         }
       }
@@ -1502,6 +1782,10 @@
           const address = params.address || '';
           const password = params.password || (typeof birthDate === 'string' ? birthDate.replace(/-/g, '') : '123456');
 
+          const userId = 'USR-' + Date.now();
+          const studentId = 'STU-' + Date.now();
+          const emailForLogin = parentEmail || `${regNum.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
+
           const cleanMeta = { ...params };
           delete cleanMeta.photo_file;
           delete cleanMeta.birth_certificate_file;
@@ -1515,6 +1799,8 @@
           delete cleanMeta.notes;
           cleanMeta.password = password;
           cleanMeta.account_password = password;
+          cleanMeta.user_id = userId;
+          cleanMeta.student_id = studentId;
           cleanMeta.uploaded_files = {
             photo_url: photoUrl || '',
             birth_certificate_url: certUrl || '',
@@ -1571,47 +1857,50 @@
             form_metadata: cleanMeta
           };
 
-          // 1. Simpan ke tabel ppdb_registrations dengan penanganan skema
+          // 1. Simpan ke tabel ppdb_registrations dengan penanganan skema bertingkat
           let res = null;
           try {
             res = await supabaseRest('ppdb_registrations', 'POST', regPayload);
           } catch (err) {
-            console.warn('PPDB insert primary failed, trying alternate schema:', err);
-            const altPayload = {
-              id,
-              registration_number: regNum,
-              registration_no: regNum,
-              full_name: studentName,
-              child_name: studentName,
-              gender: gender,
-              birth_place: birthPlace,
-              birth_date: birthDate,
-              father_name: parentName,
-              phone: parentPhone,
-              address: address,
-              photo_url: photoUrl || '',
-              birth_certificate_url: certUrl || '',
-              family_card_url: kkUrl || '',
-              status: 'pending'
-            };
-            res = await supabaseRest('ppdb_registrations', 'POST', altPayload).catch(e => {
-              console.warn('Alternate PPDB insert fallback:', e);
-              return [regPayload];
-            });
+            try {
+              const safeRegPayload = { ...regPayload };
+              delete safeRegPayload.password;
+              delete safeRegPayload.account_password;
+              res = await supabaseRest('ppdb_registrations', 'POST', safeRegPayload);
+            } catch (err2) {
+              console.warn('PPDB insert safeRegPayload failed, trying minimal schema:', err2);
+              const altPayload = {
+                id,
+                registration_number: regNum,
+                registration_no: regNum,
+                full_name: studentName,
+                child_name: studentName,
+                gender: gender,
+                birth_place: birthPlace,
+                birth_date: birthDate,
+                father_name: parentName,
+                phone: parentPhone,
+                address: address,
+                photo_url: photoUrl || '',
+                birth_certificate_url: certUrl || '',
+                family_card_url: kkUrl || '',
+                status: 'pending'
+              };
+              res = await supabaseRest('ppdb_registrations', 'POST', altPayload).catch(e => {
+                console.warn('Alternate PPDB insert fallback:', e);
+                return [regPayload];
+              });
+            }
           }
 
           // Safe local persistence fallback
           try {
             const localRegs = JSON.parse(localStorage.getItem('siy_local_ppdb_regs') || '[]');
-            localRegs.unshift({ ...regPayload, id, registration_number: regNum, registration_no: regNum, created_at: new Date().toISOString() });
+            localRegs.unshift({ ...regPayload, password, account_password: password, id, registration_number: regNum, registration_no: regNum, created_at: new Date().toISOString() });
             localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(localRegs));
           } catch (_) {}
 
           // 2. Buat akun login Portal Siswa untuk Calon Siswa
-          const userId = 'USR-' + Date.now();
-          const studentId = 'STU-' + Date.now();
-          const emailForLogin = parentEmail || `${regNum.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
-
           const newUser = {
             id: userId,
             email: emailForLogin,
@@ -1727,7 +2016,13 @@
           if (!regs || regs.length === 0) {
             return { success: false, message: 'Nomor pendaftaran tidak ditemukan' };
           }
-          return { success: true, data: { registration: regs[0] }, registration: regs[0] };
+          const reg = { ...regs[0] };
+          if (reg.form_metadata && typeof reg.form_metadata === 'object') {
+            if (!reg.converted_nis && reg.form_metadata.converted_nis) reg.converted_nis = reg.form_metadata.converted_nis;
+            if (!reg.nis && reg.form_metadata.nis) reg.nis = reg.form_metadata.nis;
+            if (!reg.class_name && reg.form_metadata.class_name) reg.class_name = reg.form_metadata.class_name;
+          }
+          return { success: true, data: { registration: reg }, registration: reg };
         }
         if (action === 'period') {
           let p = null;
@@ -1746,10 +2041,6 @@
                 extra = { notes: p.announcement_notes };
               }
             }
-            try {
-              const cached = localStorage.getItem('siy_ppdb_schedule');
-              if (cached) Object.assign(extra, JSON.parse(cached));
-            } catch (_) {}
             Object.assign(p, extra);
             try {
               if (p.status) localStorage.setItem('siy_ppdb_status', p.status);
@@ -1805,8 +2096,20 @@
           let res = null;
           try {
             res = await supabaseRest(`ppdb_periods?id=eq.${encodeURIComponent(targetId)}`, 'PATCH', payload);
+            if (!res || res.length === 0) {
+              res = await supabaseRest('ppdb_periods', 'POST', {
+                id: targetId,
+                name: params.name || 'Gelombang 1',
+                ...payload
+              });
+            }
           } catch (e) {
-            console.warn('[SIYAYASAN] ppdb_periods update fallback:', e);
+            console.warn('[SIYAYASAN] ppdb_periods update fallback, trying POST:', e);
+            res = await supabaseRest('ppdb_periods', 'POST', {
+              id: targetId,
+              name: params.name || 'Gelombang 1',
+              ...payload
+            }).catch(() => null);
           }
           await recordActivityLog('UPDATE_PERIOD', 'ppdb', 'Mengubah pengaturan jadwal & status PPDB: ' + (params.status || 'open'), targetId);
           return { success: true, data: { ...(res && res[0] ? res[0] : payload), id: targetId, ...scheduleData }, message: 'Pengaturan gelombang & jadwal PPDB diperbarui' };
@@ -1816,7 +2119,22 @@
           const patchData = { ...params };
           delete patchData.id;
           delete patchData.token;
-          const res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(id)}`, 'PATCH', patchData);
+          if (patchData.email !== undefined) {
+            if (!patchData.parent_email) patchData.parent_email = patchData.email;
+            delete patchData.email;
+          }
+          let res = null;
+          try {
+            res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(id)}`, 'PATCH', patchData);
+          } catch (err) {
+            console.warn('PPDB update primary failed, retrying with safe columns:', err);
+            const safePatch = {};
+            const validCols = ['student_name', 'full_name', 'child_name', 'nickname', 'nik', 'form_type', 'student_gender', 'gender', 'student_birth_place', 'birth_place', 'student_birth_date', 'birth_date', 'parent_name', 'father_name', 'mother_name', 'parent_phone', 'phone', 'parent_email', 'address', 'level', 'status', 'notes', 'photo_url', 'birth_certificate_url', 'family_card_url', 'documents_url', 'form_metadata'];
+            for (const k of validCols) {
+              if (patchData[k] !== undefined) safePatch[k] = patchData[k];
+            }
+            res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(id)}`, 'PATCH', safePatch);
+          }
           return { success: true, data: (res && res[0]) || patchData, message: 'Data pendaftar berhasil diperbarui' };
         }
         if (action === 'delete') {
@@ -1889,10 +2207,12 @@
             `users?or=(email.eq.${encodeURIComponent(studentEmail)},username.eq.${encodeURIComponent(regNo)},email.eq.${encodeURIComponent(pendaftarEmail)})&select=*`
           ).catch(() => []);
 
-          let userId = (existingUsers && existingUsers[0]) ? existingUsers[0].id : ('USR-' + studentNis);
+          let userId = (existingUsers && existingUsers[0])
+            ? existingUsers[0].id
+            : ((reg.form_metadata && reg.form_metadata.user_id) || ('USR-' + studentNis));
           let stuId = (existingUsers && existingUsers[0] && existingUsers[0].student_id)
             ? existingUsers[0].student_id
-            : ('STU-' + String(Date.now()).slice(-5));
+            : ((reg.form_metadata && reg.form_metadata.student_id) || ('STU-' + String(Date.now()).slice(-5)));
 
           const userPayloadToSave = {
             email: studentEmail,
@@ -1976,6 +2296,30 @@
             await supabaseRest('students', 'POST', studentPayload);
           }
 
+          // Pastikan dokumen PPDB terhubung dengan stuId di student_documents
+          try {
+            const existingDocs = await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(stuId)}&select=*`).catch(() => []);
+            if (!existingDocs || existingDocs.length === 0) {
+              const docMap = reg.documents_url && typeof reg.documents_url === 'object' ? reg.documents_url : {};
+              const uploadedMap = reg.form_metadata && reg.form_metadata.uploaded_files ? reg.form_metadata.uploaded_files : {};
+              const docsToSync = [
+                { type: 'pas_foto', name: 'Pas Foto 3x4', url: reg.photo_url || docMap.photo || uploadedMap.photo_url },
+                { type: 'akta_kelahiran', name: 'Akta Kelahiran', url: reg.birth_certificate_url || docMap.birth_certificate || uploadedMap.birth_certificate_url },
+                { type: 'kartu_keluarga', name: 'Kartu Keluarga', url: reg.family_card_url || docMap.family_card || uploadedMap.family_card_url }
+              ].filter(d => d.url);
+              for (const doc of docsToSync) {
+                await supabaseRest('student_documents', 'POST', {
+                  id: 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                  student_id: stuId,
+                  document_type: doc.type,
+                  file_name: doc.name,
+                  file_url: doc.url,
+                  is_verified: true
+                }).catch(() => {});
+              }
+            }
+          } catch (_) {}
+
           // Update jumlah siswa di kelas tujuan
           if (targetClassId) {
             supabaseRest(`students?class_id=eq.${encodeURIComponent(targetClassId)}&status=eq.active&select=id`).then(list => {
@@ -1988,22 +2332,20 @@
             ...(reg.form_metadata || {}),
             converted_nis: studentNis,
             nis: studentNis,
-            class_name: targetClassName
+            class_name: targetClassName,
+            student_id: stuId,
+            user_id: userId
           };
           try {
             await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
               status: 'converted',
-              converted_nis: studentNis,
-              nis: studentNis,
-              class_name: targetClassName,
-              form_metadata: metaWithNis,
-              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
+              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`,
+              form_metadata: metaWithNis
             });
           } catch (_) {
             await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
               status: 'converted',
-              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`,
-              form_metadata: metaWithNis
+              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
             }).catch(() => {});
           }
           await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
@@ -2040,7 +2382,8 @@
           }
 
           // 9. Ringkasan Kredensial Siswa Baru
-          const origin = typeof window !== 'undefined' ? window.location.origin : '';
+          const origin = typeof window !== 'undefined' && window.location ? window.location.origin : '';
+          const loginUrl = (origin || 'https://siyayasan-portal.vercel.app') + '/login.html';
           const activeInitialPass = customPpdbPass || birthDatePassword;
           const passNotes = customPpdbPass ? `${customPpdbPass} (Password Pendaftaran PPDB)` : `${birthDatePassword} (Tanggal Lahir: DDMMYYYY)`;
           const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${passNotes}\nLink Portal: ${loginUrl}`;
@@ -2071,7 +2414,14 @@
       if (module === 'news') {
         if (action === 'list') {
           const news = await supabaseRest('news?select=*&order=published_at.desc');
-          return { success: true, data: news, raw: { items: news } };
+          let list = Array.isArray(news) ? news : [];
+          if (params.status === 'published' || params.is_published === 'true' || params.is_published === true || params.published_only) {
+            list = list.filter(n => n.status !== 'draft' && n.is_published !== false);
+          }
+          if (params.exclude_id) {
+            list = list.filter(n => String(n.id) !== String(params.exclude_id) && String(n.slug) !== String(params.exclude_id));
+          }
+          return { success: true, data: list, raw: { items: list } };
         }
         if (action === 'get') {
           const res = await supabaseRest(`news?or=(id.eq.${encodeURIComponent(params.id || '')},slug.eq.${encodeURIComponent(params.slug || '')})&select=*`);
@@ -2135,10 +2485,13 @@
       if (module === 'announcements') {
         if (action === 'list') {
           const ann = await supabaseRest('announcements?select=*&order=published_at.desc');
-          const mapped = (ann || []).map(r => ({
+          let mapped = (ann || []).map(r => ({
             ...r,
             category: r.category || r.target_audience || r.target_role || 'Edaran'
           }));
+          if (params.status === 'published' || params.is_published === 'true' || params.is_published === true || params.published_only) {
+            mapped = mapped.filter(a => a.status !== 'draft' && a.is_published !== false);
+          }
           return { success: true, data: mapped, raw: { items: mapped } };
         }
         if (action === 'get') {
@@ -2194,7 +2547,10 @@
       if (module === 'events') {
         if (action === 'list') {
           const evts = await supabaseRest('events?select=*&order=event_date.asc').catch(() => supabaseRest('events?select=*'));
-          const normalizedEvts = (evts || []).map(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }));
+          let normalizedEvts = (evts || []).map(e => ({ ...e, date: e.date || e.event_date, event_date: e.event_date || e.date }));
+          if (params.status === 'published' || params.is_published === 'true' || params.is_published === true || params.published_only) {
+            normalizedEvts = normalizedEvts.filter(e => e.status !== 'draft' && e.is_published !== false);
+          }
           return { success: true, data: normalizedEvts, raw: { items: normalizedEvts } };
         }
         if (action === 'create') {
@@ -2292,9 +2648,31 @@
         if (action === 'get') {
           const schools = await supabaseRest('schools?select=*');
           const sch = (schools && schools[0]) ? { ...schools[0] } : {};
+          if (sch.wa_gateway_token && typeof sch.wa_gateway_token === 'string' && sch.wa_gateway_token.trim().startsWith('{')) {
+            try {
+              const extFromDb = JSON.parse(sch.wa_gateway_token);
+              Object.assign(sch, extFromDb);
+            } catch (_) {}
+          }
+          if (!sch.visi || !sch.operational_hours) {
+            try {
+              const wsRows = await supabaseRest('web_settings?id=eq.default&select=*');
+              if (Array.isArray(wsRows) && wsRows[0] && wsRows[0].announcement_banner && wsRows[0].announcement_banner.trim().startsWith('{')) {
+                const wsExt = JSON.parse(wsRows[0].announcement_banner);
+                for (const [k, v] of Object.entries(wsExt)) {
+                  if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+                }
+              }
+            } catch (_) {}
+          }
           try {
             const cachedExt = localStorage.getItem('siy_school_ext');
-            if (cachedExt) Object.assign(sch, JSON.parse(cachedExt));
+            if (cachedExt) {
+              const parsedLocal = JSON.parse(cachedExt);
+              for (const [k, v] of Object.entries(parsedLocal)) {
+                if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+              }
+            }
           } catch (_) {}
           return { success: true, data: sch };
         }
@@ -2304,14 +2682,21 @@
           delete fullPayload.id;
           fullPayload.updated_at = new Date().toISOString();
 
-          // Simpan selalu ke cache lokal agar langsung aktif
+          // Baca data sebelumnya dari DB atau localStorage agar tidak kehilangan field lain
           let existingExt = {};
           try {
+            const curSchools = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}&select=wa_gateway_token`);
+            if (curSchools && curSchools[0] && curSchools[0].wa_gateway_token && curSchools[0].wa_gateway_token.trim().startsWith('{')) {
+              existingExt = JSON.parse(curSchools[0].wa_gateway_token);
+            }
+          } catch (_) {}
+          try {
             const raw = localStorage.getItem('siy_school_ext');
-            if (raw) existingExt = JSON.parse(raw);
+            if (raw) existingExt = { ...JSON.parse(raw), ...existingExt };
           } catch (_) {}
 
           const extPayload = {
+            ...existingExt,
             campus_note: params.campus_note !== undefined ? params.campus_note : existingExt.campus_note,
             maps_url: params.maps_url !== undefined ? params.maps_url : existingExt.maps_url,
             maps_embed_url: params.maps_embed_url !== undefined ? params.maps_embed_url : existingExt.maps_embed_url,
@@ -2339,17 +2724,31 @@
             sessionStorage.setItem('siyayasan_school_profile', JSON.stringify({ ...fullPayload, ...extPayload }));
           } catch (_) {}
 
+          const validSchoolCols = [
+            'name', 'tagline', 'npsn', 'address', 'campus_note', 'phone', 'whatsapp_number', 'email', 'website',
+            'logo_url', 'footer_bg_url', 'maps_url', 'maps_embed_url', 'instagram_url', 'youtube_url', 'facebook_url',
+            'headmaster_name', 'pembina', 'pengawas', 'ketua_yayasan', 'sekretaris', 'bendahara', 'wa_gateway_token', 'updated_at'
+          ];
+          const dbSchoolPayload = {
+            wa_gateway_token: JSON.stringify(extPayload),
+            updated_at: fullPayload.updated_at
+          };
+          for (const col of validSchoolCols) {
+            if (fullPayload[col] !== undefined) dbSchoolPayload[col] = fullPayload[col];
+          }
+
           try {
-            const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', fullPayload);
-            return { success: true, data: res[0] || fullPayload, message: 'Identitas & tautan sekolah berhasil diperbarui' };
+            const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', dbSchoolPayload);
+            return { success: true, data: { ...(res && res[0] ? res[0] : dbSchoolPayload), ...extPayload }, message: 'Identitas & profil sekolah berhasil diperbarui' };
           } catch (patchErr) {
-            console.warn('Full school patch failed, fallback to core fields:', patchErr.message);
+            console.warn('School patch fallback to core fields:', patchErr.message);
             const corePayload = {
-              name: params.name,
-              address: params.address,
-              phone: params.phone,
-              email: params.email
+              wa_gateway_token: JSON.stringify(extPayload)
             };
+            if (params.name) corePayload.name = params.name;
+            if (params.address) corePayload.address = params.address;
+            if (params.phone) corePayload.phone = params.phone;
+            if (params.email) corePayload.email = params.email;
             if (params.pembina) corePayload.pembina = params.pembina;
             if (params.pengawas) corePayload.pengawas = params.pengawas;
             if (params.ketua_yayasan) corePayload.ketua_yayasan = params.ketua_yayasan;
@@ -2357,8 +2756,8 @@
             if (params.bendahara) corePayload.bendahara = params.bendahara;
             if (params.headmaster_name) corePayload.headmaster_name = params.headmaster_name;
 
-            const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', corePayload);
-            return { success: true, data: { ...corePayload, ...extPayload }, message: 'Identitas & tautan sekolah berhasil diperbarui' };
+            const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', corePayload).catch(() => []);
+            return { success: true, data: { ...(res && res[0] ? res[0] : corePayload), ...extPayload }, message: 'Identitas & profil sekolah berhasil diperbarui' };
           }
         }
       }
@@ -2368,8 +2767,9 @@
         if (action === 'list') {
           let q = 'activity_logs?select=*&order=created_at.desc&limit=100';
           if (params.action) q += `&action=ilike.*${encodeURIComponent(params.action)}*`;
-          if (params.module) q += `&entity_type=ilike.*${encodeURIComponent(params.module)}*`;
+          if (params.module) q += `&module=ilike.*${encodeURIComponent(params.module)}*`;
           if (params.user_id) q += `&user_id=eq.${encodeURIComponent(params.user_id)}`;
+          if (params.date_from) q += `&created_at=gte.${encodeURIComponent(params.date_from)}`;
           if (params.search) q += `&or=(details.ilike.*${encodeURIComponent(params.search)}*,user_name.ilike.*${encodeURIComponent(params.search)}*)`;
           const logs = await supabaseRest(q).catch(() => []);
           const mapped = (logs || []).map(r => ({
@@ -2406,7 +2806,7 @@
             const inv = await supabaseRest('invoices?select=*').catch(() => []);
             let list = inv || [];
             if (params.month) {
-              list = list.filter(i => (i.due_date && i.due_date.startsWith(params.month)) || (i.period && i.period.includes(params.month)));
+              list = list.filter(i => (i.due_date && i.due_date.startsWith(params.month)) || (i.period && i.period.includes(params.month)) || (i.month && i.month.includes(params.month)));
             }
             rows = list.map((i, idx) => [
               idx + 1,
@@ -2468,13 +2868,17 @@
           if (rawItems.length === 0) return { success: false, message: 'Tidak ada data tagihan untuk diimpor' };
           const stuList = await supabaseRest('students?status=eq.active&select=id,nis,full_name').catch(() => []);
           let insertedCount = 0;
+          let skippedCount = 0;
           for (let i = 0; i < rawItems.length; i++) {
             const row = rawItems[i];
             const stu = (stuList || []).find(s =>
               (row.nis && s.nis && String(s.nis).trim() === String(row.nis).trim()) ||
               (row.student_name && s.full_name && s.full_name.toLowerCase().includes(String(row.student_name).toLowerCase().trim()))
-            ) || (stuList && stuList[0]);
-            if (!stu) continue;
+            );
+            if (!stu) {
+              skippedCount++;
+              continue;
+            }
             const invPayload = {
               id: 'INV-' + Date.now() + '-' + i,
               invoice_number: row.invoice_number || ('INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4) + '/' + (i + 1)),
@@ -2490,17 +2894,28 @@
             await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
             insertedCount++;
           }
-          return { success: true, count: insertedCount, message: `Berhasil mengimpor ${insertedCount} data tagihan ke dalam database!` };
+          return {
+            success: true,
+            count: insertedCount,
+            skipped: skippedCount,
+            message: `Berhasil mengimpor ${insertedCount} data tagihan ke dalam database${skippedCount > 0 ? ` (${skippedCount} baris dilewati karena NIS/Nama tidak cocok)` : ''}!`
+          };
         }
 
         if (action === 'import_students') {
           const rawItems = Array.isArray(params.items) ? params.items : [];
           if (rawItems.length === 0) return { success: false, message: 'Tidak ada data siswa untuk diimpor' };
+          const clsList = await supabaseRest('classes?select=id,name').catch(() => []);
           let insertedCount = 0;
           for (let i = 0; i < rawItems.length; i++) {
             const row = rawItems[i];
             const stuId = 'STU-' + Date.now() + '-' + i;
             const fullName = row.full_name || row.name || ('Siswa Baru ' + (i + 1));
+            const matchedClass = (clsList || []).find(c =>
+              row.class_name && c.name && c.name.toLowerCase().trim() === String(row.class_name).toLowerCase().trim()
+            );
+            const resolvedClassId = row.class_id || (matchedClass ? matchedClass.id : 'CLS-001');
+            const resolvedClassName = matchedClass ? matchedClass.name : (row.class_name || 'PAUD / TK');
             const stuPayload = {
               id: stuId,
               nis: row.nis || ('2026' + String(1000 + i)),
@@ -2511,9 +2926,9 @@
               gender: row.gender || 'L',
               birth_place: row.birth_place || 'Samarinda',
               birth_date: row.birth_date || '2020-01-01',
-              class_id: row.class_id || 'CLS-001',
-              class_name: row.class_name || 'PAUD / TK',
-              kelas_sekarang: row.class_name || 'PAUD / TK',
+              class_id: resolvedClassId,
+              class_name: resolvedClassName,
+              kelas_sekarang: resolvedClassName,
               parent_name: row.parent_name || row.father_name || 'Wali Siswa',
               father_name: row.father_name || row.parent_name || '',
               mother_name: row.mother_name || '',
@@ -2570,6 +2985,7 @@
               news: nws || [],
               galleries: gal || [],
               invoices: inv || [],
+              ppdb_registrations: reg || [],
               registrations: reg || []
             }
           };
@@ -2583,15 +2999,31 @@
           return { success: true, data: backupObj, backup: backupObj, message: 'Backup berhasil dibuat: ' + filename };
         }
         if (action === 'restore') {
-          const snapshot = params.data || params;
+          let snapshot = params.data || params;
+          if (params.id && !params.data && !params.tables) {
+            try {
+              const raw = localStorage.getItem('siy_backup_history');
+              if (raw) {
+                const list = JSON.parse(raw);
+                const found = list.find(b => b.id === params.id);
+                if (found) snapshot = found.data || found;
+              }
+            } catch (_) {}
+          }
           if (snapshot && typeof snapshot === 'object') {
             try {
               localStorage.setItem('siy_restored_snapshot', JSON.stringify({ restored_at: new Date().toISOString(), ...snapshot }));
             } catch (_) {}
             const tableMap = snapshot.tables || snapshot.data || snapshot;
+            const tableAliases = {
+              registrations: 'ppdb_registrations',
+              cms_settings: 'web_settings'
+            };
+            const validTables = ['schools', 'users', 'students', 'teachers', 'classes', 'ppdb_registrations', 'invoices', 'payments', 'news', 'announcements', 'events', 'galleries', 'web_settings'];
             if (typeof tableMap === 'object') {
-              for (const [tblName, rows] of Object.entries(tableMap)) {
-                if (Array.isArray(rows) && rows.length > 0 && ['students', 'teachers', 'classes', 'ppdb_registrations', 'invoices', 'news', 'cms_settings'].includes(tblName)) {
+              for (const [rawTblName, rows] of Object.entries(tableMap)) {
+                const tblName = tableAliases[rawTblName] || rawTblName;
+                if (Array.isArray(rows) && rows.length > 0 && validTables.includes(tblName)) {
                   for (const row of rows) {
                     try {
                       await supabaseRest(tblName, 'POST', row, { 'Prefer': 'resolution=merge-duplicates,return=representation' });

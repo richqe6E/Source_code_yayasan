@@ -386,14 +386,12 @@
 
       // Populate opsi periode / bulan secara dinamis
       const selMonth = document.getElementById('filter-inv-month');
-      if (selMonth && selMonth.options.length <= 1) {
-        const uniqueMonths = [...new Set(invoicesCache.map(i => i.period || i.month || i.description || '').filter(Boolean))];
-        uniqueMonths.forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = m;
-          selMonth.appendChild(opt);
-        });
+      if (selMonth) {
+        const prevVal = selMonth.value;
+        const defaultOpt = selMonth.options[0] ? selMonth.options[0].outerHTML : '<option value="">Semua Periode / Bulan</option>';
+        const uniqueMonths = [...new Set(invoicesCache.map(i => i.month || i.period || i.description || '').filter(Boolean))];
+        selMonth.innerHTML = defaultOpt + uniqueMonths.map(m => `<option value="${m}">${m}</option>`).join('');
+        selMonth.value = prevVal;
       }
 
       applyInvoicesFilter();
@@ -415,12 +413,17 @@
 
       // 1. Realtime Search (Nama, NIS, No Tagihan, Keterangan)
       if (search) {
-        list = list.filter(i => 
-          (i.invoice_number && i.invoice_number.toLowerCase().includes(search)) ||
-          (i.student_name && i.student_name.toLowerCase().includes(search)) ||
-          (i.description && i.description.toLowerCase().includes(search)) ||
-          (i.item_name && i.item_name.toLowerCase().includes(search))
-        );
+        list = list.filter(i => {
+          const stu = studentsCache.find(s => s.id === i.student_id);
+          const stuNis = stu && stu.nis ? String(stu.nis).toLowerCase() : '';
+          return (
+            (i.invoice_number && i.invoice_number.toLowerCase().includes(search)) ||
+            (i.student_name && i.student_name.toLowerCase().includes(search)) ||
+            (stuNis && stuNis.includes(search)) ||
+            (i.description && i.description.toLowerCase().includes(search)) ||
+            (i.item_name && i.item_name.toLowerCase().includes(search))
+          );
+        });
       }
 
       // 2. Filter Status Tagihan
@@ -769,6 +772,7 @@
       if (!inv) return;
       const s = studentsCache.find(x => x.id === inv.student_id) || {};
       const studentName = inv.student_name || s.full_name || '-';
+      const waliName = s.parent_name || s.father_name || s.mother_name || studentName;
       const nis = s.nis || '-';
       const className = s.class_name || s.kelas_sekarang || 'PAUD / TK Terpadu';
       const invNum = inv.invoice_number || ('INV/' + new Date().getFullYear() + '/SPP');
@@ -841,7 +845,7 @@
             <div class="ttd">
               <p>Wali Murid / Penyetor,</p>
               <br><br><br>
-              <p><strong>( ${studentName} )</strong></p>
+              <p><strong>( ${waliName} )</strong></p>
             </div>
             <div class="ttd">
               <p>Samarinda, ${paidAt}<br>Bagian Keuangan &amp; Kasir TU,</p>

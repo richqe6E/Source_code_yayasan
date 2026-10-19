@@ -329,7 +329,7 @@
         <div>• <strong>Lupa Password?</strong> Silakan hubungi admin sekolah untuk reset akun.</div>
       </div>
       <div class="space-y-2">
-        <a id="help-wa-link" href="https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20login%20SIAKAD%20Yayasan%20At%20Tarbiyyah%20Wijaya%20Kusuma" target="_blank" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-[0.98]">
+        <a id="help-wa-link" href="https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20login%20SIAKAD%20Yayasan%20At%20Tarbiyyah%20Wijaya%20Kusuma" target="_blank" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-[0.98]">
           <i class="fi fi-brands-whatsapp text-sm"></i>
           <span id="help-wa-text">Hubungi Admin TU via WhatsApp</span>
         </a>
@@ -529,7 +529,7 @@
 
           // Role Guard berdasarkan tab aktif
           const rawRole = (user.role && user.role.code) ? user.role.code : (user.role || '');
-          const isStudentRole = (rawRole === 'siswa_aktif' || rawRole === 'student' || rawRole === 'siswa');
+          const isStudentRole = (rawRole === 'siswa_aktif' || rawRole === 'calon_siswa' || rawRole === 'student' || rawRole === 'siswa');
           const isAdminRole = (rawRole === 'super_admin' || rawRole === 'admin' || rawRole === 'admin_tu' || rawRole === 'kepala_sekolah' || rawRole === 'staff');
 
           if (currentLoginMode === 'admin' && isStudentRole) {

@@ -322,10 +322,40 @@
 
         const typeLabels = {
           foto: 'Pas Foto 3x4',
+          pas_foto: 'Pas Foto 3x4',
           kk: 'Kartu Keluarga',
-          akte: 'Akte Kelahiran',
+          kartu_keluarga: 'Kartu Keluarga',
+          akte: 'Akta Kelahiran',
+          akta: 'Akta Kelahiran',
+          akta_kelahiran: 'Akta Kelahiran',
           lainnya: 'Dokumen Tambahan'
         };
+
+        // Hydrate top 3 cards from existing documents
+        for (const d of docs) {
+          const dt = (d.document_type || '').toLowerCase();
+          if ((dt === 'pas_foto' || dt === 'foto') && d.file_url) {
+            const imgEl = document.getElementById('img-preview-foto');
+            const phEl = document.getElementById('placeholder-foto');
+            if (imgEl && (d.file_url.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(d.file_url) || d.file_url.startsWith('http'))) {
+              imgEl.src = d.file_url;
+              imgEl.classList.remove('hidden');
+              if (phEl) phEl.classList.add('hidden');
+            }
+          } else if (dt === 'kartu_keluarga' || dt === 'kk') {
+            const nameKk = document.getElementById('name-kk');
+            if (nameKk) {
+              nameKk.textContent = `✓ ${d.file_name || 'Kartu Keluarga Terunggah'}`;
+              nameKk.className = 'text-xs text-primary-700 font-bold block truncate';
+            }
+          } else if (dt === 'akta_kelahiran' || dt === 'akte' || dt === 'akta') {
+            const nameAkte = document.getElementById('name-akte');
+            if (nameAkte) {
+              nameAkte.textContent = `✓ ${d.file_name || 'Akta Kelahiran Terunggah'}`;
+              nameAkte.className = 'text-xs text-primary-700 font-bold block truncate';
+            }
+          }
+        }
 
         tbody.innerHTML = docs.map((d, idx) => {
           const verifiedBadge = d.is_verified 

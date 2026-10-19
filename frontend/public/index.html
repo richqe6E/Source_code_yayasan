@@ -583,6 +583,14 @@
                 }
               }
             }
+            if (d.program_pendidikan) {
+              const progEl = document.getElementById('home-program-pendidikan');
+              if (progEl) progEl.textContent = d.program_pendidikan;
+            }
+            if (d.kurikulum) {
+              const kurEl = document.getElementById('home-kurikulum');
+              if (kurEl) kurEl.textContent = d.kurikulum;
+            }
           }
         } catch (e) {
           console.warn('Institutional profile sync error:', e);

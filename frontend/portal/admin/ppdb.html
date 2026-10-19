@@ -427,10 +427,30 @@
               ${birthCert ? `<a href="${birthCert}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Lihat Akta Kelahiran</a>` : ''}
               ${familyCard ? `<a href="${familyCard}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Lihat Kartu Keluarga</a>` : ''}
             </div>` : ''}
-          ${r.notes ? `<div class="col-span-2 border-t border-gray-100 pt-3"><dt class="text-gray-500 text-xs font-semibold mb-0.5">Catatan Pendaftar:</dt><dd class="text-xs text-gray-700 bg-gray-50 p-2.5 rounded-lg border border-gray-200 whitespace-pre-wrap">${r.notes}</dd></div>` : ''}
+          ${r.notes ? `<div class="col-span-2 border-t border-gray-100 pt-3"><dt class="text-gray-500 text-xs font-semibold mb-0.5">Catatan Pendaftar:</dt><dd class="text-xs text-gray-700 bg-gray-50 p-2.5 rounded-lg border border-gray-200 whitespace-pre-wrap">${formatPpdbNotes(r.notes)}</dd></div>` : ''}
         </dl>
       `;
       document.getElementById('ppdb-detail-modal').classList.remove('hidden');
+    }
+
+    function formatPpdbNotes(rawNotes) {
+      if (!rawNotes) return '';
+      const str = String(rawNotes).trim();
+      if (str.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(str);
+          const parts = [];
+          if (parsed.notes) parts.push(parsed.notes);
+          if (parsed.child && parsed.child.medical_notes && parsed.child.medical_notes !== '-') {
+            parts.push('Riwayat Kesehatan: ' + parsed.child.medical_notes);
+          }
+          if (parsed.program && parsed.program.reason) {
+            parts.push('Alasan Memilih: ' + parsed.program.reason);
+          }
+          return parts.length > 0 ? parts.join(' | ') : 'Pendaftaran Online Reguler';
+        } catch (_) {}
+      }
+      return str;
     }
 
     async function openEditModal(id) {
@@ -450,7 +470,7 @@
         document.getElementById('edit-parent-phone').value = r.parent_phone || r.phone || '';
         document.getElementById('edit-parent-email').value = r.parent_email || r.email || '';
         document.getElementById('edit-address').value = r.address || '';
-        document.getElementById('edit-notes').value = r.notes || '';
+        document.getElementById('edit-notes').value = formatPpdbNotes(r.notes || '');
 
         document.getElementById('ppdb-edit-modal').classList.remove('hidden');
       } catch (err) {

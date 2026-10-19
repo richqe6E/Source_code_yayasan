@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 42 — Remediasi 4 Tahap Terpadu: Penyiapan Skema Database, Keamanan Privasi & Preservasi Sandi PPDB, Sinkronisasi Rombel Kelas & Anti-Duplikasi SPP, Serta Simulasi Siklus Penuh E2E)  
+**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 43 — Audit & Remediasi Menyeluruh Pra-Deploy Vercel: Zero Runtime Crash, Sinkronisasi Lintas Perangkat Supabase Cloud, Alur Penuh PPDB -> Portal Siswa -> Portal Admin)  
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (Vercel & Supabase Cloud).
 
 ---
@@ -93,8 +93,26 @@ Seluruh 12 temuan dari laporan audit telah diremediasi secara tuntas melalui **P
 
 ---
 
+## 🛠️ 3.2. Audit & Remediasi Pra-Deploy Vercel (Sesi 43 — 11 Temuan Menyeluruh)
+1. **Perbaikan 4 Runtime Error Kritis:**
+   - Mendeklarasikan `loginUrl` pada handler `ppdb/convert` di `api.js` (mencegah `ReferenceError: loginUrl is not defined`).
+   - Menambahkan blok `} else {` di `portal/siswa/dashboard.html` agar tampilan Siswa Aktif dan Calon Siswa PPDB terpisah sempurna serta memuat pengumuman dinamis.
+   - Mendefinisikan fungsi `escapeAttr(s)` di `portal/admin/students.html` agar modal pratinjau dokumen siswa tidak mengalami crash.
+   - Memperbaiki fallback gambar logo di `public/js/public-shell.js` (`/images/logo.png`) dan menyertakan seluruh atribut profil & `operational_hours` ke dalam cache `sessionStorage`.
+2. **Sinkronisasi Penuh Lintas Perangkat (Cross-Device Persistence Supabase):**
+   - Menyimpan dan mengekstrak seluruh pengaturan diperluas (`visi`, `misi`, `budaya`, `sejarah`, `program_pendidikan`, `kurikulum`, `struktur_organisasi`, `operational_hours`, dll.) ke dalam kolom JSON aman di tabel `web_settings` (`announcement_banner`) dan `schools` (`wa_gateway_token`), serta menambahkan fallback upsert `POST ppdb_periods` saat mengubah gelombang/jadwal PPDB.
+   - Menyaring konten berstatus `draft` dari halaman publik (`news/list`, `announcements/list`, `events/list`) dan mendukung waktu kegiatan dinamis (`ev.time`) di `agenda.html`.
+3. **Penyempurnaan Portal Siswa & Portal Admin:**
+   - Menambahkan handler `auth/update_profile` di `api.js` untuk menyimpan perubahan nama & foto profil 1-klik ke tabel `users` dan `students`.
+   - Memperbaiki resolusi `studentId` di modul `siswa` (`api.js`), menormalisasi label tipe dokumen (`pas_foto`, `kartu_keluarga`, `akta_kelahiran`), mencegah duplikasi dokumen saat upload ulang, dan menyinkronkan update biodata siswa ke `ppdb_registrations`.
+   - Menyelaraskan skema `activity_logs` (`module`, `details`), memperbaiki `ppdb/update` (`parent_email`) dan pemformatan catatan JSON di `admin/ppdb.html`, merapikan pembayaran offline & filter pencarian NIS di `admin/payments.html`, mengekspos `window.exportCurrentReportToExcel` di `admin/reports.html`, serta memperbaiki `backup/restore` berdasarkan ID riwayat.
+   - Uji unit: `tests/test-predeploy-remediation.js` **LULUS 100%**.
+
+---
+
 ## 📊 4. Hasil Uji Otomatis & Status Operasional
 Semua test suite dan verifikasi live telah dijalankan dengan hasil **100% LULUS**:
+- `tests/test-predeploy-remediation.js`: **LULUS 100%** (11/11 uji remediasi pra-deploy Vercel)
 - `tests/test-batch-1-critical.js`: **LULUS 100%** (Remediasi bug sintaks PPDB, kueri dokumen santri, & isolasi role login)
 - `tests/test-batch-2-portal-ux.js`: **LULUS 100%** (Tombol refresh 360°, ikon resmi siswa, modal profil 1-klik, & sync nama)
 - `tests/test-batch-3-cms-fallback.js`: **LULUS 100%** (Eliminasi fallback dummy, standardisasi istilah kampus, jam operasional, & accordion PPDB)

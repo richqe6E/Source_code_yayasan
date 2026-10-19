@@ -283,7 +283,7 @@
               <ul class="space-y-2 text-xs">
                 <li><a href="${base}login.html" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-graduation-cap text-[10px]"></i><span>Login SIAKAD</span></a></li>
                 <li><a href="${base}ppdb/status.html" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-search text-[10px]"></i><span>Cek Status PPDB Online</span></a></li>
-                <li><a href="${base}ppdb.html#jadwal" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-calendar text-[10px]"></i><span>Jadwal PPDB 2026</span></a></li>
+                <li><a href="${base}ppdb.html#jadwal-linimasa" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-calendar text-[10px]"></i><span>Jadwal PPDB 2026</span></a></li>
                 <li><a id="site-footer-wa-link" href="#" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-brands-whatsapp text-sky-400 text-xs"></i><span>WhatsApp Tata Usaha</span></a></li>
               </ul>
             </div>
@@ -355,12 +355,12 @@
     const hLogoImg = document.getElementById('site-header-logo-img');
     if (hLogoImg && school.logo_url && typeof school.logo_url === 'string' && school.logo_url.trim()) {
       hLogoImg.src = school.logo_url;
-      hLogoImg.onerror = function() { this.src = `${base}images/logo.png`; };
+      hLogoImg.onerror = function() { this.src = '/images/logo.png'; };
     }
     const fLogoImg = document.getElementById('site-footer-logo-img');
     if (fLogoImg && school.logo_url && typeof school.logo_url === 'string' && school.logo_url.trim()) {
       fLogoImg.src = school.logo_url;
-      fLogoImg.onerror = function() { this.src = `${base}images/logo.png`; };
+      fLogoImg.onerror = function() { this.src = '/images/logo.png'; };
     }
 
     // Topbar telah dinonaktifkan: Pembaruan kontak dipusatkan pada Drawer Mobile dan Footer
@@ -437,7 +437,10 @@
           if (setRes && setRes.success && setRes.data && setRes.data.school_name) {
             const s = setRes.data;
             school = {
+              ...s,
               name: s.school_name,
+              tagline: s.tagline,
+              logo_url: s.logo_url,
               phone: s.phone,
               email: s.email,
               address: s.address,
@@ -448,7 +451,8 @@
               instagram_url: s.instagram_url,
               youtube_url: s.youtube_url,
               facebook_url: s.facebook_url,
-              footer_bg_url: s.footer_bg_url
+              footer_bg_url: s.footer_bg_url,
+              operational_hours: s.operational_hours
             };
           }
         } catch (_) {}

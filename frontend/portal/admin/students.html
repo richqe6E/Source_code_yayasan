@@ -481,6 +481,10 @@
         kip: 'Kartu Indonesia Pintar (KIP)'
       };
 
+      function escapeAttr(s) {
+        return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
       container.innerHTML = docs.map(d => {
         const typeKey = (d.document_type || d.type || '').toLowerCase();
         const label = docLabels[typeKey] || d.file_name || 'Dokumen Santri';

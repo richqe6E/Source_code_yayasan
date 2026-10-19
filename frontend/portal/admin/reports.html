@@ -675,11 +675,6 @@
 
     <!-- Lembar Pengesahan Resmi -->
     <tr>
-      <td colspan="${leftSpan}" class="sign-title center">Mengetahui,</td>
-      ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
-      <td colspan="${rightSpan}" class="sign-title center">Samarinda, ${dateFormatted}</td>
-    </tr>
-    <tr>
       <td colspan="${leftSpan}" class="bold center" style="font-size:10pt;">Mengetahui,<br>Ketua Yayasan</td>
       ${midSpan > 0 ? `<td colspan="${midSpan}"></td>` : ''}
       <td colspan="${rightSpan}" class="bold center" style="font-size:10pt;">Samarinda, ${dateFormatted}<br>Bendahara Yayasan</td>
@@ -985,6 +980,7 @@
 
     // Expose all functions to window
     window.generateReport = generateReport;
+    window.exportCurrentReportToExcel = exportCurrentReportToExcel;
     window.exportCurrentReportToCSV = exportCurrentReportToCSV;
     window.printEducationalReport = printEducationalReport;
     window.openImportModal = openImportModal;

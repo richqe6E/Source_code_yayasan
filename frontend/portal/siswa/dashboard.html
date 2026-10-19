@@ -379,6 +379,7 @@
 
           // Load SPP & Info
           await loadSiswaAktifData(student, user);
+        } else {
           const regNo = student.registration_number || student.reg_number || (user.username && user.username.startsWith('REG') ? user.username : '') || ('REG-' + new Date().getFullYear() + '-' + String(student.id || '').slice(-4));
           const stDesc = (student.status_pendaftaran === 'accepted' || student.status === 'accepted' || student.status === 'approved') ? 'Diterima' : 'Menunggu Validasi';
           document.getElementById('student-meta').textContent = `Nomor Pendaftaran: ${regNo} • Status: ${stDesc}`;
@@ -414,6 +415,30 @@
       const ttl = [student.birth_place, student.birth_date].filter(Boolean).join(', ');
       document.getElementById('info-ttl').textContent = ttl || '-';
       document.getElementById('info-kontak').textContent = student.parent_phone || student.phone || '-';
+
+      // Load Pengumuman Akademik Dinamis
+      try {
+        const annRes = await apiCall('announcements', 'list', { published_only: true });
+        const annListEl = document.getElementById('announcements-list');
+        if (annRes && annRes.success && Array.isArray(annRes.data) && annRes.data.length > 0 && annListEl) {
+          annListEl.innerHTML = annRes.data.slice(0, 3).map((a, idx) => {
+            const isImportant = a.is_pinned || idx === 0;
+            const bgCls = isImportant ? 'border-brand-100 bg-brand-50/40' : 'border-slate-200 bg-slate-50/60';
+            const badgeCls = isImportant ? 'text-brand-700 bg-brand-100' : 'text-slate-600 bg-slate-200/80';
+            const badgeLabel = a.is_pinned ? 'Penting' : (a.category || ' Akademik');
+            return `
+              <div class="p-3.5 rounded-xl border ${bgCls}">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[11px] font-bold uppercase tracking-wider ${badgeCls} px-2 py-0.5 rounded">${badgeLabel}</span>
+                  <span class="text-[11px] text-slate-400">${formatDate(a.published_at || a.created_at)}</span>
+                </div>
+                <p class="font-bold text-slate-800 text-xs">${a.title || 'Pengumuman Sekolah'}</p>
+                <p class="text-slate-600 text-xs mt-1 leading-relaxed">${a.content || ''}</p>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (_) {}
 
       try {
         const sppRes = await apiCall('siswa', 'get_spp');
@@ -454,7 +479,7 @@
 
               return `
                 <tr class="hover:bg-slate-50/50">
-                  <td class="py-2.5 px-3 font-semibold text-slate-800">${inv.period || inv.item_name || 'SPP'}</td>
+                  <td class="py-2.5 px-3 font-semibold text-slate-800">${inv.month || inv.description || inv.period || inv.item_name || 'SPP'}</td>
                   <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${formatIDR(inv.amount)}</td>
                   <td class="py-2.5 px-3 text-slate-500">${inv.due_date || '-'}</td>
                   <td class="py-2.5 px-3">
@@ -483,7 +508,8 @@
         document.getElementById('step-biodata-desc').textContent = 'Biodata terisi lengkap';
       }
 
-      const docCount = (docs || []).length;
+      const uniqueTypes = new Set((docs || []).map(d => d.document_type || d.file_name));
+      const docCount = uniqueTypes.size;
       if (docCount >= 3) {
         document.getElementById('step-doc-box').className = 'flex items-start gap-3 p-3 rounded-xl bg-primary-50/60 border border-primary-200/60';
         document.getElementById('step-doc-icon').className = 'w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-xs shrink-0';
