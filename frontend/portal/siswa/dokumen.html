@@ -71,9 +71,10 @@
           </div>
           <p class="text-xs text-slate-600 mb-4">Foto atau scan Kartu Keluarga yang jelas dan terbaca. Format: JPG/PNG/PDF (Max. 5MB).</p>
 
-          <div class="p-6 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-center mb-4">
-            <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span id="name-kk" class="text-xs text-slate-500 block truncate">Belum dipilih</span>
+          <div id="preview-kk-box" class="h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-center mb-4 overflow-hidden relative p-2">
+            <img id="img-preview-kk" class="hidden w-full h-24 object-contain rounded-lg mb-1">
+            <svg id="icon-kk" class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span id="name-kk" class="text-xs text-slate-500 block truncate max-w-full px-2">Belum dipilih</span>
           </div>
         </div>
 
@@ -94,9 +95,10 @@
           </div>
           <p class="text-xs text-slate-600 mb-4">Scan atau foto Akte Kelahiran resmi dari Disdukcapil. Format: JPG/PNG/PDF (Max. 5MB).</p>
 
-          <div class="p-6 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-center mb-4">
-            <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span id="name-akte" class="text-xs text-slate-500 block truncate">Belum dipilih</span>
+          <div id="preview-akte-box" class="h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-center mb-4 overflow-hidden relative p-2">
+            <img id="img-preview-akte" class="hidden w-full h-24 object-contain rounded-lg mb-1">
+            <svg id="icon-akte" class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span id="name-akte" class="text-xs text-slate-500 block truncate max-w-full px-2">Belum dipilih</span>
           </div>
         </div>
 
@@ -130,13 +132,12 @@
               <th class="py-3 px-4">Jenis Dokumen</th>
               <th class="py-3 px-4">Nama File</th>
               <th class="py-3 px-4">Waktu Unggah</th>
-              <th class="py-3 px-4">Status Verifikasi</th>
               <th class="py-3 px-4 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody id="documents-table-body" class="divide-y divide-slate-100">
             <tr>
-              <td colspan="5" class="py-8 text-center text-slate-400">
+              <td colspan="4" class="py-8 text-center text-slate-400">
                 Belum ada dokumen yang diunggah.
               </td>
             </tr>
@@ -214,7 +215,7 @@
       if (!input.files || input.files.length === 0) return;
       const file = input.files[0];
 
-      // Preview Foto jika tipe adalah foto
+      // Preview gambar langsung di kartu (Foto, KK, maupun Akte)
       if (type === 'foto') {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -225,6 +226,19 @@
         reader.readAsDataURL(file);
       } else {
         document.getElementById(`name-${type}`).textContent = file.name;
+        if (file.type && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const imgEl = document.getElementById(`img-preview-${type}`);
+            const iconEl = document.getElementById(`icon-${type}`);
+            if (imgEl) {
+              imgEl.src = e.target.result;
+              imgEl.classList.remove('hidden');
+            }
+            if (iconEl) iconEl.classList.add('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
       }
 
       let fileUrl = '';
@@ -279,7 +293,7 @@
       openBtn.href = d.file_url;
       nameEl.textContent = d.file_name || 'Dokumen Persyaratan';
 
-      const isImg = d.file_url.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(d.file_url);
+      const isImg = d.file_url.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(d.file_url);
       if (isImg) {
         img.src = d.file_url;
         img.classList.remove('hidden');
@@ -312,7 +326,7 @@
         if (docs.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="5" class="py-8 text-center text-slate-400">
+              <td colspan="4" class="py-8 text-center text-slate-400">
                 Belum ada dokumen yang diunggah.
               </td>
             </tr>
@@ -334,40 +348,50 @@
         // Hydrate top 3 cards from existing documents
         for (const d of docs) {
           const dt = (d.document_type || '').toLowerCase();
+          const isImgUrl = d.file_url && (d.file_url.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(d.file_url) || (d.file_url.startsWith('http') && !/\.pdf($|\?)/i.test(d.file_url)));
           if ((dt === 'pas_foto' || dt === 'foto') && d.file_url) {
             const imgEl = document.getElementById('img-preview-foto');
             const phEl = document.getElementById('placeholder-foto');
-            if (imgEl && (d.file_url.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(d.file_url) || d.file_url.startsWith('http'))) {
+            if (imgEl && isImgUrl) {
               imgEl.src = d.file_url;
               imgEl.classList.remove('hidden');
               if (phEl) phEl.classList.add('hidden');
             }
           } else if (dt === 'kartu_keluarga' || dt === 'kk') {
             const nameKk = document.getElementById('name-kk');
+            const imgKk = document.getElementById('img-preview-kk');
+            const iconKk = document.getElementById('icon-kk');
             if (nameKk) {
               nameKk.textContent = `✓ ${d.file_name || 'Kartu Keluarga Terunggah'}`;
-              nameKk.className = 'text-xs text-primary-700 font-bold block truncate';
+              nameKk.className = 'text-xs text-primary-700 font-bold block truncate max-w-full px-2';
+            }
+            if (imgKk && isImgUrl) {
+              imgKk.src = d.file_url;
+              imgKk.classList.remove('hidden');
+              if (iconKk) iconKk.classList.add('hidden');
             }
           } else if (dt === 'akta_kelahiran' || dt === 'akte' || dt === 'akta') {
             const nameAkte = document.getElementById('name-akte');
+            const imgAkte = document.getElementById('img-preview-akte');
+            const iconAkte = document.getElementById('icon-akte');
             if (nameAkte) {
               nameAkte.textContent = `✓ ${d.file_name || 'Akta Kelahiran Terunggah'}`;
-              nameAkte.className = 'text-xs text-primary-700 font-bold block truncate';
+              nameAkte.className = 'text-xs text-primary-700 font-bold block truncate max-w-full px-2';
+            }
+            if (imgAkte && isImgUrl) {
+              imgAkte.src = d.file_url;
+              imgAkte.classList.remove('hidden');
+              if (iconAkte) iconAkte.classList.add('hidden');
             }
           }
         }
 
         tbody.innerHTML = docs.map((d, idx) => {
-          const verifiedBadge = d.is_verified 
-            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-50 text-primary-700 border border-primary-200">✓ Terverifikasi</span>'
-            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">⏳ Menunggu Review</span>';
-
           return `
             <tr class="hover:bg-slate-50/80 transition-colors">
               <td class="py-3 px-4 font-bold text-slate-900">${typeLabels[d.document_type] || d.document_type}</td>
               <td class="py-3 px-4 text-slate-600 truncate max-w-xs">${d.file_name || 'Berkas Dokumen'}</td>
               <td class="py-3 px-4 text-slate-500">${formatDateTime(d.created_at)}</td>
-              <td class="py-3 px-4">${verifiedBadge}</td>
               <td class="py-3 px-4 text-right">
                 <button type="button" onclick="previewDocByIndex(${idx})" class="px-3 py-1 bg-primary-50 hover:bg-primary-100 text-primary-700 font-bold rounded-lg text-xs transition-colors cursor-pointer">
                   Lihat Berkas
