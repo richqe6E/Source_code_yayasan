@@ -562,14 +562,32 @@
       // -------------------------------------------------------------
       if (module === 'web_settings') {
         if (action === 'get') {
+          let out = {};
           try {
             const list = await supabaseRest('web_settings?id=eq.default&select=*');
-            if (list && list.length > 0) return { success: true, data: list[0] };
+            if (list && list.length > 0) out = { ...list[0] };
           } catch (_) {}
-          const sch = await supabaseRest('schools?select=*');
-          return { success: true, data: (sch && sch[0]) || {} };
+          if (!out.school_name) {
+            const sch = await supabaseRest('schools?select=*');
+            if (sch && sch[0]) out = { ...sch[0], ...out };
+          }
+          try {
+            const cachedExt = localStorage.getItem('siy_school_ext');
+            if (cachedExt) Object.assign(out, JSON.parse(cachedExt));
+          } catch (_) {}
+          return { success: true, data: out };
         }
         if (action === 'update') {
+          try {
+            let existingExt = {};
+            const raw = localStorage.getItem('siy_school_ext');
+            if (raw) existingExt = JSON.parse(raw);
+            const extPayload = {};
+            ['visi', 'misi', 'budaya', 'sejarah', 'program_pendidikan', 'kurikulum', 'operational_hours', 'struktur_organisasi', 'pembina', 'pengawas', 'ketua_yayasan', 'sekretaris', 'bendahara'].forEach(k => {
+              if (params[k] !== undefined) extPayload[k] = params[k];
+            });
+            localStorage.setItem('siy_school_ext', JSON.stringify({ ...existingExt, ...extPayload }));
+          } catch (_) {}
           const res = await supabaseRest('web_settings?id=eq.default', 'PATCH', params);
           return { success: true, data: res, message: 'Pengaturan website berhasil disimpan' };
         }
@@ -2234,14 +2252,34 @@
           fullPayload.updated_at = new Date().toISOString();
 
           // Simpan selalu ke cache lokal agar langsung aktif
+          let existingExt = {};
+          try {
+            const raw = localStorage.getItem('siy_school_ext');
+            if (raw) existingExt = JSON.parse(raw);
+          } catch (_) {}
+
           const extPayload = {
-            campus_note: params.campus_note || '',
-            maps_url: params.maps_url || '',
-            maps_embed_url: params.maps_embed_url || '',
-            whatsapp_number: params.whatsapp_number || '',
-            instagram_url: params.instagram_url || '',
-            youtube_url: params.youtube_url || '',
-            facebook_url: params.facebook_url || ''
+            campus_note: params.campus_note !== undefined ? params.campus_note : existingExt.campus_note,
+            maps_url: params.maps_url !== undefined ? params.maps_url : existingExt.maps_url,
+            maps_embed_url: params.maps_embed_url !== undefined ? params.maps_embed_url : existingExt.maps_embed_url,
+            whatsapp_number: params.whatsapp_number !== undefined ? params.whatsapp_number : existingExt.whatsapp_number,
+            instagram_url: params.instagram_url !== undefined ? params.instagram_url : existingExt.instagram_url,
+            youtube_url: params.youtube_url !== undefined ? params.youtube_url : existingExt.youtube_url,
+            facebook_url: params.facebook_url !== undefined ? params.facebook_url : existingExt.facebook_url,
+            operational_hours: params.operational_hours !== undefined ? params.operational_hours : existingExt.operational_hours,
+            visi: params.visi !== undefined ? params.visi : existingExt.visi,
+            misi: params.misi !== undefined ? params.misi : existingExt.misi,
+            budaya: params.budaya !== undefined ? params.budaya : existingExt.budaya,
+            sejarah: params.sejarah !== undefined ? params.sejarah : existingExt.sejarah,
+            program_pendidikan: params.program_pendidikan !== undefined ? params.program_pendidikan : existingExt.program_pendidikan,
+            kurikulum: params.kurikulum !== undefined ? params.kurikulum : existingExt.kurikulum,
+            struktur_organisasi: params.struktur_organisasi !== undefined ? params.struktur_organisasi : existingExt.struktur_organisasi,
+            pembina: params.pembina !== undefined ? params.pembina : existingExt.pembina,
+            pengawas: params.pengawas !== undefined ? params.pengawas : existingExt.pengawas,
+            ketua_yayasan: params.ketua_yayasan !== undefined ? params.ketua_yayasan : existingExt.ketua_yayasan,
+            sekretaris: params.sekretaris !== undefined ? params.sekretaris : existingExt.sekretaris,
+            bendahara: params.bendahara !== undefined ? params.bendahara : existingExt.bendahara,
+            headmaster_name: params.headmaster_name !== undefined ? params.headmaster_name : existingExt.headmaster_name
           };
           try {
             localStorage.setItem('siy_school_ext', JSON.stringify(extPayload));
@@ -2259,6 +2297,13 @@
               phone: params.phone,
               email: params.email
             };
+            if (params.pembina) corePayload.pembina = params.pembina;
+            if (params.pengawas) corePayload.pengawas = params.pengawas;
+            if (params.ketua_yayasan) corePayload.ketua_yayasan = params.ketua_yayasan;
+            if (params.sekretaris) corePayload.sekretaris = params.sekretaris;
+            if (params.bendahara) corePayload.bendahara = params.bendahara;
+            if (params.headmaster_name) corePayload.headmaster_name = params.headmaster_name;
+
             const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', corePayload);
             return { success: true, data: { ...corePayload, ...extPayload }, message: 'Identitas & tautan sekolah berhasil diperbarui' };
           }

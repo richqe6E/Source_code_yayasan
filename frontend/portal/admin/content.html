@@ -442,8 +442,8 @@
       area.innerHTML = `
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm max-w-4xl">
           <div class="border-b border-gray-200 pb-4 mb-6">
-            <h3 class="text-base font-bold text-gray-900">Pengaturan Identitas, Kontak & Media Sosial Sekolah</h3>
-            <p class="text-xs text-gray-500 mt-1">Data ini otomatis disinkronkan ke seluruh header, footer, kontak, dan tautan resmi pada website publik.</p>
+            <h3 class="text-base font-bold text-gray-900">Pengaturan Identitas, Visi Misi & Profil Yayasan</h3>
+            <p class="text-xs text-gray-500 mt-1">Data institusi ini adalah <strong>Single Source of Truth</strong> yang disinkronkan langsung ke Halaman Utama (Beranda), Halaman Profil, dan Kontak website resmi.</p>
           </div>
 
           <form id="school-settings-form" class="space-y-6">
@@ -451,12 +451,12 @@
             <div>
               <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-3 flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                1. Profil Lembaga / Yayasan
+                1. Profil Lembaga & Kontak Resmi
               </h4>
               <div class="grid sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Yayasan / Sekolah *</label>
-                  <input id="sch-name" type="text" required value="${school.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Contoh: Yayasan At Tarbiyyah Wijaya Kusuma Samarinda">
+                  <input id="sch-name" type="text" required value="${school.name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Contoh: Yayasan At Tarbiyyah Wijaya Kusuma Samarinda">
                 </div>
                 <div class="sm:col-span-2">
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Lengkap *</label>
@@ -464,7 +464,7 @@
                 </div>
                 <div class="sm:col-span-2">
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Keterangan Gedung / Lokasi Yayasan</label>
-                  <input id="sch-campus-note" type="text" value="${school.campus_note || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Contoh: Gedung Utama Wijaya Kusuma">
+                  <input id="sch-campus-note" type="text" value="${school.campus_note || 'Gedung Utama Yayasan At Tarbiyyah Wijaya Kusuma'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Contoh: Gedung Utama Wijaya Kusuma">
                 </div>
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Tautan Langsung Google Maps (URL)</label>
@@ -476,53 +476,151 @@
                 </div>
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Telepon Kantor TU</label>
-                  <input id="sch-phone" type="text" value="${school.phone || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="081347142829">
+                  <input id="sch-phone" type="text" value="${school.phone || '081347142829'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="081347142829">
                 </div>
                 <div>
                   <label class="block text-xs font-semibold text-gray-700 mb-1">Email Resmi Sekolah</label>
-                  <input id="sch-email" type="email" value="${school.email || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="info@yayasan.sch.id">
+                  <input id="sch-email" type="email" value="${school.email || 'info@attarbiyyah-samarinda.sch.id'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="info@yayasan.sch.id">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Nomor WhatsApp Resmi TU *</label>
+                  <input id="sch-wa" type="text" value="${school.whatsapp_number || '081347142829'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="081347142829">
                 </div>
               </div>
             </div>
 
-            <!-- Bagian 2: Kontak WhatsApp Resmi -->
+            <!-- Bagian 2: Visi & Misi Yayasan (Single Source of Truth) -->
             <div class="pt-4 border-t border-gray-100">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-3 flex items-center gap-1.5">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                2. Kontak WhatsApp Resmi Sekolah
-              </h4>
-              <div class="max-w-md">
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Nomor WhatsApp Resmi Sekolah *</label>
-                <input id="sch-wa" type="text" value="${school.whatsapp_number || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Contoh: 081347142829">
-                <p class="text-xs text-gray-500 mt-1">Digunakan untuk tombol konsultasi/kontak langsung wali murid di website utama (awalan 62).</p>
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  2. Visi &amp; Misi Yayasan (Sinkron Serentak ke Beranda &amp; Profil)
+                </h4>
+                <span class="text-[11px] font-semibold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Single Source of Truth
+                </span>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Visi Utama Yayasan *</label>
+                  <textarea id="sch-visi" rows="2" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Tuliskan pernyataan visi yayasan...">${school.visi || 'Menjadi lembaga pendidikan anak usia dini yang unggul dalam membentuk generasi berkarakter, cerdas, dan berakhlak mulia di era modern.'}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Misi Yayasan (Tulis 1 Butir per Baris) *</label>
+                  <textarea id="sch-misi" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 font-sans" placeholder="Menyelenggarakan pendidikan yang holistik...\nMengembangkan potensi anak...\nMenanamkan nilai karakter Islami...">${Array.isArray(school.misi) ? school.misi.join('\n') : (school.misi || 'Menyelenggarakan pendidikan yang holistik dan integratif.\nMengembangkan potensi anak secara optimal di seluruh aspek perkembangan.\nMenanamkan nilai-nilai karakter Islami dan kebangsaan sejak dini.\nMembangun kemitraan strategis dengan orang tua dan masyarakat.')}</textarea>
+                  <p class="text-[11px] text-gray-500 mt-1">Setiap baris baru otomatis menjadi satu butir misi bernomor pada website.</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Budaya &amp; Nilai Lembaga</label>
+                  <textarea id="sch-budaya" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Menerapkan 5S (Senyum, Salam, Sapa, Sopan, Santun)...">${school.budaya || 'Menerapkan 5S (Senyum, Salam, Sapa, Sopan, Santun), membiasakan doa harian, adab makan minum, kepedulian sosial, serta cinta kebersihan lingkungan.'}</textarea>
+                </div>
               </div>
             </div>
 
-            <!-- Bagian 3: Media Sosial -->
+            <!-- Bagian 3: Sejarah & Perjalanan Yayasan -->
+            <div class="pt-4 border-t border-gray-100">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-3 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                3. Sejarah &amp; Latar Belakang Perjalanan Yayasan
+              </h4>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Narasi Sejarah (Tampil di Halaman Profil)</label>
+                <textarea id="sch-sejarah" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Ceritakan latar belakang pendirian yayasan, perkembangan santri, dan komitmen pengabdian...">${school.sejarah || 'Yayasan At Tarbiyyah Wijaya Kusuma Samarinda didirikan dengan tekad mulia untuk menghadirkan pendidikan anak usia dini yang bermutu tinggi, berakar pada nilai-nilai keislaman yang rahmatan lil \'alamin, dan berlokasi strategis di Jl. Wijaya Kusuma V-A No. 38, Kelurahan Air Putih, Kecamatan Samarinda Ulu.\n\nSaat ini yayasan menaungi dua pilar utama: PAUD/TK Terpadu yang mengaplikasikan Kurikulum Merdeka berorientasi 6 aspek perkembangan anak, serta Taman Pendidikan Al-Qur\'an (TPQ) dengan bimbingan tahsin, tahfidz, dan adab harian.\n\nLingkungan sekolah dirancang aman, ramah anak, dan menstimulasi rasa ingin tahu alami siswa melalui pendekatan bermain yang bermakna (play-based learning).'}</textarea>
+              </div>
+            </div>
+
+            <!-- Bagian 4: Program Pendidikan & Kurikulum Unggulan -->
+            <div class="pt-4 border-t border-gray-100">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-3 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                4. Program Pendidikan &amp; Kurikulum Unggulan
+              </h4>
+              <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Program PAUD Terpadu</label>
+                  <textarea id="sch-program-paud" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-primary-500">${(school.program_pendidikan && school.program_pendidikan.paud) || 'Usia 2-4 tahun. Stimulasi tumbuh kembang optimal melalui bermain sambil belajar dengan pendekatan sentra dan kasih sayang.'}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Program TK (A &amp; B)</label>
+                  <textarea id="sch-program-tk" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-primary-500">${(school.program_pendidikan && school.program_pendidikan.tk) || 'Usia 4-6 tahun. Persiapan masuk SD dengan penguatan kemandirian, adab Islami, dan calistung dasar yang menyenangkan.'}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Program TPQ Al-Qur'an</label>
+                  <textarea id="sch-program-tpq" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-primary-500">${(school.program_pendidikan && school.program_pendidikan.tpq) || 'Santri usia 5-12 tahun. Pembelajaran membaca Al-Qur\'an metode tartil, hafalan Juz 30, hafalan doa harian, dan praktik ibadah.'}</textarea>
+                </div>
+                <div class="sm:col-span-3">
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Poin Fokus Kurikulum Unggulan</label>
+                  <input id="sch-kurikulum" type="text" value="${school.kurikulum || 'Kurikulum Merdeka Ramah Anak, Integrasi Karakter Qurani & Adab Harian, Pembiasaan Sholat Dhuha & Doa Ceria'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="Poin-poin ringkas kurikulum unggulan...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Bagian 5: Struktur Kepengurusan Organisasi (Bagan Pohon) -->
+            <div class="pt-4 border-t border-gray-100">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                  5. Struktur Kepengurusan Organisasi (Bagan Pohon)
+                </h4>
+                <span class="text-[11px] font-semibold text-gray-500">Tampil Otomatis di Profil</span>
+              </div>
+              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Dewan Pembina Yayasan</label>
+                  <input id="sch-pembina" type="text" value="${school.pembina || 'DJOKO IRIANDONO'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Dewan Pengawas Yayasan</label>
+                  <input id="sch-pengawas" type="text" value="${school.pengawas || 'Suhardi'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Ketua Umum Yayasan *</label>
+                  <input id="sch-ketua" type="text" required value="${school.ketua_yayasan || school.headmaster_name || 'Makhrus'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Sekretaris Yayasan</label>
+                  <input id="sch-sekretaris" type="text" value="${school.sekretaris || 'Candra Gunawan'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Bendahara Yayasan</label>
+                  <input id="sch-bendahara" type="text" value="${school.bendahara || 'Sri Pragawati'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Kepala Sekolah PAUD / TK</label>
+                  <input id="sch-head-paud-tk" type="text" value="${(school.struktur_organisasi && school.struktur_organisasi.kepala_paud_tk) || 'Kepala Sekolah PAUD/TK'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Kepala / Koordinator TPQ</label>
+                  <input id="sch-head-tpq" type="text" value="${(school.struktur_organisasi && school.struktur_organisasi.kepala_tpq) || 'Koordinator TPQ Al-Qur\'an'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- Bagian 6: Media Sosial Resmi -->
             <div class="pt-4 border-t border-gray-100">
               <h4 class="text-xs font-bold uppercase tracking-wider text-purple-700 mb-3 flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                3. Tautan Media Sosial Resmi (Tampil di Header &amp; Footer Website Utama)
+                6. Tautan Media Sosial Resmi
               </h4>
-              <div class="space-y-3">
+              <div class="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Link Instagram Resmi</label>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Instagram Resmi</label>
                   <input id="sch-ig" type="url" value="${school.instagram_url || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="https://instagram.com/yayasansamarinda">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Link Channel YouTube Resmi</label>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Channel YouTube</label>
                   <input id="sch-yt" type="url" value="${school.youtube_url || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="https://youtube.com/@yayasansamarinda">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Link Halaman Facebook Resmi</label>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Facebook Resmi</label>
                   <input id="sch-fb" type="url" value="${school.facebook_url || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500" placeholder="https://facebook.com/yayasansamarinda">
                 </div>
               </div>
             </div>
 
             <div class="pt-4 border-t border-gray-200 flex justify-end">
-              <button id="btn-save-school" type="submit" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm rounded-md shadow-sm transition">
-                Simpan &amp; Perbarui Website
+              <button id="btn-save-school" type="submit" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm rounded-md shadow-sm transition cursor-pointer">
+                Simpan &amp; Perbarui Seluruh Website
               </button>
             </div>
           </form>
@@ -535,6 +633,8 @@
         btn.disabled = true;
         btn.textContent = 'Menyimpan ke Database...';
 
+        const misiLines = document.getElementById('sch-misi').value.split('\n').map(s => s.trim()).filter(Boolean);
+
         const payload = {
           name: document.getElementById('sch-name').value.trim(),
           address: document.getElementById('sch-address').value.trim(),
@@ -546,13 +646,40 @@
           whatsapp_number: document.getElementById('sch-wa').value.trim(),
           instagram_url: document.getElementById('sch-ig').value.trim(),
           youtube_url: document.getElementById('sch-yt').value.trim(),
-          facebook_url: document.getElementById('sch-fb').value.trim()
+          facebook_url: document.getElementById('sch-fb').value.trim(),
+          
+          // Institutional fields (Single Source of Truth)
+          visi: document.getElementById('sch-visi').value.trim(),
+          misi: misiLines,
+          budaya: document.getElementById('sch-budaya').value.trim(),
+          sejarah: document.getElementById('sch-sejarah').value.trim(),
+          program_pendidikan: {
+            paud: document.getElementById('sch-program-paud') ? document.getElementById('sch-program-paud').value.trim() : '',
+            tk: document.getElementById('sch-program-tk') ? document.getElementById('sch-program-tk').value.trim() : '',
+            tpq: document.getElementById('sch-program-tpq') ? document.getElementById('sch-program-tpq').value.trim() : ''
+          },
+          kurikulum: document.getElementById('sch-kurikulum') ? document.getElementById('sch-kurikulum').value.trim() : '',
+          pembina: document.getElementById('sch-pembina').value.trim(),
+          pengawas: document.getElementById('sch-pengawas').value.trim(),
+          ketua_yayasan: document.getElementById('sch-ketua').value.trim(),
+          sekretaris: document.getElementById('sch-sekretaris').value.trim(),
+          bendahara: document.getElementById('sch-bendahara').value.trim(),
+          headmaster_name: document.getElementById('sch-ketua').value.trim(),
+          struktur_organisasi: {
+            pembina: document.getElementById('sch-pembina').value.trim(),
+            pengawas: document.getElementById('sch-pengawas').value.trim(),
+            ketua_yayasan: document.getElementById('sch-ketua').value.trim(),
+            sekretaris: document.getElementById('sch-sekretaris').value.trim(),
+            bendahara: document.getElementById('sch-bendahara').value.trim(),
+            kepala_paud_tk: document.getElementById('sch-head-paud-tk') ? document.getElementById('sch-head-paud-tk').value.trim() : '',
+            kepala_tpq: document.getElementById('sch-head-tpq') ? document.getElementById('sch-head-tpq').value.trim() : ''
+          }
         };
 
         try {
           const res = await apiCall('schools', 'update', payload);
           if (res.success) {
-            // Auto sync ke web_settings
+            // Auto sync ke web_settings agar seluruh endpoint website terintegrasi
             try {
               await apiCall('web_settings', 'update', {
                 school_name: payload.name,
@@ -565,11 +692,23 @@
                 whatsapp: payload.whatsapp_number,
                 facebook_url: payload.facebook_url,
                 instagram_url: payload.instagram_url,
-                youtube_url: payload.youtube_url
+                youtube_url: payload.youtube_url,
+                visi: payload.visi,
+                misi: payload.misi,
+                budaya: payload.budaya,
+                sejarah: payload.sejarah,
+                program_pendidikan: payload.program_pendidikan,
+                kurikulum: payload.kurikulum,
+                pembina: payload.pembina,
+                pengawas: payload.pengawas,
+                ketua_yayasan: payload.ketua_yayasan,
+                sekretaris: payload.sekretaris,
+                bendahara: payload.bendahara,
+                struktur_organisasi: payload.struktur_organisasi
               });
             } catch (_) {}
 
-            showToast('Pengaturan sekolah, alamat, dan Google Maps berhasil diperbarui!', 'success');
+            showToast('Seluruh profil yayasan, visi misi, sejarah, program & struktur pengurus berhasil diperbarui!', 'success');
             sessionStorage.removeItem('siyayasan_school_profile');
             sessionStorage.setItem('siyayasan_school_profile', JSON.stringify({ ...school, ...payload }));
             if (typeof window.hydrateSchoolData === 'function') window.hydrateSchoolData();
@@ -580,7 +719,7 @@
           showToast('Terjadi kesalahan saat menyimpan pengaturan', 'error');
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Simpan & Perbarui Website';
+          btn.textContent = 'Simpan & Perbarui Seluruh Website';
         }
       });
     }

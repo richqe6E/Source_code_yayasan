@@ -368,14 +368,14 @@
       <div class="grid md:grid-cols-2 gap-12">
         <div class="reveal">
           <h2 class="text-3xl font-bold text-gray-900 mb-4">Visi</h2>
-          <p class="text-lg text-gray-700 leading-relaxed">
+          <p class="text-lg text-gray-700 leading-relaxed" id="home-visi">
             Menjadi lembaga pendidikan anak usia dini yang unggul dalam membentuk
             generasi berkarakter, cerdas, dan berakhlak mulia di era modern.
           </p>
         </div>
         <div class="reveal delay-200">
           <h2 class="text-3xl font-bold text-gray-900 mb-4">Misi</h2>
-          <ol class="space-y-3 text-gray-700">
+          <ol class="space-y-3 text-gray-700" id="home-misi-list">
             <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">1</span> Menyelenggarakan pendidikan yang holistik dan integratif.</li>
             <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">2</span> Mengembangkan potensi anak secara optimal di seluruh aspek perkembangan.</li>
             <li class="flex gap-3"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">3</span> Menanamkan nilai-nilai karakter Islami dan kebangsaan sejak dini.</li>
@@ -556,6 +556,40 @@
         }
       }
 
+      // Dynamic Institutional Profile (Visi & Misi Single Source of Truth)
+      async function loadInstitutionalProfile() {
+        try {
+          if (typeof window.apiCall !== 'function') return;
+          const res = await window.apiCall('schools', 'get');
+          if (res && res.success && res.data) {
+            const d = res.data;
+            if (d.visi) {
+              const el = document.getElementById('home-visi');
+              if (el) el.textContent = d.visi;
+            }
+            if (d.misi) {
+              const listEl = document.getElementById('home-misi-list');
+              if (listEl) {
+                let items = [];
+                if (Array.isArray(d.misi)) items = d.misi;
+                else if (typeof d.misi === 'string') items = d.misi.split('\n').map(s => s.trim()).filter(Boolean);
+                if (items.length > 0) {
+                  listEl.innerHTML = items.map((m, idx) => `
+                    <li class="flex gap-3">
+                      <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-semibold flex items-center justify-center">${idx + 1}</span>
+                      <span>${m}</span>
+                    </li>
+                  `).join('');
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Institutional profile sync error:', e);
+        }
+      }
+
+      loadInstitutionalProfile();
       syncPpdbStatus();
     });
   </script>

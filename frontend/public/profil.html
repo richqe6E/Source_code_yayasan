@@ -82,7 +82,7 @@
 
         <div class="w-16 h-1 bg-primary-600 rounded-full"></div>
 
-        <div class="space-y-4 sm:space-y-5 text-slate-700 leading-relaxed sm:leading-loose text-sm sm:text-base text-justify">
+        <div id="profil-sejarah" class="space-y-4 sm:space-y-5 text-slate-700 leading-relaxed sm:leading-loose text-sm sm:text-base text-justify">
           <p class="text-justify [text-align-last:left]">
             <strong class="font-bold text-slate-900">Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</strong> didirikan dengan tekad mulia untuk menghadirkan pendidikan anak usia dini yang bermutu tinggi, berakar pada nilai-nilai keislaman yang <em>rahmatan lil 'alamin</em>, dan berlokasi strategis di Jl. Wijaya Kusuma V-A No. 38, Kelurahan Air Putih, Kecamatan Samarinda Ulu.
           </p>
@@ -96,7 +96,7 @@
       </div>
     </section>
 
-    <!-- Section 2: Visi, Misi & Tujuan (Concentric Cards) -->
+    <!-- Section 2: Visi, Misi & Tujuan (Concentric Cards - Single Source of Truth) -->
     <section>
       <div class="text-center max-w-2xl mx-auto mb-10">
         <p class="text-xs font-bold uppercase tracking-widest text-primary-700 mb-2">Arah &amp; Prinsip</p>
@@ -112,8 +112,8 @@
             <i class="fi fi-rr-eye"></i>
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Visi Lembaga</h3>
-          <p class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
-            Menjadi lembaga pendidikan usia dini unggulan di Samarinda yang melahirkan generasi cerdas, mandiri, berkarakter Islami, dan berakhlakul karimah.
+          <p id="profil-visi" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
+            Menjadi lembaga pendidikan anak usia dini yang unggul dalam membentuk generasi berkarakter, cerdas, dan berakhlak mulia di era modern.
           </p>
         </div>
 
@@ -123,9 +123,9 @@
             <i class="fi fi-rr-target"></i>
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Misi Utama</h3>
-          <p class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
-            Menyelenggarakan pembelajaran holistik integratif berbasis fitrah anak, menumbuhkan kecintaan Al-Qur'an sejak dini, dan membangun kemitraan erat bersama orang tua.
-          </p>
+          <div id="profil-misi" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
+            <p>Menyelenggarakan pembelajaran holistik integratif berbasis fitrah anak, menumbuhkan kecintaan Al-Qur'an sejak dini, dan membangun kemitraan erat bersama orang tua.</p>
+          </div>
         </div>
 
         <!-- Nilai Budaya -->
@@ -134,7 +134,7 @@
             <i class="fi fi-rr-heart"></i>
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Budaya Sekolah</h3>
-          <p class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
+          <p id="profil-budaya" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
             Menerapkan 5S (Senyum, Salam, Sapa, Sopan, Santun), membiasakan doa harian, adab makan minum, kepedulian sosial, serta cinta kebersihan lingkungan.
           </p>
         </div>
@@ -232,67 +232,157 @@
       </div>
     </section>
 
-    <!-- Section 3.5: Struktur Kepengurusan & Pengelola Yayasan -->
-    <section class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-sm">
+    <!-- Section 3.5: Struktur Inti Pengurus Yayasan (Bagan Pohon Organisasi) -->
+    <section class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-10 shadow-sm" id="struktur-organisasi">
       <div class="text-center max-w-2xl mx-auto mb-10">
         <p class="text-xs font-bold uppercase tracking-widest text-primary-700 mb-2">Tata Kelola Lembaga</p>
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight text-balance">
-          Struktur Inti Pengurus Yayasan
+          Struktur Bagan Kepengurusan Yayasan
         </h2>
         <p class="text-sm text-slate-600 mt-2 text-pretty">
-          Dewan pimpinan dan penanggung jawab amanah Yayasan At Tarbiyyah Wijaya Kusuma Samarinda dalam membina generasi Qur'ani.
+          Diagram hierarki kepemimpinan dan penanggung jawab amanah Yayasan At Tarbiyyah Wijaya Kusuma Samarinda dalam membina generasi Qur'ani.
         </p>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
-        <!-- 1. Pembina -->
-        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 hover:border-primary-300 transition-all flex flex-col items-center text-center">
-          <div class="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center text-xl mb-3 shadow-xs">
-            <i class="fi fi-rr-star"></i>
-          </div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200/60 mb-2">Pembina</span>
-          <h3 class="text-base font-bold text-slate-900">DJOKO IRIANDONO</h3>
-          <p class="text-xs text-slate-500 mt-1">Dewan Pembina Yayasan</p>
-        </div>
+      <!-- Hierarchical Tree Diagram (Clean White + Oceanic Blue Accents) -->
+      <div class="org-tree diagram-organisasi overflow-x-auto pb-6">
+        <div class="min-w-[700px] max-w-4xl mx-auto flex flex-col items-center">
+          
+          <!-- LEVEL 1: Dewan Pembina Yayasan (Puncak) -->
+          <div class="flex flex-col items-center">
+            <div class="bg-white border-2 border-primary-600/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition text-center w-72">
+              <div class="w-11 h-11 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center text-lg mx-auto mb-2.5">
+                <i class="fi fi-rr-star"></i>
+              </div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-3 py-1 rounded-full border border-primary-200 inline-block mb-2">
+                Dewan Pembina Yayasan
+              </span>
+              <h3 class="text-base font-extrabold text-slate-900" id="org-pembina">DJOKO IRIANDONO</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Penasehat &amp; Kebijakan Strategis</p>
+            </div>
 
-        <!-- 2. Pengawas -->
-        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 hover:border-primary-300 transition-all flex flex-col items-center text-center">
-          <div class="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center text-xl mb-3 shadow-xs">
-            <i class="fi fi-rr-shield-check"></i>
+            <!-- Stem 1 down -->
+            <div class="w-0.5 h-8 bg-primary-400"></div>
           </div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200/60 mb-2">Pengawas</span>
-          <h3 class="text-base font-bold text-slate-900">Suhardi</h3>
-          <p class="text-xs text-slate-500 mt-1">Dewan Pengawas Lembaga</p>
-        </div>
 
-        <!-- 3. Ketua Yayasan -->
-        <div class="bg-slate-50 border border-primary-200 rounded-2xl p-5 hover:border-primary-400 transition-all flex flex-col items-center text-center shadow-xs sm:col-span-2 lg:col-span-1">
-          <div class="w-12 h-12 rounded-xl bg-primary-600 text-white flex items-center justify-center text-xl mb-3 shadow-xs">
-            <i class="fi fi-rr-crown"></i>
-          </div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-white bg-primary-600 px-2.5 py-0.5 rounded-full mb-2">Ketua Yayasan</span>
-          <h3 class="text-base font-bold text-slate-900">Makhrus</h3>
-          <p class="text-xs text-slate-500 mt-1">Ketua Umum Yayasan</p>
-        </div>
+          <!-- LEVEL 2: Dewan Pengawas & Ketua Yayasan (Pengurus) -->
+          <div class="w-full flex flex-col items-center">
+            <!-- Crossbar connecting Level 2 -->
+            <div class="w-2/3 h-0.5 bg-primary-300"></div>
+            
+            <div class="w-2/3 flex justify-between">
+              <!-- Left: Dewan Pengawas -->
+              <div class="flex flex-col items-center w-72 -mt-0.5">
+                <div class="w-0.5 h-6 bg-primary-300"></div>
+                <div class="bg-white border border-slate-200/90 hover:border-primary-400 rounded-2xl p-4 sm:p-5 shadow-sm text-center w-full transition">
+                  <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center text-base mx-auto mb-2">
+                    <i class="fi fi-rr-shield-check"></i>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200 inline-block mb-1.5">
+                    Dewan Pengawas
+                  </span>
+                  <h3 class="text-sm sm:text-base font-bold text-slate-900" id="org-pengawas">Suhardi</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Pengawasan Kepatuhan &amp; Akuntabilitas</p>
+                </div>
+              </div>
 
-        <!-- 4. Sekretaris -->
-        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 hover:border-primary-300 transition-all flex flex-col items-center text-center">
-          <div class="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center text-xl mb-3 shadow-xs">
-            <i class="fi fi-rr-document-signed"></i>
-          </div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200/60 mb-2">Sekretaris</span>
-          <h3 class="text-base font-bold text-slate-900">Candra Gunawan</h3>
-          <p class="text-xs text-slate-500 mt-1">Administrasi &amp; Sekretariat</p>
-        </div>
+              <!-- Right: Ketua Umum Yayasan -->
+              <div class="flex flex-col items-center w-72 -mt-0.5">
+                <div class="w-0.5 h-6 bg-primary-300"></div>
+                <div class="bg-white border-2 border-primary-600 rounded-2xl p-4 sm:p-5 shadow-sm text-center w-full transition">
+                  <div class="w-10 h-10 rounded-xl bg-primary-600 text-white flex items-center justify-center text-base mx-auto mb-2">
+                    <i class="fi fi-rr-crown"></i>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-white bg-primary-600 px-2.5 py-0.5 rounded-full inline-block mb-1.5">
+                    Ketua Umum Yayasan
+                  </span>
+                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900" id="org-ketua">Makhrus</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Pimpinan Eksekutif Lembaga</p>
+                </div>
 
-        <!-- 5. Bendahara -->
-        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 hover:border-primary-300 transition-all flex flex-col items-center text-center sm:col-span-2 lg:col-span-1">
-          <div class="w-12 h-12 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center text-xl mb-3 shadow-xs">
-            <i class="fi fi-rr-wallet"></i>
+                <!-- Stem down from Ketua Umum to Sekretaris/Bendahara -->
+                <div class="w-0.5 h-8 bg-primary-400"></div>
+              </div>
+            </div>
           </div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200/60 mb-2">Bendahara</span>
-          <h3 class="text-base font-bold text-slate-900">Sri Pragawati</h3>
-          <p class="text-xs text-slate-500 mt-1">Keuangan &amp; Akuntansi Yayasan</p>
+
+          <!-- LEVEL 3: Sekretaris & Bendahara -->
+          <div class="w-full flex flex-col items-center">
+            <div class="w-full max-w-xl mx-auto flex flex-col items-center">
+              <div class="w-full h-0.5 bg-primary-300"></div>
+              <div class="w-full flex justify-between">
+                <!-- Sekretaris -->
+                <div class="flex flex-col items-center w-64 -mt-0.5">
+                  <div class="w-0.5 h-6 bg-primary-300"></div>
+                  <div class="bg-white border border-slate-200/90 hover:border-primary-400 rounded-2xl p-4 shadow-sm text-center w-full transition">
+                    <div class="w-9 h-9 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center text-sm mx-auto mb-1.5">
+                      <i class="fi fi-rr-document-signed"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200 inline-block mb-1">
+                      Sekretaris
+                    </span>
+                    <h3 class="text-sm font-bold text-slate-900" id="org-sekretaris">Candra Gunawan</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Administrasi &amp; Tata Kelola</p>
+                  </div>
+                </div>
+
+                <!-- Bendahara -->
+                <div class="flex flex-col items-center w-64 -mt-0.5">
+                  <div class="w-0.5 h-6 bg-primary-300"></div>
+                  <div class="bg-white border border-slate-200/90 hover:border-primary-400 rounded-2xl p-4 shadow-sm text-center w-full transition">
+                    <div class="w-9 h-9 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center text-sm mx-auto mb-1.5">
+                      <i class="fi fi-rr-wallet"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200 inline-block mb-1">
+                      Bendahara
+                    </span>
+                    <h3 class="text-sm font-bold text-slate-900" id="org-bendahara">Sri Pragawati</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Keuangan &amp; Akuntansi</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stem down to Unit Pelaksana Pendidikan -->
+              <div class="w-0.5 h-8 bg-primary-400"></div>
+            </div>
+          </div>
+
+          <!-- LEVEL 4: Unit Pelaksana Pendidikan (Kepala PAUD/TK & Koordinator TPQ) -->
+          <div class="w-full max-w-xl mx-auto flex flex-col items-center">
+            <div class="w-full h-0.5 bg-primary-300"></div>
+            <div class="w-full flex justify-between">
+              <!-- Kepala PAUD/TK -->
+              <div class="flex flex-col items-center w-64 -mt-0.5">
+                <div class="w-0.5 h-6 bg-primary-300"></div>
+                <div class="bg-white border border-slate-200/90 hover:border-primary-400 rounded-2xl p-4 shadow-sm text-center w-full transition">
+                  <div class="w-9 h-9 rounded-xl bg-sky-50 text-primary-700 flex items-center justify-center text-sm mx-auto mb-1.5">
+                    <i class="fi fi-rr-backpack"></i>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200 inline-block mb-1">
+                    Kepala PAUD &amp; TK
+                  </span>
+                  <h3 class="text-sm font-bold text-slate-900" id="org-kepala-paud-tk">Kepala Sekolah PAUD/TK</h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Operasional Jenjang Usia Dini</p>
+                </div>
+              </div>
+
+              <!-- Koordinator TPQ -->
+              <div class="flex flex-col items-center w-64 -mt-0.5">
+                <div class="w-0.5 h-6 bg-primary-300"></div>
+                <div class="bg-white border border-slate-200/90 hover:border-primary-400 rounded-2xl p-4 shadow-sm text-center w-full transition">
+                  <div class="w-9 h-9 rounded-xl bg-sky-50 text-primary-700 flex items-center justify-center text-sm mx-auto mb-1.5">
+                    <i class="fi fi-rr-book-alt"></i>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200 inline-block mb-1">
+                    Koordinator TPQ
+                  </span>
+                  <h3 class="text-sm font-bold text-slate-900" id="org-kepala-tpq">Koordinator TPQ Al-Qur'an</h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Bimbingan Al-Qur'an &amp; Tahfidz</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -362,6 +452,85 @@
   <script src="js/public-shell.js"></script>
   <script>
     injectSiteChrome({ activeKey: 'profile', basePath: './' });
+
+    async function loadProfilePageData() {
+      try {
+        if (typeof window.apiCall !== 'function') return;
+        const res = await window.apiCall('schools', 'get');
+        if (res && res.success && res.data) {
+          const d = res.data;
+          if (d.sejarah) {
+            const el = document.getElementById('profil-sejarah');
+            if (el) {
+              const paras = d.sejarah.split('\n\n').filter(Boolean);
+              el.innerHTML = paras.map(p => `<p class="text-justify [text-align-last:left]">${p.replace(/\n/g, '<br>')}</p>`).join('');
+            }
+          }
+          if (d.visi) {
+            const el = document.getElementById('profil-visi');
+            if (el) el.textContent = d.visi;
+          }
+          if (d.misi) {
+            const el = document.getElementById('profil-misi');
+            if (el) {
+              let items = [];
+              if (Array.isArray(d.misi)) items = d.misi;
+              else if (typeof d.misi === 'string') items = d.misi.split('\n').map(s => s.trim()).filter(Boolean);
+              if (items.length > 0) {
+                el.innerHTML = `<ul class="space-y-2 text-xs sm:text-sm text-slate-700">${items.map(m => `
+                  <li class="flex items-start gap-2">
+                    <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+                    <span>${m}</span>
+                  </li>
+                `).join('')}</ul>`;
+              }
+            }
+          }
+          if (d.budaya) {
+            const el = document.getElementById('profil-budaya');
+            if (el) el.textContent = d.budaya;
+          }
+          if (d.pembina) {
+            const el = document.getElementById('org-pembina');
+            if (el) el.textContent = d.pembina;
+          }
+          if (d.pengawas) {
+            const el = document.getElementById('org-pengawas');
+            if (el) el.textContent = d.pengawas;
+          }
+          const ketua = d.ketua_yayasan || d.headmaster_name;
+          if (ketua) {
+            const el = document.getElementById('org-ketua');
+            if (el) el.textContent = ketua;
+          }
+          if (d.sekretaris) {
+            const el = document.getElementById('org-sekretaris');
+            if (el) el.textContent = d.sekretaris;
+          }
+          if (d.bendahara) {
+            const el = document.getElementById('org-bendahara');
+            if (el) el.textContent = d.bendahara;
+          }
+          const org = d.struktur_organisasi || {};
+          if (org.kepala_paud_tk) {
+            const el = document.getElementById('org-kepala-paud-tk');
+            if (el) el.textContent = org.kepala_paud_tk;
+          }
+          if (org.kepala_tpq) {
+            const el = document.getElementById('org-kepala-tpq');
+            if (el) el.textContent = org.kepala_tpq;
+          }
+        }
+      } catch (err) {
+        console.warn('Error loading profile page data:', err);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadProfilePageData);
+    } else {
+      loadProfilePageData();
+    }
   </script>
 </body>
 </html>
