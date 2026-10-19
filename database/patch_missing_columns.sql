@@ -21,6 +21,10 @@ ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS photo_url TEXT;
 ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS birth_certificate_url TEXT;
 ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS family_card_url TEXT;
 ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS form_metadata JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS converted_nis VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS class_name VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS password VARCHAR(255);
 
 -- 2. News (Berita)
 ALTER TABLE news ADD COLUMN IF NOT EXISTS author VARCHAR(150) DEFAULT 'Admin Sekolah';
@@ -97,15 +101,27 @@ ALTER TABLE students ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS religion VARCHAR(50) DEFAULT 'Islam';
 ALTER TABLE students ADD COLUMN IF NOT EXISTS entry_year VARCHAR(10) DEFAULT '2026';
 ALTER TABLE students ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS program VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS level VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS reg_number VARCHAR(100);
 
 -- 8B. Kolom Otentikasi & Sesi Users V2
 ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS fallback_dob_password VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date VARCHAR(50);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_password_changed BOOLEAN DEFAULT TRUE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS student_id VARCHAR(50);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS teacher_id VARCHAR(50);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_id VARCHAR(50);
+
+-- 8C. Kolom Berkas Dokumen Santri (student_documents)
+ALTER TABLE student_documents ADD COLUMN IF NOT EXISTS status VARCHAR(30) DEFAULT 'pending';
+
+-- 8D. Kolom Tenaga Pendidik (teachers)
+ALTER TABLE teachers ADD COLUMN IF NOT EXISTS subject_specialty VARCHAR(100);
 
 -- Pastikan akun Super Admin tersedia
 INSERT INTO users (id, email, password_hash, full_name, name, role, role_label, status, is_password_changed)

@@ -1439,6 +1439,35 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 
 ---
 
+### 🗓️ Sesi 42 — Remediasi 4 Tahap Terpadu: Penyiapan Skema Database, Keamanan Privasi & Preservasi Sandi PPDB, Sinkronisasi Rombel Kelas & Anti-Duplikasi SPP, Serta Simulasi Siklus Penuh E2E (19 Oktober 2026, Malam)
+
+**Fokus Utama:** Melakukan audit menyeluruh atas arsitektur kode dan logika sistem PPDB, konversi siswa baru, dan otentikasi login, kemudian mengeksekusi rencana perbaikan 4 tahap yang disetujui pengguna secara terstruktur tanpa regresi:
+
+1. **Tahap 1 (Penyiapan Laci & Kolom Database Resmi):**
+   - Membuat file migrasi DDL idempotent: `database/patch_siyayasan_v2_phase1_columns.sql` yang menambahkan kolom `converted_nis`, `nis`, `class_name`, `password` pada tabel `ppdb_registrations`; `fallback_dob_password`, `birth_date` pada tabel `users`; `program`, `level`, `registration_number`, `reg_number` pada `students`; `subject_specialty` pada `teachers`; dan `status` pada `student_documents`.
+   - Memperbarui `database/MASTER_SUPABASE_SETUP_V2.sql` dan `database/patch_missing_columns.sql`.
+   - Mengimplementasikan *Defensive Query Adapter* di `frontend/shared/js/api.js` sehingga sistem tetap berjalan 100% stabil dengan atau tanpa kolom baru di Supabase live.
+   - Pengujian: `tests/test-phase-1-schema.js` LULUS 100%.
+
+2. **Tahap 2 (Keamanan Privasi & Preservasi Kata Sandi PPDB):**
+   - Menghapus stringifikasi password pendaftaran ke catatan publik di `frontend/public/ppdb.html`.
+   - Menambahkan filter sensor privasi `sanitizeOfficialNotes()` di `frontend/public/ppdb/status.html` untuk memblokir string mentah JSON, NIK, dan kata sandi dari tampilan kartu publik.
+   - Menyimpan kata sandi pendaftaran khusus ke `cleanMeta.password`, `cleanMeta.account_password`, dan `regPayload.password` di `api.js`.
+   - Memprioritaskan kata sandi pendaftaran sebagai `initialPassword` saat admin mengonversi calon siswa, dengan fallback tanggal lahir (DDMMYYYY).
+   - Pengujian: `tests/test-phase-2-privacy-password.js` LULUS 100%.
+
+3. **Tahap 3 (Sinkronisasi Filter Kelas saat Konversi & Otomasi Tagihan SPP Awal):**
+   - Menyelaraskan filter kelas di `frontend/portal/admin/ppdb.html` dengan normalisasi format (`normTarget`, `compactTarget`, `normCLevel`, `compactCLevel`) dan regex word boundary `/\bKB\b/`, sehingga jenjang `TK_A`, `TK A`, `TKA`, `TK_B`, `TK B`, `TKB`, `PAUD`, `KB`, dan `TPQ` tersaring 100% presisi tanpa tertukar.
+   - Memasang proteksi anti-duplikasi penerbitan invoice SPP bulan berjalan di `ppdb.convert` (`frontend/shared/js/api.js`), mencegah tagihan ganda bila admin memproses ulang konversi.
+   - Memperkuat tampilan nomor NIS dan kelas di `frontend/public/ppdb/status.html` (termasuk fallback regex dari `r.notes`), menambahkan fitur salin NIS 1-klik, dan memoles tombol CTA Portal Siswa dengan warna Oceanic Blue solid `bg-primary-500 hover:bg-primary-400 text-white`.
+   - Pengujian: `tests/test-phase-3-classes-spp.js` LULUS 100%.
+
+4. **Tahap 4 (Simulasi Pengujian Menyeluruh End-to-End & Verifikasi Regresi):**
+   - Menjalankan simulasi 4 siklus beruntun (Pendaftaran PPDB -> Konversi Siswa oleh Admin TU -> Cek Status Pendaftaran Publik -> Login Siswa Aktif).
+   - Seluruh 8 suite pengujian (`test-batch-1` s/d `test-batch-4`, `test-phase-1` s/d `test-phase-4`) berjalan 100% LULUS tanpa kegagalan.
+
+---
+
 ## 6. 📁 Struktur File Penting
 
 ```

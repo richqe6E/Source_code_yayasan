@@ -529,6 +529,8 @@ END $$;
 -- 1. Pastikan seluruh kolom login V2 & last_login ada di tabel users
 ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS fallback_dob_password VARCHAR(50);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date VARCHAR(50);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_password_changed BOOLEAN DEFAULT TRUE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP WITH TIME ZONE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS student_id VARCHAR(50);
@@ -538,6 +540,10 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_id VARCHAR(50);
 -- 2. Pastikan seluruh kolom relasi & status V2 ada di tabel students
 ALTER TABLE students ADD COLUMN IF NOT EXISTS user_id VARCHAR(50);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS nisn VARCHAR(50);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS program VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS level VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS reg_number VARCHAR(100);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS kelas_sekarang VARCHAR(100);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS semester_sekarang VARCHAR(50) DEFAULT 'Semester 1 (Ganjil)';
 ALTER TABLE students ADD COLUMN IF NOT EXISTS status_kenaikan VARCHAR(50) DEFAULT 'Aktif';
@@ -549,6 +555,14 @@ ALTER TABLE students ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS religion VARCHAR(50) DEFAULT 'Islam';
 ALTER TABLE students ADD COLUMN IF NOT EXISTS entry_year VARCHAR(10) DEFAULT '2026';
 ALTER TABLE students ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+
+-- 3. Kolom pelengkap PPDB Registrations, Documents, dan Teachers
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS converted_nis VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS class_name VARCHAR(100);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS password VARCHAR(255);
+ALTER TABLE student_documents ADD COLUMN IF NOT EXISTS status VARCHAR(30) DEFAULT 'pending';
+ALTER TABLE teachers ADD COLUMN IF NOT EXISTS subject_specialty VARCHAR(100);
 
 -- ==============================================================================
 -- 11. MASTER DATA SEED AWAL (SIAP PAKAI)

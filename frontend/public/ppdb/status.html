@@ -78,6 +78,16 @@
       return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
     }
 
+    function sanitizeOfficialNotes(notes) {
+      if (!notes || typeof notes !== 'string') return '';
+      const trimmed = notes.trim();
+      // Cegah kebocoran string JSON mentah dari form metadata/password/NIK ke publik
+      if (trimmed.startsWith('{') || trimmed.includes('"nik":') || trimmed.includes('"password":') || trimmed.includes('"full_address":')) {
+        return '';
+      }
+      return trimmed;
+    }
+
     async function checkStatus(regNumber) {
       const reg = (regNumber || '').trim().toUpperCase();
       if (!reg) return;
@@ -132,7 +142,17 @@
         const parentName = r.parent_name || r.father_name || r.mother_name || '-';
         const parentPhone = r.parent_phone || r.phone || r.father_phone || '-';
         let nis = r.converted_nis || r.nis || r.student_nis || (r.form_metadata && (r.form_metadata.converted_nis || r.form_metadata.nis)) || '';
-        const className = r.class_name || (r.form_metadata && r.form_metadata.class_name) || '';
+        let className = r.class_name || (r.form_metadata && r.form_metadata.class_name) || '';
+
+        // Ekstraksi fallback dari r.notes jika field eksplisit belum terisi
+        if (!nis && typeof r.notes === 'string') {
+          const matchNis = r.notes.match(/NIS:\s*([A-Za-z0-9_-]+)/i);
+          if (matchNis && matchNis[1]) nis = matchNis[1].trim();
+        }
+        if (!className && typeof r.notes === 'string') {
+          const matchClass = r.notes.match(/Kelas:\s*([^),]+)/i);
+          if (matchClass && matchClass[1]) className = matchClass[1].trim();
+        }
 
         const isConverted = rawStatus === 'converted' || Boolean(nis && (rawStatus === 'accepted' || rawStatus === 'approved'));
         const isApproved = !isConverted && (rawStatus === 'approved' || rawStatus === 'accepted');
@@ -191,9 +211,9 @@
               </div>
 
               <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="../login.html" class="flex-1 py-3 px-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <a href="../login.html" class="flex-1 py-3 px-4 bg-primary-500 hover:bg-primary-400 text-white font-bold text-xs rounded-xl shadow-lg shadow-primary-950/40 border border-primary-400/30 transition flex items-center justify-center gap-2">
                   <span>Masuk ke Portal Siswa Sekarang</span>
-                  <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </a>
                 <button type="button" onclick="printOfficialLetter()" class="py-3 px-4 bg-white/15 hover:bg-white/25 text-white font-semibold text-xs rounded-xl border border-white/30 transition flex items-center justify-center gap-2">
                   <i class="fi fi-rr-print text-xs"></i>
@@ -306,17 +326,22 @@
             <dl class="grid sm:grid-cols-2 gap-4 text-xs mb-5">
               <div><dt class="text-slate-500 mb-0.5">Nama Lengkap Calon Siswa</dt><dd class="font-bold text-slate-900 text-sm">${escapeHtml(childName)}</dd></div>
               <div><dt class="text-slate-500 mb-0.5">Jenjang / Unit Tujuan</dt><dd class="font-bold text-primary-700 uppercase">${escapeHtml(jenjang)}</dd></div>
+              ${nis ? `<div><dt class="text-slate-500 mb-0.5">Nomor Induk Siswa (NIS Resmi)</dt><dd class="font-bold text-primary-800 font-mono text-sm">${escapeHtml(nis)}</dd></div>` : ''}
+              ${className ? `<div><dt class="text-slate-500 mb-0.5">Kelas / Rombongan Belajar</dt><dd class="font-bold text-slate-800">${escapeHtml(className)}</dd></div>` : ''}
               <div><dt class="text-slate-500 mb-0.5">Tanggal Lahir</dt><dd class="font-medium text-slate-800">${birthDate || '-'}</dd></div>
               <div><dt class="text-slate-500 mb-0.5">Tanggal Mendaftar</dt><dd class="font-medium text-slate-800">${createdAt ? createdAt.split('T')[0] : '-'}</dd></div>
               <div><dt class="text-slate-500 mb-0.5">Nama Orang Tua / Wali</dt><dd class="font-semibold text-slate-800">${escapeHtml(parentName)}</dd></div>
               <div><dt class="text-slate-500 mb-0.5">Kontak WhatsApp Terdaftar</dt><dd class="font-mono text-slate-800">${escapeHtml(parentPhone)}</dd></div>
             </dl>
 
-            ${r.notes ? `
-              <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs mb-4">
-                <span class="font-bold text-slate-700 block mb-1">Catatan Resmi Panitia PPDB:</span>
-                <p class="text-slate-600 leading-relaxed">${escapeHtml(r.notes)}</p>
-              </div>` : ''}
+            ${(() => {
+              const safeNotes = sanitizeOfficialNotes(r.notes);
+              return safeNotes ? `
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs mb-4">
+                  <span class="font-bold text-slate-700 block mb-1">Catatan Resmi Panitia PPDB:</span>
+                  <p class="text-slate-600 leading-relaxed">${escapeHtml(safeNotes)}</p>
+                </div>` : '';
+            })()}
 
             <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
               <span>Yayasan At Tarbiyyah Wijaya Kusuma &bull; Sekretariat PPDB Terpadu</span>

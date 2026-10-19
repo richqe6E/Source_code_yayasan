@@ -851,7 +851,7 @@
           let query = 'teachers?select=*&order=full_name.asc';
           if (params.search || params.q) {
             const sTerm = encodeURIComponent(params.search || params.q);
-            query += `&or=(full_name.ilike.*${sTerm}*,nip.ilike.*${sTerm}*,subject_specialty.ilike.*${sTerm}*)`;
+            query += `&or=(full_name.ilike.*${sTerm}*,nip.ilike.*${sTerm}*,specialization.ilike.*${sTerm}*)`;
           }
           if (params.is_active !== undefined && params.is_active !== '') {
             const isAct = (params.is_active === true || params.is_active === 'true' || params.is_active === 1 || params.is_active === '1');
@@ -1513,12 +1513,24 @@
           delete cleanMeta.birth_certificate_url;
           delete cleanMeta.family_card_url;
           delete cleanMeta.notes;
-          delete cleanMeta.password;
+          cleanMeta.password = password;
+          cleanMeta.account_password = password;
           cleanMeta.uploaded_files = {
             photo_url: photoUrl || '',
             birth_certificate_url: certUrl || '',
             family_card_url: kkUrl || ''
           };
+
+          let safeIncomingNotes = params.notes || '';
+          if (typeof safeIncomingNotes === 'string' && safeIncomingNotes.trim().startsWith('{')) {
+            try {
+              const parsedNotes = JSON.parse(safeIncomingNotes);
+              if (parsedNotes.account && parsedNotes.account.password) {
+                delete parsedNotes.account.password;
+              }
+              safeIncomingNotes = JSON.stringify(parsedNotes);
+            } catch (_) {}
+          }
 
           const regPayload = {
             id,
@@ -1545,7 +1557,9 @@
             address: address,
             level: level,
             status: 'pending',
-            notes: params.notes || '',
+            notes: safeIncomingNotes,
+            password: password,
+            account_password: password,
             photo_url: photoUrl || '',
             birth_certificate_url: certUrl || '',
             family_card_url: kkUrl || '',
@@ -1654,7 +1668,15 @@
             localStorage.setItem('siy_local_students', JSON.stringify(localStudents));
           } catch (_) {}
 
-          await supabaseRest('students', 'POST', newStudent).catch(err => console.warn('Student profile warning:', err));
+          try {
+            await supabaseRest('students', 'POST', newStudent);
+          } catch (err) {
+            console.warn('Student profile primary insert failed, retrying with core columns:', err);
+            const safeStudent = { ...newStudent };
+            delete safeStudent.program;
+            delete safeStudent.level;
+            await supabaseRest('students', 'POST', safeStudent).catch(e => console.warn('Student profile fallback insert warning:', e));
+          }
 
           // Sinkronkan berkas yang diunggah saat PPDB ke tabel student_documents
           const initialDocs = [
@@ -1663,16 +1685,22 @@
             { type: 'kartu_keluarga', name: 'Kartu Keluarga', url: kkUrl }
           ].filter(d => d.url);
           for (const doc of initialDocs) {
-            try {
               await supabaseRest('student_documents', 'POST', {
                 id: 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                 student_id: studentId,
                 document_type: doc.type,
                 file_name: doc.name,
                 file_url: doc.url,
-                status: 'pending'
+                is_verified: false
+              }).catch(async () => {
+                await supabaseRest('student_documents', 'POST', {
+                  id: 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                  student_id: studentId,
+                  document_type: doc.type,
+                  file_name: doc.name,
+                  file_url: doc.url
+                }).catch(() => {});
               });
-            } catch (_) {}
           }
 
           // 4. Simpan sesi login otomatis ke localStorage
@@ -1847,7 +1875,7 @@
             const p = birthDateStr.split('-');
             if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
           }
-          const customPpdbPass = String(reg.password || (reg.form_metadata && reg.form_metadata.password) || '').trim();
+          const customPpdbPass = String(reg.password || reg.account_password || (reg.form_metadata && (reg.form_metadata.password || reg.form_metadata.account_password)) || '').trim();
           const initialPassword = customPpdbPass || birthDatePassword;
 
           const regNo = reg.registration_number || reg.registration_no || '';
@@ -1866,37 +1894,47 @@
             ? existingUsers[0].student_id
             : ('STU-' + String(Date.now()).slice(-5));
 
+          const userPayloadToSave = {
+            email: studentEmail,
+            role: 'siswa_aktif',
+            role_label: 'Siswa Aktif',
+            nis: studentNis,
+            student_id: stuId,
+            password_hash: initialPassword,
+            fallback_dob_password: birthDatePassword,
+            birth_date: birthDateStr,
+            is_password_changed: Boolean(customPpdbPass),
+            status: 'active'
+          };
+
           if (existingUsers && existingUsers.length > 0) {
-            await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', {
-              email: studentEmail,
-              role: 'siswa_aktif',
-              role_label: 'Siswa Aktif',
-              nis: studentNis,
-              student_id: stuId,
-              password_hash: initialPassword,
-              fallback_dob_password: birthDatePassword,
-              birth_date: birthDateStr,
-              is_password_changed: Boolean(customPpdbPass),
-              status: 'active'
-            });
+            try {
+              await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', userPayloadToSave);
+            } catch (errUserPatch) {
+              console.warn('User patch primary with DOB fields failed, trying core fields:', errUserPatch);
+              const safePatch = { ...userPayloadToSave };
+              delete safePatch.fallback_dob_password;
+              delete safePatch.birth_date;
+              await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', safePatch).catch(() => {});
+            }
           } else {
-            await supabaseRest('users', 'POST', {
+            const newUserRecord = {
               id: userId,
-              email: studentEmail,
-              password_hash: initialPassword,
-              fallback_dob_password: birthDatePassword,
-              birth_date: birthDateStr,
+              ...userPayloadToSave,
               full_name: studentName,
               name: studentName,
               phone: reg.phone || reg.parent_phone || '',
-              role: 'siswa_aktif',
-              role_label: 'Siswa Aktif',
-              nis: studentNis,
-              student_id: stuId,
-              avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-              status: 'active',
-              is_password_changed: Boolean(customPpdbPass)
-            });
+              avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'
+            };
+            try {
+              await supabaseRest('users', 'POST', newUserRecord);
+            } catch (errUserPost) {
+              console.warn('User post primary with DOB fields failed, trying core fields:', errUserPost);
+              const safePost = { ...newUserRecord };
+              delete safePost.fallback_dob_password;
+              delete safePost.birth_date;
+              await supabaseRest('users', 'POST', safePost).catch(() => {});
+            }
           }
 
           // 6. Buat atau Update Data Siswa Aktif (Tanpa Duplikasi Baris Pending)
@@ -1946,52 +1984,66 @@
           }
 
           // 7. Update Status Registrasi PPDB menjadi 'converted'
-          await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
-            status: 'converted',
+          const metaWithNis = {
+            ...(reg.form_metadata || {}),
             converted_nis: studentNis,
             nis: studentNis,
-            class_name: targetClassName,
-            notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
-          }).catch(async () => {
+            class_name: targetClassName
+          };
+          try {
+            await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
+              status: 'converted',
+              converted_nis: studentNis,
+              nis: studentNis,
+              class_name: targetClassName,
+              form_metadata: metaWithNis,
+              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
+            });
+          } catch (_) {
             await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
               status: 'converted',
               notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`,
-              form_metadata: {
-                ...(reg.form_metadata || {}),
-                converted_nis: studentNis,
-                nis: studentNis,
-                class_name: targetClassName
-              }
+              form_metadata: metaWithNis
             }).catch(() => {});
-          });
+          }
           await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
 
-          // 8. Terbitkan Otomatis Tagihan SPP Bulan Pertama (Jika auto_spp aktif)
+          // 8. Terbitkan Otomatis Tagihan SPP Bulan Pertama (Jika auto_spp aktif & belum pernah diterbitkan untuk bulan berjalan)
           if (params.auto_spp !== false) {
             const currentYear = new Date().getFullYear();
             const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const currentMonthName = monthNames[new Date().getMonth()];
-            const invNumber = `INV/${currentYear}/${String(Math.floor(1000 + Math.random() * 9000))}`;
-            const invDueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-            const invPayload = {
-              id: 'INV-' + String(Date.now()).slice(-6),
-              invoice_number: invNumber,
-              student_id: stuId,
-              student_name: studentName,
-              month: currentMonthName,
-              period: `${currentYear}/${currentYear + 1}`,
-              amount: 150000,
-              due_date: invDueDate,
-              status: 'unpaid',
-              description: `SPP Bulan ${currentMonthName} ${currentYear} (Santri Baru)`
-            };
-            await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
+
+            let hasExistingInvoice = false;
+            try {
+              const existingInvs = await supabaseRest(`invoices?student_id=eq.${encodeURIComponent(stuId)}&month=eq.${encodeURIComponent(currentMonthName)}&select=id`);
+              if (existingInvs && existingInvs.length > 0) hasExistingInvoice = true;
+            } catch (_) {}
+
+            if (!hasExistingInvoice) {
+              const invNumber = `INV/${currentYear}/${String(Math.floor(1000 + Math.random() * 9000))}`;
+              const invDueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+              const invPayload = {
+                id: 'INV-' + String(Date.now()).slice(-6),
+                invoice_number: invNumber,
+                student_id: stuId,
+                student_name: studentName,
+                month: currentMonthName,
+                period: `${currentYear}/${currentYear + 1}`,
+                amount: 150000,
+                due_date: invDueDate,
+                status: 'unpaid',
+                description: `SPP Bulan ${currentMonthName} ${currentYear} (Santri Baru)`
+              };
+              await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
+            }
           }
 
           // 9. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' ? window.location.origin : '';
-          const loginUrl = `${origin}/login.html`;
-          const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${birthDatePassword} (Tanggal Lahir: DDMMYYYY)\nLink Portal: ${loginUrl}`;
+          const activeInitialPass = customPpdbPass || birthDatePassword;
+          const passNotes = customPpdbPass ? `${customPpdbPass} (Password Pendaftaran PPDB)` : `${birthDatePassword} (Tanggal Lahir: DDMMYYYY)`;
+          const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${passNotes}\nLink Portal: ${loginUrl}`;
 
           return {
             success: true,
@@ -2002,7 +2054,8 @@
               initial_credentials: {
                 student_name: studentName,
                 nis: studentNis,
-                default_password: birthDatePassword,
+                default_password: activeInitialPass,
+                fallback_password: birthDatePassword,
                 login_url: loginUrl
               },
               summary_text: summaryText

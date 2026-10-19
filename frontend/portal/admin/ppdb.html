@@ -553,20 +553,28 @@
 
       const defaultNis = '2026' + String(Math.floor(1000 + Math.random() * 9000));
 
-      // Filter kelas yang cocok dengan jenjang pendaftar
+      // Filter kelas yang cocok dengan jenjang pendaftar (dukung format TK_A, TK A, TKA, TK_B, KB, PAUD, TPQ)
+      const normTarget = targetJenjang.replace(/[_\-]/g, ' ').replace(/\s+/g, ' ').trim();
+      const compactTarget = targetJenjang.replace(/[\s_\-]/g, '');
+
       const matchingClasses = classes.filter(c => {
-        const cLevel = (c.level || c.grade_level || c.name || '').toUpperCase();
-        if (targetJenjang.includes('PAUD') || targetJenjang.includes('KB')) {
-          return cLevel.includes('PAUD') || cLevel.includes('KB') || cLevel.includes('BERMAIN');
+        const rawCLevel = (c.level || c.grade_level || c.name || '').toUpperCase();
+        const normCLevel = rawCLevel.replace(/[_\-]/g, ' ').replace(/\s+/g, ' ').trim();
+        const compactCLevel = rawCLevel.replace(/[\s_\-]/g, '');
+
+        if (compactTarget.includes('TKA') || normTarget.includes('TK A')) {
+          return compactCLevel.includes('TKA') || normCLevel.includes('TK A');
         }
-        if (targetJenjang.includes('TK A') || targetJenjang.includes('TKA')) {
-          return cLevel.includes('TK A') || cLevel.includes('TKA');
+        if (compactTarget.includes('TKB') || normTarget.includes('TK B')) {
+          return compactCLevel.includes('TKB') || normCLevel.includes('TK B');
         }
-        if (targetJenjang.includes('TK B') || targetJenjang.includes('TKB')) {
-          return cLevel.includes('TK B') || cLevel.includes('TKB');
+        if (normTarget.includes('PAUD') || normTarget.includes('BERMAIN') || /\bKB\b/.test(normTarget)) {
+          return normCLevel.includes('PAUD') || normCLevel.includes('BERMAIN') || /\bKB\b/.test(normCLevel);
         }
-        if (targetJenjang.includes('TK')) return cLevel.includes('TK');
-        if (targetJenjang.includes('TPQ')) return cLevel.includes('TPQ');
+        if (normTarget.includes('TPQ') || compactTarget.includes('TPQ')) {
+          return normCLevel.includes('TPQ') || compactCLevel.includes('TPQ');
+        }
+        if (normTarget.includes('TK')) return normCLevel.includes('TK');
         return false;
       });
 
