@@ -385,9 +385,13 @@
 
           // Check password
           if (matchedUser.password_hash !== password) {
-            // Check if initial login with birthdate
+            // Check if initial login with birthdate or fallback
             let passedBirthdate = false;
             const bDate = String(matchedUser.birth_date || (studentRecord && studentRecord.birth_date) || '').trim();
+            const fallbackDob = String(matchedUser.fallback_dob_password || '').trim();
+            if (fallbackDob && password === fallbackDob) {
+              passedBirthdate = true;
+            }
             if (bDate) {
               const passClean = password.replace(/[^0-9]/g, '');
               const bClean = bDate.replace(/[^0-9]/g, '');
@@ -402,7 +406,7 @@
               }
             }
             if (!passedBirthdate) {
-              return { success: false, message: 'Password salah. Untuk siswa awal, gunakan Tanggal Lahir (YYYY-MM-DD).' };
+              return { success: false, message: 'Password salah. Gunakan password saat pendaftaran PPDB atau gunakan Tanggal Lahir format DDMMYYYY (contoh: 14052020).' };
             }
           }
 
@@ -1794,13 +1798,15 @@
             return { success: false, message: `NIS ${studentNis} sudah digunakan oleh siswa aktif lain. Silakan gunakan nomor NIS lain.` };
           }
 
-          // 4. Password awal dari Tanggal Lahir (Format default: DDMMYYYY)
+          // 4. Password awal: gunakan password kustom pendaftaran PPDB (jika ada) atau tanggal lahir DDMMYYYY
           let birthDateStr = reg.birth_date || reg.student_birth_date ? String(reg.birth_date || reg.student_birth_date).trim() : '2021-01-01';
           let birthDatePassword = birthDateStr;
           if (birthDateStr.includes('-')) {
             const p = birthDateStr.split('-');
             if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
           }
+          const customPpdbPass = String(reg.password || (reg.form_metadata && reg.form_metadata.password) || '').trim();
+          const initialPassword = customPpdbPass || birthDatePassword;
 
           const regNo = reg.registration_number || reg.registration_no || '';
           const pendaftarEmail = `${regNo.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
@@ -1825,15 +1831,19 @@
               role_label: 'Siswa Aktif',
               nis: studentNis,
               student_id: stuId,
-              password_hash: birthDatePassword,
-              is_password_changed: false,
+              password_hash: initialPassword,
+              fallback_dob_password: birthDatePassword,
+              birth_date: birthDateStr,
+              is_password_changed: Boolean(customPpdbPass),
               status: 'active'
             });
           } else {
             await supabaseRest('users', 'POST', {
               id: userId,
               email: studentEmail,
-              password_hash: birthDatePassword,
+              password_hash: initialPassword,
+              fallback_dob_password: birthDatePassword,
+              birth_date: birthDateStr,
               full_name: studentName,
               name: studentName,
               phone: reg.phone || reg.parent_phone || '',
@@ -1843,7 +1853,7 @@
               student_id: stuId,
               avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
               status: 'active',
-              is_password_changed: false
+              is_password_changed: Boolean(customPpdbPass)
             });
           }
 
