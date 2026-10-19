@@ -1179,6 +1179,23 @@
             }
           };
         }
+        if (action === 'documents') {
+          const studentId = params.student_id || params.id;
+          const nis = params.nis;
+          let docs = [];
+          try {
+            let q = `student_documents?select=*`;
+            if (studentId && nis) {
+              q += `&or=(student_id.eq.${encodeURIComponent(studentId)},student_nis.eq.${encodeURIComponent(nis)})`;
+            } else if (studentId) {
+              q += `&student_id=eq.${encodeURIComponent(studentId)}`;
+            } else if (nis) {
+              q += `&student_nis=eq.${encodeURIComponent(nis)}`;
+            }
+            docs = await supabaseRest(q) || [];
+          } catch (_) { docs = []; }
+          return { success: true, data: docs };
+        }
         if (action === 'delete') {
           await supabaseRest(`students?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
           return { success: true, message: 'Siswa berhasil dihapus' };
