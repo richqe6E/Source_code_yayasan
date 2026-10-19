@@ -27,3 +27,4 @@ desktop.ini
 # Test Backup Snapshots
 frontend/backups/*.json
 
+.vercel

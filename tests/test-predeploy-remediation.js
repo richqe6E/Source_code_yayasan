@@ -142,7 +142,20 @@ assert(
   publicPpdb.includes('current-step-badge') && /Tahap\s+\$\{targetStep\}\s+dari\s+5/.test(publicPpdb),
   'FAILED: ppdb.html updateStepperUI does not update #current-step-badge'
 );
-console.log('✅ Test 11 Passed');
+// 12. Check users/update role_id sanitization & supabaseRest schema-cache self-healing
+console.log('Test 12: Checking users/update column whitelist & supabaseRest schema-cache self-healing...');
+const adminUsers = fs.readFileSync(path.join(__dirname, '../frontend/portal/admin/users.html'), 'utf8');
+assert(
+  apiJs.includes("Could not find the '([^']+)' column") && apiJs.includes('Auto-stripping unrecognized column'),
+  'FAILED: supabaseRest in api.js is missing automatic schema-cache column self-healing'
+);
+assert(
+  apiJs.includes('const resolvedRole = params.role || roleIdToCodeMap[params.role_id];') &&
+  !adminUsers.includes('role_id: ROLE_CODE_TO_ID[roleVal]'),
+  'FAILED: users/update in api.js or users.html still passes raw role_id to Supabase'
+);
+console.log('✅ Test 12 Passed');
 
 console.log('\n🎉 ALL PRE-DEPLOYMENT REMEDIATION TESTS PASSED 100%!');
+
 

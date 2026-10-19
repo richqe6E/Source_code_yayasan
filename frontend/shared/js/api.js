@@ -66,8 +66,8 @@
     return null;
   }
 
-  // Low-level fetch wrapper to Supabase REST API
-  async function supabaseRest(endpoint, method = 'GET', body = null, extraHeaders = {}) {
+  // Low-level fetch wrapper to Supabase REST API (with automatic schema-cache column self-healing)
+  async function supabaseRest(endpoint, method = 'GET', body = null, extraHeaders = {}, _retryCount = 0) {
     if (isSupabaseOffline && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
       throw new Error('OfflineMode');
     }
@@ -102,6 +102,26 @@
 
       if (!res.ok) {
         const errMessage = (data && (data.message || data.error || data.msg)) || `Error ${res.status}`;
+        // Self-healing: if PostgREST rejects an unknown column in POST/PATCH/PUT object payload, strip it and retry
+        if (
+          _retryCount < 8 &&
+          body &&
+          typeof body === 'object' &&
+          !Array.isArray(body) &&
+          (method === 'POST' || method === 'PATCH' || method === 'PUT')
+        ) {
+          const colMatch =
+            errMessage.match(/Could not find the '([^']+)' column/i) ||
+            errMessage.match(/column "([^"]+)" of relation/i);
+          if (colMatch && colMatch[1] && Object.prototype.hasOwnProperty.call(body, colMatch[1])) {
+            const badCol = colMatch[1];
+            console.warn(`[SIYAYASAN] Auto-stripping unrecognized column '${badCol}' on ${method} ${endpoint} and retrying...`);
+            const nextBody = { ...body };
+            delete nextBody[badCol];
+            if (Object.keys(nextBody).length === 0) return [];
+            return supabaseRest(endpoint, method, nextBody, extraHeaders, _retryCount + 1);
+          }
+        }
         throw new Error(errMessage);
       }
       return data;
@@ -1026,13 +1046,19 @@
         }
         if (action === 'create') {
           const id = 'USR-' + String(Date.now()).slice(-5);
+          const roleIdToCodeMap = {
+            'ROL-001': 'super_admin',
+            'ROL-002': 'admin_tu',
+            'ROL-003': 'siswa_aktif',
+            'ROL-004': 'calon_siswa'
+          };
           const roleLabelMap = {
             super_admin: 'Super Admin',
             admin_tu: 'Admin Tata Usaha',
             siswa_aktif: 'Siswa Aktif',
             calon_siswa: 'Calon Siswa / Pendaftar'
           };
-          const role = params.role || 'admin_tu';
+          const role = params.role || roleIdToCodeMap[params.role_id] || 'admin_tu';
           const payload = {
             id,
             email: params.email,
@@ -1043,38 +1069,76 @@
             phone: params.phone || '',
             role,
             role_label: roleLabelMap[role] || role,
-            status: params.status || 'active',
-            avatar: params.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
+            status: params.status || (params.is_active === false ? 'inactive' : 'active'),
+            avatar: params.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+            is_password_changed: true
           };
           const created = await supabaseRest('users', 'POST', payload);
+          await recordActivityLog('CREATE_USER', 'users', `Menambahkan user baru: ${payload.full_name} (${payload.email})`, id);
           const { password_hash, ...safeCreated } = (created && created[0]) || payload;
           return { success: true, data: safeCreated, message: 'User berhasil dibuat' };
         }
         if (action === 'update') {
           const id = params.id;
+          const roleIdToCodeMap = {
+            'ROL-001': 'super_admin',
+            'ROL-002': 'admin_tu',
+            'ROL-003': 'siswa_aktif',
+            'ROL-004': 'calon_siswa'
+          };
           const roleLabelMap = {
             super_admin: 'Super Admin',
             admin_tu: 'Admin Tata Usaha',
             siswa_aktif: 'Siswa Aktif',
             calon_siswa: 'Calon Siswa / Pendaftar'
           };
-          const payload = { ...params };
-          delete payload.id;
-          delete payload.is_active;
-          if (params.is_active !== undefined && !payload.status) {
+          const payload = {};
+          if (params.email !== undefined) payload.email = params.email;
+          if (params.nis !== undefined) payload.nis = params.nis;
+          if (params.username !== undefined) payload.username = params.username;
+          if (params.full_name !== undefined || params.name !== undefined) {
+            payload.full_name = params.full_name || params.name;
+            payload.name = params.name || params.full_name;
+          }
+          if (params.phone !== undefined) payload.phone = params.phone;
+          const resolvedRole = params.role || roleIdToCodeMap[params.role_id];
+          if (resolvedRole) {
+            payload.role = resolvedRole;
+            payload.role_label = params.role_label || roleLabelMap[resolvedRole] || resolvedRole;
+          }
+          if (params.status !== undefined) {
+            payload.status = params.status;
+          } else if (params.is_active !== undefined) {
             payload.status = params.is_active ? 'active' : 'inactive';
           }
-          if (payload.role && !payload.role_label && roleLabelMap[payload.role]) {
-            payload.role_label = roleLabelMap[payload.role];
+          if (params.avatar !== undefined) payload.avatar = params.avatar;
+          if (params.student_id !== undefined) payload.student_id = params.student_id;
+          if (params.teacher_id !== undefined) payload.teacher_id = params.teacher_id;
+          if (params.password || params.password_hash) {
+            payload.password_hash = params.password || params.password_hash;
+            payload.is_password_changed = true;
           }
-          if (payload.password) {
-            payload.password_hash = payload.password;
-            delete payload.password;
-          }
-          if (payload.name && !payload.full_name) payload.full_name = payload.name;
           payload.updated_at = new Date().toISOString();
+
           const updated = await supabaseRest(`users?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
-          const { password_hash, ...safeUpdated } = (updated && updated[0]) || payload;
+          const { password_hash, ...safeUpdated } = (updated && updated[0]) || { id, ...payload };
+
+          // Sinkronkan sesi localStorage jika akun yang diperbarui adalah user yang sedang login
+          if (currentUser && String(currentUser.id) === String(id)) {
+            if (payload.full_name) {
+              currentUser.full_name = payload.full_name;
+              currentUser.name = payload.full_name;
+            }
+            if (payload.email) currentUser.email = payload.email;
+            if (payload.phone !== undefined) currentUser.phone = payload.phone;
+            if (payload.is_password_changed) {
+              currentUser.is_password_changed = true;
+              currentUser.needs_password_change = false;
+            }
+            try { localStorage.setItem('siy_user', JSON.stringify(currentUser)); } catch (_) {}
+          }
+
+          await recordActivityLog('UPDATE_USER', 'users', `Memperbarui akun user ID: ${id}`, id);
           return { success: true, data: safeUpdated, message: 'User berhasil diperbarui' };
         }
         if (action === 'activate' || action === 'deactivate') {
