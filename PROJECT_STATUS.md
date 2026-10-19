@@ -1,33 +1,31 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
-> **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian lokal menyeluruh. Setiap sesi baru wajib membaca file ini terlebih dahulu agar pekerjaan langsung presisi tanpa menganalisa ulang seluruh repositori.
+> **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 19 Oktober 2026 — Sesi 43 (Audit & Remediasi Menyeluruh Pra-Deploy Vercel: Perbaikan 11 Temuan Bug Runtime, Cacat Logika, Sinkronisasi Lintas Perangkat Supabase Cloud, Alur PPDB, Portal Siswa & Portal Admin) | Status: ✅ PRODUCTION & LIVE VERIFIED 100% GREEN (GitHub: richqe6E/Source_code_yayasan)*
+*Terakhir Diperbarui: 19 Oktober 2026 — Sesi 44 (Finalisasi Operasional Live Production Vercel & Supabase Cloud: Integrasi Penuh Portal Admin, Portal Siswa & Website Utama) | Status: ✅ PRODUCTION & LIVE VERIFIED 100% GREEN (`https://siyayasan-portal.vercel.app`)*
 
 ---
 
-## 1. ⚙️ Ringkasan Infrastruktur & Konfigurasi
+## 1. ⚙️ Ringkasan Infrastruktur & Konfigurasi (Sistem Baru Resmi)
 
 | Komponen | Status | Nilai / Keterangan |
 | :--- | :---: | :--- |
 | **Repositori GitHub** | ✅ Terkoneksi & Up to Date | https://github.com/richqe6E/Source_code_yayasan (Branch `main`) |
-| **Supabase Cloud DB** | ✅ Aktif & Terverifikasi (100%) | `https://hnkxrbmngmveoxipohtk.supabase.co` (PostgreSQL & Storage) |
-| **Google Apps Script ID** | ✅ Terkoneksi (Pushed v13/v14) | `1unTcAl8cYbIJwrowkatfJNJGQUIpMOcodn768cPUrxD-i_vMRR366Paj` |
-| **Frontend Hosting** | ✅ Aktif (Vercel) | https://siyayasan-portal.vercel.app |
-| **Localhost Server** | ✅ Aktif & Portabel | `http://localhost:3000` — jalankan: `node frontend/dev-server.js` atau `start-server.cmd` |
-| **Arsitektur Portal** | ✅ 2 Portal Resmi Aktif | **Portal Admin Sekolah** & **Portal Siswa** (Guru & Ortu diarsipkan di `.legacy_backup/`) |
-| **Database Sync** | ✅ Sinkron Multi-Role | PPDB, Siswa, Kelas, Tagihan SPP, Pembayaran, Nilai Akademik |
+| **Supabase Cloud DB & Storage** | ✅ Aktif & Terverifikasi (100%) | `https://hnkxrbmngmveoxipohtk.supabase.co` (PostgreSQL REST & Bucket `siyayasan-uploads`) |
+| **Frontend Production Hosting** | ✅ Aktif (Vercel) | https://siyayasan-portal.vercel.app |
+| **Localhost Server** | ✅ Aktif & Portabel | `http://localhost:3000` — jalankan: `node frontend/dev-server.js` |
+| **Arsitektur Portal** | ✅ Murni 2 Portal + Web Publik | **Portal Admin Sekolah**, **Portal Siswa**, & **Website Publik Utama** (Sistem lama GAS/Portal Guru/Ortu resmi dihapus) |
+| **Database Sync** | ✅ Sinkron Multi-Perangkat | PPDB, Siswa, Kelas, Guru (Tanpa Password), Tagihan SPP, Pembayaran, CMS Konten & Pengaturan Website, Backup Cloud |
 
-### 🔑 Kredensial Akun Uji Coba Resmi (Semua Terverifikasi)
-
+### 🔑 Kredensial Akun Uji Coba Resmi
 
 | Role | Identitas (Email / NIS) | Password | URL Dashboard Tujuan |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@yayasan.sch.id` | `admin123` | `http://localhost:3000/admin/dashboard.html` |
-| **Admin TU** | `tu@yayasan.sch.id` | `tu123456` | `http://localhost:3000/admin/dashboard.html` |
-| **Siswa Aktif (Demo 1)** | `2026001` (NIS) | `2020-03-12` (Tgl Lahir) | `http://localhost:3000/siswa/dashboard.html` |
-| **Siswa Aktif (Demo 2)** | `2026002` (NIS) | `2019-08-25` (Tgl Lahir) | `http://localhost:3000/siswa/dashboard.html` |
+| **Super Admin** | `admin@yayasan.sch.id` | Sesuai Manajemen Akun | `/portal/admin/dashboard.html` |
+| **Admin TU** | `tu@yayasan.sch.id` | `tu123456` | `/portal/admin/dashboard.html` |
+| **Siswa Aktif (Demo 1)** | `2026001` (NIS) | `2020-03-12` (Tgl Lahir) | `/portal/siswa/dashboard.html` |
+| **Siswa Aktif (Demo 2)** | `2026002` (NIS) | `2019-08-25` (Tgl Lahir) | `/portal/siswa/dashboard.html` |
 
-*(Catatan: Portal Guru dan Orang Tua telah dinonaktifkan sesuai kesepakatan ruang lingkup resmi proyek).*
+*(Catatan Mandat: Sistem lama seperti Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dan Rapor Elektronik telah resmi ditinggalkan dan tidak digunakan lagi).*
 
 ---
 
@@ -1465,6 +1463,29 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 4. **Tahap 4 (Simulasi Pengujian Menyeluruh End-to-End & Verifikasi Regresi):**
    - Menjalankan simulasi 4 siklus beruntun (Pendaftaran PPDB -> Konversi Siswa oleh Admin TU -> Cek Status Pendaftaran Publik -> Login Siswa Aktif).
    - Seluruh 8 suite pengujian (`test-batch-1` s/d `test-batch-4`, `test-phase-1` s/d `test-phase-4`) berjalan 100% LULUS tanpa kegagalan.
+
+---
+
+### 🗓️ Sesi 43 & 44 — Audit & Remediasi Pra-Deploy serta Penyempurnaan Operasional Live Vercel & Supabase (19 Oktober 2026, Malam)
+
+**Fokus Utama:** Memastikan seluruh fitur di Website Utama, Portal Admin, dan Portal Siswa berjalan 100% tanpa bug/error di lingkungan produksi (`https://siyayasan-portal.vercel.app`) dan terintegrasi penuh dengan Supabase Cloud:
+
+1. **Remediasi 11 Temuan Pra-Deploy (`a2da3a6`):**
+   - Memperbaiki 4 runtime error (`loginUrl` pada `ppdb/convert`, percabangan `else` pada `siswa/dashboard.html`, `escapeAttr` pada `admin/students.html`, dan fallback logo pada `public-shell.js`).
+   - Mengaktifkan sinkronisasi penuh lintas perangkat via kolom JSON `web_settings.announcement_banner` dan `schools.wa_gateway_token`.
+   - Menyaring konten `draft` dari publik, mendukung jam agenda dinamis (`ev.time`), menambahkan `auth/update_profile`, dan menyempurnakan CRUD Admin & Siswa.
+2. **Perbaikan Ganti Password & Whitelist Kolom `users` (`b2901a3`):**
+   - Menghapus pengiriman kolom warisan `role_id` dari `users/update` & `users/create` serta menambahkan mekanisme *PostgREST schema-cache column self-healing* otomatis di `supabaseRest()`.
+3. **Pembersihan Field Password Guru & Panduan Uji E2E (`9cdec0d`):**
+   - Menghapus field input `Password` warisan dari modal Tambah/Edit Guru di `frontend/portal/admin/teachers.html`.
+   - Membuat panduan pengujian menyeluruh dari awal hingga akhir di `PANDUAN_PENGUJIAN_MENYELURUH_E2E.md`.
+4. **Pembersihan Tabel Berkas Siswa & Pratinjau Thumbnail (`ed13d57`):**
+   - Menghapus kolom `Status Verifikasi (⏳ Menunggu Review)` yang tidak terintegrasi di `frontend/portal/siswa/dokumen.html` dan menambahkan pratinjau gambar (*thumbnail*) langsung pada kartu **Kartu Keluarga (KK)** serta **Akte Kelahiran**.
+5. **Integrasi Penuh Program Pendidikan, Kurikulum, Hero Carousel Auto-Save, Catatan PPDB & Riwayat Backup Cloud (`98a0267`):**
+   - Memasang atribut ID HTML (`#home-program-paud`, `#home-program-tk`, `#home-program-tpq`, `#home-kurikulum`, `#profil-program-paud-tk`, `#profil-program-tpq`, `#profil-kurikulum`) di `public/index.html` dan `public/profil.html` agar perubahan **Program Pendidikan & Kurikulum Unggulan** dari tab **Identitas & Medsos Sekolah** (`admin/content.html`) langsung tampil di Website Utama.
+   - Mengaktifkan *auto-save* ke Supabase saat menambah/menghapus slide Hero Carousel di `admin/cms_setting.html`.
+   - Menyinkronkan catatan periode PPDB ke kolom `notes` dan `announcement_notes` pada `ppdb_periods`, serta menyinkronkan banner CTA bawah di `public/profil.html` saat pendaftaran ditutup.
+   - Memperbaiki penyimpanan riwayat **Backup & Restore Database** (`admin/backup.html` & `api.js`) untuk mencakup seluruh 14 tabel utama dan menyinkronkan metadata riwayat ke Supabase Cloud (`web_settings`) tanpa terkendala batas kuota `localStorage`.
 
 ---
 

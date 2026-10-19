@@ -1,177 +1,94 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 43 — Audit & Remediasi Menyeluruh Pra-Deploy Vercel: Zero Runtime Crash, Sinkronisasi Lintas Perangkat Supabase Cloud, Alur Penuh PPDB -> Portal Siswa -> Portal Admin)  
-**Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (Vercel & Supabase Cloud).
+**Terakhir Diperbarui:** 19 Oktober 2026 (Sesi 44 — Finalisasi Operasional Live Production Vercel & Supabase Cloud: Integrasi Penuh Portal Admin, Portal Siswa & Website Utama)  
+**Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan-portal.vercel.app` & Supabase Cloud).  
+**Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
 ---
 
-## 🎯 1. Ringkasan & Arsitektur Utama Sistem
-Sistem Informasi Manajemen & Portal Website Yayasan (PAUD, TK, TPQ Samarinda) dirancang dengan arsitektur **Lean & Terkoordinasi**, terdiri dari 2 portal inti:
+## 🎯 1. Ringkasan & Arsitektur Utama Sistem (Single Source of Truth)
+Sistem Informasi Manajemen & Portal Website **Yayasan At Tarbiyyah Wijaya Kusuma Samarinda (PAUD, TK, TPQ)** beroperasi penuh di atas **Supabase Cloud (PostgreSQL + Storage)** dan **Vercel Production** dengan arsitektur **2 Portal Inti + Website Publik Utama**:
 1. **Portal Admin & Staf TU** (`frontend/portal/admin/`):
-   - Mengelola PPDB (Penerimaan Peserta Didik Baru), Keuangan SPP & Infaq, Kelas & Rombel, Data Siswa Aktif, Guru/Tenaga Pendidik, CMS Konten Website (Berita, Pengumuman, Agenda, Galeri), CMS Pengaturan Website & Tampilan, Audit Logs, Laporan Ekspor/Impor, dan Backup Database.
+   - Mengelola Dashboard KPI, Manajemen Akun (`users.html`), Data Guru tanpa akun login (`teachers.html`), Kelas & Rombel (`classes.html`), Data Siswa Aktif (`students.html`), Verifikasi & Konversi PPDB (`ppdb.html`), Keuangan SPP & Verifikasi Bukti Transfer (`payments.html`), Kelola Konten & Profil Lembaga (`content.html`), CMS Pengaturan Website & Hero Carousel (`cms_setting.html`), Laporan Ekspor/Impor Excel (`reports.html`), Audit Log (`logs.html`), dan Backup & Restore Database (`backup.html`).
 2. **Portal Siswa & Wali Murid** (`frontend/portal/siswa/`):
-   - Mengelola pendaftaran/biodata calon santri, upload berkas persyaratan, pelacakan seleksi PPDB (4-step tracker), rincian kewajiban SPP & konfirmasi bayar transfer, cetak kuitansi dengan format terbilang resmi Indonesia, dan unduh berkas dokumen sekolah.
+   - Mengelola Dashboard Status PPDB (4-Step Tracker bagi Calon Siswa) & Ringkasan Akademik/SPP (bagi Siswa Aktif) (`dashboard.html`), Biodata & Sinkronisasi Profil (`biodata.html`), Tagihan SPP, Upload Bukti Transfer & Cetak Kuitansi Resmi (`spp.html`), serta Upload & Pratinjau Berkas Dokumen Siswa (`dokumen.html`).
 3. **Website Publik Utama** (`frontend/public/`):
-   - Beranda, Profil Yayasan, Berita, Pengumuman, Agenda, Galeri, Kontak & Peta Interaktif Google Maps, serta Formulir PPDB Online 5 tahap dengan sinkronisasi langsung ke Supabase.
+   - Beranda (`index.html`), Profil Yayasan & Bagan Pohon Organisasi (`profil.html`), Berita (`berita.html`), Pengumuman (`pengumuman.html`), Agenda (`agenda.html`), Galeri (`galeri.html`), Kontak & Peta Interaktif Google Maps (`kontak.html`), Formulir PPDB Online 5 Tahap (`ppdb.html`), dan Cek Status Pendaftaran PPDB (`ppdb/status.html`).
 
 ---
 
-## ⚖️ 2. Keputusan Arsitektur Kunci yang Berlaku
-1. **Rapor Akademik Siswa Ditiadakan:**
-   - **Keputusan:** Halaman rapor elektronik di portal siswa resmi **ditiadakan**.
-   - **Rasional:** Tidak ada Portal Guru dalam sistem yayasan ini. Evaluasi santri usia dini (STPPA 6 Aspek) berupa rapor fisik yang diserahkan guru langsung ke orang tua santri saat pertemuan akhir semester.
-   - **Arsip Digital:** Jika sekolah ingin membagikan scan PDF ijazah/rapor, didistribusikan melalui menu **Berkas Dokumen** (`dokumen.html`). Rute lama `akademik.html` dialihkan secara mulus ke `dashboard.html`.
-2. **Aturan Palet Warna Zero-Green (Oceanic Blue):**
-   - **Keputusan:** Seluruh aksen warna hijau (`emerald`, `green`, `teal`) dihilangkan dari seluruh halaman portal admin dan siswa.
-   - **Standar:** Menggunakan palet Oceanic Blue (`#0284c7`, `#0ea5e9`, `#0369a1`, `#e0f2fe`) untuk status lunas, aktif, disetujui, dan elemen brand yayasan.
-3. **Pengaturan Lokasi, Alamat & Google Maps Dinamis Tanpa Koding:**
-   - **Keputusan:** Alamat fisik, catatan kampus, tautan langsung Google Maps, dan URL iframe embed peta Google Maps dapat diubah sewaktu-waktu oleh pihak Admin/TU melalui formulir visual di **CMS Pengaturan Website** (`cms_setting.html`) dan **Profil Lembaga** (`content.html`).
-4. **Skema Storage & Basis Data Supabase Cloud:**
-   - **Database:** Menggunakan 16 tabel relasional PostgreSQL di Supabase Cloud (`users`, `students`, `teachers`, `classes`, `invoices`, `payments`, `ppdb_registrations`, `ppdb_periods`, `student_documents`, `news`, `announcements`, `events`, `galleries`, `schools`, `activity_logs`, `contact_messages`).
-   - **Storage:** Bucket `siyayasan-uploads` aktif dengan kebijakan public access untuk file bukti transfer, foto profil, dokumen santri, dan aset konten.
-   - **Graceful Fallback:** Jika koneksi Supabase terputus, sistem otomatis berpindah ke `localStorage` tanpa menimbulkan crash layar.
-5. **Visibilitas Kartu Formulir PPDB Dinamis Berbasis Status Admin:**
-   - **Keputusan:** Saat admin menutup pendaftaran PPDB (`status = closed`), kartu formulir pendaftaran diri (`#formulir-pendaftaran`) disembunyikan sepenuhnya dari website publik, dan digantikan oleh kartu pemberitahuan pendaftaran ditutup beserta linimasa jadwal. Saat admin membuka kembali PPDB (`status = open`), kartu formulir otomatis muncul kembali.
+## ⚖️ 2. Keputusan Arsitektur Kunci yang Berlaku Permanen
+1. **Sistem Murni 2-Portal (Tanpa Portal Guru & Tanpa Portal Ortu Terpisah):**
+   - **Guru / Tenaga Pendidik** adalah data direktori kepegawaian & wali kelas yang dikelola oleh Admin di `teachers.html` (tanpa field password/login).
+   - **Rapor Akademik Elektronik Ditiadakan** karena evaluasi santri usia dini diberikan secara fisik kepada orang tua.
+2. **Berkas Dokumen Siswa (`siswa/dokumen.html`) Terintegrasi Langsung ke Modal Detail Siswa Admin (`admin/students.html` & `admin/ppdb.html`):**
+   - Kartu unggah **Kartu Keluarga (KK)** dan **Akte Kelahiran** menampilkan pratinjau gambar (*thumbnail*) langsung, dan tabel riwayat unggahan bebas dari kolom status verifikasi per-dokumen yang tidak memiliki tombol aksi di Admin.
+3. **Aturan Palet Warna Zero-Green (Oceanic Blue):**
+   - Seluruh halaman publik, portal admin, dan portal siswa menggunakan palet **Oceanic Blue** (`#0284c7`, `#0ea5e9`, `#0369a1`, `#e0f2fe`).
+4. **Sinkronisasi Penuh Lintas Perangkat (Supabase Cloud Persistence):**
+   - Seluruh pengaturan dari `content.html` dan `cms_setting.html` (termasuk `visi`, `misi`, `budaya`, `sejarah`, `program_pendidikan.{paud,tk,tpq}`, `kurikulum`, `struktur_organisasi`, `operational_hours`, `hero_images`, `maps_url`, `maps_embed_url`, dan `backup_history`) disimpan ke Supabase (`web_settings` & `schools`) sehingga tampil konsisten di semua perangkat pengunjung.
+5. **Self-Healing PostgREST Adapter (`frontend/shared/js/api.js`):**
+   - Fungsi `supabaseRest` dilengkapi mekanisme *automatic column self-healing*: apabila sebuah *payload* `POST`/`PATCH` menyertakan kolom lama yang tidak ada pada skema tabel Supabase, adapter otomatis menghapus kolom tersebut dan mengulang permintaan tanpa error.
 
 ---
 
-## 🛠️ 3. Remediasi 12 Kerentanan Audit Komprehensif (Sesi 37)
-Seluruh 12 temuan dari laporan audit telah diremediasi secara tuntas melalui **Plan B (Implementasi Bertahap Berlapis)**:
+## 🛠️ 3. Riwayat Remediasi & Pembaruan Sistem Terbaru (Sesi 43 & Sesi 44)
 
-### 🔹 Batch 1: Pondasi Adapter Supabase & Integrasi Skema
-- **BUG-01:** Menambahkan batas waktu (`timeout` 8s read, 15s write, 25s storage) di `frontend/shared/js/api.js` untuk mencegah hanging UI saat jaringan terputus.
-- **BUG-02:** Menghapus payload Base64 raksasa dari kolom JSONB `cleanMeta` sebelum disimpan ke tabel `student_documents`.
-- **BUG-03:** Memperbaiki hardcoded period ID `1` pada `update_period` di `api.js` menjadi dinamis sesuai parameter pemanggilan.
-- **BUG-04:** Memperbaiki filter status PPDB di `api.js` agar mendukung pencarian multi-status `status=in.(approved,accepted)`.
-- **BUG-05:** Menstandarkan respon `payments/summary` agar menyediakan kunci ganda (`total_amount`/`total_revenue`, `paid_amount`/`total_paid`, `unpaid_amount`/`total_unpaid`, `pending_amount`/`total_pending`).
-- **BUG-06:** Menginjeksi tag `<script src="../../shared/js/supabase-config.js"></script>` pada seluruh 12 file HTML portal admin agar adapter Supabase selalu siap pakai.
-- **BUG-11:** Menghapus blok dead-code duplikat di `frontend/portal/admin/dashboard.html`.
-- **Tambahan:** Menghubungkan modul `backup/restore` langsung ke Supabase dengan metode `upsert`, dan memetakan field `activity_logs` (`details`, `entity_type`).
-
-### 🔹 Batch 2: Alur Kritis PPDB, Dokumen Santri & Kontak
-- **BUG-07:** Memperbaiki modal sukses konversi siswa baru di `ppdb.html` dengan mendeklarasikan variabel `defaultPassword` dan `loginUrl`.
-- **Penyelarasan PPDB Publik:** Form registrasi online publik (`frontend/public/js/app.js`) menyinkronkan seluruh biodata lengkap santri ke tabel `ppdb_registrations` dan meregistrasikan berkas dokumen ke tabel `student_documents`.
-- **Dynamic 4-Step Tracker:** Halaman `frontend/portal/siswa/dashboard.html` menyajikan visual status seleksi PPDB 4 tahap (`Pendaftaran` -> `Verifikasi Berkas` -> `Wawancara & Seleksi` -> `Diterima / Registrasi Ulang`).
-- **Standardisasi Kontak:** Menstandarkan format nomor WhatsApp ke format internasional `62...` di `kontak.html` dan menyimpan pesan formulir ke tabel `contact_messages`.
-
-### 🔹 Batch 3: Konsistensi Antarmuka Admin & Siswa
-- **Manajemen Konten:** Memprioritaskan field `status` di atas boolean `is_published` pada `content.html`, serta menambahkan tombol hapus galeri.
-- **Manajemen Pengguna:** Membatasi pilihan role di `users.html` hanya pada role aktif 2-portal (`super_admin`, `admin`, `siswa_aktif`, `calon_siswa`) dan menambahkan aksi hapus user (`deleteUser`).
-- **Manajemen Kelas:** Menambahkan jenjang `TK` dan `TPQ` pada formulir kelas (`classes.html`).
-- **Manajemen Guru:** Menambahkan tombol hapus guru dan filter pencarian berbasis NIP di `teachers.html`.
-- **Format Kuitansi Resmi:** Menambahkan generator terbilang Bahasa Indonesia (`angkaKeTerbilang`) pada kuitansi pembayaran SPP di `payments.html` (Admin) dan `spp.html` (Siswa).
-
-### 🔹 Batch 4: Penegakan Zero-Green Rule & Audit Palet
-- Mengaudit seluruh 14 file portal HTML (`10 portal admin` + `4 portal siswa`).
-- Menghapus 113 deklarasi warna hijau/emerald/teal dan mengonversinya ke palet Oceanic Blue (`#0284c7`, `#0ea5e9`, `#0369a1`).
-
----
-
-## 🛠️ 3.1. Remediasi 17 Temuan Audit Pengguna (Sesi 41 — TDD 4 Batch)
-1. **Batch 1 (Bug Kritis & Keamanan — Commit `4607f13`):**
-   - SyntaxError pada `ppdb.html` diperbaiki.
-   - Kueri dokumen santri di `api.js` dibersihkan dari kolom fiktif `student_nis.eq`.
-   - Isolasi role login di `login.html` mencegah tab siswa dimasuki email admin dan sebaliknya, plus modal bantuan kontekstual.
-   - Uji unit: `tests/test-batch-1-critical.js` 100% LULUS.
-2. **Batch 2 (UX Portal, Profil 1-Klik & Navigasi — Commit `5335d5c`):**
-   - Tombol refresh modern 360° tactile state di `shell.js` dan `dokumen.html`.
-   - Ikon resmi siswa `STUDENT_ICONS` di `shell.js` dan emoji duplikat dibersihkan.
-   - Modal profil 1-klik di header portal untuk ganti nama dan upload avatar seketika.
-   - Sinkronisasi instan nama santri di `biodata.html` ke `localStorage.siy_user` dan database.
-   - Uji unit: `tests/test-batch-2-portal-ux.js` 100% LULUS.
-3. **Batch 3 (Eliminasi Fallback Dummy, Standarisasi Terminologi, Jam Operasional Dinamis, & Accordion PPDB — Commit `d4d0e54`):**
-   - Logika pemaksaan data dummy saat konten kosong dihapus total di `agenda.html`, `berita.html`, `pengumuman.html`, dan `galeri.html`; diganti *Empty State* resmi.
-   - Istilah "Kampus" distandarkan menjadi "Gedung Utama Yayasan" / "Lokasi Yayasan".
-   - Form Jam Operasional Pelayanan Kantor di `cms_setting.html` disinkronkan ke `kontak.html`.
-   - Accordion persyaratan & kelengkapan berkas PPDB interaktif buka-tutup dengan animasi chevron di `ppdb.html`.
-   - Uji unit: `tests/test-batch-3-cms-fallback.js` 100% LULUS.
-4. **Batch 4 (Penyelarasan Total Profil & Beranda — Single Source of Truth — Commit `b417948`):**
-   - Form CMS Profil Lengkap di `content.html` (Visi, Misi, Budaya, Sejarah, Program Pendidikan, Kurikulum Unggulan, Struktur Organisasi).
-   - Single Source of Truth Visi & Misi serentak ke Beranda (`index.html`) dan Profil (`profil.html`).
-   - Bagan Pohon Organisasi (*Org Tree Chart*) visual 4 level berdesain elegan putih bersih aksen Oceanic Blue di `profil.html`.
-   - Propagasi data instan via `api.js` (Supabase `schools`, `web_settings`, dan cache `siy_school_ext`).
-   - Uji unit: `tests/test-batch-4-profile-alignment.js` 100% LULUS.
-
----
-
-## 🛠️ 3.2. Audit & Remediasi Pra-Deploy Vercel (Sesi 43 — 11 Temuan Menyeluruh)
+### 🔹 A. Remediasi Menyeluruh Pra-Deploy (Sesi 43 — Commit `a2da3a6`)
 1. **Perbaikan 4 Runtime Error Kritis:**
-   - Mendeklarasikan `loginUrl` pada handler `ppdb/convert` di `api.js` (mencegah `ReferenceError: loginUrl is not defined`).
-   - Menambahkan blok `} else {` di `portal/siswa/dashboard.html` agar tampilan Siswa Aktif dan Calon Siswa PPDB terpisah sempurna serta memuat pengumuman dinamis.
-   - Mendefinisikan fungsi `escapeAttr(s)` di `portal/admin/students.html` agar modal pratinjau dokumen siswa tidak mengalami crash.
-   - Memperbaiki fallback gambar logo di `public/js/public-shell.js` (`/images/logo.png`) dan menyertakan seluruh atribut profil & `operational_hours` ke dalam cache `sessionStorage`.
-2. **Sinkronisasi Penuh Lintas Perangkat (Cross-Device Persistence Supabase):**
-   - Menyimpan dan mengekstrak seluruh pengaturan diperluas (`visi`, `misi`, `budaya`, `sejarah`, `program_pendidikan`, `kurikulum`, `struktur_organisasi`, `operational_hours`, dll.) ke dalam kolom JSON aman di tabel `web_settings` (`announcement_banner`) dan `schools` (`wa_gateway_token`), serta menambahkan fallback upsert `POST ppdb_periods` saat mengubah gelombang/jadwal PPDB.
-   - Menyaring konten berstatus `draft` dari halaman publik (`news/list`, `announcements/list`, `events/list`) dan mendukung waktu kegiatan dinamis (`ev.time`) di `agenda.html`.
+   - Mendeklarasikan `loginUrl` pada handler `ppdb/convert` di `api.js`.
+   - Memperbaiki percabangan `} else {` di `portal/siswa/dashboard.html` antara tampilan Calon Siswa PPDB dan Siswa Aktif.
+   - Mendefinisikan helper `escapeAttr(s)` di `portal/admin/students.html` untuk modal pratinjau dokumen siswa.
+   - Memperbaiki fallback logo (`/images/logo.png`) dan cache `sessionStorage` di `public/js/public-shell.js`.
+2. **Sinkronisasi Lintas Perangkat & Filter Konten Publik:**
+   - Menyimpan atribut diperluas profil yayasan & pengaturan website ke kolom JSON `web_settings.announcement_banner` dan `schools.wa_gateway_token`.
+   - Menyaring konten berstatus `draft` dari halaman publik (`news/list`, `announcements/list`, `events/list`) serta menampilkan jam agenda dinamis (`ev.time`) di `agenda.html`.
 3. **Penyempurnaan Portal Siswa & Portal Admin:**
-   - Menambahkan handler `auth/update_profile` di `api.js` untuk menyimpan perubahan nama & foto profil 1-klik ke tabel `users` dan `students`.
-   - Memperbaiki resolusi `studentId` di modul `siswa` (`api.js`), menormalisasi label tipe dokumen (`pas_foto`, `kartu_keluarga`, `akta_kelahiran`), mencegah duplikasi dokumen saat upload ulang, dan menyinkronkan update biodata siswa ke `ppdb_registrations`.
-   - Menyelaraskan skema `activity_logs` (`module`, `details`), memperbaiki `ppdb/update` (`parent_email`) dan pemformatan catatan JSON di `admin/ppdb.html`, merapikan pembayaran offline & filter pencarian NIS di `admin/payments.html`, mengekspos `window.exportCurrentReportToExcel` di `admin/reports.html`, serta memperbaiki `backup/restore` berdasarkan ID riwayat.
-   - Uji unit: `tests/test-predeploy-remediation.js` **LULUS 100%**.
+   - Menambahkan handler `auth/update_profile` di `api.js`, menormalisasi tipe dokumen (`pas_foto`, `kartu_keluarga`, `akta_kelahiran`), mencegah duplikasi dokumen saat upload ulang, dan menyinkronkan update biodata siswa ke `ppdb_registrations`.
+
+### 🔹 B. Penyempurnaan Operasional Live Hasil Uji Pengguna (Sesi 44 — Commit `b2901a3`, `9cdec0d`, `ed13d57`, `98a0267`)
+1. **Manajemen Akun & Ganti Password (`users.html` & `api.js` — Commit `b2901a3`):**
+   - Menghapus atribut warisan `role_id` yang memicu error PostgREST `Could not find the 'role_id' column of 'users' in the schema cache`.
+   - Memasang *strict column whitelist* pada `users/create` & `users/update` serta proteksi *self-healing* otomatis di `supabaseRest()`.
+2. **Pembersihan Field Password Guru & Panduan Pengujian E2E (`teachers.html` & `PANDUAN_PENGUJIAN_MENYELURUH_E2E.md` — Commit `9cdec0d`):**
+   - Menghapus field input `Password` warisan dari modal Tambah/Edit Guru di `frontend/portal/admin/teachers.html`.
+   - Menyusun dokumen panduan pengujian menyeluruh manual & otomatis di `PANDUAN_PENGUJIAN_MENYELURUH_E2E.md`.
+3. **Pembersihan Tabel Berkas Siswa & Pratinjau Thumbnail (`siswa/dokumen.html` — Commit `ed13d57`):**
+   - Menghapus kolom `Status Verifikasi (⏳ Menunggu Review)` yang tidak memiliki integrasi tombol di Admin.
+   - Menambahkan pratinjau gambar (*thumbnail*) langsung pada kartu **Kartu Keluarga (KK)** dan **Akte Kelahiran**.
+4. **Integrasi Penuh Program Pendidikan, Kurikulum, Hero Carousel, Catatan PPDB & Riwayat Backup (`index.html`, `profil.html`, `cms_setting.html`, `backup.html`, `api.js` — Commit `98a0267`):**
+   - Menambahkan atribut ID HTML (`#home-program-paud`, `#home-program-tk`, `#home-program-tpq`, `#home-kurikulum`, `#profil-program-paud-tk`, `#profil-program-tpq`, `#profil-kurikulum`) pada `public/index.html` dan `public/profil.html` serta memetakan objek `program_pendidikan.{paud, tk, tpq}` dan `kurikulum` dari tab **Identitas & Medsos Sekolah** (`admin/content.html`).
+   - Mengaktifkan **Auto-Save ke Supabase** saat menambah atau menghapus slide gambar Hero Carousel di `admin/cms_setting.html`.
+   - Menyinkronkan catatan periode PPDB ke kolom `notes` dan `announcement_notes` di tabel `ppdb_periods`, serta menyinkronkan banner CTA bawah di `public/profil.html` saat pendaftaran PPDB ditutup/dibuka.
+   - Memperbaiki penyimpanan riwayat **Backup & Restore Database** (`admin/backup.html` & `api.js`) agar mencakup seluruh 14 tabel utama, bebas dari kegagalan batas kuota `localStorage` (`QuotaExceededError`), dan menyinkronkan metadata riwayat backup ke Supabase Cloud (`web_settings`).
 
 ---
 
 ## 📊 4. Hasil Uji Otomatis & Status Operasional
-Semua test suite dan verifikasi live telah dijalankan dengan hasil **100% LULUS**:
-- `tests/test-predeploy-remediation.js`: **LULUS 100%** (11/11 uji remediasi pra-deploy Vercel)
-- `tests/test-batch-1-critical.js`: **LULUS 100%** (Remediasi bug sintaks PPDB, kueri dokumen santri, & isolasi role login)
-- `tests/test-batch-2-portal-ux.js`: **LULUS 100%** (Tombol refresh 360°, ikon resmi siswa, modal profil 1-klik, & sync nama)
-- `tests/test-batch-3-cms-fallback.js`: **LULUS 100%** (Eliminasi fallback dummy, standardisasi istilah kampus, jam operasional, & accordion PPDB)
-- `tests/test-batch-4-profile-alignment.js`: **LULUS 100%** (CMS profil lengkap, Single Source of Truth Visi Misi, & bagan pohon organisasi)
-- `tests/test-nis-status-flow.js`: **LULUS 100%** (Resolusi NIS calon siswa & warna tombol login kontras)
-- `tests/test-auth-password-flow.js`: **LULUS 100%** (Harmonisasi sandi pendaftaran & multi-format validator)
-- `tests/test-ppdb-class-filter.js`: **LULUS 100%** (Filter kelas berjenjang otomatis pada modal admin)
-- `tests/test-teachers-classes-flow.js`: **LULUS 100%** (Query guru aktif skema riil & dropdown wali kelas lengkap)
-- `tests/test-admin-student-docs.js`: **LULUS 100%** (Pratinjau berkas dokumen santri di modal detail admin)
-- `tests/test-auto-invoice-flow.js`: **LULUS 100%** (Otomatisasi penerbitan invoice SPP bulan pertama siswa baru)
-- `tests/test-content-consistency.js`: **LULUS 100%** (Konsistensi rentang usia PAUD/TK/TPQ & overline tipografi profil)
-- `test-batch-1.js`: **LULUS 100%** (8 subtes adapter & timeout)
-- `test-batch-2.js`: **LULUS 100%** (8 subtes alur PPDB & dokumen)
-- `test-batch-3.js`: **LULUS 100%** (12 subtes konsistensi admin & siswa)
-- `test-batch-4.js`: **LULUS 100%** (Zero-Green verification pada 14 file portal)
-- `test-phase-1-schema.js`: **LULUS 100%** (Migrasi DDL & Defensive Query Adapter)
-- `test-phase-2-privacy-password.js`: **LULUS 100%** (Privasi catatan & preservasi kata sandi PPDB)
-- `test-phase-3-classes-spp.js`: **LULUS 100%** (Normalisasi filter rombel & anti-duplikasi SPP)
-- `test-phase-4-e2e-simulation.js`: **LULUS 100%** (Simulasi siklus penuh 4 tahap PPDB -> Login Siswa)
-- `test-simulation.js`: **LULUS 100%** (Simulasi end-to-end profil & Supabase)
-- `audit-all-features.js`: **LULUS 100%** (34/34 skenario fitur penuh 2 portal)
-- `test-ppdb-visibility.js`: **LULUS 100%** (15/15 subtes visibilitas kartu buka/tutup)
-- `test-routes.js`: **LULUS 100%** (37/37 rute berstatus HTTP 200 OK)
-- `test-ppdb-e2e.js`: **LULUS 100%** (11/11 skenario alur PPDB hingga siswa login)
-- `test-cms-e2e.js`: **LULUS 100%** (17/17 skenario konten CMS)
-- `test-spp-e2e.js`: **LULUS 100%** (13/13 skenario sistem pembayaran SPP)
-- **Supabase Cloud Live Test:**
-  - 16 Tabel Database: `HTTP 200 OK`
-  - Storage Bucket `siyayasan-uploads`: `Upload 200 OK`, `Public Read 200 OK`, `Delete 200 OK`.
-- **Vercel Production:**
-  - URL: `https://siyayasan-portal.vercel.app` (Status: Ready)
+Semua test suite dan verifikasi live berjalan **100% LULUS**:
+- `tests/test-predeploy-remediation.js`: **LULUS 100%** (12/12 pengujian regresi menyeluruh pra-deploy & pasca-deploy)
+- `PANDUAN_PENGUJIAN_MENYELURUH_E2E.md`: Tersedia di root direktori untuk panduan pengujian simulasi dari awal hingga akhir (Pengunjung Umum, Pendaftar PPDB, Admin/Staf TU, dan Siswa Aktif).
+- **Supabase Cloud Live (`https://hnkxrbmngmveoxipohtk.supabase.co`):** 100% Aktif & Terverifikasi.
+- **Vercel Production (`https://siyayasan-portal.vercel.app`):** 100% Aktif (`READY` — Deployment `dpl_JAqeMH6KfuQNzQSJsRPutKUzJPrb`).
 
 ---
 
 ## 🚀 5. Cara Menjalankan & Menguji Sistem
 1. **Akses Daring (Production Live):**
-   - Kunjungi: `https://siyayasan-portal.vercel.app`
-
-2. **Akses Lokal (Pengembangan / Offline):**
+   - URL Utama: `https://siyayasan-portal.vercel.app`
+2. **Akses Lokal (Pengembangan):**
    ```bash
    node frontend/dev-server.js
    ```
    Buka peramban: `http://localhost:3000`
-
 3. **Kredensial Akun Login Resmi:**
-   - **Super Admin:**
-     - URL: `http://localhost:3000/login.html` (Tab Admin)
-     - Email: `admin@yayasan.sch.id` | Password: `admin123`
-   - **Admin TU:**
-     - Email: `tu@yayasan.sch.id` | Password: `tu123456`
-   - **Siswa Aktif (Demo):**
-     - URL: `http://localhost:3000/login.html` (Tab Siswa)
-     - NIS: `2026001` | Password: `2020-03-12` (Tanggal Lahir)
+   - **Super Admin (Tab Staf / Admin):** `admin@yayasan.sch.id` (Password sesuai yang diatur Admin di Manajemen Akun)
+   - **Admin TU (Tab Staf / Admin):** `tu@yayasan.sch.id` | Password: `tu123456`
+   - **Siswa Aktif (Tab Portal Siswa):** NIS `2026001` | Password: `2020-03-12`
 
 ---
 
-## 🗺️ 6. Panduan untuk Sesi Mendatang
-1. **Dokumentasi Utama:** Rujuk selalu `PROJECT_STATUS.md` dan `PROJECT_CONTEXT_CHECKPOINT.md` sebelum memulai tugas baru.
-2. **Arsitektur 2-Portal:** Jangan mengaktifkan kembali modul Guru atau Orang Tua secara terpisah karena sudah diputuskan tidak digunakan.
-3. **Penyimpanan Berkas:** Gunakan selalu Supabase Storage bucket `siyayasan-uploads` untuk aset berkas, bukti transfer, dan foto.
-4. **Palet Warna:** Wajib mempertahankan aturan **Zero-Green** (Oceanic Blue) pada seluruh elemen portal baru.
-5. **SOP Pembaruan Konteks Permanen:** Wajib selalu memperbarui dokumen pelacakan (`PROJECT_STATUS.md` dan `PROJECT_CONTEXT_CHECKPOINT.md`) setiap kali selesai melakukan audit, analisis, pengembangan, atau eksekusi perubahan apapun agar kontinuitas konteks terjamin 100%.
+## 🗺️ 6. Panduan Wajib untuk Sesi Mendatang
+1. **Konteks Tunggal:** Selalu baca `PROJECT_CONTEXT_CHECKPOINT.md` dan `PROJECT_STATUS.md` di awal sesi.
+2. **Jangan Gunakan Sistem Lama:** Abaikan dan jangan pernah mengaktifkan kembali sistem/kode lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, atau field database fiktif seperti `role_id` pada tabel `users`).
+3. **Pertahankan Sistem Baru:** Seluruh alur kerja menggunakan `frontend/shared/js/api.js` yang terhubung langsung ke Supabase REST & Storage API serta ter-deploy di Vercel (`https://siyayasan-portal.vercel.app`).
+
