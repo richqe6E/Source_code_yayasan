@@ -1180,19 +1180,19 @@
           };
         }
         if (action === 'documents') {
-          const studentId = params.student_id || params.id;
+          let studentId = params.student_id || params.id;
           const nis = params.nis;
           let docs = [];
           try {
-            let q = `student_documents?select=*`;
-            if (studentId && nis) {
-              q += `&or=(student_id.eq.${encodeURIComponent(studentId)},student_nis.eq.${encodeURIComponent(nis)})`;
-            } else if (studentId) {
-              q += `&student_id=eq.${encodeURIComponent(studentId)}`;
-            } else if (nis) {
-              q += `&student_nis=eq.${encodeURIComponent(nis)}`;
+            if (!studentId && nis) {
+              const matchedStudent = await supabaseRest(`students?nis=eq.${encodeURIComponent(nis)}&select=id`);
+              if (matchedStudent && matchedStudent.length > 0) {
+                studentId = matchedStudent[0].id;
+              }
             }
-            docs = await supabaseRest(q) || [];
+            if (studentId) {
+              docs = await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(studentId)}&order=created_at.desc`) || [];
+            }
           } catch (_) { docs = []; }
           return { success: true, data: docs };
         }

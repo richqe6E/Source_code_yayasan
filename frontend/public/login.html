@@ -319,11 +319,11 @@
       <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mx-auto mb-4">
         <i class="fi fi-rr-interrogation text-xl"></i>
       </div>
-      <h3 class="text-base font-bold text-slate-900 text-center mb-1">Panduan Login SIAKAD</h3>
-      <p class="text-xs text-slate-600 text-center mb-4 leading-relaxed">
+      <h3 id="help-modal-title" class="text-base font-bold text-slate-900 text-center mb-1">Panduan Akses Portal Siswa</h3>
+      <p id="help-modal-desc" class="text-xs text-slate-600 text-center mb-4 leading-relaxed">
         Akun siswa menggunakan <strong>NIS</strong> terdaftar dan <strong>Tanggal Lahir</strong> bawaan.
       </p>
-      <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-700 space-y-1.5 mb-4">
+      <div id="help-modal-body" class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-700 space-y-1.5 mb-4">
         <div>• <strong>Siswa Aktif:</strong> Masukkan NIS Anda (cth: 2026001)</div>
         <div>• <strong>Password Awal:</strong> Tanggal Lahir format DDMMYYYY (cth: 14052020) atau password saat pendaftaran PPDB</div>
         <div>• <strong>Lupa Password?</strong> Silakan hubungi admin sekolah untuk reset akun.</div>
@@ -331,7 +331,7 @@
       <div class="space-y-2">
         <a id="help-wa-link" href="https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20login%20SIAKAD%20Yayasan%20At%20Tarbiyyah%20Wijaya%20Kusuma" target="_blank" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-[0.98]">
           <i class="fi fi-brands-whatsapp text-sm"></i>
-          <span>Hubungi Admin TU via WhatsApp</span>
+          <span id="help-wa-text">Hubungi Admin TU via WhatsApp</span>
         </a>
         <button type="button" onclick="closeHelpModal()" class="w-full py-2 px-4 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-[0.98]">
           Tutup
@@ -470,6 +470,34 @@
     });
 
     function openHelpModal() {
+      const title = document.getElementById('help-modal-title');
+      const desc = document.getElementById('help-modal-desc');
+      const body = document.getElementById('help-modal-body');
+      const waText = document.getElementById('help-wa-text');
+
+      if (currentLoginMode === 'admin') {
+        if (title) title.textContent = 'Panduan Akses Portal Administrator';
+        if (desc) desc.textContent = 'Khusus staf Dewan Pembina, Pengurus Yayasan, Kepala Sekolah, dan Staf TU.';
+        if (body) {
+          body.innerHTML = `
+            <div>• <strong>Username:</strong> Gunakan alamat email resmi yayasan terdaftar (contoh: <code>admin@yayasan.sch.id</code>).</div>
+            <div>• <strong>Password:</strong> Gunakan kata sandi akun administrator resmi yayasan.</div>
+            <div>• <strong>Kendala Akses?</strong> Hubungi Administrator IT Yayasan jika lupa kata sandi atau akun terkunci.</div>
+          `;
+        }
+        if (waText) waText.textContent = 'Hubungi IT Yayasan via WhatsApp';
+      } else {
+        if (title) title.textContent = 'Panduan Akses Portal Siswa';
+        if (desc) desc.textContent = 'Akun siswa menggunakan NIS terdaftar dan Tanggal Lahir bawaan.';
+        if (body) {
+          body.innerHTML = `
+            <div>• <strong>Siswa Aktif:</strong> Masukkan NIS Anda (cth: <code>2026001</code>).</div>
+            <div>• <strong>Password Awal:</strong> Format Tanggal Lahir (contoh: <code>2018-05-14</code> atau <code>14052018</code>) atau password saat pendaftaran PPDB.</div>
+            <div>• <strong>Lupa Password?</strong> Silakan hubungi admin sekolah untuk reset akun.</div>
+          `;
+        }
+        if (waText) waText.textContent = 'Hubungi Admin TU via WhatsApp';
+      }
       document.getElementById('help-modal').classList.remove('hidden');
     }
     function closeHelpModal() {
@@ -498,6 +526,25 @@
         if (res.success && res.data) {
           const user = res.data.user || {};
           const token = res.data.token || ('siy_' + Date.now());
+
+          // Role Guard berdasarkan tab aktif
+          const rawRole = (user.role && user.role.code) ? user.role.code : (user.role || '');
+          const isStudentRole = (rawRole === 'siswa_aktif' || rawRole === 'student' || rawRole === 'siswa');
+          const isAdminRole = (rawRole === 'super_admin' || rawRole === 'admin' || rawRole === 'admin_tu' || rawRole === 'kepala_sekolah' || rawRole === 'staff');
+
+          if (currentLoginMode === 'admin' && isStudentRole) {
+            showToast('Akun ini terdaftar sebagai Siswa. Silakan gunakan tab "Siswa" untuk masuk.', 'warning');
+            btn.disabled = false;
+            btnText.textContent = 'Login';
+            return;
+          }
+
+          if (currentLoginMode === 'siswa' && isAdminRole) {
+            showToast('Akun ini terdaftar sebagai Administrator. Silakan gunakan tab "Administrator" untuk masuk.', 'warning');
+            btn.disabled = false;
+            btnText.textContent = 'Login';
+            return;
+          }
 
           // Periksa apakah siswa aktif baru dan belum mengganti password awal
           if (user.role && (user.role.code === 'siswa_aktif' || user.role === 'siswa_aktif') && user.is_password_changed === false) {
