@@ -830,7 +830,7 @@
           }
           if (params.is_active !== undefined && params.is_active !== '') {
             const isAct = (params.is_active === true || params.is_active === 'true' || params.is_active === 1 || params.is_active === '1');
-            query += `&is_active=eq.${isAct}`;
+            query += `&status=eq.${isAct ? 'active' : 'inactive'}`;
           }
           const teachers = await supabaseRest(query);
           const mapped = (teachers || []).map(t => ({

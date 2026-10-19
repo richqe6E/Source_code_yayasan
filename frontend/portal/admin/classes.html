@@ -141,7 +141,11 @@
       const res = await apiCall('teachers', 'list', { per_page: 100, is_active: 'true' });
       if (res.success) {
         const teachers = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.teachers)) || []);
-        document.getElementById('form-teacher').innerHTML = '<option value="">-</option>' + teachers.map(t => `<option value="${t.id}">${t.full_name}</option>`).join('');
+        document.getElementById('form-teacher').innerHTML = '<option value="">- Tanpa Wali Kelas -</option>' + teachers.map(t => {
+          const name = t.full_name || t.name || '-';
+          const nip = t.nip ? ` (NIP: ${escapeAttr(t.nip)})` : '';
+          return `<option value="${t.id}">${escapeAttr(name)}${nip}</option>`;
+        }).join('');
       }
     }
 
