@@ -294,10 +294,19 @@
     }
 
     // 3. Download Ulang dari Baris Riwayat
-    function downloadBackupEntry(idx) {
+    async function downloadBackupEntry(idx) {
       const b = backupsCache[idx];
       if (!b) return;
-      const snapshot = b.snapshot || b.data || b;
+      let snapshot = b.snapshot || b.data;
+      if (!snapshot) {
+        showToast('Menyiapkan salinan berkas cadangan dari server...', 'info');
+        const res = await apiCall('backup', 'create', { silent_history: true });
+        if (res && res.success && res.data) {
+          snapshot = res.data.data || res.data;
+        } else {
+          snapshot = b;
+        }
+      }
       const filename = b.folder_name || b.filename || `backup-${b.id}.json`;
       const jsonStr = JSON.stringify(snapshot, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });

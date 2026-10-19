@@ -148,7 +148,7 @@
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight text-balance">
           Dua Jenjang Pendidikan yang Bersinergi
         </h2>
-        <p class="text-sm sm:text-base text-slate-600 mt-2 text-pretty">
+        <p id="profil-kurikulum" class="text-sm sm:text-base text-slate-600 mt-2 text-pretty">
           Setiap program disusun dengan target capaian terukur sesuai fase perkembangan usia emas anak.
         </p>
       </div>
@@ -165,7 +165,7 @@
               <div class="text-xs font-semibold text-primary-700">PAUD: Usia 2 – 4 Tahun &bull; TK (A/B): Usia 4 – 6 Tahun</div>
             </div>
           </div>
-          <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed text-justify [text-align-last:left]">
+          <p id="profil-program-paud-tk" class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed text-justify [text-align-last:left]">
             Pembelajaran aktif dengan sentra bermain yang menstimulasi 6 aspek perkembangan anak:
           </p>
           <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
@@ -203,7 +203,7 @@
               <div class="text-xs font-semibold text-primary-700">Santri Usia 5 – 12 Tahun</div>
             </div>
           </div>
-          <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed text-justify [text-align-last:left]">
+          <p id="profil-program-tpq" class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed text-justify [text-align-last:left]">
             Fokus bimbingan Al-Qur'an terstruktur dengan metode tartil dan adab Islami:
           </p>
           <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
@@ -423,15 +423,15 @@
     <!-- CTA Section -->
     <section class="bg-gradient-to-br from-primary-900 via-slate-900 to-primary-950 text-white rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
       <div class="max-w-2xl mx-auto relative z-10">
-        <h2 class="text-2xl sm:text-3xl font-extrabold mb-3 text-balance">
+        <h2 id="profil-ppdb-title" class="text-2xl sm:text-3xl font-extrabold mb-3 text-balance">
           Daftarkan Putra-Putri Anda di Yayasan Kami
         </h2>
-        <p class="text-primary-200 text-sm sm:text-base mb-8 text-pretty">
+        <p id="profil-ppdb-desc" class="text-primary-200 text-sm sm:text-base mb-8 text-pretty">
           Penerimaan Peserta Didik Baru (PPDB) Tahun Ajaran 2026/2027 telah dibuka dengan kuota terbatas.
         </p>
         <div class="flex flex-col sm:flex-row gap-3.5 justify-center">
-          <a href="ppdb.html#formulir-pendaftaran" class="ps-6 pe-5 py-3.5 bg-white text-primary-900 font-bold rounded-lg shadow-lg hover:bg-slate-100 transition inline-flex items-center justify-center gap-2 active:scale-[0.98]">
-            <span>Daftar PPDB Online</span>
+          <a id="profil-ppdb-cta-btn" href="ppdb.html#formulir-pendaftaran" class="ps-6 pe-5 py-3.5 bg-white text-primary-900 font-bold rounded-lg shadow-lg hover:bg-slate-100 transition inline-flex items-center justify-center gap-2 active:scale-[0.98]">
+            <span id="profil-ppdb-cta-text">Daftar PPDB Online</span>
             <i class="fi fi-rr-arrow-right text-xs"></i>
           </a>
           <a href="kontak.html" class="ps-6 pe-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/20 transition inline-flex items-center justify-center gap-2 active:scale-[0.98]">
@@ -456,7 +456,10 @@
     async function loadProfilePageData() {
       try {
         if (typeof window.apiCall !== 'function') return;
-        const res = await window.apiCall('schools', 'get');
+        const [res, ppdbRes] = await Promise.all([
+          window.apiCall('schools', 'get'),
+          window.apiCall('ppdb', 'period').catch(() => null)
+        ]);
         if (res && res.success && res.data) {
           const d = res.data;
           if (d.sejarah) {
@@ -491,8 +494,20 @@
             if (el) el.textContent = d.budaya;
           }
           if (d.program_pendidikan) {
-            const el = document.getElementById('profil-program-pendidikan');
-            if (el) el.textContent = d.program_pendidikan;
+            if (typeof d.program_pendidikan === 'object') {
+              const paudTkEl = document.getElementById('profil-program-paud-tk');
+              if (paudTkEl) {
+                const parts = [d.program_pendidikan.paud, d.program_pendidikan.tk].filter(Boolean);
+                if (parts.length > 0) paudTkEl.textContent = parts.join(' ');
+              }
+              const tpqEl = document.getElementById('profil-program-tpq');
+              if (tpqEl && d.program_pendidikan.tpq) {
+                tpqEl.textContent = d.program_pendidikan.tpq;
+              }
+            } else if (typeof d.program_pendidikan === 'string') {
+              const el = document.getElementById('profil-program-pendidikan') || document.getElementById('profil-program-paud-tk');
+              if (el) el.textContent = d.program_pendidikan;
+            }
           }
           if (d.kurikulum) {
             const el = document.getElementById('profil-kurikulum');
@@ -527,6 +542,24 @@
           if (org.kepala_tpq) {
             const el = document.getElementById('org-kepala-tpq');
             if (el) el.textContent = org.kepala_tpq;
+          }
+        }
+
+        if (ppdbRes && ppdbRes.success && ppdbRes.data) {
+          const p = ppdbRes.data;
+          const isClosed = (p.status === 'closed' || p.status === 'inactive' || p.status === 'ditutup');
+          const academicYear = p.academic_year || '2026/2027';
+          const descEl = document.getElementById('profil-ppdb-desc');
+          const btnEl = document.getElementById('profil-ppdb-cta-btn');
+          const btnTextEl = document.getElementById('profil-ppdb-cta-text');
+          if (isClosed) {
+            if (descEl) descEl.textContent = `Pendaftaran Peserta Didik Baru (PPDB) Tahun Ajaran ${academicYear} saat ini telah ditutup atau sedang dalam tahap seleksi.`;
+            if (btnEl) btnEl.href = 'ppdb.html';
+            if (btnTextEl) btnTextEl.textContent = 'Lihat Informasi PPDB';
+          } else {
+            if (descEl) descEl.textContent = `Penerimaan Peserta Didik Baru (PPDB) Tahun Ajaran ${academicYear} telah dibuka dengan kuota terbatas.`;
+            if (btnEl) btnEl.href = 'ppdb.html#formulir-pendaftaran';
+            if (btnTextEl) btnTextEl.textContent = 'Daftar PPDB Online';
           }
         }
       } catch (err) {

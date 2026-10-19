@@ -252,7 +252,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Program Pendidikan</h2>
-        <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto reveal">
+        <p id="home-kurikulum" class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto reveal">
           Kami menyelenggarakan <strong class="text-slate-800">3 jenjang pendidikan terpadu</strong> untuk membentuk generasi Qur&#39;ani yang cerdas, mandiri, dan berakhlak mulia.
         </p>
       </div>
@@ -265,7 +265,7 @@
               <i class="fi fi-sr-shapes text-2xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">PAUD (Pendidikan Anak Usia Dini)</h3>
-            <p class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
+            <p id="home-program-paud" class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
               Untuk anak usia 2-4 tahun. Fokus pada stimulasi tumbuh kembang optimal melalui
               bermain sambil belajar dengan kurikulum yang menyenangkan dan penuh kasih sayang.
             </p>
@@ -299,7 +299,7 @@
               <i class="fi fi-sr-backpack text-2xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">TK (Taman Kanak-kanak)</h3>
-            <p class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
+            <p id="home-program-tk" class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
               Untuk anak usia 4-6 tahun. Persiapan masuk sekolah dasar dengan penguatan
               kemandirian, sosial-emosional, nilai-nilai adab Islami, dan kesiapan calistung dasar yang menyenangkan.
             </p>
@@ -333,7 +333,7 @@
               <i class="fi fi-sr-book-alt text-2xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">TPQ (Taman Pendidikan Al-Qur&#39;an)</h3>
-            <p class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
+            <p id="home-program-tpq" class="text-gray-600 mb-5 leading-relaxed text-sm text-justify">
               Untuk santri usia 5-12 tahun. Pembelajaran membaca Al-Qur&#39;an metode tartil, bimbingan hafalan surat pendek (Juz 30), hafalan doa harian, dan pembiasaan ibadah praktis.
             </p>
             <ul class="space-y-2.5 text-xs sm:text-sm text-gray-600 mb-6">
@@ -584,8 +584,23 @@
               }
             }
             if (d.program_pendidikan) {
-              const progEl = document.getElementById('home-program-pendidikan');
-              if (progEl) progEl.textContent = d.program_pendidikan;
+              if (typeof d.program_pendidikan === 'object') {
+                if (d.program_pendidikan.paud) {
+                  const el = document.getElementById('home-program-paud');
+                  if (el) el.textContent = d.program_pendidikan.paud;
+                }
+                if (d.program_pendidikan.tk) {
+                  const el = document.getElementById('home-program-tk');
+                  if (el) el.textContent = d.program_pendidikan.tk;
+                }
+                if (d.program_pendidikan.tpq) {
+                  const el = document.getElementById('home-program-tpq');
+                  if (el) el.textContent = d.program_pendidikan.tpq;
+                }
+              } else if (typeof d.program_pendidikan === 'string') {
+                const progEl = document.getElementById('home-program-pendidikan') || document.getElementById('home-program-paud');
+                if (progEl) progEl.textContent = d.program_pendidikan;
+              }
             }
             if (d.kurikulum) {
               const kurEl = document.getElementById('home-kurikulum');

@@ -632,11 +632,16 @@
       `).join('');
     }
 
-    function deleteSlide(idx) {
+    async function deleteSlide(idx) {
       if (confirm('Hapus slide gambar ini dari carousel beranda?')) {
         currentHeroImages.splice(idx, 1);
         renderSlides();
-        showToast('Slide dihapus dari daftar.', 'info');
+        try {
+          await apiCall('web_settings', 'update', { hero_images: currentHeroImages });
+          showToast('Slide berhasil dihapus dan disimpan ke beranda!', 'info');
+        } catch (_) {
+          showToast('Slide dihapus dari daftar. Klik "Simpan Semua Pengaturan" untuk menerapkan.', 'info');
+        }
       }
     }
 
@@ -689,8 +694,9 @@
       try {
         currentHeroImages.push({ url: finalImageUrl, caption });
         renderSlides();
+        await apiCall('web_settings', 'update', { hero_images: currentHeroImages }).catch(() => {});
         closeAddSlideModal();
-        showToast('Slide berhasil ditambahkan! Silakan klik "Simpan Semua Pengaturan" untuk menerapkan.', 'success');
+        showToast('Slide berhasil ditambahkan dan langsung disimpan ke Beranda!', 'success');
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Tambahkan Slide';

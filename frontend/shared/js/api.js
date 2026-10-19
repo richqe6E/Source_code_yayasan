@@ -639,7 +639,8 @@
           'visi', 'misi', 'budaya', 'sejarah', 'program_pendidikan', 'kurikulum',
           'operational_hours', 'struktur_organisasi', 'pembina', 'pengawas',
           'ketua_yayasan', 'sekretaris', 'bendahara', 'headmaster_name',
-          'campus_note', 'maps_url', 'maps_embed_url', 'footer_bg_url', 'logo_url', 'tagline'
+          'campus_note', 'maps_url', 'maps_embed_url', 'footer_bg_url', 'logo_url', 'tagline',
+          'hero_images', 'backup_history'
         ];
         const VALID_WEB_SETTINGS_COLS = [
           'id', 'school_name', 'tagline', 'hero_title', 'hero_subtitle', 'hero_images',
@@ -2155,6 +2156,7 @@
           const payload = {
             status: params.status || 'open',
             academic_year: params.academic_year || '2026/2027',
+            notes: params.notes || '',
             announcement_notes: JSON.stringify(scheduleData)
           };
           let res = null;
@@ -3018,48 +3020,119 @@
             const raw = localStorage.getItem('siy_backup_history');
             if (raw) backups = JSON.parse(raw);
           } catch (_) {}
+          try {
+            const ws = await supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => []);
+            if (ws && ws[0] && typeof ws[0].announcement_banner === 'string' && ws[0].announcement_banner.trim().startsWith('{')) {
+              const parsed = JSON.parse(ws[0].announcement_banner);
+              if (Array.isArray(parsed.backup_history) && parsed.backup_history.length > 0) {
+                const localById = {};
+                backups.forEach(b => { if (b && b.id) localById[b.id] = b; });
+                parsed.backup_history.forEach(cloudItem => {
+                  if (cloudItem && cloudItem.id && !localById[cloudItem.id]) {
+                    backups.push(cloudItem);
+                  }
+                });
+                backups.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+              }
+            }
+          } catch (_) {}
           return { success: true, data: backups, items: backups, total: backups.length };
         }
         if (action === 'create') {
-          let [sch, usr, stu, cls, tea, nws, gal, inv, reg] = await Promise.all([
+          let [sch, usr, stu, cls, tea, nws, ann, evt, gal, inv, pay, reg, per, ws] = await Promise.all([
             supabaseRest('schools?select=*').catch(() => []),
             supabaseRest('users?select=*').catch(() => []),
             supabaseRest('students?select=*').catch(() => []),
             supabaseRest('classes?select=*').catch(() => []),
             supabaseRest('teachers?select=*').catch(() => []),
             supabaseRest('news?select=*').catch(() => []),
+            supabaseRest('announcements?select=*').catch(() => []),
+            supabaseRest('events?select=*').catch(() => []),
             supabaseRest('galleries?select=*').catch(() => []),
             supabaseRest('invoices?select=*').catch(() => []),
-            supabaseRest('ppdb_registrations?select=*').catch(() => [])
+            supabaseRest('payments?select=*').catch(() => []),
+            supabaseRest('ppdb_registrations?select=*').catch(() => []),
+            supabaseRest('ppdb_periods?select=*').catch(() => []),
+            supabaseRest('web_settings?select=*').catch(() => [])
           ]);
           const dStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
           const filename = `backup-yayasan-${dStr}.json`;
+          const fullData = {
+            schools: sch || [],
+            users: usr || [],
+            students: stu || [],
+            classes: cls || [],
+            teachers: tea || [],
+            news: nws || [],
+            announcements: ann || [],
+            events: evt || [],
+            galleries: gal || [],
+            invoices: inv || [],
+            payments: pay || [],
+            ppdb_registrations: reg || [],
+            ppdb_periods: per || [],
+            web_settings: ws || []
+          };
+          const approxBytes = JSON.stringify(fullData).length;
+          const sizeMb = Math.max(0.05, Number((approxBytes / (1024 * 1024)).toFixed(2)));
           const backupObj = {
             id: 'BCK-' + Date.now(),
             created_at: new Date().toISOString(),
             folder_name: filename,
             filename: filename,
-            file_count: 9,
-            data: {
-              schools: sch || [],
-              users: usr || [],
-              students: stu || [],
-              classes: cls || [],
-              teachers: tea || [],
-              news: nws || [],
-              galleries: gal || [],
-              invoices: inv || [],
-              ppdb_registrations: reg || [],
-              registrations: reg || []
-            }
+            file_count: 14,
+            size_mb: sizeMb,
+            data: fullData
           };
-          try {
+          const metaEntry = {
+            id: backupObj.id,
+            created_at: backupObj.created_at,
+            folder_name: backupObj.folder_name,
+            filename: backupObj.filename,
+            file_count: backupObj.file_count,
+            size_mb: backupObj.size_mb
+          };
+          if (!params || !params.silent_history) {
             let list = [];
-            const raw = localStorage.getItem('siy_backup_history');
-            if (raw) list = JSON.parse(raw);
+            try {
+              const raw = localStorage.getItem('siy_backup_history');
+              if (raw) list = JSON.parse(raw);
+            } catch (_) {}
             list.unshift(backupObj);
-            localStorage.setItem('siy_backup_history', JSON.stringify(list.slice(0, 15)));
-          } catch (_) {}
+            list = list.slice(0, 15);
+            try {
+              localStorage.setItem('siy_backup_history', JSON.stringify(list));
+            } catch (quotaErr) {
+              // If full snapshot exceeds 5MB localStorage quota, store lightweight metadata entries
+              try {
+                const lightList = list.map(item => ({
+                  id: item.id,
+                  created_at: item.created_at,
+                  folder_name: item.folder_name,
+                  filename: item.filename,
+                  file_count: item.file_count || 14,
+                  size_mb: item.size_mb || sizeMb
+                }));
+                localStorage.setItem('siy_backup_history', JSON.stringify(lightList));
+              } catch (_) {}
+            }
+            // Also persist lightweight backup history metadata to Supabase web_settings so it persists across devices/sessions
+            try {
+              const existingWs = await supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => []);
+              let bannerObj = {};
+              if (existingWs && existingWs[0] && typeof existingWs[0].announcement_banner === 'string' && existingWs[0].announcement_banner.trim().startsWith('{')) {
+                bannerObj = JSON.parse(existingWs[0].announcement_banner);
+              }
+              const cloudHist = Array.isArray(bannerObj.backup_history) ? bannerObj.backup_history : [];
+              cloudHist.unshift(metaEntry);
+              bannerObj.backup_history = cloudHist.slice(0, 20);
+              await supabaseRest('web_settings?id=eq.default', 'PATCH', {
+                announcement_banner: JSON.stringify(bannerObj),
+                updated_at: new Date().toISOString()
+              }).catch(() => {});
+            } catch (_) {}
+            await recordActivityLog('CREATE_BACKUP', 'backup', `Membuat cadangan database: ${filename} (${sizeMb} MB)`);
+          }
           return { success: true, data: backupObj, backup: backupObj, message: 'Backup berhasil dibuat: ' + filename };
         }
         if (action === 'restore') {
@@ -3070,20 +3143,20 @@
               if (raw) {
                 const list = JSON.parse(raw);
                 const found = list.find(b => b.id === params.id);
-                if (found) snapshot = found.data || found;
+                if (found && found.data) snapshot = found.data;
               }
             } catch (_) {}
           }
           if (snapshot && typeof snapshot === 'object') {
             try {
-              localStorage.setItem('siy_restored_snapshot', JSON.stringify({ restored_at: new Date().toISOString(), ...snapshot }));
+              localStorage.setItem('siy_restored_snapshot', JSON.stringify({ restored_at: new Date().toISOString() }));
             } catch (_) {}
             const tableMap = snapshot.tables || snapshot.data || snapshot;
             const tableAliases = {
               registrations: 'ppdb_registrations',
               cms_settings: 'web_settings'
             };
-            const validTables = ['schools', 'users', 'students', 'teachers', 'classes', 'ppdb_registrations', 'invoices', 'payments', 'news', 'announcements', 'events', 'galleries', 'web_settings'];
+            const validTables = ['schools', 'users', 'students', 'teachers', 'classes', 'ppdb_registrations', 'ppdb_periods', 'invoices', 'payments', 'news', 'announcements', 'events', 'galleries', 'web_settings'];
             if (typeof tableMap === 'object') {
               for (const [rawTblName, rows] of Object.entries(tableMap)) {
                 const tblName = tableAliases[rawTblName] || rawTblName;
@@ -3107,6 +3180,19 @@
             if (raw) list = JSON.parse(raw);
             list = list.filter(b => b.id !== params.id);
             localStorage.setItem('siy_backup_history', JSON.stringify(list));
+          } catch (_) {}
+          try {
+            const existingWs = await supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => []);
+            if (existingWs && existingWs[0] && typeof existingWs[0].announcement_banner === 'string' && existingWs[0].announcement_banner.trim().startsWith('{')) {
+              const bannerObj = JSON.parse(existingWs[0].announcement_banner);
+              if (Array.isArray(bannerObj.backup_history)) {
+                bannerObj.backup_history = bannerObj.backup_history.filter(b => b.id !== params.id);
+                await supabaseRest('web_settings?id=eq.default', 'PATCH', {
+                  announcement_banner: JSON.stringify(bannerObj),
+                  updated_at: new Date().toISOString()
+                }).catch(() => {});
+              }
+            }
           } catch (_) {}
           return { success: true, message: 'Riwayat cadangan berhasil dihapus' };
         }
