@@ -105,13 +105,29 @@
 
   <!-- ============ HERO CAROUSEL SECTION ============ -->
   <section class="relative overflow-hidden bg-primary-950 text-white min-h-[520px] lg:min-h-[600px] flex items-center">
-    <!-- Slider Images Container (Controlled via JS) -->
+    <!-- Slider Images Container (Controlled via JS & Instant Local Cache) -->
     <div id="hero-slider-container" class="absolute inset-0">
-      <!-- Fallback Image / First Slide -->
-      <div class="hero-slide active bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2000&auto=format&fit=crop');"></div>
-      <div class="hero-slide bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2000&auto=format&fit=crop');"></div>
-      <div class="hero-slide bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2000&auto=format&fit=crop');"></div>
+      <!-- Foto asli beranda sekolah sebagai fallback terverifikasi (bebas dari foto template atau banner yang sudah dihapus) -->
+      <div class="hero-slide active bg-cover bg-center" style="background-image: url('https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1792469386750_srz5t.jpg'), url('/images/school-campus.jpg');"></div>
     </div>
+    <script>
+      (function() {
+        try {
+          var raw = localStorage.getItem('siy_hero_cache');
+          if (raw) {
+            var imgs = JSON.parse(raw);
+            if (Array.isArray(imgs) && imgs.length > 0) {
+              var container = document.getElementById('hero-slider-container');
+              if (container) {
+                container.innerHTML = imgs.map(function(img, i) {
+                  return '<div class="hero-slide ' + (i === 0 ? 'active' : '') + ' bg-cover bg-center" style="background-image: url(\'' + (img.url || '') + '\'), url(\'/images/school-campus.jpg\');"></div>';
+                }).join('');
+              }
+            }
+          }
+        } catch (_) {}
+      })();
+    </script>
     <div class="hero-overlay"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 w-full">
@@ -480,28 +496,57 @@
       });
 
       // Dynamic Hero Carousel from web_settings
+      let heroCarouselTimer = null;
       async function initHeroCarousel() {
         const sliderContainer = document.getElementById('hero-slider-container');
+        if (!sliderContainer) return;
+
+        function renderSlides(images) {
+          if (!Array.isArray(images) || images.length === 0) {
+            sliderContainer.innerHTML = '<div class="hero-slide active bg-cover bg-center" style="background-image: url(\'https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1792469386750_srz5t.jpg\'), url(\'/images/school-campus.jpg\');"></div>';
+            return;
+          }
+          sliderContainer.innerHTML = images.map((img, i) => `
+            <div class="hero-slide ${i === 0 ? 'active' : ''} bg-cover bg-center" style="background-image: url('${img.url}'), url('/images/school-campus.jpg');"></div>
+          `).join('');
+
+          if (heroCarouselTimer) {
+            clearInterval(heroCarouselTimer);
+            heroCarouselTimer = null;
+          }
+
+          const slides = sliderContainer.querySelectorAll('.hero-slide');
+          if (slides.length <= 1) return;
+
+          let currentSlide = 0;
+          heroCarouselTimer = setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+          }, 5000);
+        }
+
+        // 1. Render dari cache lokal terlebih dahulu untuk transisi instan tanpa jeda
         try {
-          if (typeof window.apiCall === 'function') {
-            const res = await window.apiCall('web_settings', 'get');
-            if (res && res.success && res.data && Array.isArray(res.data.hero_images) && res.data.hero_images.length > 0) {
-              sliderContainer.innerHTML = res.data.hero_images.map((img, i) => `
-                <div class="hero-slide ${i === 0 ? 'active' : ''} bg-cover bg-center" style="background-image: url('${img.url}');"></div>
-              `).join('');
+          const cached = localStorage.getItem('siy_hero_cache');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              renderSlides(parsed);
             }
           }
         } catch (_) {}
 
-        const slides = sliderContainer.querySelectorAll('.hero-slide');
-        if (slides.length <= 1) return;
-
-        let currentSlide = 0;
-        setInterval(() => {
-          slides[currentSlide].classList.remove('active');
-          currentSlide = (currentSlide + 1) % slides.length;
-          slides[currentSlide].classList.add('active');
-        }, 5000);
+        // 2. Sinkronkan dengan data database terbaru Supabase
+        try {
+          if (typeof window.apiCall === 'function') {
+            const res = await window.apiCall('web_settings', 'get');
+            if (res && res.success && res.data && Array.isArray(res.data.hero_images)) {
+              localStorage.setItem('siy_hero_cache', JSON.stringify(res.data.hero_images));
+              renderSlides(res.data.hero_images);
+            }
+          }
+        } catch (_) {}
       }
 
       initHeroCarousel();

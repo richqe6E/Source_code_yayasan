@@ -698,12 +698,20 @@
             if (out.school_name && !out.name) out.name = out.school_name;
             if (out.whatsapp && !out.whatsapp_number) out.whatsapp_number = out.whatsapp;
             if (out.whatsapp_number && !out.whatsapp) out.whatsapp = out.whatsapp_number;
+
+            // Kolom asli hero_images di tabel web_settings adalah sumber kebenaran tunggal
+            if (ws && Array.isArray(ws.hero_images)) {
+              out.hero_images = ws.hero_images;
+            } else if (!Array.isArray(out.hero_images)) {
+              out.hero_images = [];
+            }
           } catch (_) {}
           try {
             const cachedExt = localStorage.getItem('siy_school_ext');
             if (cachedExt) {
               const parsedLocal = JSON.parse(cachedExt);
               Object.keys(parsedLocal).forEach(k => {
+                if (k === 'hero_images') return;
                 if (out[k] === undefined || out[k] === null || out[k] === '') {
                   out[k] = parsedLocal[k];
                 }
@@ -772,6 +780,7 @@
               whatsapp: safeWsPayload.whatsapp,
               email: safeWsPayload.email,
               address: safeWsPayload.address,
+              hero_images: safeWsPayload.hero_images,
               announcement_banner: JSON.stringify(mergedExt),
               updated_at: nowIso
             };
@@ -2750,6 +2759,9 @@
           if (sch.name && !sch.school_name) sch.school_name = sch.name;
           if (sch.whatsapp && !sch.whatsapp_number) sch.whatsapp_number = sch.whatsapp;
           if (sch.whatsapp_number && !sch.whatsapp) sch.whatsapp = sch.whatsapp_number;
+          if (ws && Array.isArray(ws.hero_images)) {
+            sch.hero_images = ws.hero_images;
+          }
 
           try {
             const cachedExt = localStorage.getItem('siy_school_ext');
@@ -2822,6 +2834,7 @@
             bendahara: params.bendahara !== undefined ? params.bendahara : existingExt.bendahara,
             headmaster_name: params.headmaster_name !== undefined ? params.headmaster_name : existingExt.headmaster_name
           };
+          delete extPayload.hero_images;
           try {
             localStorage.setItem('siy_school_ext', JSON.stringify(extPayload));
             sessionStorage.setItem('siyayasan_school_profile', JSON.stringify({ ...fullPayload, ...extPayload }));

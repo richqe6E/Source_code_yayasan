@@ -538,6 +538,7 @@
 
           // Hero images
           currentHeroImages = Array.isArray(d.hero_images) ? d.hero_images : [];
+          try { localStorage.setItem('siy_hero_cache', JSON.stringify(currentHeroImages)); } catch (_) {}
           renderSlides();
         }
       } catch (e) {
@@ -640,6 +641,7 @@
     async function deleteSlide(idx) {
       if (confirm('Hapus slide gambar ini dari carousel beranda?')) {
         currentHeroImages.splice(idx, 1);
+        try { localStorage.setItem('siy_hero_cache', JSON.stringify(currentHeroImages)); } catch (_) {}
         renderSlides();
         try {
           await apiCall('web_settings', 'update', { hero_images: currentHeroImages });
@@ -698,6 +700,7 @@
 
       try {
         currentHeroImages.push({ url: finalImageUrl, caption });
+        try { localStorage.setItem('siy_hero_cache', JSON.stringify(currentHeroImages)); } catch (_) {}
         renderSlides();
         await apiCall('web_settings', 'update', { hero_images: currentHeroImages }).catch(() => {});
         closeAddSlideModal();
@@ -739,6 +742,7 @@
       try {
         const res = await apiCall('web_settings', 'update', payload);
         if (res.success) {
+          try { localStorage.setItem('siy_hero_cache', JSON.stringify(currentHeroImages)); } catch (_) {}
           // Sinkronisasi otomatis ke modul schools agar seluruh endpoint website terintegrasi
           try {
             await apiCall('schools', 'update', {
