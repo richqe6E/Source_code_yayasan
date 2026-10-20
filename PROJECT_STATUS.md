@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 19 Oktober 2026 — Sesi 44 (Finalisasi Operasional Live Production Vercel & Supabase Cloud: Integrasi Penuh Portal Admin, Portal Siswa & Website Utama) | Status: ✅ PRODUCTION & LIVE VERIFIED 100% GREEN (`https://siyayasan-portal.vercel.app`)*
+*Terakhir Diperbarui: 20 Oktober 2026 — Sesi 45 (Domain Resmi `siyayasan.vercel.app`, Simulasi Operasional E2E di Browser & Perbaikan Seluruh Temuan) | Status: ✅ PRODUCTION & LIVE VERIFIED — 44/44 PASS, 0 error (`https://siyayasan.vercel.app`)*
 
 ---
 
@@ -11,7 +11,7 @@
 | :--- | :---: | :--- |
 | **Repositori GitHub** | ✅ Terkoneksi & Up to Date | https://github.com/richqe6E/Source_code_yayasan (Branch `main`) |
 | **Supabase Cloud DB & Storage** | ✅ Aktif & Terverifikasi (100%) | `https://hnkxrbmngmveoxipohtk.supabase.co` (PostgreSQL REST & Bucket `siyayasan-uploads`) |
-| **Frontend Production Hosting** | ✅ Aktif (Vercel) | https://siyayasan-portal.vercel.app |
+| **Frontend Production Hosting** | ✅ Aktif (Vercel) | **https://siyayasan.vercel.app** (domain resmi; alias lama: siyayasan-portal.vercel.app) |
 | **Localhost Server** | ✅ Aktif & Portabel | `http://localhost:3000` — jalankan: `node frontend/dev-server.js` |
 | **Arsitektur Portal** | ✅ Murni 2 Portal + Web Publik | **Portal Admin Sekolah**, **Portal Siswa**, & **Website Publik Utama** (Sistem lama GAS/Portal Guru/Ortu resmi dihapus) |
 | **Database Sync** | ✅ Sinkron Multi-Perangkat | PPDB, Siswa, Kelas, Guru (Tanpa Password), Tagihan SPP, Pembayaran, CMS Konten & Pengaturan Website, Backup Cloud |
@@ -20,7 +20,7 @@
 
 | Role | Identitas (Email / NIS) | Password | URL Dashboard Tujuan |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@yayasan.sch.id` | Sesuai Manajemen Akun | `/portal/admin/dashboard.html` |
+| **Super Admin** | `admin@yayasan.sch.id` | `230400` | `/portal/admin/dashboard.html` |
 | **Admin TU** | `tu@yayasan.sch.id` | `tu123456` | `/portal/admin/dashboard.html` |
 | **Siswa Aktif (Demo 1)** | `2026001` (NIS) | `2020-03-12` (Tgl Lahir) | `/portal/siswa/dashboard.html` |
 | **Siswa Aktif (Demo 2)** | `2026002` (NIS) | `2019-08-25` (Tgl Lahir) | `/portal/siswa/dashboard.html` |
@@ -1486,6 +1486,36 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
    - Mengaktifkan *auto-save* ke Supabase saat menambah/menghapus slide Hero Carousel di `admin/cms_setting.html`.
    - Menyinkronkan catatan periode PPDB ke kolom `notes` dan `announcement_notes` pada `ppdb_periods`, serta menyinkronkan banner CTA bawah di `public/profil.html` saat pendaftaran ditutup.
    - Memperbaiki penyimpanan riwayat **Backup & Restore Database** (`admin/backup.html` & `api.js`) untuk mencakup seluruh 14 tabel utama dan menyinkronkan metadata riwayat ke Supabase Cloud (`web_settings`) tanpa terkendala batas kuota `localStorage`.
+
+---
+
+### 🗓️ Sesi 45 — Domain Resmi `siyayasan.vercel.app`, Simulasi Operasional E2E di Browser & Perbaikan Seluruh Temuan (20 Oktober 2026)
+
+**Fokus Utama:** Menetapkan domain resmi, menjalankan simulasi operasional penuh di browser (headless Chrome) layaknya website yang baru diluncurkan, lalu memperbaiki seluruh temuan sesuai rencana yang disetujui pengguna.
+
+1. **Domain Resmi Produksi:**
+   - `https://siyayasan.vercel.app` didaftarkan sebagai domain produksi proyek Vercel `siyayasan-portal` (publik, HTTP 200, tanpa redirect SSO). Domain lama `siyayasan-portal.vercel.app` tetap aktif sebagai alias.
+2. **Simulasi Operasional 6 Tahap (44 langkah) di Browser:**
+   - Admin setup profil/visi-misi/maps/medsos/jam operasional, berita, pengumuman, agenda, guru, 3 kelas, buka periode PPDB → Pengunjung baru cek semua halaman & tombol (telepon, WA, maps, medsos, form kontak) → PPDB 5 langkah + 3 berkas → Admin cek berkas, setujui, konversi ke siswa aktif + SPP otomatis → Siswa login NIS, edit biodata, unggah dokumen, unggah bukti SPP → Admin verifikasi bayar, siswa cek Lunas & kuitansi, laporan, log, pesan kontak.
+   - Script: `<brain>/scratch/run-full-browser-uat.js` (memakai `playwright-core` + Chrome lokal). **Script ini mengosongkan data operasional sebelum berjalan.**
+3. **Perbaikan yang Diterapkan:**
+   - `frontend/shared/js/page-transitions.js`: progress bar dibuat setelah `document.body` siap (memperbaiki error `appendChild` di semua halaman publik & login); peredam error ViewTransition.
+   - `frontend/public/css/style.css` & `page-transitions.js`: aturan native `@view-transition` dan `view-transition-name` dihapus (memicu `Transition was aborted` saat redirect login). Efek fade antarhalaman tidak ada lagi; progress bar atas tetap aktif.
+   - `frontend/shared/js/api.js`:
+     - `siswa/get_spp`: urutan `payments` memakai `submitted_at` (kolom `created_at` tidak ada).
+     - `ppdb/submit`: kolom fiktif `password`/`account_password` (ppdb_registrations) dan `program`/`level` (students) dihapus dari payload. Kata sandi pendaftaran tetap tersimpan di `form_metadata.password` dan dipakai saat konversi.
+     - `ppdb/convert`: kolom fiktif `fallback_dob_password`/`birth_date` (users) dihapus.
+     - `schools/get`, `schools/update`, `web_settings/get`, `web_settings/update`: data profil kini ditulis ke **kedua** penyimpanan (`schools.wa_gateway_token` & `web_settings.announcement_banner`, id `default`) dan saat dibaca diambil sumber dengan `updated_at` terbaru. Whitelist kolom `schools` disesuaikan dengan skema asli.
+     - `contact_messages`: aksi baru `delete` dan `mark_read`.
+   - `frontend/portal/admin/ppdb.html`: modal detail menampilkan 3 berkas berlabel (Pas Foto, Akta Kelahiran, Kartu Keluarga) dengan pratinjau lightbox dalam halaman `openPpdbDocPreview()` — mendukung URL Storage maupun Data URL base64 (sebelumnya diblokir browser bila dibuka di tab baru).
+   - `frontend/portal/admin/content.html`: tab baru **Pesan Kontak** (daftar pesan dari `/kontak.html`, tombol **Balas via WA** & **Hapus**); field WA membaca `whatsapp_number || whatsapp || phone`.
+   - `frontend/public/kontak.html`: selalu mengambil data terbaru dari `web_settings/get` (tidak lagi hanya mengandalkan cache sessionStorage) agar jam operasional & WA selalu mutakhir.
+4. **Hasil Verifikasi Akhir (produksi `https://siyayasan.vercel.app`):**
+   - Simulasi penuh: **44/44 PASS, 0 bug, 0 console error.**
+   - Verifikasi ulang setelah deploy terakhir (login admin + 9 halaman publik): **0 page error, 0 console error.**
+5. **Kondisi Data Produksi Saat Sesi Ditutup:**
+   - Database berisi **data simulasi** (siswa Muhammad Rayhan Al-Fatih NIS `20265046` / pw `230400`, 1 guru Siti Aminah, 3 kelas, 1 berita/pengumuman/agenda, 1 pesan kontak, 1 tagihan SPP Lunas). Pengguna menyatakan akan menghapus sendiri sebelum input data asli.
+   - Akun admin: `admin@yayasan.sch.id` / `230400`.
 
 ---
 

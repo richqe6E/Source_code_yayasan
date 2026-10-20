@@ -290,11 +290,11 @@
       try {
         const cached = sessionStorage.getItem('siyayasan_school_profile');
         let school = cached ? JSON.parse(cached) : null;
-        if (!school && typeof window.apiCall === 'function') {
+        if (typeof window.apiCall === 'function') {
           try {
             const setRes = await window.apiCall('web_settings', 'get');
-            if (setRes && setRes.success && setRes.data && (setRes.data.address || setRes.data.school_name)) {
-              school = setRes.data;
+            if (setRes && setRes.success && setRes.data && (setRes.data.address || setRes.data.school_name || setRes.data.name)) {
+              school = { ...(school || {}), ...setRes.data };
             }
           } catch (_) {}
           if (!school) {

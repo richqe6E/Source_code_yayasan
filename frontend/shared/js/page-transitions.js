@@ -37,30 +37,9 @@
       }
     }
 
-    /* 2. Native View Transitions (Chrome 111+, Edge, Safari 18+) */
-    @view-transition {
-      navigation: auto;
-    }
-
-    /* Pin header dan nav agar TIDAK pernah ikut ter-reload atau berkedip */
+    /* 2. Pin header dan nav agar tetap stabil tanpa pergeseran layout */
     #site-header, nav.sticky {
-      view-transition-name: site-header;
-    }
-
-    /* Silky Cross-Fade: Lembut, tenang, tanpa lonjakan posisi */
-    ::view-transition-old(root) {
-      animation: 140ms cubic-bezier(0.2, 0, 0, 1) both siyFadeOut;
-    }
-    ::view-transition-new(root) {
-      animation: 200ms cubic-bezier(0.2, 0, 0, 1) both siyFadeIn;
-    }
-    @keyframes siyFadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    @keyframes siyFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      transform: translateZ(0);
     }
 
     /* 3. Sleek Top Progress Bar (Feedback visual instan saat tautan diklik) */
@@ -98,13 +77,33 @@
     }
   `;
 
-  // 2. Buat Elemen Progress Bar jika belum ada
-  let progressBar = document.getElementById('siy-page-progress');
-  if (!progressBar) {
-    progressBar = document.createElement('div');
-    progressBar.id = 'siy-page-progress';
-    document.body.appendChild(progressBar);
+  // 2. Buat Elemen Progress Bar dengan aman (mendukung pemuatan di <head> sebelum <body> siap)
+  let progressBar = null;
+  function ensureProgressBar() {
+    if (progressBar && progressBar.isConnected) return progressBar;
+    progressBar = document.getElementById('siy-page-progress');
+    if (!progressBar && document.body) {
+      progressBar = document.createElement('div');
+      progressBar.id = 'siy-page-progress';
+      document.body.appendChild(progressBar);
+    }
+    return progressBar;
   }
+
+  if (document.body) {
+    ensureProgressBar();
+  } else {
+    document.addEventListener('DOMContentLoaded', ensureProgressBar, { once: true });
+  }
+
+  // Tangani pembatalan ViewTransition bawaan browser saat redirect cepat agar tidak memicu uncaught error
+  window.addEventListener('unhandledrejection', function (event) {
+    const reason = event && event.reason;
+    const msg = reason && (reason.message || String(reason));
+    if (msg && (msg.includes('ViewTransition') || msg.includes('Transition was skipped') || msg.includes(' transition '))) {
+      event.preventDefault();
+    }
+  });
 
   // 3. Inject Speculation Rules API untuk Prerendering Instan di Browser Modern
   if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
@@ -158,18 +157,20 @@
     }
 
     // Aktifkan loading progress bar di atas
-    if (progressBar) {
-      progressBar.classList.remove('done');
-      progressBar.classList.add('active');
+    const bar = ensureProgressBar();
+    if (bar) {
+      bar.classList.remove('done');
+      bar.classList.add('active');
     }
   });
 
   // 5. Bersihkan Progress Bar saat Halaman Selesai Dimuat atau Kembali dari Cache
   window.addEventListener('pageshow', function () {
-    if (progressBar) {
-      progressBar.classList.add('done');
+    const bar = ensureProgressBar();
+    if (bar) {
+      bar.classList.add('done');
       setTimeout(function () {
-        progressBar.classList.remove('active', 'done');
+        bar.classList.remove('active', 'done');
       }, 350);
     }
   });

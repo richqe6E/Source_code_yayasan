@@ -640,7 +640,9 @@
           'operational_hours', 'struktur_organisasi', 'pembina', 'pengawas',
           'ketua_yayasan', 'sekretaris', 'bendahara', 'headmaster_name',
           'campus_note', 'maps_url', 'maps_embed_url', 'footer_bg_url', 'logo_url', 'tagline',
-          'hero_images', 'backup_history'
+          'hero_images', 'backup_history', 'whatsapp_number', 'whatsapp', 'phone', 'email',
+          'address', 'school_name', 'name', 'instagram_url', 'youtube_url', 'facebook_url',
+          'hero_title', 'hero_subtitle', 'ppdb_active_note'
         ];
         const VALID_WEB_SETTINGS_COLS = [
           'id', 'school_name', 'tagline', 'hero_title', 'hero_subtitle', 'hero_images',
@@ -652,32 +654,55 @@
 
         if (action === 'get') {
           let out = {};
-          let schRow = null;
           try {
             const [list, sch] = await Promise.all([
               supabaseRest('web_settings?id=eq.default&select=*').catch(() => []),
               supabaseRest('schools?select=*&limit=1').catch(() => [])
             ]);
-            if (sch && sch[0]) {
-              schRow = sch[0];
-              out = { ...schRow };
-              if (typeof schRow.wa_gateway_token === 'string' && schRow.wa_gateway_token.trim().startsWith('{')) {
-                try { Object.assign(out, JSON.parse(schRow.wa_gateway_token)); } catch (_) {}
-              }
+            const ws = (list && list[0]) ? list[0] : null;
+            const schRow = (sch && sch[0]) ? sch[0] : null;
+
+            let wsExt = {};
+            if (ws && typeof ws.announcement_banner === 'string' && ws.announcement_banner.trim().startsWith('{')) {
+              try { wsExt = JSON.parse(ws.announcement_banner); } catch (_) {}
             }
-            if (list && list.length > 0) {
-              const ws = list[0];
-              Object.assign(out, ws);
-              if (typeof ws.announcement_banner === 'string' && ws.announcement_banner.trim().startsWith('{')) {
-                try { Object.assign(out, JSON.parse(ws.announcement_banner)); } catch (_) {}
-              }
+            let schExt = {};
+            if (schRow && typeof schRow.wa_gateway_token === 'string' && schRow.wa_gateway_token.trim().startsWith('{')) {
+              try { schExt = JSON.parse(schRow.wa_gateway_token); } catch (_) {}
             }
+
+            // Tentukan sumber mana yang lebih baru berdasarkan updated_at
+            const wsTime = ws && ws.updated_at ? new Date(ws.updated_at).getTime() : 0;
+            const schTime = schRow && schRow.updated_at ? new Date(schRow.updated_at).getTime() : 0;
+
+            if (schTime > wsTime) {
+              if (ws) Object.assign(out, ws);
+              Object.assign(out, wsExt);
+              if (schRow) Object.assign(out, schRow);
+              Object.assign(out, schExt);
+            } else {
+              if (schRow) Object.assign(out, schRow);
+              Object.assign(out, schExt);
+              if (ws) Object.assign(out, ws);
+              Object.assign(out, wsExt);
+            }
+
+            // Pastikan field yang hanya ada di salah satu ekstensi tetap terisi
+            for (const [k, v] of Object.entries(schExt)) {
+              if (out[k] === undefined || out[k] === null || out[k] === '') out[k] = v;
+            }
+            for (const [k, v] of Object.entries(wsExt)) {
+              if (out[k] === undefined || out[k] === null || out[k] === '') out[k] = v;
+            }
+            if (out.name && !out.school_name) out.school_name = out.name;
+            if (out.school_name && !out.name) out.name = out.school_name;
+            if (out.whatsapp && !out.whatsapp_number) out.whatsapp_number = out.whatsapp;
+            if (out.whatsapp_number && !out.whatsapp) out.whatsapp = out.whatsapp_number;
           } catch (_) {}
           try {
             const cachedExt = localStorage.getItem('siy_school_ext');
             if (cachedExt) {
               const parsedLocal = JSON.parse(cachedExt);
-              // Merge local cache for keys not yet present in cloud response
               Object.keys(parsedLocal).forEach(k => {
                 if (out[k] === undefined || out[k] === null || out[k] === '') {
                   out[k] = parsedLocal[k];
@@ -694,9 +719,15 @@
             if (raw) mergedExt = JSON.parse(raw);
           } catch (_) {}
 
-          // Read existing cloud JSON in announcement_banner so we don't overwrite other extended fields
+          // Read existing cloud JSON in both schools.wa_gateway_token and web_settings.announcement_banner
           try {
-            const existingWs = await supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => []);
+            const [existingWs, existingSch] = await Promise.all([
+              supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => []),
+              supabaseRest('schools?select=wa_gateway_token&limit=1').catch(() => [])
+            ]);
+            if (existingSch && existingSch[0] && typeof existingSch[0].wa_gateway_token === 'string' && existingSch[0].wa_gateway_token.trim().startsWith('{')) {
+              mergedExt = { ...JSON.parse(existingSch[0].wa_gateway_token), ...mergedExt };
+            }
             if (existingWs && existingWs[0] && typeof existingWs[0].announcement_banner === 'string' && existingWs[0].announcement_banner.trim().startsWith('{')) {
               mergedExt = { ...JSON.parse(existingWs[0].announcement_banner), ...mergedExt };
             }
@@ -705,12 +736,19 @@
           EXT_KEYS.forEach(k => {
             if (params[k] !== undefined) mergedExt[k] = params[k];
           });
+          if (params.whatsapp !== undefined && params.whatsapp_number === undefined) {
+            mergedExt.whatsapp_number = params.whatsapp;
+          }
+          if (params.whatsapp_number !== undefined && params.whatsapp === undefined) {
+            mergedExt.whatsapp = params.whatsapp_number;
+          }
 
           try {
             localStorage.setItem('siy_school_ext', JSON.stringify(mergedExt));
           } catch (_) {}
 
-          const safeWsPayload = { updated_at: new Date().toISOString() };
+          const nowIso = new Date().toISOString();
+          const safeWsPayload = { updated_at: nowIso };
           VALID_WEB_SETTINGS_COLS.forEach(col => {
             if (params[col] !== undefined && col !== 'id') {
               safeWsPayload[col] = params[col];
@@ -734,7 +772,8 @@
               whatsapp: safeWsPayload.whatsapp,
               email: safeWsPayload.email,
               address: safeWsPayload.address,
-              announcement_banner: JSON.stringify(mergedExt)
+              announcement_banner: JSON.stringify(mergedExt),
+              updated_at: nowIso
             };
             Object.keys(minimalWs).forEach(k => minimalWs[k] === undefined && delete minimalWs[k]);
             res = await supabaseRest('web_settings?id=eq.default', 'PATCH', minimalWs).catch(() => []);
@@ -742,7 +781,7 @@
 
           // Sync extended JSON to schools.wa_gateway_token as well so schools/get on other devices also receives it
           try {
-            const schSync = { wa_gateway_token: JSON.stringify(mergedExt), updated_at: new Date().toISOString() };
+            const schSync = { wa_gateway_token: JSON.stringify(mergedExt), updated_at: nowIso };
             if (params.school_name || params.name) schSync.name = params.school_name || params.name;
             if (params.phone) schSync.phone = params.phone;
             if (params.email) schSync.email = params.email;
@@ -964,7 +1003,7 @@
           let id = (stuRecord && stuRecord.id) || studentId;
           const [invoices, payments] = await Promise.all([
             id ? supabaseRest(`invoices?student_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.desc`).catch(() => []) : [],
-            id ? supabaseRest(`payments?student_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.desc`).catch(() => []) : []
+            id ? supabaseRest(`payments?student_id=eq.${encodeURIComponent(id)}&select=*&order=submitted_at.desc`).catch(() => []) : []
           ]);
           return { success: true, data: { invoices: invoices || [], payments: payments || [] } };
         }
@@ -1909,8 +1948,6 @@
             level: level,
             status: 'pending',
             notes: safeIncomingNotes,
-            password: password,
-            account_password: password,
             photo_url: photoUrl || '',
             birth_certificate_url: certUrl || '',
             family_card_url: kkUrl || '',
@@ -1927,35 +1964,28 @@
           try {
             res = await supabaseRest('ppdb_registrations', 'POST', regPayload);
           } catch (err) {
-            try {
-              const safeRegPayload = { ...regPayload };
-              delete safeRegPayload.password;
-              delete safeRegPayload.account_password;
-              res = await supabaseRest('ppdb_registrations', 'POST', safeRegPayload);
-            } catch (err2) {
-              console.warn('PPDB insert safeRegPayload failed, trying minimal schema:', err2);
-              const altPayload = {
-                id,
-                registration_number: regNum,
-                registration_no: regNum,
-                full_name: studentName,
-                child_name: studentName,
-                gender: gender,
-                birth_place: birthPlace,
-                birth_date: birthDate,
-                father_name: parentName,
-                phone: parentPhone,
-                address: address,
-                photo_url: photoUrl || '',
-                birth_certificate_url: certUrl || '',
-                family_card_url: kkUrl || '',
-                status: 'pending'
-              };
-              res = await supabaseRest('ppdb_registrations', 'POST', altPayload).catch(e => {
-                console.warn('Alternate PPDB insert fallback:', e);
-                return [regPayload];
-              });
-            }
+            console.warn('PPDB insert regPayload failed, trying minimal schema:', err);
+            const altPayload = {
+              id,
+              registration_number: regNum,
+              registration_no: regNum,
+              full_name: studentName,
+              child_name: studentName,
+              gender: gender,
+              birth_place: birthPlace,
+              birth_date: birthDate,
+              father_name: parentName,
+              phone: parentPhone,
+              address: address,
+              photo_url: photoUrl || '',
+              birth_certificate_url: certUrl || '',
+              family_card_url: kkUrl || '',
+              status: 'pending'
+            };
+            res = await supabaseRest('ppdb_registrations', 'POST', altPayload).catch(e => {
+              console.warn('Alternate PPDB insert fallback:', e);
+              return [regPayload];
+            });
           }
 
           // Safe local persistence fallback
@@ -2007,8 +2037,6 @@
             parent_name: parentName,
             parent_phone: parentPhone,
             parent_email: emailForLogin,
-            program: (params.level || level || 'PAUD').toUpperCase(),
-            level: (params.level || level || 'PAUD').toUpperCase(),
             status_pendaftaran: 'pending',
             is_active: false,
             status: 'calon_siswa',
@@ -2022,15 +2050,7 @@
             localStorage.setItem('siy_local_students', JSON.stringify(localStudents));
           } catch (_) {}
 
-          try {
-            await supabaseRest('students', 'POST', newStudent);
-          } catch (err) {
-            console.warn('Student profile primary insert failed, retrying with core columns:', err);
-            const safeStudent = { ...newStudent };
-            delete safeStudent.program;
-            delete safeStudent.level;
-            await supabaseRest('students', 'POST', safeStudent).catch(e => console.warn('Student profile fallback insert warning:', e));
-          }
+          await supabaseRest('students', 'POST', newStudent).catch(e => console.warn('Student profile insert warning:', e));
 
           // Sinkronkan berkas yang diunggah saat PPDB ke tabel student_documents
           const initialDocs = [
@@ -2287,22 +2307,12 @@
             nis: studentNis,
             student_id: stuId,
             password_hash: initialPassword,
-            fallback_dob_password: birthDatePassword,
-            birth_date: birthDateStr,
             is_password_changed: Boolean(customPpdbPass),
             status: 'active'
           };
 
           if (existingUsers && existingUsers.length > 0) {
-            try {
-              await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', userPayloadToSave);
-            } catch (errUserPatch) {
-              console.warn('User patch primary with DOB fields failed, trying core fields:', errUserPatch);
-              const safePatch = { ...userPayloadToSave };
-              delete safePatch.fallback_dob_password;
-              delete safePatch.birth_date;
-              await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', safePatch).catch(() => {});
-            }
+            await supabaseRest(`users?id=eq.${encodeURIComponent(userId)}`, 'PATCH', userPayloadToSave).catch(() => {});
           } else {
             const newUserRecord = {
               id: userId,
@@ -2312,15 +2322,7 @@
               phone: reg.phone || reg.parent_phone || '',
               avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'
             };
-            try {
-              await supabaseRest('users', 'POST', newUserRecord);
-            } catch (errUserPost) {
-              console.warn('User post primary with DOB fields failed, trying core fields:', errUserPost);
-              const safePost = { ...newUserRecord };
-              delete safePost.fallback_dob_password;
-              delete safePost.birth_date;
-              await supabaseRest('users', 'POST', safePost).catch(() => {});
-            }
+            await supabaseRest('users', 'POST', newUserRecord).catch(() => {});
           }
 
           // 6. Buat atau Update Data Siswa Aktif (Tanpa Duplikasi Baris Pending)
@@ -2712,25 +2714,43 @@
       // -------------------------------------------------------------
       if (module === 'schools' || module === 'school') {
         if (action === 'get') {
-          const schools = await supabaseRest('schools?select=*');
-          const sch = (schools && schools[0]) ? { ...schools[0] } : {};
-          if (sch.wa_gateway_token && typeof sch.wa_gateway_token === 'string' && sch.wa_gateway_token.trim().startsWith('{')) {
-            try {
-              const extFromDb = JSON.parse(sch.wa_gateway_token);
-              Object.assign(sch, extFromDb);
-            } catch (_) {}
+          const [schools, wsRows] = await Promise.all([
+            supabaseRest('schools?select=*').catch(() => []),
+            supabaseRest('web_settings?id=eq.default&select=*').catch(() => [])
+          ]);
+          const schRow = (schools && schools[0]) ? { ...schools[0] } : {};
+          const ws = (wsRows && wsRows[0]) ? { ...wsRows[0] } : {};
+
+          let schExt = {};
+          if (schRow.wa_gateway_token && typeof schRow.wa_gateway_token === 'string' && schRow.wa_gateway_token.trim().startsWith('{')) {
+            try { schExt = JSON.parse(schRow.wa_gateway_token); } catch (_) {}
           }
-          if (!sch.visi || !sch.operational_hours) {
-            try {
-              const wsRows = await supabaseRest('web_settings?id=eq.default&select=*');
-              if (Array.isArray(wsRows) && wsRows[0] && wsRows[0].announcement_banner && wsRows[0].announcement_banner.trim().startsWith('{')) {
-                const wsExt = JSON.parse(wsRows[0].announcement_banner);
-                for (const [k, v] of Object.entries(wsExt)) {
-                  if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
-                }
-              }
-            } catch (_) {}
+          let wsExt = {};
+          if (ws.announcement_banner && typeof ws.announcement_banner === 'string' && ws.announcement_banner.trim().startsWith('{')) {
+            try { wsExt = JSON.parse(ws.announcement_banner); } catch (_) {}
           }
+
+          const wsTime = ws.updated_at ? new Date(ws.updated_at).getTime() : 0;
+          const schTime = schRow.updated_at ? new Date(schRow.updated_at).getTime() : 0;
+
+          let sch = {};
+          if (wsTime > schTime) {
+            Object.assign(sch, schRow, schExt, ws, wsExt);
+          } else {
+            Object.assign(sch, ws, wsExt, schRow, schExt);
+          }
+
+          for (const [k, v] of Object.entries(wsExt)) {
+            if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+          }
+          for (const [k, v] of Object.entries(schExt)) {
+            if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+          }
+          if (sch.school_name && !sch.name) sch.name = sch.school_name;
+          if (sch.name && !sch.school_name) sch.school_name = sch.name;
+          if (sch.whatsapp && !sch.whatsapp_number) sch.whatsapp_number = sch.whatsapp;
+          if (sch.whatsapp_number && !sch.whatsapp) sch.whatsapp = sch.whatsapp_number;
+
           try {
             const cachedExt = localStorage.getItem('siy_school_ext');
             if (cachedExt) {
@@ -2746,14 +2766,21 @@
           const id = params.id || 'SCH-001';
           const fullPayload = { ...params };
           delete fullPayload.id;
-          fullPayload.updated_at = new Date().toISOString();
+          const nowIso = new Date().toISOString();
+          fullPayload.updated_at = nowIso;
 
-          // Baca data sebelumnya dari DB atau localStorage agar tidak kehilangan field lain
+          // Baca data sebelumnya dari DB (schools & web_settings) atau localStorage agar tidak kehilangan field lain
           let existingExt = {};
           try {
-            const curSchools = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}&select=wa_gateway_token`);
+            const [curSchools, curWs] = await Promise.all([
+              supabaseRest(`schools?id=eq.${encodeURIComponent(id)}&select=wa_gateway_token`).catch(() => []),
+              supabaseRest('web_settings?id=eq.default&select=announcement_banner').catch(() => [])
+            ]);
+            if (curWs && curWs[0] && curWs[0].announcement_banner && curWs[0].announcement_banner.trim().startsWith('{')) {
+              existingExt = { ...existingExt, ...JSON.parse(curWs[0].announcement_banner) };
+            }
             if (curSchools && curSchools[0] && curSchools[0].wa_gateway_token && curSchools[0].wa_gateway_token.trim().startsWith('{')) {
-              existingExt = JSON.parse(curSchools[0].wa_gateway_token);
+              existingExt = { ...existingExt, ...JSON.parse(curSchools[0].wa_gateway_token) };
             }
           } catch (_) {}
           try {
@@ -2761,12 +2788,22 @@
             if (raw) existingExt = { ...JSON.parse(raw), ...existingExt };
           } catch (_) {}
 
+          const resolvedWa = params.whatsapp_number !== undefined
+            ? params.whatsapp_number
+            : (params.whatsapp !== undefined ? params.whatsapp : (existingExt.whatsapp_number || existingExt.whatsapp));
+
           const extPayload = {
             ...existingExt,
+            name: params.name !== undefined ? params.name : existingExt.name,
+            school_name: params.name !== undefined ? params.name : existingExt.school_name,
+            address: params.address !== undefined ? params.address : existingExt.address,
+            phone: params.phone !== undefined ? params.phone : existingExt.phone,
+            email: params.email !== undefined ? params.email : existingExt.email,
             campus_note: params.campus_note !== undefined ? params.campus_note : existingExt.campus_note,
             maps_url: params.maps_url !== undefined ? params.maps_url : existingExt.maps_url,
             maps_embed_url: params.maps_embed_url !== undefined ? params.maps_embed_url : existingExt.maps_embed_url,
-            whatsapp_number: params.whatsapp_number !== undefined ? params.whatsapp_number : existingExt.whatsapp_number,
+            whatsapp_number: resolvedWa,
+            whatsapp: resolvedWa,
             instagram_url: params.instagram_url !== undefined ? params.instagram_url : existingExt.instagram_url,
             youtube_url: params.youtube_url !== undefined ? params.youtube_url : existingExt.youtube_url,
             facebook_url: params.facebook_url !== undefined ? params.facebook_url : existingExt.facebook_url,
@@ -2790,41 +2827,42 @@
             sessionStorage.setItem('siyayasan_school_profile', JSON.stringify({ ...fullPayload, ...extPayload }));
           } catch (_) {}
 
+          // Kolom asli yang tersedia di tabel schools Supabase:
+          // id, name, npsn, address, phone, email, website, logo_url, headmaster_name, pembina, pengawas, ketua_yayasan, sekretaris, bendahara, wa_gateway_token, updated_at
           const validSchoolCols = [
-            'name', 'tagline', 'npsn', 'address', 'campus_note', 'phone', 'whatsapp_number', 'email', 'website',
-            'logo_url', 'footer_bg_url', 'maps_url', 'maps_embed_url', 'instagram_url', 'youtube_url', 'facebook_url',
+            'name', 'npsn', 'address', 'phone', 'email', 'website', 'logo_url',
             'headmaster_name', 'pembina', 'pengawas', 'ketua_yayasan', 'sekretaris', 'bendahara', 'wa_gateway_token', 'updated_at'
           ];
           const dbSchoolPayload = {
             wa_gateway_token: JSON.stringify(extPayload),
-            updated_at: fullPayload.updated_at
+            updated_at: nowIso
           };
           for (const col of validSchoolCols) {
             if (fullPayload[col] !== undefined) dbSchoolPayload[col] = fullPayload[col];
           }
 
-          try {
-            const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', dbSchoolPayload);
-            return { success: true, data: { ...(res && res[0] ? res[0] : dbSchoolPayload), ...extPayload }, message: 'Identitas & profil sekolah berhasil diperbarui' };
-          } catch (patchErr) {
-            console.warn('School patch fallback to core fields:', patchErr.message);
-            const corePayload = {
-              wa_gateway_token: JSON.stringify(extPayload)
-            };
-            if (params.name) corePayload.name = params.name;
-            if (params.address) corePayload.address = params.address;
-            if (params.phone) corePayload.phone = params.phone;
-            if (params.email) corePayload.email = params.email;
-            if (params.pembina) corePayload.pembina = params.pembina;
-            if (params.pengawas) corePayload.pengawas = params.pengawas;
-            if (params.ketua_yayasan) corePayload.ketua_yayasan = params.ketua_yayasan;
-            if (params.sekretaris) corePayload.sekretaris = params.sekretaris;
-            if (params.bendahara) corePayload.bendahara = params.bendahara;
-            if (params.headmaster_name) corePayload.headmaster_name = params.headmaster_name;
+          // Sinkronkan juga ke web_settings?id=eq.default agar seluruh pengunjung lintas perangkat selalu mendapatkan data terbaru
+          const wsSyncPayload = {
+            announcement_banner: JSON.stringify(extPayload),
+            updated_at: nowIso
+          };
+          if (params.name) wsSyncPayload.school_name = params.name;
+          if (params.address !== undefined) wsSyncPayload.address = params.address;
+          if (params.phone !== undefined) wsSyncPayload.phone = params.phone;
+          if (resolvedWa !== undefined) wsSyncPayload.whatsapp = resolvedWa;
+          if (params.email !== undefined) wsSyncPayload.email = params.email;
+          if (params.campus_note !== undefined) wsSyncPayload.campus_note = params.campus_note;
+          if (params.maps_url !== undefined) wsSyncPayload.maps_url = params.maps_url;
+          if (params.maps_embed_url !== undefined) wsSyncPayload.maps_embed_url = params.maps_embed_url;
+          if (params.instagram_url !== undefined) wsSyncPayload.instagram_url = params.instagram_url;
+          if (params.youtube_url !== undefined) wsSyncPayload.youtube_url = params.youtube_url;
+          if (params.facebook_url !== undefined) wsSyncPayload.facebook_url = params.facebook_url;
 
-            const res = await supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', corePayload).catch(() => []);
-            return { success: true, data: { ...(res && res[0] ? res[0] : corePayload), ...extPayload }, message: 'Identitas & profil sekolah berhasil diperbarui' };
-          }
+          const [res] = await Promise.all([
+            supabaseRest(`schools?id=eq.${encodeURIComponent(id)}`, 'PATCH', dbSchoolPayload).catch(() => []),
+            supabaseRest('web_settings?id=eq.default', 'PATCH', wsSyncPayload).catch(() => [])
+          ]);
+          return { success: true, data: { ...(res && res[0] ? res[0] : dbSchoolPayload), ...extPayload }, message: 'Identitas & profil sekolah berhasil diperbarui' };
         }
       }
 
@@ -3203,6 +3241,16 @@
         if (action === 'list') {
           const msgs = await supabaseRest('contact_messages?select=*&order=created_at.desc').catch(() => []);
           return { success: true, data: msgs };
+        }
+        if (action === 'delete' || action === 'remove') {
+          await supabaseRest(`contact_messages?id=eq.${encodeURIComponent(params.id)}`, 'DELETE').catch(() => {});
+          return { success: true, message: 'Pesan kontak berhasil dihapus' };
+        }
+        if (action === 'mark_read' || action === 'update') {
+          const updated = await supabaseRest(`contact_messages?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', {
+            status: params.status || 'read'
+          }).catch(() => []);
+          return { success: true, data: updated[0] || {}, message: 'Status pesan diperbarui' };
         }
         const id = 'MSG-' + Date.now();
         const msgPayload = {
