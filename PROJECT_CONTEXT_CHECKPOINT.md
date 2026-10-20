@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 20 Oktober 2026 (Sesi 46 - Favicon Resmi Yayasan, Skalabilitas Multi-Tenant Portal Siswa, Domain Resmi https://siyayasan.vercel.app — Domain Resmi `https://siyayasan.vercel.app`, Simulasi E2E Browser 44/44 PASS, Eliminasi 0 Error & 0 Bug)  
+**Terakhir Diperbarui:** 20 Oktober 2026 (Sesi 47 - Redesain Modal Panduan Login Editorial Bebas AI-Slop, Resolusi Single Source of Truth Hero Carousel, Eliminasi 100% Foto Fallback Statis, Domain Resmi https://siyayasan.vercel.app)  
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -31,7 +31,7 @@ Sistem Informasi Manajemen & Portal Website **Yayasan At Tarbiyyah Wijaya Kusuma
 
 ---
 
-## 🛠️ 3. Riwayat Remediasi & Pembaruan Sistem Terbaru (Sesi 43 & Sesi 44)
+## 🛠️ 3. Riwayat Remediasi & Pembaruan Sistem Terbaru
 
 ### 🔹 A. Remediasi Menyeluruh Pra-Deploy (Sesi 43 — Commit `a2da3a6`)
 1. **Perbaikan 4 Runtime Error Kritis:**
@@ -61,7 +61,6 @@ Sistem Informasi Manajemen & Portal Website **Yayasan At Tarbiyyah Wijaya Kusuma
    - Menyinkronkan catatan periode PPDB ke kolom `notes` dan `announcement_notes` di tabel `ppdb_periods`, serta menyinkronkan banner CTA bawah di `public/profil.html` saat pendaftaran PPDB ditutup/dibuka.
    - Memperbaiki penyimpanan riwayat **Backup & Restore Database** (`admin/backup.html` & `api.js`) agar mencakup seluruh 14 tabel utama, bebas dari kegagalan batas kuota `localStorage` (`QuotaExceededError`), dan menyinkronkan metadata riwayat backup ke Supabase Cloud (`web_settings`).
 
-
 ### 🔹 C. Domain Resmi & Simulasi Browser E2E Operasional Menyeluruh (Sesi 45 — 20 Oktober 2026)
 1. **Domain Resmi Produksi (`https://siyayasan.vercel.app`):**
    - Berhasil ditetapkan sebagai domain produksi resmi yayasan via Vercel CLI (HTTP 200, clean public URL tanpa proteksi SSO).
@@ -77,10 +76,7 @@ Sistem Informasi Manajemen & Portal Website **Yayasan At Tarbiyyah Wijaya Kusuma
    - **Lightbox Preview Dokumen PPDB:** Pratinjau berkas Pas Foto 3x4, Akta Kelahiran, dan Kartu Keluarga langsung di dalam modal `ppdb.html` (`openPpdbDocPreview`) tanpa diblokir browser.
    - **Tab Pesan Kontak Masuk:** Tab `messages` pada `frontend/portal/admin/content.html` untuk menampung pesan konsultasi dari pengunjung `/kontak.html` lengkap dengan tombol **Balas via WA** dan **Hapus**.
 
----
-
-
-### D. Branding Resmi Yayasan & Favicon Browser (Sesi 46 - Commit `a18a70a`)
+### 🔹 D. Branding Resmi Yayasan & Favicon Browser (Sesi 46 — Commit `a18a70a`)
 1. **Pembaruan Asset Favicon Multi-Ukuran:**
    - Menghasilkan `frontend/public/favicon.ico` multi-resolusi (16, 32, 48, 64, 128, 256 px) berbasis logo resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda (`logo.png`).
    - Menghasilkan `favicon.png` (32x32), `apple-touch-icon.png` (180x180), dan `icon-192.png` (192x192).
@@ -94,16 +90,33 @@ Sistem Informasi Manajemen & Portal Website **Yayasan At Tarbiyyah Wijaya Kusuma
    - Struktur portal siswa menggunakan arsitektur multi-tenant dinamis berbasis token JWT dan isolasi query per-`student_id`.
    - Kapasitas database PostgreSQL (Supabase) dan cloud storage siap melayani ratusan hingga ribuan siswa aktif secara bersamaan tanpa benturan data.
 
-
-### E. Pembersihan Form Login & Desain Editorial Modal Panduan Bebas AI-Slop (Sesi 47 - Commit `7e3c7c1`)
+### 🔹 E. Pembersihan Form Login & Desain Editorial Modal Panduan Bebas AI-Slop (Sesi 47 — Commit `7e3c7c1`)
 1. **Pembersihan Form Login:** Menghapus tombol `?` kecil dan kotak bantuan inline di samping label NIS dan Password di `frontend/public/login.html`. Formulir menjadi lega, elegan, dan bebas dari pergeseran layout (*zero layout shift*).
 2. **Desain Editorial Modal Bantuan:** Menghilangkan elemen grafis/ikon lingkaran besar. Menggantinya dengan kartu panduan resmi berstruktur rapi (*clean definition list*), tipografi formal, dan tombol WhatsApp otomatis yang menyesuaikan peran Siswa vs Admin.
 3. **Penyempurnaan Interaksi:** Menambahkan event listener penutup modal saat klik di luar kotak (*backdrop click*) dan tombol keyboard `Escape`.
+
+### 🔹 F. Sinkronisasi Tunggal Banner Hero Carousel & Eliminasi Foto Fallback Statis (Sesi 47 — Commit `965d3d2`)
+1. **Eliminasi Foto Fallback Statis (Zero FOUC):**
+   - Menghapus 3 foto ruang kelas Unsplash yang sebelumnya tertulis secara statis di `frontend/public/index.html`.
+   - Menggantinya dengan foto resmi lingkungan sekolah (`hero_slide_1792469386750_srz5t.jpg`) serta menyisipkan script inline instan pada elemen `#hero-slider-container` yang membaca `siy_hero_cache` dari `localStorage` saat detik ke-0 sehingga halaman beranda terbuka mulus tanpa jeda atau kedipan layar.
+2. **Penetapan Single Source of Truth `hero_images` di API:**
+   - Memperbaiki `frontend/shared/js/api.js` pada aksi `web_settings` get agar kolom `web_settings.hero_images` menjadi satu-satunya sumber kebenaran data slide. Data JSON sekunder (`announcement_banner` dan `schools.wa_gateway_token`) maupun cache usang tidak lagi dapat menimpa daftar slide database.
+   - Memastikan `web_settings` update menyertakan `hero_images` bahkan saat fallback `minimalWs` berjalan.
+   - Menghapus keterlibatan `hero_images` dari pembaruan modul `schools` agar profil sekolah umum tidak mengotori daftar slide beranda.
+3. **Sinkronisasi Instan CMS Admin:**
+   - Memperbarui `frontend/portal/admin/cms_setting.html` saat admin menambah, menghapus (`deleteSlide`), atau menyimpan slide untuk langsung menyelaraskan `localStorage.setItem('siy_hero_cache', ...)` sehingga perubahan di tab admin langsung berdampak seketika pada tab beranda publik.
+4. **Pembersihan Data Cloud di Supabase:**
+   - Membersihkan banner lama "test" (`73w1l`) yang terhapus dari seluruh kolom JSON di Supabase (`web_settings.announcement_banner` dan `schools.wa_gateway_token`) melalui REST API, menghasilkan konsistensi 100% dengan hanya slide aktif "Suasana" (`srz5t`).
+5. **Verifikasi Produksi Live:**
+   - Ter-deploy dan terverifikasi live di `https://siyayasan.vercel.app` (HTTP fetch: 0 Unsplash, 0 slide terhapus, foto aktif sekolah termuat instan).
+
+---
 
 ## 📊 4. Hasil Uji Otomatis & Status Operasional
 Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
 - **Simulasi E2E Browser Headless Chrome (44 Langkah Operasional):** **44/44 PASS (100%)**, 0 Bug, 0 Error Konsol, 0 Error Halaman (`scratch/run-full-browser-uat.js`).
 - **Verifikasi Halaman Publik & Autentikasi (`scratch/verify-login-errors.js`):** 0 Error Halaman, 0 Error Konsol.
+- **Verifikasi Sinkronisasi Hero Carousel (`verify_hero_sync.js`):** LULUS 100% (0 Unsplash, 0 zombie banner, 1 foto aktif tersinkronisasi).
 - **Supabase Cloud Live (`https://hnkxrbmngmveoxipohtk.supabase.co`):** 100% Aktif & Terverifikasi.
 - **Vercel Production Domain Resmi:** `https://siyayasan.vercel.app` (Alias: `https://siyayasan-portal.vercel.app`).
 
@@ -128,4 +141,3 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
 1. **Konteks Tunggal:** Selalu baca `PROJECT_CONTEXT_CHECKPOINT.md` dan `PROJECT_STATUS.md` di awal sesi.
 2. **Jangan Gunakan Sistem Lama:** Abaikan dan jangan pernah mengaktifkan kembali sistem/kode lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, atau field database fiktif seperti `role_id` pada tabel `users`).
 3. **Pertahankan Sistem Baru:** Seluruh alur kerja menggunakan `frontend/shared/js/api.js` yang terhubung langsung ke Supabase REST & Storage API serta ter-deploy di Vercel (`https://siyayasan.vercel.app`).
-

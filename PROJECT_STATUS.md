@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 20 Oktober 2026 — Sesi 45 (Domain Resmi `siyayasan.vercel.app`, Simulasi Operasional E2E di Browser & Perbaikan Seluruh Temuan) | Status: ✅ PRODUCTION & LIVE VERIFIED — 44/44 PASS, 0 error (`https://siyayasan.vercel.app`)*
+*Terakhir Diperbarui: 20 Oktober 2026 — Sesi 47 (Redesain Modal Panduan Login Editorial Bebas AI-Slop & Sinkronisasi Hero Carousel Single Source of Truth) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
 
 ---
 
@@ -1516,6 +1516,45 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 5. **Kondisi Data Produksi Saat Sesi Ditutup:**
    - Database berisi **data simulasi** (siswa Muhammad Rayhan Al-Fatih NIS `20265046` / pw `230400`, 1 guru Siti Aminah, 3 kelas, 1 berita/pengumuman/agenda, 1 pesan kontak, 1 tagihan SPP Lunas). Pengguna menyatakan akan menghapus sendiri sebelum input data asli.
    - Akun admin: `admin@yayasan.sch.id` / `230400`.
+
+---
+
+### 🗓️ Sesi 46 — Favicon Multi-Resolusi Resmi Yayasan & Skalabilitas Multi-Tenant Portal Siswa (20 Oktober 2026)
+
+**Fokus Utama:** Menyempurnakan branding visual institusi dengan favicon multi-resolusi serta menganalisis skalabilitas arsitektur portal siswa.
+
+1. **Favicon Multi-Resolusi Resmi:**
+   - Menghasilkan aset favicon berkualitas tinggi dari logo resmi (`logo.png`): `favicon.ico` (multi-layer 16, 32, 48, 64, 128, 256 px), `favicon.png` (32x32), `apple-touch-icon.png` (180x180), dan `icon-192.png` (192x192).
+   - Memasang tag `<link rel="icon">` dan `<link rel="apple-touch-icon">` secara universal ke seluruh 30 file HTML (halaman publik, portal admin, portal siswa).
+   - Menambahkan routing rewrites favicon di `vercel.json` dan memverifikasi live HTTP 200 di Vercel.
+2. **Skalabilitas Multi-Tenant Portal Siswa:**
+   - Memverifikasi isolasi query berbasis token JWT & `student_id` di Supabase REST. Portal siswa dirancang stateless dan siap melayani ratusan hingga ribuan siswa bersamaan.
+
+---
+
+### 🗓️ Sesi 47 — Redesain Panduan Login Bebas AI-Slop & Sinkronisasi Tunggal Banner Hero Carousel (20 Oktober 2026)
+
+**Fokus Utama:** Merapikan antarmuka panduan login agar bersih, formal, dan bebas dari ornamen berlebihan (anti-AI slop), serta menyelesaikan investigasi dan perbaikan bug banner lama/terhapus yang selalu muncul di Hero Carousel beranda publik.
+
+1. **Redesain UI Panduan Login (`frontend/public/login.html` — Commit `7e3c7c1`):**
+   - Menghapus tombol tanda tanya `?` inline di samping label input NIS dan Password yang sebelumnya membuat tata letak formulir terasa sempit dan jengkat saat diklik.
+   - Mengganti dialog bantuan dengan modal bertransisi mulus berdesain *editorial definition list* yang bersih dan formal tanpa ikon lingkaran raksasa (anti-AI slop).
+   - Memisahkan panduan akses akun Siswa (NIS & tanggal lahir) dan Staf TU/Admin (email sekolah resmi) serta menambahkan tombol WhatsApp bantuan yang kontekstual.
+   - Menambahkan event listener penutup modal saat klik luar (*backdrop click*) dan tombol keyboard `Escape`.
+2. **Investigasi & Resolusi Banner Hero Carousel Beranda (`index.html`, `api.js`, `cms_setting.html` — Commit `965d3d2`):**
+   - **Akar Masalah Ditemukan:**
+     1. Terdapat 3 slide cadangan foto ruang kelas Unsplash yang tertulis statis di HTML `index.html` (slide pertama aktif), menyebabkan browser selalu menampilkan foto kelas luar negeri tersebut selama 1–2 detik saat halaman pertama kali dimuat sebelum script API selesai berjalan (*Flash of Unstyled Content*).
+     2. Di server Supabase, slide lama "test" (`73w1l`) yang sudah dihapus oleh pengguna di Admin CMS masih tertinggal di dalam kolom string JSON cadangan (`announcement_banner` dan `schools.wa_gateway_token`). Logika `Object.assign` pada fungsi pembacaan data di `api.js` menyebabkan data JSON lama menimpa kolom asli dan membangkitkan kembali slide yang sudah dihapus.
+   - **Perbaikan Kode yang Diterapkan:**
+     1. `frontend/public/index.html`: Seluruh URL foto Unsplash dihapus. Digantikan oleh foto asli beranda sekolah (`hero_slide_1792469386750_srz5t.jpg`) dan fallback lokal `/images/school-campus.jpg`. Ditambahkan skrip inline instan yang membaca `siy_hero_cache` dari `localStorage` saat detik ke-0 sehingga beranda tampil instan tanpa kedipan/glitch.
+     2. `frontend/shared/js/api.js`: Kolom asli `web_settings.hero_images` ditetapkan sebagai *Single Source of Truth* mutlak yang tidak boleh ditimpa oleh JSON string kedaluwarsa atau cache lokal lama. Kolom `hero_images` diproteksi dalam `minimalWs` dan dipisahkan dari update modul `schools`.
+     3. `frontend/portal/admin/cms_setting.html`: Menambahkan sinkronisasi otomatis ke `localStorage.setItem('siy_hero_cache', ...)` saat admin mengunggah, menghapus, atau menyimpan slide, sehingga perubahan di Admin langsung sinkron seketika ke tab beranda publik.
+   - **Pembersihan Database Supabase:**
+     - Membersihkan string JSON `announcement_banner` dan `schools.wa_gateway_token` via REST API sehingga basis data cloud hanya memuat slide aktif "Suasana" (`srz5t`).
+   - **Hasil Verifikasi Live Produksi (`https://siyayasan.vercel.app`):**
+     - Uji verifikasi `verify_hero_sync.js`: 100% LULUS.
+     - Live curl/fetch: `Contains unsplash: false`, `Contains hero-slider-container: true`, `Contains srz5t: true`, `Contains 73w1l: false`.
+     - Tidak ada bug, error, atau degradasi pada fitur lain (PPDB, SPP, biodata, CMS). Seluruh sistem beroperasi normal dan stabil.
 
 ---
 
