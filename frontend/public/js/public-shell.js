@@ -363,6 +363,11 @@
       fLogoImg.onerror = function() { this.src = '/images/logo.png'; };
     }
 
+    if (school.logo_url && typeof school.logo_url === 'string' && school.logo_url.trim()) {
+      const favicons = document.querySelectorAll("link[rel*='icon'], link[rel='apple-touch-icon']");
+      favicons.forEach(el => { el.href = school.logo_url; });
+    }
+
     // Topbar telah dinonaktifkan: Pembaruan kontak dipusatkan pada Drawer Mobile dan Footer
 
     // Mobile drawer contact updates

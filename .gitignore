@@ -14,6 +14,7 @@ frontend/.vercel/
 
 # Temporary files & Logs
 tmp_remote/
+scratch/
 *.log
 npm-debug.log*
 yarn-debug.log*
