@@ -173,27 +173,10 @@
         
         <!-- Field 1: Identifier (NIS / Email) -->
         <div>
-          <div class="flex items-center gap-1.5 mb-1.5">
+          <div class="mb-1.5">
             <label for="identifier" id="identifier-label" class="block text-xs font-bold text-slate-700">
               Nomor Induk Siswa (NIS) *
             </label>
-            <button 
-              type="button" 
-              id="nis-help-btn"
-              onclick="toggleNisTooltip(event)" 
-              class="w-4 h-4 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 text-[10px] font-bold leading-none inline-flex items-center justify-center transition active:scale-95 focus:outline-none"
-              title="Informasi NIS"
-              aria-label="Informasi NIS"
-            >?</button>
-          </div>
-
-          <!-- Petunjuk NIS (Collapsible) -->
-          <div id="nis-tooltip" class="hidden mb-2 bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-600 flex items-start justify-between gap-2">
-            <div>
-              <span class="font-semibold text-slate-800 text-xs">Petunjuk NIS:</span>
-              <p class="mt-0.5 text-[11px] text-slate-600 leading-relaxed">Nomor Induk Siswa tertera pada kartu pelajar atau bukti registrasi PPDB Anda (contoh: <code>2026001</code>).</p>
-            </div>
-            <button type="button" onclick="closeNisTooltip(event)" class="text-slate-400 hover:text-slate-600 p-0.5 text-xs leading-none font-bold" aria-label="Tutup petunjuk NIS">✕</button>
           </div>
 
           <div class="relative">
@@ -215,32 +198,12 @@
         <!-- Field 2: Password -->
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <div class="flex items-center gap-1.5">
-              <label for="password" class="block text-xs font-bold text-slate-700">
-                Password *
-              </label>
-              <button 
-                type="button" 
-                id="pwd-help-btn"
-                onclick="togglePasswordTooltip(event)" 
-                class="w-4 h-4 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 text-[10px] font-bold leading-none inline-flex items-center justify-center transition active:scale-95 focus:outline-none"
-                title="Petunjuk password awal"
-                aria-label="Petunjuk password awal"
-              >?</button>
-            </div>
-            
-            <button type="button" onclick="openHelpModal()" class="text-xs text-slate-500 hover:text-slate-800 transition">
+            <label for="password" class="block text-xs font-bold text-slate-700">
+              Password *
+            </label>
+            <button type="button" onclick="openHelpModal()" class="text-xs text-brand-600 hover:text-brand-700 font-semibold transition focus:outline-none">
               Bantuan?
             </button>
-          </div>
-
-          <!-- Petunjuk Password Awal (Collapsible) -->
-          <div id="pwd-tooltip" class="hidden mb-2 bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-600 flex items-start justify-between gap-2">
-            <div>
-              <span class="font-semibold text-slate-800 text-xs">Password Awal Siswa Baru:</span>
-              <p class="mt-0.5 text-[11px] text-slate-600 leading-relaxed">Gunakan format <strong>Tanggal Lahir</strong> (contoh: <code>2018-05-14</code> atau <code>14052018</code>) sebagai password awal akun Anda.</p>
-            </div>
-            <button type="button" onclick="closePasswordTooltip(event)" class="text-slate-400 hover:text-slate-600 p-0.5 text-xs leading-none font-bold" aria-label="Tutup petunjuk password">✕</button>
           </div>
 
           <div class="relative">
@@ -317,27 +280,32 @@
     </div>
   </div>
 
-  <!-- Modal Bantuan Login -->
+  <!-- Modal Bantuan Login (Desain Bersih & Editorial Bebas Ikon Besar) -->
   <div id="help-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
-      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mx-auto mb-4">
-        <i class="fi fi-rr-interrogation text-xl"></i>
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200/80 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Header Modal -->
+      <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100 mb-4">
+        <div>
+          <h3 id="help-modal-title" class="text-base font-bold text-slate-900">Panduan Akses Portal Siswa</h3>
+          <p id="help-modal-desc" class="text-xs text-slate-500 mt-0.5">Petunjuk resmi autentikasi akun Yayasan At Tarbiyyah.</p>
+        </div>
+        <button type="button" onclick="closeHelpModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition focus:outline-none" aria-label="Tutup panduan">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
-      <h3 id="help-modal-title" class="text-base font-bold text-slate-900 text-center mb-1">Panduan Akses Portal Siswa</h3>
-      <p id="help-modal-desc" class="text-xs text-slate-600 text-center mb-4 leading-relaxed">
-        Akun siswa menggunakan <strong>NIS</strong> terdaftar dan <strong>Tanggal Lahir</strong> bawaan.
-      </p>
-      <div id="help-modal-body" class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-xs text-slate-700 space-y-1.5 mb-4">
-        <div>• <strong>Siswa Aktif:</strong> Masukkan NIS Anda (cth: 2026001)</div>
-        <div>• <strong>Password Awal:</strong> Tanggal Lahir format DDMMYYYY (cth: 14052020) atau password saat pendaftaran PPDB</div>
-        <div>• <strong>Lupa Password?</strong> Silakan hubungi admin sekolah untuk reset akun.</div>
+
+      <!-- Body Panduan Terstruktur (Clean Definition List) -->
+      <div id="help-modal-body" class="border border-slate-200 rounded-xl divide-y divide-slate-100 bg-slate-50/50 mb-5 text-xs">
+        <!-- Konten diisi dinamis oleh openHelpModal() -->
       </div>
+
+      <!-- Action Footer -->
       <div class="space-y-2">
-        <a id="help-wa-link" href="https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20login%20SIAKAD%20Yayasan%20At%20Tarbiyyah%20Wijaya%20Kusuma" target="_blank" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 active:scale-[0.98]">
-          <i class="fi fi-brands-whatsapp text-sm"></i>
+        <a id="help-wa-link" href="https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20akses%20Portal%20Siswa%20Yayasan%20At%20Tarbiyyah" target="_blank" class="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]">
           <span id="help-wa-text">Hubungi Admin TU via WhatsApp</span>
         </a>
-        <button type="button" onclick="closeHelpModal()" class="w-full py-2 px-4 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition active:scale-[0.98]">
+        <button type="button" onclick="closeHelpModal()" class="w-full py-2 px-4 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 hover:text-slate-800 transition active:scale-[0.98]">
           Tutup
         </button>
       </div>
@@ -390,12 +358,6 @@
       const label = document.getElementById('identifier-label');
       const input = document.getElementById('identifier');
       const icon = document.getElementById('identifier-icon');
-      const nisHelpBtn = document.getElementById('nis-help-btn');
-      const pwdHelpBtn = document.getElementById('pwd-help-btn');
-
-      // Tutup tooltip jika sedang terbuka
-      closeNisTooltip();
-      closePasswordTooltip();
 
       if (mode === 'admin') {
         tabAdmin.className = 'flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5 font-semibold';
@@ -404,8 +366,6 @@
         input.placeholder = 'admin@yayasan.sch.id';
         input.type = 'email';
         icon.className = 'fi fi-rr-envelope text-base';
-        if (nisHelpBtn) nisHelpBtn.classList.add('hidden');
-        if (pwdHelpBtn) pwdHelpBtn.classList.add('hidden');
       } else {
         tabSiswa.className = 'flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5 font-semibold';
         tabAdmin.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5 font-semibold';
@@ -413,52 +373,8 @@
         input.placeholder = 'Contoh: 2026001';
         input.type = 'text';
         icon.className = 'fi fi-rr-graduation-cap text-base';
-        if (nisHelpBtn) nisHelpBtn.classList.remove('hidden');
-        if (pwdHelpBtn) pwdHelpBtn.classList.remove('hidden');
       }
     }
-
-    function toggleNisTooltip(e) {
-      if (e) e.stopPropagation();
-      const el = document.getElementById('nis-tooltip');
-      const pwd = document.getElementById('pwd-tooltip');
-      if (pwd) pwd.classList.add('hidden');
-      if (el) el.classList.toggle('hidden');
-    }
-
-    function closeNisTooltip(e) {
-      if (e) e.stopPropagation();
-      const el = document.getElementById('nis-tooltip');
-      if (el) el.classList.add('hidden');
-    }
-
-    function togglePasswordTooltip(e) {
-      if (e) e.stopPropagation();
-      const el = document.getElementById('pwd-tooltip');
-      const nis = document.getElementById('nis-tooltip');
-      if (nis) nis.classList.add('hidden');
-      if (el) el.classList.toggle('hidden');
-    }
-
-    function closePasswordTooltip(e) {
-      if (e) e.stopPropagation();
-      const el = document.getElementById('pwd-tooltip');
-      if (el) el.classList.add('hidden');
-    }
-
-    // Tutup tooltip saat klik di luar
-    document.addEventListener('click', function(e) {
-      const nisTooltip = document.getElementById('nis-tooltip');
-      const nisBtn = document.getElementById('nis-help-btn');
-      if (nisTooltip && !nisTooltip.contains(e.target) && e.target !== nisBtn) {
-        nisTooltip.classList.add('hidden');
-      }
-      const pwdTooltip = document.getElementById('pwd-tooltip');
-      const pwdBtn = document.getElementById('pwd-help-btn');
-      if (pwdTooltip && !pwdTooltip.contains(e.target) && e.target !== pwdBtn) {
-        pwdTooltip.classList.add('hidden');
-      }
-    });
 
     // Toggle Show/Hide Password
     document.getElementById('toggle-password').addEventListener('click', function() {
@@ -473,10 +389,12 @@
       }
     });
 
+    // Modal Bantuan Login (Format Bersih, Rapi & Terstruktur)
     function openHelpModal() {
       const title = document.getElementById('help-modal-title');
       const desc = document.getElementById('help-modal-desc');
       const body = document.getElementById('help-modal-body');
+      const waLink = document.getElementById('help-wa-link');
       const waText = document.getElementById('help-wa-text');
 
       if (currentLoginMode === 'admin') {
@@ -484,29 +402,70 @@
         if (desc) desc.textContent = 'Khusus staf Dewan Pembina, Pengurus Yayasan, Kepala Sekolah, dan Staf TU.';
         if (body) {
           body.innerHTML = `
-            <div>• <strong>Username:</strong> Gunakan alamat email resmi yayasan terdaftar (contoh: <code>admin@yayasan.sch.id</code>).</div>
-            <div>• <strong>Password:</strong> Gunakan kata sandi akun administrator resmi yayasan.</div>
-            <div>• <strong>Kendala Akses?</strong> Hubungi Administrator IT Yayasan jika lupa kata sandi atau akun terkunci.</div>
+            <div class="p-3.5">
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Email Resmi Yayasan</div>
+              <div class="text-slate-700 mt-1 leading-relaxed">
+                Gunakan alamat email resmi staf yang telah didaftarkan oleh Super Admin (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">admin@yayasan.sch.id</code> atau <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800">tu@yayasan.sch.id</code>).
+              </div>
+            </div>
+            <div class="p-3.5">
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Kata Sandi Staf</div>
+              <div class="text-slate-700 mt-1 leading-relaxed">
+                Masukkan kata sandi resmi administrator yayasan yang telah diberikan oleh pengurus.
+              </div>
+            </div>
+            <div class="p-3.5">
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Kendala Akses & Pemulihan</div>
+              <div class="text-slate-700 mt-1 leading-relaxed">
+                Jika akun terkunci atau lupa kata sandi, hubungi Super Admin Yayasan / Tim IT untuk verifikasi identitas dan pemulihan hak akses.
+              </div>
+            </div>
           `;
         }
-        if (waText) waText.textContent = 'Hubungi IT Yayasan via WhatsApp';
+        if (waLink) waLink.href = 'https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20akses%20Portal%20Administrator%20Yayasan%20At%20Tarbiyyah';
+        if (waText) waText.textContent = 'Hubungi IT / Super Admin via WhatsApp';
       } else {
         if (title) title.textContent = 'Panduan Akses Portal Siswa';
-        if (desc) desc.textContent = 'Akun siswa menggunakan NIS terdaftar dan Tanggal Lahir bawaan.';
+        if (desc) desc.textContent = 'Petunjuk resmi autentikasi santri & wali murid Yayasan At Tarbiyyah.';
         if (body) {
           body.innerHTML = `
-            <div>• <strong>Siswa Aktif:</strong> Masukkan NIS Anda (cth: <code>2026001</code>).</div>
-            <div>• <strong>Password Awal:</strong> Format Tanggal Lahir (contoh: <code>2018-05-14</code> atau <code>14052018</code>) atau password saat pendaftaran PPDB.</div>
-            <div>• <strong>Lupa Password?</strong> Silakan hubungi admin sekolah untuk reset akun.</div>
+            <div class="p-3.5">
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Nomor Induk Siswa (NIS)</div>
+              <div class="text-slate-700 mt-1 leading-relaxed">
+                Masukkan NIS terdaftar Anda (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">2026001</code>). NIS tertera pada kartu pelajar atau bukti formulir pendaftaran PPDB.
+              </div>
+            </div>
+            <div class="p-3.5">
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Kata Sandi Awal</div>
+              <div class="text-slate-700 mt-1 leading-relaxed">
+                Gunakan format <strong>Tanggal Lahir</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800">2018-05-14</code> atau <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800">14052018</code>) atau kata sandi yang Anda tentukan saat pendaftaran PPDB.
+              </div>
+            </div>
+            <div class="p-3.5">
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Lupa Kata Sandi</div>
+              <div class="text-slate-700 mt-1 leading-relaxed">
+                Jika lupa kata sandi, silakan hubungi bagian Tata Usaha sekolah melalui WhatsApp resmi di bawah untuk verifikasi dan pengaturan ulang akun.
+              </div>
+            </div>
           `;
         }
+        if (waLink) waLink.href = 'https://wa.me/6281347142829?text=Assalamu%27alaikum%2C%20saya%20memerlukan%20bantuan%20akses%20Portal%20Siswa%20Yayasan%20At%20Tarbiyyah';
         if (waText) waText.textContent = 'Hubungi Admin TU via WhatsApp';
       }
       document.getElementById('help-modal').classList.remove('hidden');
     }
+
     function closeHelpModal() {
       document.getElementById('help-modal').classList.add('hidden');
     }
+
+    // Tutup Modal Bantuan saat klik backdrop atau tekan tombol ESC
+    document.getElementById('help-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeHelpModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeHelpModal();
+    });
 
     // Form Login Submit
     document.getElementById('login-form').addEventListener('submit', async function(e) {
