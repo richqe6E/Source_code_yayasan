@@ -94,6 +94,12 @@ Sistem Informasi Manajemen & Portal Website **Yayasan At Tarbiyyah Wijaya Kusuma
    - Struktur portal siswa menggunakan arsitektur multi-tenant dinamis berbasis token JWT dan isolasi query per-`student_id`.
    - Kapasitas database PostgreSQL (Supabase) dan cloud storage siap melayani ratusan hingga ribuan siswa aktif secara bersamaan tanpa benturan data.
 
+
+### E. Pembersihan Form Login & Desain Editorial Modal Panduan Bebas AI-Slop (Sesi 47 - Commit `7e3c7c1`)
+1. **Pembersihan Form Login:** Menghapus tombol `?` kecil dan kotak bantuan inline di samping label NIS dan Password di `frontend/public/login.html`. Formulir menjadi lega, elegan, dan bebas dari pergeseran layout (*zero layout shift*).
+2. **Desain Editorial Modal Bantuan:** Menghilangkan elemen grafis/ikon lingkaran besar. Menggantinya dengan kartu panduan resmi berstruktur rapi (*clean definition list*), tipografi formal, dan tombol WhatsApp otomatis yang menyesuaikan peran Siswa vs Admin.
+3. **Penyempurnaan Interaksi:** Menambahkan event listener penutup modal saat klik di luar kotak (*backdrop click*) dan tombol keyboard `Escape`.
+
 ## 📊 4. Hasil Uji Otomatis & Status Operasional
 Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
 - **Simulasi E2E Browser Headless Chrome (44 Langkah Operasional):** **44/44 PASS (100%)**, 0 Bug, 0 Error Konsol, 0 Error Halaman (`scratch/run-full-browser-uat.js`).
