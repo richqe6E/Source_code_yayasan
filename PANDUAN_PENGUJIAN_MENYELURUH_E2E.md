@@ -1,6 +1,6 @@
 # PANDUAN & INSTRUKSI PENGUJIAN SIMULASI MENYELURUH (END-TO-END / UAT)
 **Sistem Informasi & Portal Terpadu — Yayasan At Tarbiyyah Wijaya Kusuma Samarinda**  
-**URL Produksi (Vercel):** `https://siyayasan-portal.vercel.app`  
+**URL Produksi (Vercel):** `https://siyayasan.vercel.app`  
 **URL Lokal (Dev Server):** `http://localhost:5000`
 
 ---
@@ -43,7 +43,7 @@ Sebelum memulai simulasi dari awal hingga akhir, siapkan:
 
 ### Langkah-Langkah Pengujian Manual:
 1. **Beranda Utama (`/index.html`)**
-   - Buka `https://siyayasan-portal.vercel.app/`.
+   - Buka `https://siyayasan.vercel.app/`.
    - **Yang Diperiksa:**
      - Hero Carousel tampil dengan judul, subjudul, dan tombol CTA **"Daftar PPDB Sekarang"**.
      - Bagian **Program Pendidikan** (KB, TK, TPQ) menampilkan deskripsi yang sesuai.
@@ -251,7 +251,7 @@ Buka jendela browser baru (atau *Incognito*), masuk ke `/login.html`, dan login 
 
 1. Di **Portal Admin** (`/portal/admin/content.html` -> Tab Profil Institusi atau `/portal/admin/cms_setting.html`), ubah teks **Tagline / Jam Operasional / Visi** dengan tambahan kata unik (misal: `Update Cloud 2026`). Klik **Simpan**.
 2. Buka **Perangkat Berbeda** (misalnya melalui browser Smartphone Anda, atau profil browser baru yang bersih tanpa cache/`localStorage`).
-3. Kunjungi `https://siyayasan-portal.vercel.app/` dan `/profil.html`.
+3. Kunjungi `https://siyayasan.vercel.app/` dan `/profil.html`.
 4. **Hasil yang Diharapkan:** Perubahan `Update Cloud 2026` langsung tampil di perangkat kedua tersebut.
 
 ---
@@ -275,9 +275,9 @@ node tests/test-api-contract.js
 ```
 
 ### Metode B — Skrip Smoke-Test Otomatis Langsung di Browser (DevTools Console)
-Anda dapat menguji seluruh koneksi API dan ketersediaan modul langsung dari browser pada website `https://siyayasan-portal.vercel.app`:
+Anda dapat menguji seluruh koneksi API dan ketersediaan modul langsung dari browser pada website `https://siyayasan.vercel.app`:
 
-1. Buka `https://siyayasan-portal.vercel.app`.
+1. Buka `https://siyayasan.vercel.app`.
 2. Tekan **`F12`** (atau Klik Kanan -> **Inspect**) lalu pilih tab **Console**.
 3. Salin dan tempel (*copy-paste*) skrip pengujian otomatis berikut ke dalam Console, lalu tekan **Enter**:
 
