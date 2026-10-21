@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 50 (Integrasi Dinamis Real-Time Potret Galeri Beranda dengan Upload Portal Admin & Supabase Cloud) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
+*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 51 (Remediasi Cacat Logika Tagihan SPP Massal & Redesain Struktur Pengurus Anti-Slop)*
 
 ---
 
@@ -1644,6 +1644,35 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
    - Dilengkapi proteksi sanitasi HTML (`escapeHtml`) dan *smart fallback* ke foto kampus sekolah jika admin belum mengunggah foto baru.
 3. **Live Production Verified:**
    - Teruji dan aktif di `https://siyayasan.vercel.app` (Commit `27f343f`).
+
+---
+
+
+---
+
+### 🗓️ Sesi 51 — Remediasi Cacat Logika Tagihan SPP Massal & Redesain Arsitektural Struktur Pengurus Bebas AI-Slop (21 Oktober 2026, Malam)
+
+**Fokus Utama:** 
+1. Mengatasi cacat logika penagihan massal per kelas di mana invoice SPP terbit ganda untuk siswa yang belum membayar atau sudah menerima tagihan bulan berjalan dari aktivasi PPDB.
+2. Membersihkan invoice duplikat santri baru (Riky Rivaldi) di database cloud Supabase.
+3. Merancang arsitektur smart deduplication engine pada API penagihan serta standarisasi dropdown bulan/tahun pada modal tagihan admin.
+4. Merancang redesain visual struktur bagan pengurus di `frontend/public/profil.html` agar tidak kaku, teduh (slate-50 canvas), bebas ornamen AI-slop (kabel biru elektrik, ikon mahkota/dompet/perisai klip-art), dan responsif adaptif (Desktop Tree vs Mobile Stepper) dengan 100% preservasi ID CMS Supabase.
+5. Menerbitkan panduan komprehensif `ARSITEKTUR_DAN_KOMPONEN_VITAL.md` ke repositori utama.
+
+1. **Penyelidikan Akar Masalah Logika Penagihan SPP:**
+   - Ditemukan bahwa aksi `invoices -> create_bulk` pada `frontend/shared/js/api.js` mengeksekusi `POST /invoices` dalam perulangan `for` secara buta tanpa mengecek invoice yang sudah ada untuk siswa/bulan tersebut.
+   - Kotak input bulan di `frontend/portal/admin/payments.html` berupa teks bebas (`<input type="text">`), menghasilkan variasi penulisan tidak seragam (`"Bulan Oktober"` vs `"Oktober"`).
+   - Riky Rivaldi tercatat memiliki 2 invoice: `INV-1792580611754-0` (`INV/2026/1754/1`, dari bulk) dan `INV-431607` (`INV/2026/2758`, dari PPDB), sehingga total tagihannya membengkak menjadi Rp 300.000.
+2. **Eksekusi Pembersihan Data Duplikat di Supabase Cloud (Live):**
+   - Menghapus invoice duplikat `INV-1792580611754-0` melalui Supabase REST API dengan verifikasi status 200 OK.
+   - Terverifikasi: Riky Rivaldi kini hanya memiliki 1 tagihan resmi pertama `INV/2026/2758` (Rp 150.000), total tunggakan kembali normal Rp 150.000.
+3. **Dokumentasi & Artefak Rencana Implementasi:**
+   - Dokumen arsitektur `ARSITEKTUR_DAN_KOMPONEN_VITAL.md` diterbitkan ke repositori utama (Commit `e25fa02`).
+   - Rencana terpadu diterbitkan di artefak `rencana_perbaikan_spp_dan_struktur_organisasi.md` (mencakup Smart De-duplication Engine, Dropdown Terstandar, Redesain Kanvas Berkedalaman, Monogram Avatar Inisial, Konektor Slate 1.5px Netral, dan Tata Letak Adaptif).
+   - Skrip persiapan disimpan di `scratch/apply_spp_and_org_fix.js`.
+4. **Status Handover Kerja:**
+   - Sesi di-pause sesuai instruksi pengguna (*"simpan pekerjaan kita, kita akan lanjut di lain waktu, simpan riwayat kerja terakhir. saya akan mengirimkan cht continue nanti untuk anda melanjutkan implementasiannya"*).
+   - Pekerjaan siap dilanjutkan seketika saat menerima pesan perintah kelanjutan.
 
 ---
 

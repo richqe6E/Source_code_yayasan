@@ -185,3 +185,4 @@ Setiap pengembang atau asisten AI yang memelihara proyek ini **wajib mematuhi 6 
    Satu-satunya domain resmi institusi adalah **`https://siyayasan.vercel.app`**. Seluruh akses dari domain lama wajib dibelokkan melalui redirect 308 di `vercel.json`.
 6. **Proteksi Anti-AI Slop:**  
    Pertahankan prinsip tipografi bersih: hindari floating kicker pill badges di atas H1, hindari badge "Interaktif", dan gunakan garis pemisah tipis (*clean hairline dividers*) daripada kotak bersarang (*box-in-box*).
+

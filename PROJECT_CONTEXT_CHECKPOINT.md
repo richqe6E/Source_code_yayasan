@@ -172,3 +172,17 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
 1. **Dinamisasi Kartu Galeri Beranda:**
    - Kartu "Potret Kegiatan Santri" di beranda terhubung langsung ke API Supabase `gallery` via `Promise.all` di `frontend/public/js/app.js`.
    - Foto yang diunggah staf/admin di Portal Admin (`content.html`) otomatis tampil di beranda secara *real-time* tanpa perubahan kode.
+
+
+### 🔹 F. Remediasi Tagihan SPP Massal & Redesain Struktur Organisasi Anti-Slop (Sesi 51 — 21 Oktober 2026)
+1. **Analisis Masalah SPP Ganda:**
+   - Teridentifikasi akar masalah: loop buta tanpa de-duplikasi di `create_bulk` (`api.js`) dan input bulan teks bebas tanpa normalisasi di `payments.html`.
+2. **Pembersihan Invoice Duplikat di Database Supabase:**
+   - Berhasil menghapus invoice duplikat `INV-1792580611754-0` (INV/2026/1754/1). Riky Rivaldi terverifikasi hanya memiliki 1 invoice sah `INV/2026/2758` senilai Rp 150.000.
+3. **Penyusunan Solusi & Persiapan Skrip:**
+   - Dibuat `getInvoiceMonthKey` normalizer (mengonversi seluruh variasi bulan bahasa Indonesia dan tahun ke format standar `YYYY-MM`).
+   - Disiapkan pencegahan tagihan ganda pada `create` dan `create_bulk` di `api.js`.
+   - Disiapkan penggantian input bulan di `payments.html` menjadi dropdown bulan (Jan–Des) dan tahun (2026–2028).
+   - Disiapkan redesain bagan organisasi di `frontend/public/profil.html` dengan kanvas `bg-slate-50/70`, monogram inisial (`DI`, `SH`, `MK`, `CG`, `SP`), konektor arsitektural netral 1.5px, eliminasi total clipart AI-slop, dan layout adaptif (Desktop Tree + Mobile Stepper) dengan preservasi 100% ID CMS Supabase (`org-pembina`, `org-pengawas`, `org-ketua`, `org-sekretaris`, `org-bendahara`, `org-kepala-paud-tk`, `org-kepala-tpq`).
+4. **Status Checkpoint:**
+   - Sesi disimpan secara rapi sesuai instruksi user untuk dilanjutkan saat chat "continue" dikirimkan.
