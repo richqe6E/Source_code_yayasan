@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 21 Oktober 2026 (Sesi 49 - Redesain UI/UX Clean & Aesthetic: Eliminasi Total Ornamen AI-Slop, Bento Grid Warta & Galeri, Vektor SVG Murni 3 Jenjang, & Accordion Minimalis)
+**Terakhir Diperbarui:** 21 Oktober 2026 (Sesi 50 - Integrasi Dinamis Real-Time Galeri Beranda dengan Upload Portal Admin & Supabase Cloud)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -166,3 +166,9 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Mengubah seksi berita beranda menjadi Bento Hub adaptif: memadukan Warta Utama dengan Potret Galeri Kegiatan Santri sehingga tidak ada kekosongan ruang putih saat data artikel baru sedikit.
 4. **Hierarki Tipografi Tenang & Konsisten:**
    - Merapikan kartu alamat kampus di `kontak.html` dengan hierarki bersih dan tombol peta minimalis.
+
+
+### 🔹 E. Integrasi Real-Time Galeri Beranda dengan Portal Admin (Sesi 50 — 21 Oktober 2026)
+1. **Dinamisasi Kartu Galeri Beranda:**
+   - Kartu "Potret Kegiatan Santri" di beranda terhubung langsung ke API Supabase `gallery` via `Promise.all` di `frontend/public/js/app.js`.
+   - Foto yang diunggah staf/admin di Portal Admin (`content.html`) otomatis tampil di beranda secara *real-time* tanpa perubahan kode.

@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 49 (Redesain UI/UX Clean & Aesthetic: Eliminasi Total Elemen AI-Slop, Bento Grid Warta & Galeri, Vektor SVG Murni 3 Jenjang, & Accordion Minimalis) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
+*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 50 (Integrasi Dinamis Real-Time Potret Galeri Beranda dengan Upload Portal Admin & Supabase Cloud) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
 
 ---
 
@@ -1629,6 +1629,21 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 6. **Hierarki Tipografi Kartu Kontak Alamat Kampus (`frontend/public/kontak.html`):**
    - Menata ulang teks alamat yang sebelumnya berjejal 4 baris dengan warna bertabrakan.
    - Menyusun hierarki rapi: label `KAMPUS UTAMA`, nama gedung `Gedung Pendidikan Terpadu At Tarbiyyah`, alamat jalan dalam font reguler yang nyaman dibaca, catatan patokan dalam teks abu-abu lembut (*muted slate*), serta tombol mini Google Maps berbingkai halus (*subtle pill button*).
+
+---
+
+### 🗓️ Sesi 50 — Integrasi Dinamis Real-Time Potret Galeri Beranda dengan Upload Portal Admin & Supabase Cloud (21 Oktober 2026)
+
+**Fokus Utama:** Mengintegrasikan kartu "Potret Kegiatan Santri" pada seksi Berita & Galeri di beranda utama secara langsung ke database Supabase (`gallery` / `galleries`) dan modul upload Portal Admin (`content.html` tab Galeri).
+
+1. **Pemanggilan Asinkron Paralel (`frontend/public/js/app.js`):**
+   - Fungsi `loadLatestNews()` ditingkatkan menggunakan `Promise.all` untuk mengambil warta berita (`news`) dan foto galeri terbaru (`gallery`, batas 6 foto) secara bersamaan tanpa menambah waktu tunggu halaman.
+   - Menyaring foto aktif yang memiliki `image_url` valid dan memetakan 2 foto terbaru secara dinamis ke kartu cuplikan galeri.
+2. **Sinkronisasi Otomatis dari Portal Admin:**
+   - Setiap foto kegiatan, santri, atau fasilitas yang diunggah atau dihapus oleh staf/admin melalui **Portal Admin (Menu Konten > Tab Galeri)** kini otomatis tampil seketika di kartu beranda beranda utama lengkap dengan judul fotonya.
+   - Dilengkapi proteksi sanitasi HTML (`escapeHtml`) dan *smart fallback* ke foto kampus sekolah jika admin belum mengunggah foto baru.
+3. **Live Production Verified:**
+   - Teruji dan aktif di `https://siyayasan.vercel.app` (Commit `27f343f`).
 
 ---
 
