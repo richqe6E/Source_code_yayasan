@@ -329,6 +329,16 @@
     }, 4000);
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function formatDateID(iso) {
     if (!iso) return '-';
     const d = new Date(iso);
@@ -340,10 +350,19 @@
     const container = document.getElementById('latest-news');
     if (!container) return;
 
-    const res = await apiCall('news', 'list', { status: 'published' });
-    const rawItems = Array.isArray(res.data) ? res.data : ((res.data && res.data.items) || res.items || []);
+    // Fetch warta berita dan galeri dokumentasi secara paralel
+    const [newsRes, galleryRes] = await Promise.all([
+      apiCall('news', 'list', { status: 'published' }).catch(() => null),
+      apiCall('gallery', 'list', { per_page: 6 }).catch(() => null)
+    ]);
+
+    const rawItems = (newsRes && Array.isArray(newsRes.data)) ? newsRes.data : ((newsRes && newsRes.data && newsRes.data.items) || (newsRes && newsRes.items) || []);
     const items = rawItems.slice(0, 3);
-    if (!res.success || items.length === 0) {
+
+    const rawGallery = (galleryRes && Array.isArray(galleryRes.data)) ? galleryRes.data : ((galleryRes && galleryRes.data && galleryRes.data.items) || (galleryRes && galleryRes.items) || []);
+    const galleryPhotos = rawGallery.filter(g => g && (g.image_url || g.image)).slice(0, 2);
+
+    if (!newsRes || !newsRes.success || items.length === 0) {
       container.className = 'w-full';
       container.innerHTML = '<div class="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200/80 text-sm">Belum ada warta berita yang diterbitkan.</div>';
       return;
@@ -396,14 +415,42 @@
               Momen belajar, bermain edukatif, dan pembiasaan adab Qur'ani santri PAUD, TK, dan TPQ di lingkungan sekolah.
             </p>
             <div class="grid grid-cols-2 gap-3 mb-4">
-              <div class="aspect-4/3 rounded-xl overflow-hidden bg-slate-200 border border-slate-200/80 shadow-2xs group/img relative">
-                <img src="images/school-campus.jpg" alt="Aktivitas Santri At Tarbiyyah" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300">
-                <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 px-1.5 py-0.5 rounded">Lingkungan</span>
-              </div>
-              <div class="aspect-4/3 rounded-xl overflow-hidden bg-slate-200 border border-slate-200/80 shadow-2xs group/img relative">
-                <img src="images/school-campus.jpg" alt="Gedung Kampus Yayasan" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300">
-                <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 px-1.5 py-0.5 rounded">Fasilitas</span>
-              </div>
+              ${(function() {
+                if (galleryPhotos.length > 0) {
+                  let html = galleryPhotos.map((g, idx) => {
+                    const photoUrl = g.image_url || g.image;
+                    const photoTitle = g.title || (idx === 0 ? 'Kegiatan Santri' : 'Fasilitas Sekolah');
+                    return `
+                      <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="${escapeHtml(photoTitle)}">
+                        <img src="${photoUrl}" alt="${escapeHtml(photoTitle)}" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
+                        <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded truncate max-w-[85%]">${escapeHtml(photoTitle)}</span>
+                      </a>
+                    `;
+                  }).join('');
+
+                  if (galleryPhotos.length === 1) {
+                    html += `
+                      <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Gedung Kampus Yayasan">
+                        <img src="images/school-campus.jpg" alt="Gedung Kampus Yayasan" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
+                        <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">Kampus</span>
+                      </a>
+                    `;
+                  }
+                  return html;
+                }
+
+                // Fallback jika belum ada foto galeri di Supabase
+                return `
+                  <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Lingkungan Kampus">
+                    <img src="images/school-campus.jpg" alt="Aktivitas Santri At Tarbiyyah" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
+                    <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">Lingkungan</span>
+                  </a>
+                  <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Fasilitas Yayasan">
+                    <img src="images/school-campus.jpg" alt="Gedung Kampus Yayasan" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
+                    <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">Fasilitas</span>
+                  </a>
+                `;
+              })()}
             </div>
           </div>
           <div class="pt-4 border-t border-slate-200/70">
