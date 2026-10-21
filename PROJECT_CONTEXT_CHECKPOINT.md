@@ -118,7 +118,7 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
 - **Verifikasi Halaman Publik & Autentikasi (`scratch/verify-login-errors.js`):** 0 Error Halaman, 0 Error Konsol.
 - **Verifikasi Sinkronisasi Hero Carousel (`verify_hero_sync.js`):** LULUS 100% (0 Unsplash, 0 zombie banner, 1 foto aktif tersinkronisasi).
 - **Supabase Cloud Live (`https://hnkxrbmngmveoxipohtk.supabase.co`):** 100% Aktif & Terverifikasi.
-- **Vercel Production Domain Resmi:** `https://siyayasan.vercel.app` (Alias: `https://siyayasan-portal.vercel.app`).
+- **Vercel Production Domain Resmi:** `https://siyayasan.vercel.app` (Domain Tunggal Resmi; domain lama `siyayasan-portal.vercel.app` telah dihapus total).
 
 ---
 

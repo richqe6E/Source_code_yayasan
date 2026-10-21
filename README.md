@@ -72,5 +72,5 @@ Source_code_yayasan/
 
 ## ☁️ Integrasi Cloud & Database
 * **Database**: PostgreSQL Supabase (sudah terhubung di `frontend/shared/js/supabase-config.js`).
-* **Hosting Produksi**: Vercel (`https://siyayasan-portal.vercel.app`).
+* **Hosting Produksi**: Vercel (`https://siyayasan.vercel.app`).
 * Sistem beroperasi secara hybrid: otomatis tersambung ke Supabase saat online, dan didukung simulasi data lokal saat offline.

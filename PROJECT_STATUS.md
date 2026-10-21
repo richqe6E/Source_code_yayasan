@@ -11,7 +11,7 @@
 | :--- | :---: | :--- |
 | **Repositori GitHub** | ✅ Terkoneksi & Up to Date | https://github.com/richqe6E/Source_code_yayasan (Branch `main`) |
 | **Supabase Cloud DB & Storage** | ✅ Aktif & Terverifikasi (100%) | `https://hnkxrbmngmveoxipohtk.supabase.co` (PostgreSQL REST & Bucket `siyayasan-uploads`) |
-| **Frontend Production Hosting** | ✅ Aktif (Vercel) | **https://siyayasan.vercel.app** (domain resmi; alias lama: siyayasan-portal.vercel.app) |
+| **Frontend Production Hosting** | ✅ Aktif (Vercel) | **https://siyayasan.vercel.app** (Domain Tunggal Resmi; domain lama siyayasan-portal.vercel.app telah dihapus total) |
 | **Localhost Server** | ✅ Aktif & Portabel | `http://localhost:3000` — jalankan: `node frontend/dev-server.js` |
 | **Arsitektur Portal** | ✅ Murni 2 Portal + Web Publik | **Portal Admin Sekolah**, **Portal Siswa**, & **Website Publik Utama** (Sistem lama GAS/Portal Guru/Ortu resmi dihapus) |
 | **Database Sync** | ✅ Sinkron Multi-Perangkat | PPDB, Siswa, Kelas, Guru (Tanpa Password), Tagihan SPP, Pembayaran, CMS Konten & Pengaturan Website, Backup Cloud |
@@ -1624,7 +1624,7 @@ frontend/
 ## 7. 🚀 Cara Mengakses Aplikasi
 
 - **Versi Live (Smartphone & Laptop):**
-  Akses langsung: `https://siyayasan-portal.vercel.app`
+  Akses langsung: `https://siyayasan.vercel.app`
 - **Versi Lokal (Offline / Pengembangan):**
   Jalankan di terminal:
   ```powershell
