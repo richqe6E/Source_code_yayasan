@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 20 Oktober 2026 (Sesi 47 - Redesain Modal Panduan Login Editorial Bebas AI-Slop, Resolusi Single Source of Truth Hero Carousel, Eliminasi 100% Foto Fallback Statis, Domain Resmi https://siyayasan.vercel.app)  
+**Terakhir Diperbarui:** 21 Oktober 2026 (Sesi 48 - Penyatuan Domain Kanonik siyayasan.vercel.app, Pembentukan Subagent SEO Auditor & Eksekusi Fondasi SEO Tahap 1: robots.txt, sitemap.xml, canonical, noindex portal, OpenGraph, JSON-LD Schema.org)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -141,3 +141,15 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
 1. **Konteks Tunggal:** Selalu baca `PROJECT_CONTEXT_CHECKPOINT.md` dan `PROJECT_STATUS.md` di awal sesi.
 2. **Jangan Gunakan Sistem Lama:** Abaikan dan jangan pernah mengaktifkan kembali sistem/kode lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, atau field database fiktif seperti `role_id` pada tabel `users`).
 3. **Pertahankan Sistem Baru:** Seluruh alur kerja menggunakan `frontend/shared/js/api.js` yang terhubung langsung ke Supabase REST & Storage API serta ter-deploy di Vercel (`https://siyayasan.vercel.app`).
+
+
+### 🔹 C. Penyatuan Domain Kanonik & Implementasi SEO Tahap 1 (Sesi 48 — 21 Oktober 2026)
+1. **Penyatuan Domain & Redirect Kanonik:**
+   - Menghapus redundansi `siyayasan-portal.vercel.app` dengan menerapkan aturan HTTP 308 Permanent Redirect di `vercel.json` ke domain kanonik `https://siyayasan.vercel.app`.
+2. **Subagent AI SEO Website Auditor:**
+   - Agen audit teknis non-destruktif berbasis standar Google Search Essentials dan Core Web Vitals dibentuk di `.agents/skills/seo-website-auditor/SKILL.md` dan artefak audit komprehensif dipublikasikan.
+3. **Pondasi SEO Tahap 1 (Infrastruktur & Indexability):**
+   - Menerbitkan `robots.txt` dan `sitemap.xml` resmi dengan 10 URL publik kanonik.
+   - Menambahkan perlindungan `noindex, nofollow, noarchive` pada 16 file HTML portal admin & siswa (melalui meta tag dan HTTP Edge header `X-Robots-Tag`) guna melindungi privasi data sekolah.
+   - Melengkapi 11 halaman publik dengan `<link rel="canonical">`, Open Graph, Twitter Cards, dan Schema.org JSON-LD Structured Data.
+   - Seluruh integrasi data (PPDB, SPP, Auth, Supabase REST) tetap 100% utuh tanpa perubahan.

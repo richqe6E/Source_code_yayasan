@@ -51,6 +51,8 @@
     { "source": "/portal/ortu/(.*)", "destination": "/login.html", "permanent": false }
   ],
   "rewrites": [
+    { "source": "/robots.txt", "destination": "/frontend/public/robots.txt" },
+    { "source": "/sitemap.xml", "destination": "/frontend/public/sitemap.xml" },
     { "source": "/favicon.ico", "destination": "/frontend/public/favicon.ico" },
     { "source": "/favicon.png", "destination": "/frontend/public/favicon.png" },
     { "source": "/apple-touch-icon.png", "destination": "/frontend/public/apple-touch-icon.png" },
@@ -105,25 +107,37 @@
       ]
     },
     {
+      "source": "/(admin|siswa|portal)/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/(images|public/images)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
+      ]
+    },
+    {
+      "source": "/(css|public/css)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/(js|public/js)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
       "source": "/shared/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
-      ]
-    },
-    {
-      "source": "/public/css/(.*)",
-      "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]
     },
     {
-      "source": "/public/images/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400" }
-      ]
-    },
-    {
-      "source": "/public/videos/(.*)",
+      "source": "/(videos|public/videos)/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800" }
       ]

@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 20 Oktober 2026 — Sesi 47 (Redesain Modal Panduan Login Editorial Bebas AI-Slop & Sinkronisasi Hero Carousel Single Source of Truth) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
+*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 48 (Penyatuan Domain Kanonik, Pembentukan Agen SEO Auditor & Implementasi Fondasi SEO Tahap 1) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
 
 ---
 
@@ -1555,6 +1555,41 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
      - Uji verifikasi `verify_hero_sync.js`: 100% LULUS.
      - Live curl/fetch: `Contains unsplash: false`, `Contains hero-slider-container: true`, `Contains srz5t: true`, `Contains 73w1l: false`.
      - Tidak ada bug, error, atau degradasi pada fitur lain (PPDB, SPP, biodata, CMS). Seluruh sistem beroperasi normal dan stabil.
+
+---
+
+### 🗓️ Sesi 48 — Penyatuan Kanonik Domain Produksi, Pembentukan Agen SEO Spesialis & Implementasi Fondasi SEO Tahap 1 (21 Oktober 2026)
+
+**Fokus Utama:** Menyelesaikan masalah duplikasi domain produksi Vercel (`siyayasan-portal.vercel.app` vs `siyayasan.vercel.app`), membentuk Subagent AI Khusus `seo-website-auditor` berstandar industri dengan SOP ketat, melakukan audit menyeluruh atas website yayasan, dan mengeksekusi remedi SEO Tahap 1 (Infrastruktur & Indexability) dengan jaminan 100% tanpa menyentuh integrasi data/skema portal admin, siswa, dan PPDB.
+
+1. **Penyatuan Domain & Kanonikalisasi Produksi Vercel (`vercel.json`):**
+   - Menghapus kerancuan domain ganda dengan menetapkan `https://siyayasan.vercel.app` sebagai domain tunggal kanonik.
+   - Mengonfigurasi aturan HTTP 308 Permanent Redirect di `vercel.json` untuk semua permintaan yang mengarah ke `siyayasan-portal.vercel.app` dan `siyayasan-portal-risgoldteam.vercel.app`.
+   - Terverifikasi live: akses ke domain lama otomatis dialihkan 308 seketika ke `https://siyayasan.vercel.app/` dengan path utuh.
+
+2. **Pembentukan Subagent AI & Skill Khusus (`.agents/skills/seo-website-auditor/`):**
+   - Dibuat Subagent `seo-website-auditor` dengan peran **Senior Technical SEO Auditor**.
+   - Prinsip kerja: audit berbasis bukti empiris, non-destruktif (*read-only* saat audit), larangan taktik manipulatif/black-hat, pengujian kode sumber dan live website, pemisahan tingkat prioritas (Critical, High, Medium, Low).
+   - Menghasilkan laporan audit komprehensif pada artefak `audit_report_seo_siyayasan.md` (Skor awal: 53.4/100, Grade C, 17 temuan prioritas).
+
+3. **Implementasi Fondasi SEO Tahap 1 (Infrastruktur & Indexability):**
+   - **`robots.txt` (`frontend/public/robots.txt` & sync root):** Mengizinkan perayapan halaman publik, memblokir direktori sensitif (`/admin/`, `/siswa/`, `/portal/`, `/shared/`), dan mencantumkan tautan `Sitemap: https://siyayasan.vercel.app/sitemap.xml`.
+   - **`sitemap.xml` (`frontend/public/sitemap.xml` & sync root):** Mendaftarkan 10 URL kanonik website publik resmi (`/`, `/profil.html`, `/ppdb.html`, `/ppdb/status.html`, `/berita.html`, `/berita/detail.html`, `/pengumuman.html`, `/agenda.html`, `/galeri.html`, `/kontak.html`) lengkap dengan bobot `priority` dan `changefreq`.
+   - **Edge Routing & Proteksi Bot Portal (`vercel.json`):**
+     - Rewrite clean URL untuk `/robots.txt` dan `/sitemap.xml`.
+     - Edge security header `X-Robots-Tag: noindex, nofollow, noarchive` untuk seluruh rute portal `/admin/*`, `/siswa/*`, dan `/portal/*`.
+     - Header cache statis `Cache-Control: public, max-age=604800, immutable` untuk aset `images/`, `css/`, `js/`.
+   - **Proteksi Halaman Portal Siswa & Admin (16 File HTML):**
+     - Menyematkan `<meta name="robots" content="noindex, nofollow, noarchive">` pada seluruh 12 file di `portal/admin/` dan 4 file di `portal/siswa/` untuk menjamin data privasi dan sistem internal sekolah tidak akan pernah terindeks di SERP mesin pencari.
+   - **Meta Kanonik, Media Sosial (Open Graph & Twitter) & Schema.org JSON-LD (11 File HTML Publik):**
+     - Setiap halaman publik kini memiliki `<link rel="canonical">` dengan URL absolut resmi.
+     - Ditambahkan meta tag Open Graph (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`, `og:site_name`, `og:locale`).
+     - Ditambahkan meta tag Twitter Card (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`).
+     - Ditambahkan Structured Data JSON-LD Schema.org (`EducationalOrganization`, `WebSite`, `Article`, `Event`, `ContactPage`, `ImageGallery`) agar Google menampilkan rich snippets sekolah dengan valid.
+
+4. **Verifikasi Keutuhan Sistem & Integrasi Data:**
+   - **100% Zero-Touch pada Backend:** Tidak ada perubahan pada skema Supabase PostgreSQL, fungsi API di `frontend/shared/js/api.js`, sistem autentikasi JWT/NIS, proses pendaftaran PPDB, pembayaran SPP, maupun logika CMS.
+   - **Live Production Verification:** Seluruh endpoint live (`robots.txt`, `sitemap.xml`, canonical headers, OG tags, JSON-LD, 308 redirects) telah diuji via live fetch dan 100% dinyatakan LULUS.
 
 ---
 

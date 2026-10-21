@@ -1,0 +1,32 @@
+# robots.txt for https://siyayasan.vercel.app
+# Yayasan At Tarbiyyah Wijaya Kusuma Samarinda
+
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /profil.html
+Allow: /berita.html
+Allow: /berita/detail.html
+Allow: /pengumuman.html
+Allow: /agenda.html
+Allow: /galeri.html
+Allow: /kontak.html
+Allow: /ppdb.html
+Allow: /ppdb/status.html
+Allow: /login.html
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Disallow Private Portals & Sensitive Data Areas
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /siswa/
+Disallow: /siswa/*
+Disallow: /portal/
+Disallow: /portal/*
+Disallow: /shared/
+Disallow: /shared/*
+Disallow: /api/
+
+Sitemap: https://siyayasan.vercel.app/sitemap.xml
