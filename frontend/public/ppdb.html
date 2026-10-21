@@ -835,96 +835,99 @@
 
     <!-- Persyaratan & Jadwal Penting PPDB -->
     <div id="jadwal-linimasa" class="grid lg:grid-cols-2 gap-6 mb-12 scroll-mt-24">
-      <!-- Persyaratan & Kelengkapan Berkas (Accordion Buka-Tutup Interaktif) -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm" id="accordion-persyaratan-ppdb">
-        <div class="border-b border-slate-100 pb-3 mb-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <i class="fi fi-rr-document-signed text-primary-600"></i>
-              <span>Persyaratan &amp; Kelengkapan Berkas PPDB</span>
-            </h3>
-            <span class="text-[11px] font-semibold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full border border-primary-200">
-              Interaktif
-            </span>
-          </div>
+      <!-- Persyaratan & Kelengkapan Berkas (Clean Minimalist Accordion) -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm" id="accordion-persyaratan-ppdb">
+        <div class="border-b border-slate-100 pb-4 mb-4">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
+            <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span>Persyaratan &amp; Kelengkapan Berkas PPDB</span>
+          </h3>
           <p class="text-xs text-slate-500 mt-1">
-            Klik kategori di bawah untuk membuka dan menutup rincian berkas persyaratan.
+            Klik kategori di bawah untuk memeriksa rincian dokumen persyaratan calon santri.
           </p>
         </div>
 
-        <div class="space-y-3" id="ppdb-requirements-accordion">
-          <!-- Accordion Item 1: Dokumen Identitas Utama -->
-          <div class="border border-primary-300 bg-primary-50/20 rounded-xl transition overflow-hidden" id="acc-item-1">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-1')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
-              <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-lg bg-primary-100 text-primary-700 font-bold text-xs flex items-center justify-center shrink-0">1</span>
-                <span class="text-xs sm:text-sm font-bold text-slate-900">Dokumen Pokok Calon Siswa (Akta Kelahiran &amp; KK)</span>
+        <div class="border border-slate-200/80 rounded-xl overflow-hidden divide-y divide-slate-100 bg-white" id="ppdb-requirements-accordion">
+          <!-- Accordion Item 1: Dokumen Pokok -->
+          <div class="transition-colors" id="acc-item-1">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-1')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/></svg>
+                </div>
+                <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">Dokumen Pokok Calon Siswa (Akta Kelahiran &amp; KK)</span>
               </div>
-              <svg class="w-4 h-4 text-slate-500 accordion-chevron transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200 rotate-180 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-              <div class="flex items-start gap-2">
-                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+            <div class="accordion-content px-4 pb-4 pt-1 text-xs text-slate-600 space-y-2.5 bg-slate-50/40">
+              <div class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-1.5 shrink-0"></span>
                 <span><strong>Akta Kelahiran:</strong> Scan atau foto lembar asli yang terbaca jelas (memuat nama lengkap, tempat/tanggal lahir, dan nama orang tua).</span>
               </div>
-              <div class="flex items-start gap-2">
-                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+              <div class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-1.5 shrink-0"></span>
                 <span><strong>Kartu Keluarga (KK):</strong> Scan atau foto KK terbaru yang memuat Nomor Induk Kependudukan (NIK 16 digit) ananda dan orang tua.</span>
               </div>
             </div>
           </div>
 
           <!-- Accordion Item 2: Pas Foto Siswa -->
-          <div class="border border-slate-200 rounded-xl transition overflow-hidden bg-white" id="acc-item-2">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-2')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
-              <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">2</span>
-                <span class="text-xs sm:text-sm font-bold text-slate-900">Pas Foto Formal Anak Didik</span>
+          <div class="transition-colors" id="acc-item-2">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-2')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/></svg>
+                </div>
+                <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">Pas Foto Formal Anak Didik</span>
               </div>
-              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content hidden px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-              <div class="flex items-start gap-2">
-                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+            <div class="accordion-content hidden px-4 pb-4 pt-1 text-xs text-slate-600 space-y-2 bg-slate-50/40">
+              <div class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-1.5 shrink-0"></span>
                 <span>Pas foto setengah badan dengan pakaian rapi, sopan, atau busana muslim/muslimah.</span>
               </div>
-              <div class="flex items-start gap-2">
-                <i class="fi fi-sr-check-circle text-primary-600 mt-0.5 shrink-0 text-xs"></i>
+              <div class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-1.5 shrink-0"></span>
                 <span>Format file gambar JPG atau PNG (maksimal 5 MB) dengan resolusi yang tajam.</span>
               </div>
             </div>
           </div>
 
           <!-- Accordion Item 3: Batasan Usia per Jenjang -->
-          <div class="border border-slate-200 rounded-xl transition overflow-hidden bg-white" id="acc-item-3">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-3')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
-              <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">3</span>
-                <span class="text-xs sm:text-sm font-bold text-slate-900">Ketentuan Usia Masuk per Jenjang Pendidikan</span>
+          <div class="transition-colors" id="acc-item-3">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-3')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">Ketentuan Usia Masuk per Jenjang Pendidikan</span>
               </div>
-              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content hidden px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
+            <div class="accordion-content hidden px-4 pb-4 pt-1 text-xs text-slate-600 bg-slate-50/40">
               <div class="grid grid-cols-2 gap-2 pt-1">
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200/70">
                   <span class="font-bold text-slate-800 block">PAUD Terpadu:</span>
                   <span class="text-slate-500">Usia 2 - 4 Tahun</span>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200/70">
                   <span class="font-bold text-slate-800 block">TK Kelompok A:</span>
                   <span class="text-slate-500">Usia 4 - 5 Tahun</span>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200/70">
                   <span class="font-bold text-slate-800 block">TK Kelompok B:</span>
                   <span class="text-slate-500">Usia 5 - 6 Tahun</span>
                 </div>
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200/70">
                   <span class="font-bold text-slate-800 block">TPQ Al-Quran:</span>
                   <span class="text-slate-500">Usia 6+ Tahun / Santri Baru</span>
                 </div>
@@ -933,18 +936,20 @@
           </div>
 
           <!-- Accordion Item 4: Fleksibilitas Berkas -->
-          <div class="border border-slate-200 rounded-xl transition overflow-hidden bg-white" id="acc-item-4">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-4')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer select-none">
-              <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">4</span>
-                <span class="text-xs sm:text-sm font-bold text-slate-900">Fleksibilitas Pengunggahan &amp; Verifikasi</span>
+          <div class="transition-colors" id="acc-item-4">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-4')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                </div>
+                <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">Fleksibilitas Pengunggahan &amp; Verifikasi</span>
               </div>
-              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-slate-400 accordion-chevron transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content hidden px-4 pb-4 pt-1 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-              <p>
+            <div class="accordion-content hidden px-4 pb-4 pt-1 text-xs text-slate-600 bg-slate-50/40">
+              <p class="leading-relaxed">
                 Anda dapat mengunggah berkas sekarang pada Langkah 4 formulir di atas, atau melengkapinya kemudian dengan login ke <strong>Portal Siswa Mandiri</strong>. Verifikator TU Yayasan akan memeriksa dokumen dan memberikan status validasi secara transparan.
               </p>
             </div>

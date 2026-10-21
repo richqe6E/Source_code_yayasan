@@ -146,7 +146,6 @@
               <div class="min-w-0">
                 <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight uppercase" id="site-header-school-name-top">YAYASAN AT TARBIYYAH</div>
                 <div class="text-[10px] sm:text-[11px] font-bold text-primary-700 leading-tight tracking-normal uppercase" id="site-header-school-name-sub">WIJAYA KUSUMA SAMARINDA</div>
-                <div class="text-[9px] sm:text-[10px] font-medium text-slate-500 leading-tight hidden xl:block">PAUD Terpadu • TK • TPQ — Samarinda</div>
               </div>
             </a>
 

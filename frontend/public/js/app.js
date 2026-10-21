@@ -344,22 +344,106 @@
     const rawItems = Array.isArray(res.data) ? res.data : ((res.data && res.data.items) || res.items || []);
     const items = rawItems.slice(0, 3);
     if (!res.success || items.length === 0) {
-      container.innerHTML = '<p class="col-span-3 text-center text-gray-500">Belum ada berita.</p>';
+      container.className = 'w-full';
+      container.innerHTML = '<div class="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200/80 text-sm">Belum ada warta berita yang diterbitkan.</div>';
       return;
     }
 
-    container.innerHTML = items.map(n => `
-      <a href="berita/detail.html?slug=${encodeURIComponent(n.slug || n.id)}" class="group block">
-        <div class="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden mb-4">
-          ${(n.image || n.featured_image_url)
-            ? `<img src="${n.image || n.featured_image_url}" alt="${n.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">`
-            : `<div class="w-full h-full flex items-center justify-center text-gray-400"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>`
-          }
+    // Jika artikel hanya 1: Tampilkan Bento Split (Warta Utama di kiri + Dokumentasi Galeri Kegiatan di kanan)
+    if (items.length === 1) {
+      const n = items[0];
+      const imgUrl = n.image || n.featured_image_url || 'images/school-campus.jpg';
+      container.className = 'grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch';
+      container.innerHTML = `
+        <!-- Kartu Berita Utama (Featured News) -->
+        <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+          <div>
+            <div class="aspect-video w-full rounded-xl overflow-hidden bg-slate-100 mb-5 relative">
+              <img src="${imgUrl}" alt="${n.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+              <span class="absolute top-3 left-3 bg-slate-900/75 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-1 rounded-md">Warta Yayasan</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>${formatDateID(n.published_at || n.created_at)}</span>
+            </div>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-primary-700 leading-snug mb-2 transition-colors">
+              <a href="berita/detail.html?slug=${encodeURIComponent(n.slug || n.id)}">${n.title}</a>
+            </h3>
+            <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed text-justify mb-4">${n.summary || 'Informasi terbaru seputar kegiatan pendidikan, pembiasaan ibadah, dan agenda santri Yayasan At Tarbiyyah.'}</p>
+          </div>
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <a href="berita/detail.html?slug=${encodeURIComponent(n.slug || n.id)}" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 hover:text-primary-800 transition">
+              <span>Baca Selengkapnya</span>
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+            <span class="text-[11px] text-slate-400">Liputan Resmi</span>
+          </div>
         </div>
-        <div class="text-xs text-gray-500 mb-2">${formatDateID(n.published_at || n.created_at)}</div>
-        <h3 class="text-base font-semibold text-gray-900 group-hover:text-primary-700 leading-snug mb-1">${n.title}</h3>
-        <p class="text-sm text-gray-600 line-clamp-2">${n.summary || ''}</p>
-      </a>
+
+        <!-- Kartu Potret & Dokumentasi Santri (Mengisi Void Kanan) -->
+        <div class="lg:col-span-5 bg-gradient-to-br from-slate-50 to-sky-50/40 border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900">Potret Kegiatan Santri</h4>
+              </div>
+              <span class="text-[11px] font-semibold text-primary-700 bg-white border border-primary-200 px-2.5 py-0.5 rounded-full">Dokumentasi</span>
+            </div>
+            <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+              Momen belajar, bermain edukatif, dan pembiasaan adab Qur'ani santri PAUD, TK, dan TPQ di lingkungan sekolah.
+            </p>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="aspect-4/3 rounded-xl overflow-hidden bg-slate-200 border border-slate-200/80 shadow-2xs group/img relative">
+                <img src="images/school-campus.jpg" alt="Aktivitas Santri At Tarbiyyah" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300">
+                <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 px-1.5 py-0.5 rounded">Lingkungan</span>
+              </div>
+              <div class="aspect-4/3 rounded-xl overflow-hidden bg-slate-200 border border-slate-200/80 shadow-2xs group/img relative">
+                <img src="images/school-campus.jpg" alt="Gedung Kampus Yayasan" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300">
+                <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 px-1.5 py-0.5 rounded">Fasilitas</span>
+              </div>
+            </div>
+          </div>
+          <div class="pt-4 border-t border-slate-200/70">
+            <a href="galeri.html" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold transition shadow-2xs active:scale-[0.98]">
+              <span>Buka Galeri Foto Aktivitas</span>
+              <svg class="w-3.5 h-3.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // Jika 2 atau 3 artikel: Tampilkan Elevated Card Grid
+    container.className = items.length === 2 ? 'grid md:grid-cols-2 gap-6' : 'grid md:grid-cols-3 gap-6';
+    container.innerHTML = items.map(n => `
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-primary-400 transition-all flex flex-col justify-between group">
+        <div>
+          <div class="aspect-video bg-slate-100 rounded-xl overflow-hidden mb-4 relative">
+            ${(n.image || n.featured_image_url)
+              ? `<img src="${n.image || n.featured_image_url}" alt="${n.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">`
+              : `<div class="w-full h-full flex items-center justify-center text-slate-400"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>`
+            }
+          </div>
+          <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>${formatDateID(n.published_at || n.created_at)}</span>
+          </div>
+          <h3 class="text-base font-bold text-slate-900 group-hover:text-primary-700 leading-snug mb-2 transition-colors">
+            <a href="berita/detail.html?slug=${encodeURIComponent(n.slug || n.id)}">${n.title}</a>
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed mb-4">${n.summary || ''}</p>
+        </div>
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+          <a href="berita/detail.html?slug=${encodeURIComponent(n.slug || n.id)}" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 hover:text-primary-800 transition">
+            <span>Baca Warta</span>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+          </a>
+        </div>
+      </div>
     `).join('');
   }
 

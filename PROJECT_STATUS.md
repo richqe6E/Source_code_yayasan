@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 48 (Penyatuan Domain Kanonik, Pembentukan Agen SEO Auditor & Implementasi Fondasi SEO Tahap 1) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
+*Terakhir Diperbarui: 21 Oktober 2026 — Sesi 49 (Redesain UI/UX Clean & Aesthetic: Eliminasi Total Elemen AI-Slop, Bento Grid Warta & Galeri, Vektor SVG Murni 3 Jenjang, & Accordion Minimalis) | Status: ✅ PRODUCTION & LIVE VERIFIED (https://siyayasan.vercel.app)*
 
 ---
 
@@ -1590,6 +1590,45 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 4. **Verifikasi Keutuhan Sistem & Integrasi Data:**
    - **100% Zero-Touch pada Backend:** Tidak ada perubahan pada skema Supabase PostgreSQL, fungsi API di `frontend/shared/js/api.js`, sistem autentikasi JWT/NIS, proses pendaftaran PPDB, pembayaran SPP, maupun logika CMS.
    - **Live Production Verification:** Seluruh endpoint live (`robots.txt`, `sitemap.xml`, canonical headers, OG tags, JSON-LD, 308 redirects) telah diuji via live fetch dan 100% dinyatakan LULUS.
+
+---
+
+### 🗓️ Sesi 49 — Redesain Visual UI/UX Bebas AI-Slop (Clean & Aesthetic Anti-Generic Overhaul) (21 Oktober 2026)
+
+**Fokus Utama:** Mengeksekusi secara serentak 6 masukan desain visual dari pengguna guna menghapus seluruh ornamen template generik bawaan AI (*AI-slop*), menghilangkan kekosongan ruang canggung (*grid void*), memperbaiki bug ikon hilang, dan menyajikan estetika antarmuka lembaga pendidikan Islam terpadu yang berkelas, lapang (*generous whitespace*), dan profesional.
+
+1. **Rampingkan Header / Navbar Website Publik (`frontend/public/js/public-shell.js`):**
+   - Menghapus baris ke-3 teks `PAUD Terpadu • TK • TPQ — Samarinda` yang sebelumnya memakan ruang vertikal dan membuat navbar terlalu padat.
+   - Menyisakan 2 baris proporsional: `YAYASAN AT TARBIYYAH` dan `WIJAYA KUSUMA SAMARINDA`. Navbar kini tampil lebih ramping, bersih, dan modern di seluruh 11 halaman publik.
+
+2. **Eliminasi Kicker Pill Klise Hero Beranda (`frontend/public/index.html`):**
+   - Menghapus badge kapsul `[🎓 Penerimaan Santri & Siswa Baru TA 2026/2027]` yang merupakan ciri khas template AI generik di atas judul hero.
+   - Memberikan otoritas tipografi penuh kepada judul utama H1 (*"Membangun Generasi Cerdas, Beradab & Berkarakter Qur'ani"*) yang langsung menyapa pengunjung dengan wibawa editorial yang bersih dan lapang.
+
+3. **Vektor SVG Murni & Presisi 3 Jenjang Pendidikan (`frontend/public/index.html`):**
+   - Mengatasi bug ikon PAUD yang hilang/kosong serta menghapus ikon tas ransel dan buku tebal klip-art di dalam kotak biru tebal (`w-14 h-14 bg-sky-100`).
+   - Menerapkan **Vektor SVG Fine-Line Art (1.75px stroke)** dalam wadah berbingkai lembut (`bg-slate-50 border border-slate-200/80`):
+     - **PAUD:** Simbol *Tunas Tumbuh Bersemi (Seedling of Growth)*.
+     - **TK:** Simbol *Matahari & Lentera Eksplorasi Pengetahuan*.
+     - **TPQ:** Simbol *Rehal Kayu & Mushaf Al-Qur'an Terbuka (Juz 30)*.
+   - Mengganti centang biru tebal pada rincian materi dengan checkmark tipis elegan.
+
+4. **Smart Bento Hub Berita & Galeri Terkini (`frontend/public/index.html` & `frontend/public/js/app.js`):**
+   - Mengatasi masalah ruang putih bolong (*grid void*) saat database hanya memiliki sedikit artikel.
+   - Merancang logika adaptif: jika hanya ada 1 berita, tampilan otomatis berubah menjadi **Bento Split**:
+     - Kolom Kiri (60%): *Featured Story Card* berbingkai halus dengan foto sinematik, badge `Warta Yayasan`, tanggal berikon kalender tipis, dan tombol `Baca Selengkapnya →`.
+     - Kolom Kanan (40%): *Potret Kegiatan Santri* (cuplikan 2 foto dokumentasi sekolah dengan tombol pintas ke `galeri.html`).
+   - Ruang kosong 100% teratasi dan beranda langsung terasa hidup, seimbang, dan hangat.
+
+5. **Redesain Accordion Persyaratan Berkas PPDB (`frontend/public/ppdb.html`):**
+   - Menghapus badge pill tak berfaedah `Interaktif` di header kartu.
+   - Mengeliminasi penyakit "kotak di dalam kotak" (*box-inside-box*); digantikan oleh **Garis Pembatas Tipis Elegan (`divide-y divide-slate-100`)** bergaya Stripe/Apple.
+   - Mengganti nomor kotak tebal dengan **Ikon SVG Vektor Garis Presisi**: Dokumen Akta/KK, Pas Foto Portret, Kalender Usia Masuk, dan Perisai Verifikasi Berkas.
+   - Mengganti checkmark bulat solid besar dengan penanda bullet dot tipografi yang tenang.
+
+6. **Hierarki Tipografi Kartu Kontak Alamat Kampus (`frontend/public/kontak.html`):**
+   - Menata ulang teks alamat yang sebelumnya berjejal 4 baris dengan warna bertabrakan.
+   - Menyusun hierarki rapi: label `KAMPUS UTAMA`, nama gedung `Gedung Pendidikan Terpadu At Tarbiyyah`, alamat jalan dalam font reguler yang nyaman dibaca, catatan patokan dalam teks abu-abu lembut (*muted slate*), serta tombol mini Google Maps berbingkai halus (*subtle pill button*).
 
 ---
 

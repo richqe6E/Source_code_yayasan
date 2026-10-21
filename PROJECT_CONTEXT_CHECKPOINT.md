@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 21 Oktober 2026 (Sesi 48 - Penyatuan Domain Kanonik siyayasan.vercel.app, Pembentukan Subagent SEO Auditor & Eksekusi Fondasi SEO Tahap 1: robots.txt, sitemap.xml, canonical, noindex portal, OpenGraph, JSON-LD Schema.org)
+**Terakhir Diperbarui:** 21 Oktober 2026 (Sesi 49 - Redesain UI/UX Clean & Aesthetic: Eliminasi Total Ornamen AI-Slop, Bento Grid Warta & Galeri, Vektor SVG Murni 3 Jenjang, & Accordion Minimalis)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -153,3 +153,16 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Menambahkan perlindungan `noindex, nofollow, noarchive` pada 16 file HTML portal admin & siswa (melalui meta tag dan HTTP Edge header `X-Robots-Tag`) guna melindungi privasi data sekolah.
    - Melengkapi 11 halaman publik dengan `<link rel="canonical">`, Open Graph, Twitter Cards, dan Schema.org JSON-LD Structured Data.
    - Seluruh integrasi data (PPDB, SPP, Auth, Supabase REST) tetap 100% utuh tanpa perubahan.
+
+
+### 🔹 D. Redesain Visual UI/UX Clean & Aesthetic Bebas AI-Slop (Sesi 49 — 21 Oktober 2026)
+1. **Pembersihan Ornamen Generik AI-Slop:**
+   - Menghapus baris ke-3 teks sub-judul navbar di `public-shell.js` agar header ramping dan elegan.
+   - Menghapus floating kicker pill `[🎓 Penerimaan Santri 2026/2027]` pada hero beranda.
+   - Menghapus badge `Interaktif` dan kotak bersarang (*box-in-box*) pada accordion persyaratan PPDB.
+2. **Ikonografi Vektor Murni & Presisi (Zero Broken Icons):**
+   - Mengganti font ikon klip-art yang rentan hilang dengan SVG inline 1.75px stroke untuk PAUD (Tunas), TK (Lentera/Matahari), TPQ (Rehal Al-Qur'an), serta 4 kategori berkas PPDB.
+3. **Keseimbangan Tata Letak Cerdas (*Zero-Void Bento Layout*):**
+   - Mengubah seksi berita beranda menjadi Bento Hub adaptif: memadukan Warta Utama dengan Potret Galeri Kegiatan Santri sehingga tidak ada kekosongan ruang putih saat data artikel baru sedikit.
+4. **Hierarki Tipografi Tenang & Konsisten:**
+   - Merapikan kartu alamat kampus di `kontak.html` dengan hierarki bersih dan tombol peta minimalis.
