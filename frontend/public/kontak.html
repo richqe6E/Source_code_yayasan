@@ -218,9 +218,6 @@
           <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight text-balance">
             Kirim Pertanyaan / Pesan
           </h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed text-pretty" id="contact-wa-desc">
-            Pesan Anda akan otomatis terhubung ke WhatsApp resmi Tata Usaha Yayasan untuk penanganan yang cepat dan personal.
-          </p>
         </div>
 
         <div id="contact-alert" class="hidden mb-6 p-4 bg-primary-50 border border-primary-200 text-primary-900 text-xs sm:text-sm rounded-xl flex items-center gap-3">
@@ -415,10 +412,6 @@
             btnWa.href = `https://wa.me/${waTarget}`;
           }
 
-          const waDesc = document.getElementById('contact-wa-desc');
-          if (waDesc) {
-            waDesc.textContent = `Pesan Anda akan otomatis terhubung ke WhatsApp resmi ${currentSchoolName} (${formattedDisplay}) untuk penanganan yang cepat dan personal.`;
-          }
 
           if (school.email) document.getElementById('contact-page-email').textContent = school.email;
 
