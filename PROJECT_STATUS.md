@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 22 Oktober 2026 — Sesi 51 (Remediasi Cacat Logika Tagihan SPP Massal & Redesain Struktur Pengurus Anti-Slop - Selesai & Terverifikasi)*
+*Terakhir Diperbarui: 22 Oktober 2026 — Sesi 52 (Pembersihan Visual & Redesain Anti-AI-Slop Tahap 2: Kontak, Beranda, PPDB & Profil - Selesai & Terverifikasi)*
 
 ---
 
@@ -1687,6 +1687,40 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
    - **Pembersihan Ornamen AI-Slop Lanjutan (Tahap 2):**
      * Menghapus badge pill `[✓ Terverifikasi Sah]` pada seksi Legalitas di `frontend/public/profil.html`, membiarkan judul legalitas tampil bersih dengan tipografi editorial yang berwibawa.
      * Menghapus floating kicker badge `[📢 PPDB Online Tahun Ajaran 2026/2027]` pada hero section `frontend/public/ppdb.html`, membiarkan judul utama `H1` memimpin seksi hero secara bersih, lapang, dan berwibawa, serta membersihkan skrip dari referensi elemen tersebut.
+
+---
+
+### 🗓️ Sesi 52 — Pembersihan Visual & Redesain Anti-AI-Slop Tahap 2: Kontak, Beranda, PPDB & Profil (22 Oktober 2026, Sore)
+
+**Pekerjaan:**
+Melanjutkan penataan visual clean, editorial, dan anti-AI-slop pada seluruh halaman website publik yayasan, merapikan antarmuka kartu kontak, menyederhanakan formulir konsultasi, dan mengeliminasi badge/kicker mengambang yang menurunkan wibawa institusi.
+
+**Penyelesaian & Detail Implementasi:**
+1. **Penghapusan Badge Pill Legalitas (`frontend/public/profil.html`):**
+   - Menghapus badge pill `[✓ Terverifikasi Sah]` pada Seksi 4 Legalitas & Perizinan Resmi. Judul dan izin Kemenkumham & Disdik kini tampil tenang, lapang, dan berwibawa tanpa ornamen mengambang.
+2. **Penghapusan Floating Kicker Hero PPDB (`frontend/public/ppdb.html`):**
+   - Menghapus floating kicker badge `[📢 PPDB Online Tahun Ajaran 2026/2027]` pada hero section. Judul utama `H1` (*"Penerimaan Peserta Didik Baru"*) langsung memimpin seksi secara bersih. Skrip `checkPpdbPeriod()` dibersihkan dari referensi elemen badge.
+3. **Standardisasi Istilah Lokasi Utama (`frontend/public/kontak.html` & `public-shell.js`):**
+   - Mengganti label *"KAMPUS UTAMA"* menjadi *"LOKASI UTAMA"* pada kartu alamat, meta description, judul iframe Google Maps, dan tooltip link footer di `public-shell.js`.
+4. **Penyederhanaan Formulir Konsultasi (`frontend/public/kontak.html`):**
+   - Menghapus kalimat keterangan redundan *"Pesan Anda akan otomatis terhubung ke WhatsApp resmi..."* di atas input formulir.
+   - Mengubah kolom isian email menjadi opsional: menghapus tanda bintang merah wajib (`*`) dan atribut `required`, serta mengganti label menjadi `Alamat Email (Opsional)`. Pengiriman pesan tetap tersambung lancar ke WhatsApp dan API tanpa kendala.
+5. **Pembersihan Catatan Patokan Legacy & Database (`frontend/public/kontak.html` & Supabase Cloud):**
+   - Menghapus baris bullet catatan patokan *"• Lokasi Yayasan Terpadu PAUD, TK & TPQ Ulinnuha..."* di bawah alamat kantor.
+   - Mengosongkan kolom `campus_note` di tabel `web_settings` Supabase Cloud dan menyelaraskan footer di `public-shell.js` menjadi *"TPQ At Tarbiyyah"*.
+6. **Perapian Arsitektural Kartu Kontak (`frontend/public/kontak.html`):**
+   - Mengeliminasi garis pembatas terpotong (*broken half-dividers*) `border-t border-slate-100` di atas tombol aksi pada kartu Lokasi Utama, Telepon, dan Email.
+   - Menaikkan posisi tombol aksi (*Buka di Google Maps*, *Panggilan Telepon*, *Chat WhatsApp*) menjadi `mt-2.5` sehingga alur bacaan menyatu padu dengan teks di atasnya.
+   - Menyelaraskan padding kartu seragam `p-5` dan penyejajaran optis ikon pin/telepon (`mt-0.5`).
+7. **Pembersihan Bento Hub Galeri Beranda (`frontend/public/js/app.js`):**
+   - Menghapus badge pill `[Dokumentasi]` pada header kartu bento *"Potret Kegiatan Santri"*.
+   - Menyelaraskan layout header dengan ikon kamera dan judul yang bersih (`gap-2.5 mb-3.5`).
+   - Menyelaraskan teks fallback gambar dari *"Kampus"* menjadi *"Gedung Utama"* & *"Lingkungan Sekolah"*.
+
+**Verifikasi & Status Produksi:**
+- Seluruh kode bebas syntax error (`node --check` lulus).
+- Ter-commit dan ter-push ke GitHub `origin/main` (Commit `24f5896`, `fe02c92`, `5fc0761`, `465df97`).
+- Ter-deploy dan terverifikasi live di Vercel Production (`https://siyayasan.vercel.app`).
 
 ---
 

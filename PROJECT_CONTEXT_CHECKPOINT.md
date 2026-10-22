@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 22 Oktober 2026 (Sesi 51 - Remediasi Logika Tagihan SPP Massal Anti-Duplikasi & Redesain Arsitektural Bagan Pengurus Bebas AI-Slop)
+**Terakhir Diperbarui:** 22 Oktober 2026 (Sesi 52 - Pembersihan Visual & Redesain Anti-AI-Slop Tahap 2: Kontak, Beranda, PPDB & Profil)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -189,3 +189,20 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Tagihan duplikat Riky Rivaldi di Supabase Cloud telah bersih (sisa 1 invoice sah Rp 150.000).
    - Redesain struktur pengurus di `frontend/public/profil.html` telah aktif (anti-slop, slate-50 canvas, monogram inisial, konektor netral 1.5px, mobile stepper, dan 100% sinkronisasi dinamis CMS Supabase).
    - Pembersihan ornamen AI-slop lanjutan: menghapus badge pill `[✓ Terverifikasi Sah]` di `profil.html` dan floating kicker badge `[📢 PPDB Online Tahun Ajaran 2026/2027]` di `ppdb.html`.
+### 🔹 G. Pembersihan Visual & Redesain Anti-AI-Slop Tahap 2 (Sesi 52 — 22 Oktober 2026)
+1. **Penghapusan Ornamen AI-Slop & Kicker Mengambang:**
+   - **Badge "✓ Terverifikasi Sah"** dihapus seutuhnya dari Seksi 4 Profil Legalitas (`frontend/public/profil.html`), menyisakan judul berwibawa dengan tipografi editorial bersih.
+   - **Floating Kicker Badge "📢 PPDB Online Tahun Ajaran 2026/2027"** dihapus dari Hero Section PPDB (`frontend/public/ppdb.html`), membiarkan judul utama H1 memimpin seksi tanpa elemen template AI-slop. Skrip JavaScript dibersihkan dari referensi badge.
+2. **Standardisasi Tata Nama & Perapian Kartu Kontak (`frontend/public/kontak.html`):**
+   - **"KAMPUS UTAMA"** diganti menjadi **"LOKASI UTAMA"** pada kartu alamat, meta description, iframe Google Maps, dan tooltip link footer di `public-shell.js`.
+   - **Teks Keterangan WhatsApp Redundan** ("Pesan Anda akan otomatis terhubung ke WhatsApp resmi...") dihapus dari formulir konsultasi, membuat formulir ringkas dan langsung ke pokok pesan.
+   - **Catatan Patokan Legacy "Ulinnuha"** pada kartu alamat dihapus, kolom `campus_note` di Supabase Cloud `web_settings` dikosongkan, dan teks footer diselaraskan menjadi "TPQ At Tarbiyyah".
+   - **Garis Pembatas Terpotong (*Broken Half-Dividers*) Dihapus**: Menghilangkan garis pembatas `border-t border-slate-100` terpotong di atas tombol aksi pada kartu Lokasi Utama, Telepon, dan Email.
+   - **Penyelarasan Posisi Tombol Aksi**: Tombol Google Maps, Panggilan Telepon, dan Chat WhatsApp dinaikkan posisinya (`mt-2.5`) sehingga menyatu padu dan proporsional dengan teks di atasnya. Ikon pin lokasi dan telepon disejajarkan optis (`mt-0.5`).
+3. **Formulir Konsultasi Lebih Ramah Pengunjung:**
+   - **Isian Alamat Email Menjadi Opsional**: Menghilangkan tanda wajib merah dan atribut `required`, memperbarui label menjadi `Alamat Email (Opsional)`. Pengiriman pesan ke WhatsApp dan API tetap berjalan lancar tanpa mewajibkan email.
+4. **Pembersihan Kartu Galeri Beranda (`frontend/public/js/app.js`):**
+   - **Badge Pill "Dokumentasi" Dihapus**: Menghapus elemen badge pill mengambang pada header kartu bento *"Potret Kegiatan Santri"*.
+   - **Penyelarasan Teks Fallback**: Istilah "Kampus" pada atribut alt/title fallback gambar diselaraskan menjadi "Gedung Utama" & "Lingkungan Sekolah".
+5. **Verifikasi Produksi Live:**
+   - Seluruh perubahan telah lolos uji bebas error, ter-commit dan ter-push ke GitHub `origin/main` (Commit `24f5896`, `fe02c92`, `5fc0761`, `465df97`), dan 100% aktif terverifikasi di `https://siyayasan.vercel.app`.
