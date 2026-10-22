@@ -188,3 +188,4 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Anti-duplikasi SPP telah aktif di `frontend/shared/js/api.js` dan modal `payments.html` telah terstandarisasi.
    - Tagihan duplikat Riky Rivaldi di Supabase Cloud telah bersih (sisa 1 invoice sah Rp 150.000).
    - Redesain struktur pengurus di `frontend/public/profil.html` telah aktif (anti-slop, slate-50 canvas, monogram inisial, konektor netral 1.5px, mobile stepper, dan 100% sinkronisasi dinamis CMS Supabase).
+   - Pembersihan ornamen AI-slop lanjutan: menghapus badge pill `[✓ Terverifikasi Sah]` di `profil.html` dan floating kicker badge `[📢 PPDB Online Tahun Ajaran 2026/2027]` di `ppdb.html`.

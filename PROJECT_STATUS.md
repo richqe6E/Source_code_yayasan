@@ -1684,6 +1684,9 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
      * Mengeliminasi seluruh ikon AI-slop klip-art (bintang, perisai, mahkota, dompet, tas ransel) dan menggantinya dengan Monogram Inisial Eksekutif (`DI`, `SH`, `MK`, `CG`, `SP`) serta ikon SVG vektor edukasi murni untuk Kepala PAUD/TK dan Koordinator TPQ.
      * Mengimplementasikan layout responsif ganda: **Desktop Hierarchical Tree** yang elegan dan **Mobile Vertical Stepper** yang mengalir vertikal tanpa geser horizontal.
      * Preservasi 100% integrasi CMS Supabase (`org-pembina`, `org-pengawas`, `org-ketua`, `org-sekretaris`, `org-bendahara`, `org-kepala-paud-tk`, `org-kepala-tpq`) melalui fungsi pembantu `setOrgValue()` yang memperbarui elemen desktop maupun mobile secara simultan.
+   - **Pembersihan Ornamen AI-Slop Lanjutan (Tahap 2):**
+     * Menghapus badge pill `[✓ Terverifikasi Sah]` pada seksi Legalitas di `frontend/public/profil.html`, membiarkan judul legalitas tampil bersih dengan tipografi editorial yang berwibawa.
+     * Menghapus floating kicker badge `[📢 PPDB Online Tahun Ajaran 2026/2027]` pada hero section `frontend/public/ppdb.html`, membiarkan judul utama `H1` memimpin seksi hero secara bersih, lapang, dan berwibawa, serta membersihkan skrip dari referensi elemen tersebut.
 
 ---
 
