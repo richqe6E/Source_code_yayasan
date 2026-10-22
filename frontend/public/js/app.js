@@ -402,14 +402,11 @@
         <!-- Kartu Potret & Dokumentasi Santri (Mengisi Void Kanan) -->
         <div class="lg:col-span-5 bg-gradient-to-br from-slate-50 to-sky-50/40 border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <h4 class="text-sm font-bold text-slate-900">Potret Kegiatan Santri</h4>
+            <div class="flex items-center gap-2.5 mb-3.5">
+              <div class="w-7 h-7 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               </div>
-              <span class="text-[11px] font-semibold text-primary-700 bg-white border border-primary-200 px-2.5 py-0.5 rounded-full">Dokumentasi</span>
+              <h4 class="text-sm font-bold text-slate-900">Potret Kegiatan Santri</h4>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
               Momen belajar, bermain edukatif, dan pembiasaan adab Qur'ani santri PAUD, TK, dan TPQ di lingkungan sekolah.
@@ -430,9 +427,9 @@
 
                   if (galleryPhotos.length === 1) {
                     html += `
-                      <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Gedung Kampus Yayasan">
-                        <img src="images/school-campus.jpg" alt="Gedung Kampus Yayasan" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
-                        <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">Kampus</span>
+                      <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Gedung Utama Yayasan">
+                        <img src="images/school-campus.jpg" alt="Gedung Utama Yayasan" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
+                        <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">Gedung Utama</span>
                       </a>
                     `;
                   }
@@ -441,7 +438,7 @@
 
                 // Fallback jika belum ada foto galeri di Supabase
                 return `
-                  <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Lingkungan Kampus">
+                  <a href="galeri.html" class="aspect-4/3 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-2xs group/img relative block" title="Lingkungan Sekolah">
                     <img src="images/school-campus.jpg" alt="Aktivitas Santri At Tarbiyyah" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" loading="lazy">
                     <span class="absolute bottom-1.5 left-1.5 text-[9px] font-medium text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">Lingkungan</span>
                   </a>
