@@ -1614,6 +1614,39 @@
       }
 
       // -------------------------------------------------------------
+  function getInvoiceMonthKey(str) {
+    if (!str) return '';
+    const s = String(str).toLowerCase();
+    const months = [
+      { key: 'januari', match: ['januari', 'january', 'jan'] },
+      { key: 'februari', match: ['februari', 'february', 'feb'] },
+      { key: 'maret', match: ['maret', 'march', 'mar'] },
+      { key: 'april', match: ['april', 'apr'] },
+      { key: 'mei', match: ['mei', 'may'] },
+      { key: 'juni', match: ['juni', 'june', 'jun'] },
+      { key: 'juli', match: ['juli', 'july', 'jul'] },
+      { key: 'agustus', match: ['agustus', 'august', 'agu', 'aug'] },
+      { key: 'september', match: ['september', 'sep', 'sept'] },
+      { key: 'oktober', match: ['oktober', 'october', 'okt', 'oct'] },
+      { key: 'november', match: ['november', 'nov'] },
+      { key: 'desember', match: ['desember', 'december', 'des', 'dec'] }
+    ];
+
+    let foundMonth = '';
+    for (const m of months) {
+      if (m.match.some(alias => s.includes(alias))) {
+        foundMonth = m.key;
+        break;
+      }
+    }
+
+    const yearMatch = s.match(/20\d\d/);
+    const foundYear = yearMatch ? yearMatch[0] : String(new Date().getFullYear());
+
+    if (foundMonth) return `${foundMonth}-${foundYear}`;
+    return s.trim().replace(/\s+/g, '-');
+  }
+
       // 8. INVOICES
       // -------------------------------------------------------------
       if (module === 'invoices') {
@@ -1631,6 +1664,26 @@
           return { success: true, data: invoices };
         }
         if (action === 'create') {
+          const targetMonth = params.month || params.item_name || 'September 2026';
+          const targetKey = getInvoiceMonthKey(targetMonth);
+
+          // Cek anti-duplikasi untuk siswa bersangkutan
+          if (params.student_id && targetKey) {
+            const existingInvs = await supabaseRest(`invoices?student_id=eq.${encodeURIComponent(params.student_id)}&select=id,month,period,description,status`);
+            const alreadyHas = (existingInvs || []).some(inv => {
+              const k1 = getInvoiceMonthKey(inv.month);
+              const k2 = getInvoiceMonthKey(inv.period);
+              const k3 = getInvoiceMonthKey(inv.description);
+              return k1 === targetKey || k2 === targetKey || k3 === targetKey;
+            });
+            if (alreadyHas) {
+              return {
+                success: false,
+                message: `Siswa ini sudah memiliki tagihan untuk periode ${targetMonth}. Tagihan ganda dicegah.`
+              };
+            }
+          }
+
           const id = 'INV-' + Date.now();
           const invNum = 'INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4);
           let studentName = params.student_name || '';
@@ -1643,12 +1696,12 @@
             invoice_number: params.invoice_number || invNum,
             student_id: params.student_id,
             student_name: studentName,
-            month: params.month || params.item_name || 'September 2026',
-            period: params.period || params.item_name || '2026/2027',
+            month: targetMonth,
+            period: params.period || targetMonth,
             amount: Number(params.amount) || 0,
             due_date: params.due_date || new Date().toISOString().slice(0, 10),
             status: 'unpaid',
-            description: params.description || params.item_name || ''
+            description: params.description || params.item_name || `SPP ${targetMonth}`
           };
           const res = await supabaseRest('invoices', 'POST', payload);
           return { success: true, data: res[0] || payload, message: 'Tagihan berhasil dibuat' };
@@ -1668,11 +1721,32 @@
             return { success: false, message: 'Tidak ada siswa aktif ditemukan pada kelas/filter ini' };
           }
 
+          // Cek seluruh invoice yang sudah ada untuk mencegah tagihan ganda
+          const existingInvs = await supabaseRest('invoices?select=id,student_id,month,period,description,status');
+          const targetKey = getInvoiceMonthKey(month);
+
           const createdInvoices = [];
+          const skippedStudents = [];
+
           for (let i = 0; i < students.length; i++) {
             const stu = students[i];
+
+            // Cek apakah siswa ini sudah memiliki tagihan untuk bulan/periode yang sama
+            const alreadyHasInvoice = (existingInvs || []).some(inv => {
+              if (inv.student_id !== stu.id) return false;
+              const k1 = getInvoiceMonthKey(inv.month);
+              const k2 = getInvoiceMonthKey(inv.period);
+              const k3 = getInvoiceMonthKey(inv.description);
+              return k1 === targetKey || k2 === targetKey || k3 === targetKey;
+            });
+
+            if (alreadyHasInvoice) {
+              skippedStudents.push(stu.full_name);
+              continue;
+            }
+
             const invId = 'INV-' + Date.now() + '-' + i;
-            const invNum = 'INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4) + '/' + (i + 1);
+            const invNum = 'INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4) + '/' + (createdInvoices.length + 1);
             const invPayload = {
               id: invId,
               invoice_number: invNum,
@@ -1688,10 +1762,17 @@
             await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
             createdInvoices.push(invPayload);
           }
+
+          let msg = `Berhasil menerbitkan ${createdInvoices.length} tagihan SPP baru untuk ${month}`;
+          if (skippedStudents.length > 0) {
+            msg += `. ${skippedStudents.length} siswa dilewati karena sudah memiliki tagihan (${skippedStudents.slice(0, 2).join(', ')}${skippedStudents.length > 2 ? ' dll.' : ''})`;
+          }
+
           return {
             success: true,
             data: createdInvoices,
-            message: `Berhasil menerbitkan ${createdInvoices.length} tagihan SPP untuk siswa terpilih`
+            skipped: skippedStudents,
+            message: msg
           };
         }
         if (action === 'delete') {
