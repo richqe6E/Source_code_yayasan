@@ -88,10 +88,6 @@
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
     
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-      <div id="ppdb-badge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-4 shadow-sm">
-        <i class="fi fi-rr-bullhorn text-xs text-sky-300"></i>
-        <span id="ppdb-badge-text">PPDB Online Tahun Ajaran 2026/2027</span>
-      </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 drop-shadow-sm">
         Penerimaan Peserta Didik Baru
       </h1>
@@ -1782,7 +1778,6 @@
             }
           }
 
-          const badge = document.getElementById('ppdb-badge');
           const formSection = document.getElementById('formulir-pendaftaran');
           const closedCard = document.getElementById('ppdb-closed-card');
           const heroRegBtn = document.getElementById('hero-reg-btn');
@@ -1801,10 +1796,6 @@
               if (heroRegBtnIcon) heroRegBtnIcon.className = 'fi fi-rr-calendar text-base text-primary-700';
             }
 
-            if (badge) {
-              badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-900/60 backdrop-blur-md border border-slate-700/60 text-xs font-semibold text-slate-300 mb-4 shadow-sm';
-              badge.innerHTML = `<i class="fi fi-rr-lock text-xs text-slate-400"></i><span id="ppdb-badge-text">Pendaftaran PPDB Ditutup</span>`;
-            }
 
             if (window.location.hash === '#formulir-pendaftaran') {
               const target = closedCard || document.getElementById('jadwal-linimasa');
@@ -1824,10 +1815,6 @@
               if (heroRegBtnIcon) heroRegBtnIcon.className = 'fi fi-rr-edit text-base text-primary-700';
             }
 
-            if (badge) {
-              badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-sky-100 mb-4 shadow-sm';
-              badge.innerHTML = `<i class="fi fi-rr-bullhorn text-xs text-sky-300"></i><span id="ppdb-badge-text">PPDB Online Tahun Ajaran ${academicYear}</span>`;
-            }
           }
         }
       } catch (e) {
