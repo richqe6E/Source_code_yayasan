@@ -313,7 +313,7 @@
           <!-- 4. Baris Hak Cipta Bawah -->
           <div class="mt-12 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <p>&copy; 2026 <span id="site-footer-copy-name" class="font-bold text-slate-200">YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</span>. Hak Cipta Dilindungi.</p>
-            <p class="text-[11px] text-slate-400">PAUD &bull; TK Terpadu &bull; TPQ Ulinnuha</p>
+            <p class="text-[11px] text-slate-400">PAUD &bull; TK Terpadu &bull; TPQ At Tarbiyyah</p>
           </div>
         </div>
       </footer>`;
