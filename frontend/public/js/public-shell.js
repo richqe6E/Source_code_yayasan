@@ -292,7 +292,7 @@
                 <li class="flex items-start gap-2">
                   <i class="fi fi-rr-marker text-sky-400 shrink-0 mt-0.5"></i>
                   <div>
-                    <a id="site-footer-maps-link" href="https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition group flex items-start gap-1.5" title="Buka lokasi kampus di Google Maps">
+                    <a id="site-footer-maps-link" href="https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition group flex items-start gap-1.5" title="Buka lokasi utama di Google Maps">
                       <span id="site-footer-address">Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Samarinda 75124</span>
                       <i class="fi fi-rr-arrow-up-right text-[10px] text-sky-400 opacity-70 group-hover:opacity-100 transition mt-0.5"></i>
                     </a>
