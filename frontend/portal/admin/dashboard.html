@@ -60,16 +60,16 @@
         <div class="text-2xl font-bold text-gray-900 truncate" id="stat-teachers"><div class="skeleton h-7 w-12 rounded"></div></div>
         <div class="text-xs text-gray-500 mt-1 truncate"><span id="stat-teachers-active"><div class="skeleton h-3 w-12 rounded inline-block"></div></span> aktif mengajar</div>
       </div>
-      <div class="bg-white border border-gray-200 rounded-lg p-5 min-w-0">
+      <a href="ppdb.html" class="bg-white border border-gray-200 rounded-lg p-5 min-w-0 hover:border-amber-300 hover:shadow-sm transition block group">
         <div class="flex items-center justify-between mb-3 gap-2">
-          <div class="text-sm text-gray-600 truncate">Orang Tua</div>
-          <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <div class="text-sm font-medium text-gray-600 group-hover:text-amber-800 transition truncate">Pendaftar PPDB</div>
+          <div class="w-8 h-8 bg-amber-100 rounded-md flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
           </div>
         </div>
-        <div class="text-2xl font-bold text-gray-900 truncate" id="stat-parents"><div class="skeleton h-7 w-12 rounded"></div></div>
-        <div class="text-xs text-gray-500 mt-1 truncate">Terdaftar</div>
-      </div>
+        <div class="text-2xl font-bold text-gray-900 truncate" id="stat-ppdb-pending"><div class="skeleton h-7 w-12 rounded"></div></div>
+        <div class="text-xs text-amber-700 font-medium mt-1 truncate"><span id="stat-ppdb-sub"><div class="skeleton h-3 w-8 rounded inline-block"></div></span> perlu verifikasi</div>
+      </a>
     </div>
 
     <!-- Two columns: PPDB + Finance -->
@@ -123,7 +123,7 @@
             </div>
             <div class="min-w-0">
               <div class="text-sm font-medium text-gray-900 truncate">Verifikasi Bayar</div>
-              <div class="text-xs text-gray-500 truncate">Konfirmasi pembayaran ortu</div>
+              <div class="text-xs text-gray-500 truncate">Konfirmasi pembayaran siswa</div>
             </div>
           </a>
           <a href="students.html" class="flex items-center gap-3 p-3 rounded-md border border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition group min-w-0">
@@ -189,9 +189,12 @@
     })();
 
     function showSkeleton() {
-      const ids = ['stat-students', 'stat-classes', 'stat-teachers', 'stat-parents',
-                   'stat-students-active', 'stat-teachers-active'];
-      ids.forEach(id => Shell.skeleton(document.getElementById(id)));
+      const ids = ['stat-students', 'stat-classes', 'stat-teachers', 'stat-ppdb-pending',
+                   'stat-students-active', 'stat-teachers-active', 'stat-ppdb-sub'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) Shell.skeleton(el);
+      });
     }
 
     async function loadDashboard() {
@@ -211,7 +214,8 @@
         Shell.setText('stat-classes', d.total_classes != null ? d.total_classes : 0);
         Shell.setText('stat-teachers', d.total_teachers != null ? d.total_teachers : 0);
         Shell.setText('stat-teachers-active', d.total_teachers_active != null ? d.total_teachers_active : (d.total_teachers != null ? d.total_teachers : 0));
-        Shell.setText('stat-parents', d.total_parents != null ? d.total_parents : 0);
+        Shell.setText('stat-ppdb-pending', d.ppdb_pending != null ? d.ppdb_pending : 0);
+        Shell.setText('stat-ppdb-sub', d.ppdb_pending != null ? d.ppdb_pending : 0);
 
         Shell.setText('ppdb-total', d.ppdb_total != null ? d.ppdb_total : (d.ppdb_pending != null ? d.ppdb_pending : 0));
         Shell.setText('ppdb-pending', d.ppdb_pending != null ? d.ppdb_pending : 0);

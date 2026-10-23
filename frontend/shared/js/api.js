@@ -1033,8 +1033,24 @@
 
         const activeStudents = (students || []).filter(s => s.status === 'active').length;
         const activeTeachers = (teachers || []).filter(t => t.status === 'active').length;
-        const pendingPPDB = (ppdb || []).filter(p => p.status === 'pending').length;
-        const acceptedPPDB = (ppdb || []).filter(p => p.status === 'accepted' || p.status === 'approved' || p.status === 'converted').length;
+
+        // Gabungkan data PPDB dari Supabase dan memori lokal agar metrik dashboard selalu sinkron dengan tabel PPDB
+        let ppdbList = Array.isArray(ppdb) ? [...ppdb] : [];
+        try {
+          const localRegs = JSON.parse(localStorage.getItem('siy_local_ppdb_regs') || '[]');
+          if (Array.isArray(localRegs) && localRegs.length > 0) {
+            localRegs.forEach(lr => {
+              const exists = ppdbList.some(p => p.id === lr.id || (p.registration_number && lr.registration_number && p.registration_number === lr.registration_number));
+              if (!exists) ppdbList.push(lr);
+            });
+          }
+        } catch (_) {}
+
+        const pendingPPDB = ppdbList.filter(p => (p.status || 'pending').toLowerCase() === 'pending').length;
+        const acceptedPPDB = ppdbList.filter(p => {
+          const st = (p.status || '').toLowerCase();
+          return st === 'accepted' || st === 'approved' || st === 'converted';
+        }).length;
         const unpaidInvoices = (invoices || []).filter(i => i.status === 'unpaid');
         const paidInvoices = (invoices || []).filter(i => i.status === 'paid');
         const pendingPayments = (payments || []).filter(p => p.status === 'menunggu_verifikasi').length;
@@ -1044,7 +1060,7 @@
         const totalTargetAmount = (invoices || []).reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
 
         const currentMonthPrefix = new Date().toISOString().slice(0, 7);
-        const ppdbThisMonth = (ppdb || []).filter(p => String(p.created_at || '').startsWith(currentMonthPrefix)).length;
+        const ppdbThisMonth = ppdbList.filter(p => String(p.created_at || '').startsWith(currentMonthPrefix)).length;
 
         const stats = {
           total_students: (students || []).length || activeStudents,
@@ -1053,10 +1069,9 @@
           total_teachers: (teachers || []).length || activeTeachers,
           total_teachers_active: activeTeachers,
           total_classes: (classes || []).length,
-          total_parents: activeStudents,
           ppdb_pending: pendingPPDB,
           ppdb_accepted: acceptedPPDB,
-          ppdb_total: (ppdb || []).length,
+          ppdb_total: ppdbList.length,
           ppdb_this_month: ppdbThisMonth,
           fin_pending: pendingPayments,
           payments_pending_verification: pendingPayments,
@@ -1655,8 +1670,10 @@
           if (params.student_id) query += `&student_id=eq.${encodeURIComponent(params.student_id)}`;
           if (params.status) query += `&status=eq.${encodeURIComponent(params.status)}`;
 
-          // If user is orang_tua and no student_id filter provided, filter by parent's student
-          if (currentUser && currentUser.role === 'orang_tua' && !params.student_id && currentUser.student_id) {
+          // Jika user adalah siswa yang login di Portal Siswa dan tidak menyertakan filter student_id, batasi ke student_id miliknya
+          const rawRole = (currentUser && currentUser.role && currentUser.role.code ? currentUser.role.code : (currentUser && currentUser.role || '')).toLowerCase();
+          const isStudent = rawRole === 'siswa_aktif' || rawRole === 'siswa' || rawRole === 'calon_siswa' || rawRole === 'student';
+          if (currentUser && isStudent && !params.student_id && currentUser.student_id) {
             query += `&student_id=eq.${encodeURIComponent(currentUser.student_id)}`;
           }
 
@@ -1911,7 +1928,7 @@
       if (module === 'ppdb') {
         if (action === 'list') {
           let query = 'ppdb_registrations?select=*&order=created_at.desc';
-          if (params.status) {
+          if (params.status && params.status !== 'all') {
             if (params.status === 'approved' || params.status === 'accepted') {
               query += `&status=in.(approved,accepted)`;
             } else {
@@ -1928,19 +1945,68 @@
             const sTerm = encodeURIComponent(params.search || params.q);
             query += `&or=(full_name.ilike.*${sTerm}*,registration_number.ilike.*${sTerm}*,id.ilike.*${sTerm}*)`;
           }
-          let regs = [];
+
+          let regs = null;
+          let isNetworkError = false;
           try {
             regs = await supabaseRest(query);
           } catch (e) {
-            console.warn('PPDB registrations fetch fallback:', e);
+            console.warn('PPDB registrations fetch error:', e);
+            isNetworkError = true;
           }
-          if (!regs || regs.length === 0) {
-            try {
-              const localRegs = JSON.parse(localStorage.getItem('siy_local_ppdb_regs') || '[]');
-              if (localRegs.length > 0) regs = localRegs;
-            } catch (_) {}
+
+          // Ambil juga cache lokal
+          let localRegs = [];
+          try {
+            localRegs = JSON.parse(localStorage.getItem('siy_local_ppdb_regs') || '[]');
+          } catch (_) {}
+
+          let combined = [];
+          if (Array.isArray(regs)) {
+            combined = [...regs];
+            // Tambahkan record lokal yang belum ada di database
+            localRegs.forEach(lr => {
+              const inDb = combined.some(r => r.id === lr.id || (r.registration_number && lr.registration_number && r.registration_number === lr.registration_number));
+              if (!inDb) combined.push(lr);
+            });
+          } else if (isNetworkError) {
+            combined = localRegs;
           }
-          return { success: true, data: regs };
+
+          // Terapkan filter ketat pada combined list agar filter status & jenjang selalu akurat
+          if (params.status && params.status !== 'all') {
+            if (params.status === 'approved' || params.status === 'accepted') {
+              combined = combined.filter(r => {
+                const st = (r.status || '').toLowerCase();
+                return st === 'approved' || st === 'accepted';
+              });
+            } else {
+              combined = combined.filter(r => (r.status || 'pending').toLowerCase() === params.status.toLowerCase());
+            }
+          }
+          if (params.form_type) {
+            const ft = params.form_type.toLowerCase();
+            combined = combined.filter(r => {
+              const rFt = (r.form_type || '').toLowerCase();
+              const rLvl = (r.level || '').toLowerCase();
+              if (ft === 'paud') return rFt === 'paud' || rFt === 'tk' || rLvl.includes('paud') || rLvl.includes('tk');
+              if (ft === 'tpq') return rFt === 'tpq' || rLvl.includes('tpq');
+              return rFt === ft;
+            });
+          }
+          if (params.search || params.q) {
+            const q = String(params.search || params.q).toLowerCase();
+            combined = combined.filter(r =>
+              (r.student_name && r.student_name.toLowerCase().includes(q)) ||
+              (r.full_name && r.full_name.toLowerCase().includes(q)) ||
+              (r.child_name && r.child_name.toLowerCase().includes(q)) ||
+              (r.registration_number && r.registration_number.toLowerCase().includes(q)) ||
+              (r.parent_name && r.parent_name.toLowerCase().includes(q)) ||
+              (r.id && r.id.toLowerCase().includes(q))
+            );
+          }
+
+          return { success: true, data: combined };
         }
         if (action === 'get') {
           const id = params.id;
@@ -2315,24 +2381,102 @@
         }
         if (action === 'delete') {
           const id = params.id;
-          await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(id)}`, 'DELETE');
-          return { success: true, message: 'Data pendaftar berhasil dihapus' };
+          if (!id) return { success: false, message: 'ID pendaftar tidak ditentukan' };
+
+          // 1. Hapus dari Supabase dengan mencocokkan ID dan registration_number
+          try {
+            await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(id)},registration_number.eq.${encodeURIComponent(id)},registration_no.eq.${encodeURIComponent(id)})`, 'DELETE');
+          } catch (delErr) {
+            console.warn('Supabase PPDB delete error:', delErr);
+          }
+
+          // 2. Hapus secara sinkron dari localStorage siy_local_ppdb_regs
+          try {
+            const rawRegs = localStorage.getItem('siy_local_ppdb_regs');
+            if (rawRegs) {
+              const localRegs = JSON.parse(rawRegs);
+              const filtered = localRegs.filter(r => r.id !== id && r.registration_number !== id && r.registration_no !== id);
+              localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(filtered));
+            }
+          } catch (_) {}
+
+          // 3. Hapus juga dari local students dan local users jika akun dibuat saat PPDB
+          try {
+            const rawStudents = localStorage.getItem('siy_local_students');
+            if (rawStudents) {
+              const students = JSON.parse(rawStudents);
+              const filteredStudents = students.filter(s => s.id !== id && s.registration_number !== id);
+              localStorage.setItem('siy_local_students', JSON.stringify(filteredStudents));
+            }
+          } catch (_) {}
+
+          try {
+            const rawUsers = localStorage.getItem('siy_local_users');
+            if (rawUsers) {
+              const users = JSON.parse(rawUsers);
+              const filteredUsers = users.filter(u => u.id !== id && u.username !== id);
+              localStorage.setItem('siy_local_users', JSON.stringify(filteredUsers));
+            }
+          } catch (_) {}
+
+          await recordActivityLog('DELETE_PPDB', 'ppdb', 'Menghapus berkas pendaftaran calon siswa ID: ' + id, id);
+          return { success: true, message: 'Data pendaftar berhasil dihapus dari sistem' };
         }
         if (action === 'approve') {
-          const res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', {
-            status: 'accepted',
-            notes: params.notes || ''
-          });
-          await recordActivityLog('APPROVE_PPDB', 'ppdb', 'Menyetujui berkas pendaftaran calon siswa ID: ' + params.id, params.id);
-          return { success: true, data: res[0], message: 'Pendaftar diterima' };
+          const targetId = params.id;
+          let res = null;
+          try {
+            res = await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(targetId)},registration_number.eq.${encodeURIComponent(targetId)})`, 'PATCH', {
+              status: 'accepted',
+              notes: params.notes || ''
+            });
+          } catch (_) {}
+
+          // Sinkronkan status di localStorage
+          try {
+            const rawRegs = localStorage.getItem('siy_local_ppdb_regs');
+            if (rawRegs) {
+              const localRegs = JSON.parse(rawRegs);
+              localRegs.forEach(r => {
+                if (r.id === targetId || r.registration_number === targetId || r.registration_no === targetId) {
+                  r.status = 'accepted';
+                  if (params.notes) r.notes = params.notes;
+                }
+              });
+              localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(localRegs));
+            }
+          } catch (_) {}
+
+          await recordActivityLog('APPROVE_PPDB', 'ppdb', 'Menyetujui berkas pendaftaran calon siswa ID: ' + targetId, targetId);
+          return { success: true, data: (res && res[0]) || { id: targetId, status: 'accepted' }, message: 'Pendaftar diterima (Approved)' };
         }
         if (action === 'reject') {
-          const res = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', {
-            status: 'rejected',
-            notes: params.reason || params.notes || ''
-          });
-          await recordActivityLog('REJECT_PPDB', 'ppdb', 'Menolak berkas pendaftaran calon siswa ID: ' + params.id, params.id);
-          return { success: true, data: res[0], message: 'Pendaftar ditolak' };
+          const targetId = params.id;
+          let res = null;
+          try {
+            res = await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(targetId)},registration_number.eq.${encodeURIComponent(targetId)})`, 'PATCH', {
+              status: 'rejected',
+              notes: params.reason || params.notes || ''
+            });
+          } catch (_) {}
+
+          // Sinkronkan status di localStorage
+          try {
+            const rawRegs = localStorage.getItem('siy_local_ppdb_regs');
+            if (rawRegs) {
+              const localRegs = JSON.parse(rawRegs);
+              localRegs.forEach(r => {
+                if (r.id === targetId || r.registration_number === targetId || r.registration_no === targetId) {
+                  r.status = 'rejected';
+                  if (params.reason || params.notes) r.notes = params.reason || params.notes;
+                }
+              });
+              localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(localRegs));
+            }
+          } catch (_) {}
+
+          await recordActivityLog('REJECT_PPDB', 'ppdb', 'Menolak berkas pendaftaran calon siswa ID: ' + targetId, targetId);
+          return { success: true, data: (res && res[0]) || { id: targetId, status: 'rejected' }, message: 'Pendaftar ditolak (Rejected)' };
         }
         if (action === 'convert') {
           const regs = await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(params.id)}&select=*`);
@@ -2507,6 +2651,21 @@
             }).catch(() => {});
           }
           await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
+
+          // Sinkronkan status di localStorage
+          try {
+            const rawRegs = localStorage.getItem('siy_local_ppdb_regs');
+            if (rawRegs) {
+              const localRegs = JSON.parse(rawRegs);
+              localRegs.forEach(r => {
+                if (r.id === reg.id || r.registration_number === regNo || r.registration_no === regNo) {
+                  r.status = 'converted';
+                  r.form_metadata = metaWithNis;
+                }
+              });
+              localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(localRegs));
+            }
+          } catch (_) {}
 
           // 8. Terbitkan Otomatis Tagihan SPP Bulan Pertama (Jika auto_spp aktif & belum pernah diterbitkan untuk bulan berjalan)
           if (params.auto_spp !== false) {
