@@ -99,7 +99,7 @@
           if (el) {
             let items = Array.isArray(d.misi) ? d.misi : (typeof d.misi === 'string' ? d.misi.split('\n').map(s=>s.trim()).filter(Boolean) : []);
             if (items.length > 0) {
-              el.innerHTML = '<ul class="space-y-2 text-xs sm:text-sm text-slate-700">' + items.map(m => '<li class="flex items-start gap-2"><i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i><span>' + m + '</span></li>').join('') + '</ul>';
+              el.innerHTML = '<ul class="space-y-2 text-xs sm:text-sm text-slate-700">' + items.map(m => '<li class="flex items-start gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span><span>' + m + '</span></li>').join('') + '</ul>';
             }
           }
         }
@@ -183,17 +183,17 @@
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Misi Utama</h3>
           <div id="profil-misi" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
-            <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
-              <li class="flex items-start gap-2">
-                <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-700">
+              <li class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
                 <span>Menyelenggarakan pembelajaran PAUD &amp; TK yang aktif, kreatif, dan menyenangkan.</span>
               </li>
-              <li class="flex items-start gap-2">
-                <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+              <li class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
                 <span>Menanamkan adab Islami dan hafalan doa sehari-hari sejak usia dini.</span>
               </li>
-              <li class="flex items-start gap-2">
-                <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+              <li class="flex items-start gap-2.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
                 <span>Membimbing santri membaca Al-Quran dengan tartil melalui metode tilawati di TPQ At Tarbiyyah.</span>
               </li>
             </ul>
@@ -241,24 +241,24 @@
             Pembelajaran aktif dengan sentra bermain yang menstimulasi 6 aspek perkembangan anak:
           </p>
           <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Nilai Agama &amp; Budi Pekerti (Doa, wudhu &amp; sholat dhuha ceria)</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Fisik Motorik Kasar &amp; Halus (Senam, melipat, menggambar)</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Kognitif &amp; Logika Dasar (Pola, angka, sains sederhana)</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Literasi &amp; Bahasa (Bercerita, mengenal huruf, kosa kata)</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Sosial Emosional &amp; Kemandirian Anak</span>
             </li>
           </ul>
@@ -279,24 +279,24 @@
             Fokus bimbingan Al-Qur'an terstruktur dengan metode tartil dan adab Islami:
           </p>
           <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Metode Iqro' dan Tilawah Al-Qur'an bertahap</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Bimbingan Tajwid, Makharijul Huruf, dan Tahsin</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Hafalan Juz 'Amma (Surat Pendek) &amp; Doa Sehari-hari</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Praktek Sholat Fardhu &amp; Gerakan Sholat Berjamaah</span>
             </li>
-            <li class="flex items-center gap-2">
-              <i class="fi fi-rr-check text-primary-600 text-xs"></i>
+            <li class="flex items-start gap-2.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
               <span>Kisah Teladan Para Nabi &amp; Pengenalan Bahasa Arab Dasar</span>
             </li>
           </ul>
@@ -619,7 +619,7 @@
               if (items.length > 0) {
                 el.innerHTML = `<ul class="space-y-2 text-xs sm:text-sm text-slate-700">${items.map(m => `
                   <li class="flex items-start gap-2">
-                    <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
                     <span>${m}</span>
                   </li>
                 `).join('')}</ul>`;
