@@ -78,6 +78,46 @@
   </script>
   <link rel="stylesheet" href="css/style.css">
   <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+
+  <!-- Instant PPDB Period Pre-Hydration (Zero-FOUC) -->
+  <script>
+    (function() {
+      try {
+        const raw = localStorage.getItem('siy_ppdb_period_cache');
+        if (!raw) return;
+        const p = JSON.parse(raw);
+        document.addEventListener('DOMContentLoaded', function() {
+          if (p.academic_year) {
+            const tlTitle = document.getElementById('ppdb-timeline-title');
+            if (tlTitle) tlTitle.textContent = 'Jadwal Linimasa PPDB TA ' + p.academic_year;
+          }
+          if (p.online_registration_dates) {
+            const el = document.getElementById('timeline-reg-dates');
+            if (el) el.textContent = p.online_registration_dates;
+          }
+          if (p.verification_dates) {
+            const el = document.getElementById('timeline-verif-dates');
+            if (el) el.textContent = p.verification_dates;
+          }
+          if (p.announcement_dates) {
+            const el = document.getElementById('timeline-ann-dates');
+            if (el) el.textContent = p.announcement_dates;
+          }
+          if (p.re_registration_dates) {
+            const el = document.getElementById('timeline-rereg-dates');
+            if (el) el.textContent = p.re_registration_dates;
+          }
+          if (p.notes) {
+            const el = document.getElementById('timeline-notes');
+            if (el) {
+              el.textContent = 'Catatan Panitia: ' + p.notes;
+              el.classList.remove('hidden');
+            }
+          }
+        });
+      } catch (_) {}
+    })();
+  </script>
 </head>
 <body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-brand-600 selection:text-white">
 
@@ -962,22 +1002,22 @@
         <div id="ppdb-timeline-container" class="space-y-3 text-xs">
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
             <span class="font-bold text-slate-800">1. Pendaftaran Online</span>
-            <span id="timeline-reg-dates" class="font-semibold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-md">1 Jan - 31 Jul 2026</span>
+            <span id="timeline-reg-dates" class="font-semibold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-md">tanggal 17</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
             <span class="font-bold text-slate-800">2. Verifikasi Berkas TU</span>
-            <span id="timeline-verif-dates" class="text-slate-600 font-medium">1 - 5 Agustus 2026</span>
+            <span id="timeline-verif-dates" class="text-rose-600 font-semibold bg-rose-50 px-2.5 py-0.5 rounded-md">TUTUP</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
             <span class="font-bold text-slate-800">3. Pengumuman Kelulusan</span>
-            <span id="timeline-ann-dates" class="text-slate-600 font-medium">10 Agustus 2026</span>
+            <span id="timeline-ann-dates" class="text-rose-600 font-semibold bg-rose-50 px-2.5 py-0.5 rounded-md">TUTUP</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
             <span class="font-bold text-slate-800">4. Daftar Ulang &amp; Penyerahan Berkas</span>
-            <span id="timeline-rereg-dates" class="text-slate-600 font-medium">12 - 20 Agustus 2026</span>
+            <span id="timeline-rereg-dates" class="text-rose-600 font-semibold bg-rose-50 px-2.5 py-0.5 rounded-md">TUTUP</span>
           </div>
         </div>
-        <p id="timeline-notes" class="text-xs text-slate-500 mt-3 hidden bg-sky-50 border border-sky-100 p-3 rounded-xl"></p>
+        <p id="timeline-notes" class="text-xs text-slate-700 mt-3 bg-sky-50 border border-sky-100 p-3 rounded-xl font-medium">Catatan Panitia: Pendaftaran Peserta Didik Baru Gelombang Masih di Tutup. Info Selanjutnya Tanyakan Riki</p>
       </div>
     </div>
   </main>
@@ -1746,6 +1786,7 @@
       try {
         const res = await apiCall('ppdb', 'period');
         if (res && res.success && res.data) {
+          try { localStorage.setItem('siy_ppdb_period_cache', JSON.stringify(res.data)); } catch(_) {}
           const p = res.data;
           const isClosed = (p.status === 'closed' || p.status === 'inactive' || p.status === 'ditutup');
           const academicYear = p.academic_year || '2026/2027';

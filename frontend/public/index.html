@@ -143,6 +143,34 @@
     .delay-200 { transition-delay: 200ms; }
     .delay-300 { transition-delay: 300ms; }
   </style>
+
+  <!-- Instant PPDB Period Pre-Hydration on Home (Zero-FOUC) -->
+  <script>
+    (function() {
+      try {
+        const raw = localStorage.getItem('siy_ppdb_period_cache');
+        if (!raw) return;
+        const p = JSON.parse(raw);
+        const isClosed = (p.status === 'closed' || p.status === 'inactive' || p.status === 'ditutup');
+        document.addEventListener('DOMContentLoaded', function() {
+          const heroBtn = document.getElementById('hero-ppdb-cta-btn');
+          const heroBtnText = document.getElementById('hero-ppdb-cta-text');
+          const bottomTitle = document.getElementById('bottom-ppdb-title');
+          const bottomDesc = document.getElementById('bottom-ppdb-desc');
+          const bottomBtn = document.getElementById('bottom-ppdb-cta-btn');
+          const bottomBtnText = document.getElementById('bottom-ppdb-cta-text');
+          if (isClosed) {
+            if (heroBtn) heroBtn.href = 'ppdb.html';
+            if (heroBtnText) heroBtnText.textContent = 'Informasi PPDB';
+            if (bottomTitle) bottomTitle.textContent = 'Pendaftaran PPDB Sedang Ditutup';
+            if (bottomDesc) bottomDesc.textContent = p.notes || 'Pendaftaran peserta didik baru saat ini belum dibuka kembali. Silakan pantau linimasa resmi atau hubungi narahubung kami.';
+            if (bottomBtn) bottomBtn.href = 'ppdb.html';
+            if (bottomBtnText) bottomBtnText.textContent = 'Pelajari Informasi PPDB';
+          }
+        });
+      } catch (_) {}
+    })();
+  </script>
 </head>
 <body class="font-sans bg-white text-gray-800 antialiased">
 

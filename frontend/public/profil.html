@@ -75,6 +75,41 @@
 
   <link rel="stylesheet" href="css/style.css">
   <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
+
+  <!-- Instant Pre-Hydration from Local Cache (Zero-FOUC) -->
+  <script>
+    (function() {
+      try {
+        const raw = localStorage.getItem('siy_school_ext');
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.sejarah) {
+          const el = document.getElementById('profil-sejarah');
+          if (el) {
+            const paras = d.sejarah.split('\n\n').filter(Boolean);
+            el.innerHTML = paras.map(p => '<p class="text-justify [text-align-last:left]">' + p.replace(/\n/g, '<br>') + '</p>').join('');
+          }
+        }
+        if (d.visi) {
+          const el = document.getElementById('profil-visi');
+          if (el) el.textContent = d.visi;
+        }
+        if (d.misi) {
+          const el = document.getElementById('profil-misi');
+          if (el) {
+            let items = Array.isArray(d.misi) ? d.misi : (typeof d.misi === 'string' ? d.misi.split('\n').map(s=>s.trim()).filter(Boolean) : []);
+            if (items.length > 0) {
+              el.innerHTML = '<ul class="space-y-2 text-xs sm:text-sm text-slate-700">' + items.map(m => '<li class="flex items-start gap-2"><i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i><span>' + m + '</span></li>').join('') + '</ul>';
+            }
+          }
+        }
+        if (d.budaya) {
+          const el = document.getElementById('profil-budaya');
+          if (el) el.textContent = d.budaya;
+        }
+      } catch (_) {}
+    })();
+  </script>
 </head>
 <body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-primary-500 selection:text-white">
 
@@ -114,13 +149,7 @@
 
         <div id="profil-sejarah" class="space-y-4 sm:space-y-5 text-slate-700 leading-relaxed sm:leading-loose text-sm sm:text-base text-justify">
           <p class="text-justify [text-align-last:left]">
-            <strong class="font-bold text-slate-900">Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</strong> didirikan dengan tekad mulia untuk menghadirkan pendidikan anak usia dini yang bermutu tinggi, berakar pada nilai-nilai keislaman yang <em>rahmatan lil 'alamin</em>, dan berlokasi strategis di Jl. Wijaya Kusuma V-A No. 38, Kelurahan Air Putih, Kecamatan Samarinda Ulu.
-          </p>
-          <p class="text-justify [text-align-last:left]">
-            Saat ini yayasan menaungi dua pilar utama: <strong class="font-bold text-slate-900">PAUD/TK Terpadu</strong> yang mengaplikasikan Kurikulum Merdeka berorientasi 6 aspek perkembangan anak (Nilai Agama &amp; Moral, Fisik Motorik, Kognitif, Bahasa, Sosial Emosional, dan Seni), serta <strong class="font-bold text-slate-900">Taman Pendidikan Al-Qur'an (TPQ)</strong> dengan bimbingan tahsin, tahfidz, dan adab harian.
-          </p>
-          <p class="text-justify [text-align-last:left]">
-            Lingkungan sekolah dirancang aman, ramah anak, dan menstimulasi rasa ingin tahu alami siswa melalui pendekatan bermain yang bermakna (<em>play-based learning</em>). Seluruh proses pembinaan dirancang untuk melahirkan generasi yang bertauhid lurus, berakhlak mulia, cerdas, dan mandiri dalam menyongsong masa depan.
+            <strong class="font-bold text-slate-900">Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</strong> berdiri sebagai wujud kepedulian masyarakat di lingkungan Air Putih Samarinda Ulu terhadap pendidikan dasar Islam dan anak usia dini yang berkualitas. Yayasan ini dibangun di lingkungan yang sangat menjamin tumbuh kembang siswa agar lebih konsisten dan berfokus dengan lingkungan yang tenang dan adem.
           </p>
         </div>
       </div>
@@ -143,7 +172,7 @@
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Visi Lembaga</h3>
           <p id="profil-visi" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
-            Menjadi lembaga pendidikan anak usia dini yang unggul dalam membentuk generasi berkarakter, cerdas, dan berakhlak mulia di era modern.
+            Mewujudkan generasi anak usia dini yang berakhlak mulia, cerdas, mandiri, ceria, dan cinta Al-Quran.
           </p>
         </div>
 
@@ -154,7 +183,20 @@
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Misi Utama</h3>
           <div id="profil-misi" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
-            <p>Menyelenggarakan pembelajaran holistik integratif berbasis fitrah anak, menumbuhkan kecintaan Al-Qur'an sejak dini, dan membangun kemitraan erat bersama orang tua.</p>
+            <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
+              <li class="flex items-start gap-2">
+                <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+                <span>Menyelenggarakan pembelajaran PAUD &amp; TK yang aktif, kreatif, dan menyenangkan.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+                <span>Menanamkan adab Islami dan hafalan doa sehari-hari sejak usia dini.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fi fi-rr-check text-primary-600 text-xs mt-0.5 shrink-0"></i>
+                <span>Membimbing santri membaca Al-Quran dengan tartil melalui metode tilawati di TPQ At Tarbiyyah.</span>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -555,6 +597,7 @@
           window.apiCall('ppdb', 'period').catch(() => null)
         ]);
         if (res && res.success && res.data) {
+          try { localStorage.setItem('siy_school_ext', JSON.stringify(res.data)); } catch(_) {}
           const d = res.data;
           if (d.sejarah) {
             const el = document.getElementById('profil-sejarah');

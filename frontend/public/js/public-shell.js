@@ -238,7 +238,7 @@
     return `
       <footer id="site-footer-root" class="relative bg-slate-950 text-slate-300 border-t border-slate-800/90 overflow-hidden">
         <!-- 1. Background Foto Sekolah (Dapat diubah via CMS Admin) -->
-        <div id="site-footer-bg-image" class="absolute inset-0 bg-cover bg-center transition-all duration-700 pointer-events-none scale-105" style="background-image: url('${base}images/school-campus.jpg');"></div>
+        <div id="site-footer-bg-image" class="absolute inset-0 bg-cover bg-center transition-all duration-700 pointer-events-none scale-105" style="background-image: url('${base}images/school-campus.webp'), url('${base}images/school-campus.jpg');"></div>
         
         <!-- 2. Overlay Gradasi 50% Semi-Transparan Gelap (Anti-Slop: Teks Sangat Kontras & Berisi) -->
         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-900/60 pointer-events-none"></div>
@@ -270,20 +270,20 @@
             <div>
               <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3">Tautan Cepat</h3>
               <ul class="space-y-2 text-xs">
-                <li><a href="${base}profil.html" class="hover:text-sky-300 transition">Profil Yayasan</a></li>
-                <li><a href="${base}berita.html" class="hover:text-sky-300 transition">Berita &amp; Kegiatan</a></li>
-                <li><a href="${base}pengumuman.html" class="hover:text-sky-300 transition">Pengumuman Resmi</a></li>
-                <li><a href="${base}ppdb.html#formulir-pendaftaran" class="hover:text-sky-300 transition">Formulir PPDB Online</a></li>
-                <li><a href="${base}kontak.html" class="hover:text-sky-300 transition">Hubungi Kami</a></li>
+                <li><a href="${base}profil.html" class="hover:text-sky-300 transition inline-block py-1">Profil Yayasan</a></li>
+                <li><a href="${base}berita.html" class="hover:text-sky-300 transition inline-block py-1">Berita &amp; Kegiatan</a></li>
+                <li><a href="${base}pengumuman.html" class="hover:text-sky-300 transition inline-block py-1">Pengumuman Resmi</a></li>
+                <li><a href="${base}ppdb.html#formulir-pendaftaran" class="hover:text-sky-300 transition inline-block py-1">Formulir PPDB Online</a></li>
+                <li><a href="${base}kontak.html" class="hover:text-sky-300 transition inline-block py-1">Hubungi Kami</a></li>
               </ul>
             </div>
             <div>
               <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3">Layanan SIAKAD</h3>
               <ul class="space-y-2 text-xs">
-                <li><a href="${base}login.html" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-graduation-cap text-[10px]"></i><span>Login SIAKAD</span></a></li>
-                <li><a href="${base}ppdb/status.html" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-search text-[10px]"></i><span>Cek Status PPDB Online</span></a></li>
-                <li><a href="${base}ppdb.html#jadwal-linimasa" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-rr-calendar text-[10px]"></i><span>Jadwal PPDB 2026</span></a></li>
-                <li><a id="site-footer-wa-link" href="#" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition flex items-center gap-1.5"><i class="fi fi-brands-whatsapp text-sky-400 text-xs"></i><span>WhatsApp Tata Usaha</span></a></li>
+                <li><a href="${base}login.html" class="hover:text-sky-300 transition inline-flex items-center gap-1.5 py-1"><i class="fi fi-rr-graduation-cap text-[10px]"></i><span>Login SIAKAD</span></a></li>
+                <li><a href="${base}ppdb/status.html" class="hover:text-sky-300 transition inline-flex items-center gap-1.5 py-1"><i class="fi fi-rr-search text-[10px]"></i><span>Cek Status PPDB Online</span></a></li>
+                <li><a href="${base}ppdb.html#jadwal-linimasa" class="hover:text-sky-300 transition inline-flex items-center gap-1.5 py-1"><i class="fi fi-rr-calendar text-[10px]"></i><span>Jadwal PPDB 2026</span></a></li>
+                <li><a id="site-footer-wa-link" href="#" target="_blank" rel="noopener noreferrer" class="hover:text-sky-300 transition inline-flex items-center gap-1.5 py-1"><i class="fi fi-brands-whatsapp text-sky-400 text-xs"></i><span>WhatsApp Tata Usaha</span></a></li>
               </ul>
             </div>
             <div>
