@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 22 Oktober 2026 (Sesi 52 - Pembersihan Visual & Redesain Anti-AI-Slop Tahap 2: Kontak, Beranda, PPDB & Profil)
+**Terakhir Diperbarui:** 23 Oktober 2026 (Sesi 53 - Verifikasi Google Search Console, Optimasi Mobile PageSpeed & Eliminasi Zero-FOUC Lintas Halaman)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -206,3 +206,18 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - **Penyelarasan Teks Fallback**: Istilah "Kampus" pada atribut alt/title fallback gambar diselaraskan menjadi "Gedung Utama" & "Lingkungan Sekolah".
 5. **Verifikasi Produksi Live:**
    - Seluruh perubahan telah lolos uji bebas error, ter-commit dan ter-push ke GitHub `origin/main` (Commit `24f5896`, `fe02c92`, `5fc0761`, `465df97`), dan 100% aktif terverifikasi di `https://siyayasan.vercel.app`.
+### 🔹 H. Verifikasi Google Search Console, Optimasi Mobile PageSpeed & Eliminasi Zero-FOUC Lintas Halaman (Sesi 53 — 23 Oktober 2026)
+1. **Verifikasi Resmi Google Search Console (GSC):**
+   - File verifikasi `google65a66b7608d95bce.html` diterbitkan dan ter-deploy aktif (HTTP 200).
+   - Meta tag cadangan disematkan di `<head>` `index.html`, dan diizinkan secara eksplisit pada `robots.txt`.
+2. **Optimasi Aset & Google PageSpeed Mobile (Fase 2 Performance):**
+   - **Kompresi Gambar Masif**: Aset gambar gedung utama `school-campus.jpg` dikompresi dari 998 KB (~1 MB) menjadi 245 KB JPG (-75%) dan format modern `school-campus.webp` 169 KB (-83%) dengan ketajaman visual tetap utuh.
+   - **Eliminasi Render-Blocking CSS Flaticon**: 4 file CSS ikon eksternal (~782 KB) diubah menjadi pemanggilan asinkron non render-blocking (`media="print" onload="this.media='all'"` dengan fallback `<noscript>`) di seluruh 8 halaman publik utama.
+   - **Penyelarasan Target Sentuh (*Tap Targets*) Mobile**: Menambah padding sentuh (`py-1` dan `min-h-[36px]`) pada seluruh tautan footer dan menu navigasi mobile agar memenuhi standar ergonomi jari Google (≥ 44px).
+3. **Eliminasi Total Kedipan Konten Lama (*Zero-FOUC & Static-Cloud Sync*) Lintas Halaman:**
+   - **Halaman Profil (`profil.html`)**: Teks statis Sejarah disinkronkan 100% dengan teks terbaru Supabase Cloud (*"Yayasan At Tarbiyyah Wijaya Kusuma Samarinda berdiri sebagai wujud kepedulian..."*), begitu pula Visi dan Misi (bullet points).
+   - **Halaman PPDB (`ppdb.html`)**: Linimasa tanggal statis disinkronkan dengan status database terkini (`tanggal 17`, `TUTUP`, `TUTUP`, `TUTUP`, dan catatan resmi panitia) sejak detik ke-0.
+   - **Halaman Kontak (`kontak.html`)**: Jam operasional statis diselaraskan dengan database (`07.30 - 12.30 WITA` & `07.30 - 11.00 WITA`).
+   - **Instant Pre-Hydration Cache (`siy_school_ext` & `siy_ppdb_period_cache`)**: Skrip inline instan di `<head>` membaca cache lokal pada detik ke-0 sehingga perubahan CMS admin di masa mendatang otomatis tampil instan tanpa jeda latensi jaringan.
+4. **Verifikasi Produksi Live:**
+   - Ter-deploy dan terverifikasi live di `https://siyayasan.vercel.app` (Commit `ecbf560` & `6c79d63`).

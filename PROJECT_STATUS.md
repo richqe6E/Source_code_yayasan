@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 22 Oktober 2026 — Sesi 52 (Pembersihan Visual & Redesain Anti-AI-Slop Tahap 2: Kontak, Beranda, PPDB & Profil - Selesai & Terverifikasi)*
+*Terakhir Diperbarui: 23 Oktober 2026 — Sesi 53 (Verifikasi Google Search Console, Optimasi Mobile PageSpeed & Eliminasi Zero-FOUC Lintas Halaman - Selesai & Terverifikasi)*
 
 ---
 
@@ -1720,6 +1720,32 @@ Melanjutkan penataan visual clean, editorial, dan anti-AI-slop pada seluruh hala
 **Verifikasi & Status Produksi:**
 - Seluruh kode bebas syntax error (`node --check` lulus).
 - Ter-commit dan ter-push ke GitHub `origin/main` (Commit `24f5896`, `fe02c92`, `5fc0761`, `465df97`).
+- Ter-deploy dan terverifikasi live di Vercel Production (`https://siyayasan.vercel.app`).
+
+---
+
+### 🗓️ Sesi 53 — Verifikasi Google Search Console, Optimasi Mobile PageSpeed & Eliminasi Zero-FOUC Lintas Halaman (23 Oktober 2026, Pagi)
+
+**Pekerjaan:**
+Mendaftarkan dan memverifikasi website ke Google Search Console, mengoptimasi aset render-blocking dan kompresi gambar WebP untuk Google PageSpeed Mobile, serta mengeliminasi fenomena pergantian/kedipan data lama di detik pertama (Zero-FOUC) secara sistemik lintas seluruh halaman publik.
+
+**Penyelesaian & Detail Implementasi:**
+1. **Verifikasi Resmi Google Search Console (GSC):**
+   - File verifikasi `google65a66b7608d95bce.html` diterbitkan dan diizinkan secara eksplisit pada `robots.txt` dan `vercel.json` (Commit `ecbf560`).
+   - Meta tag cadangan disematkan di `<head>` `index.html` untuk redundansi ganda.
+2. **Optimasi Aset & PageSpeed Mobile:**
+   - Mengompresi aset gambar utama `school-campus.jpg` dari 998 KB (~1 MB) menjadi 245 KB JPG (-75%) dan memproduksi `school-campus.webp` 169 KB (-83%) untuk web modern.
+   - Mengubah 4 file CSS Flaticon eksternal (~782 KB) menjadi non render-blocking (`media="print" onload="this.media='all'"` dengan `<noscript>` fallback) di seluruh 8 halaman publik utama.
+   - Menyelaraskan target sentuh jari (*tap targets*) mobile ≥ 44px pada footer dan tautan navigasi.
+3. **Eliminasi Kedipan Data Lama (*Zero-FOUC & Static-Cloud Sync*):**
+   - Menyelaraskan 100% teks statis di `profil.html` (sejarah baru, visi, misi) agar identik dengan database Supabase Cloud sejak detik ke-0.
+   - Menyelaraskan jadwal linimasa PPDB di `ppdb.html` (`tanggal 17`, `TUTUP`, `TUTUP`, `TUTUP`, dan catatan panitia) sejak detik ke-0.
+   - Menyelaraskan jam operasional statis di `kontak.html` (`07.30 - 12.30 WITA` & `07.30 - 11.00 WITA`).
+   - Memasang skrip *Instant Pre-Hydration Cache* (`siy_school_ext` & `siy_ppdb_period_cache`) di `<head>` pada `profil.html`, `ppdb.html`, dan `index.html` sehingga perubahan CMS di masa depan tampil instan tanpa jeda koneksi.
+
+**Verifikasi & Status Produksi:**
+- Seluruh kode bebas syntax error (`node --check` lulus).
+- Ter-commit dan ter-push ke GitHub `origin/main` (Commit `ecbf560`, `6c79d63`).
 - Ter-deploy dan terverifikasi live di Vercel Production (`https://siyayasan.vercel.app`).
 
 ---
