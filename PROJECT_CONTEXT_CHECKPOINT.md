@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 23 Oktober 2026 (Sesi 53 - Verifikasi Google Search Console, Optimasi Mobile PageSpeed & Eliminasi Zero-FOUC Lintas Halaman)
+**Terakhir Diperbarui:** 23 Oktober 2026 (Sesi 54 - Remediasi Logika Portal Admin & Siswa, Decommissioning Legacy Role Ortu, dan Restorasi Navigasi Sticky)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -225,3 +225,30 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Menghapus seluruh ikon centang biru (`fi-rr-check` & SVG checkmark) pada kartu Misi Utama dan Program Pendidikan PAUD, TK, TPQ di `profil.html` dan `index.html`.
    - Menggantinya dengan penanda titik piringan mikro proporsional (`w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0`) yang tenang, rapi, lapang, dan bebas polusi visual.
    - Menjaga 100% integritas logika kode dan ID binding CMS (`home-program-paud`, `profil-program-paud-tk`, dll.) serta membiarkan data teks database tetap utuh sesuai input admin.
+
+
+### 🔹 I. Remediasi Logika Portal Admin & Siswa, Decommissioning Legacy Role Ortu, dan Restorasi Navigasi Sticky (Sesi 54 — 23 Oktober 2026)
+1. **Perbaikan Bug Penghapusan Pendaftar PPDB (Item #17 - Commit `cf8da26`):**
+   - Menerapkan penghapusan *dual-key* fleksibel ke Supabase REST: `or=(id.eq.${id},registration_number.eq.${id},registration_no.eq.${id})`.
+   - Membersihkan record serentak dari seluruh memori lokal (`siy_local_ppdb_regs`, `siy_local_students`, dan `siy_local_users`), menjamin data yang dihapus hilang permanen dan tidak bangkit kembali saat tabel dimuat ulang.
+2. **Pembersihan UI Pembayaran & Fitur 1-Klik WhatsApp Tunggakan (Items #18, #19, #20 - Commit `cf8da26`):**
+   - Menghilangkan duplikasi tanda tambah pada tombol `[ Buat Tagihan Individu ]` di `payments.html`.
+   - Menghilangkan bilah scroll vertikal palsu (*scrollbar thumb artifact*) pada tab bar `payments.html`, `ppdb.html`, dan `content.html` dengan utility anti-scrollbar modern.
+   - Mengimplementasikan fitur **1-Klik Kirim Pengingat Tunggakan SPP via WhatsApp** pada tombol `[ 💬 Kirim WA ]` di setiap baris tagihan siswa menunggak, lengkap dengan normalisasi nomor internasional (`628xxx`), salam Islami, rincian bulan, nominal, jatuh tempo, serta nomor rekening resmi Yayasan At Tarbiyyah (BSI `7123456789` & Bank Kaltimtara `0012345678`).
+3. **Perbaikan Menyeluruh Sistem Filter & Tab Status PPDB Admin (Item #21 - Commit `cf8da26`):**
+   - Memperbaiki logika fallback di `api.js` agar hasil pencarian kosong valid (`[]`) tidak ditimpa data mentah lokal tanpa filter.
+   - Menerapkan filter status tab (*Pending, Approved, Converted, Rejected*), dropdown jenjang fleksibel (`paud`, `tk`, `tpq`), dan pencarian teks nama/no pendaftaran multi-kolom yang reaktif dengan event `onchange`, tombol `Enter`, dan tombol `Reset Filter`.
+   - Menambahkan mutasi status lokal pada aksi `approve` (`accepted`), `reject` (`rejected`), dan `convert` (`converted`).
+4. **Decommissioning Penuh Akun/Peran Orang Tua & Penyelarasan 2 Portal (Item #22 - Commit `cf8da26`):**
+   - Menghapus peran `orang_tua` dari `users.html` dan query invoices `api.js`.
+   - Mengganti kartu KPI ke-4 di Dashboard Admin dari *"Orang Tua 0 Terdaftar"* menjadi kartu operasional aktif **"Pendaftar PPDB (Perlu Verifikasi)"** yang terhubung langsung ke tabel PPDB.
+   - Memperbaiki nomor WA Bendahara di `spp.html` menjadi nomor resmi `081347142829`, serta membersihkan *flashing mock badges* di `students.html` dan `teachers.html`.
+5. **Restorasi Navigasi Sticky & Proporsi Desain Publik Asli (Item #23 - Commit `2d3dbb5`):**
+   - Mengidentifikasi akar masalah hilangnya navigasi saat scroll: penambahan `overflow-x: hidden` pada `html, body` di `style.css` mematikan fungsi `position: sticky` per spesifikasi W3C CSS.
+   - Menghapus aturan `overflow-x: hidden` pada `html, body` serta menghapus blok media query overrides agresif `!important`.
+   - Mengembalikan proporsi logo, teks nama yayasan, dan tombol burger di `public-shell.js` ke ukuran nyaman sentuh.
+   - Mengembalikan keleluasaan padding kartu di `index.html`, `profil.html`, `kontak.html`, dan `ppdb.html` ke proporsi estetis asli dengan tetap mempertahankan dropdown listbox jenjang pendidikan (Item #14) dan pencegahan autofill email admin (Item #13).
+6. **Status Produksi Terkini:**
+   - Git Commit: `2d3dbb5` di branch `main` GitHub (`origin/main`).
+   - Vercel: 100% aktif ter-deploy di `https://siyayasan.vercel.app`.
+   - Status Working Tree: Bersih (`working tree clean`).
