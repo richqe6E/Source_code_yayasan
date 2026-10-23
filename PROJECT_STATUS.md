@@ -1750,6 +1750,11 @@ Mendaftarkan dan memverifikasi website ke Google Search Console, mengoptimasi as
 
 ---
 
+4. **Redesain Sub-Poin Akademik Bersih & Eliminasi Ikon Centang AI-Slop (Commit `cfd8c96`):**
+   - Menghapus seluruh ikon centang biru (`fi-rr-check` & SVG checkmark) pada kartu Misi Utama dan Program Pendidikan PAUD, TK, TPQ di `profil.html` dan `index.html`.
+   - Menggantinya dengan penanda titik piringan mikro proporsional (`w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0`) yang tenang, rapi, lapang, dan bebas polusi visual.
+   - Menjaga 100% integritas logika kode dan ID binding CMS (`home-program-paud`, `profil-program-paud-tk`, dll.) serta membiarkan data teks database tetap utuh sesuai input admin.
+
 ## 6. 📁 Struktur File Penting
 
 ```

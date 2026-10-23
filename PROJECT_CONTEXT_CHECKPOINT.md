@@ -221,3 +221,7 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - **Instant Pre-Hydration Cache (`siy_school_ext` & `siy_ppdb_period_cache`)**: Skrip inline instan di `<head>` membaca cache lokal pada detik ke-0 sehingga perubahan CMS admin di masa mendatang otomatis tampil instan tanpa jeda latensi jaringan.
 4. **Verifikasi Produksi Live:**
    - Ter-deploy dan terverifikasi live di `https://siyayasan.vercel.app` (Commit `ecbf560` & `6c79d63`).
+5. **Redesain Sub-Poin Akademik Bersih & Eliminasi Ikon Centang AI-Slop (Item #12 - Commit `cfd8c96`):**
+   - Menghapus seluruh ikon centang biru (`fi-rr-check` & SVG checkmark) pada kartu Misi Utama dan Program Pendidikan PAUD, TK, TPQ di `profil.html` dan `index.html`.
+   - Menggantinya dengan penanda titik piringan mikro proporsional (`w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0`) yang tenang, rapi, lapang, dan bebas polusi visual.
+   - Menjaga 100% integritas logika kode dan ID binding CMS (`home-program-paud`, `profil-program-paud-tk`, dll.) serta membiarkan data teks database tetap utuh sesuai input admin.
