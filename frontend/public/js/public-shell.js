@@ -141,11 +141,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16 sm:h-20">
             <!-- Brand Logo & Nama -->
-            <a href="${base}index.html" class="flex items-center gap-2.5 sm:gap-3 group min-w-0" title="YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA">
-              <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform flex-shrink-0" id="site-header-logo-img">
-              <div class="min-w-0">
-                <div class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight uppercase" id="site-header-school-name-top">YAYASAN AT TARBIYYAH</div>
-                <div class="text-[10px] sm:text-[11px] font-bold text-primary-700 leading-tight tracking-normal uppercase" id="site-header-school-name-sub">WIJAYA KUSUMA SAMARINDA</div>
+            <a href="${base}index.html" class="flex items-center gap-2 sm:gap-3 group min-w-0 flex-1 pr-2" title="YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA">
+              <img src="${base}images/logo.png" onerror="this.onerror=null; this.src='${base}public/images/logo.png'" alt="Logo Yayasan At Tarbiyyah Wijaya Kusuma" class="w-8 h-8 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform shrink-0" id="site-header-logo-img">
+              <div class="min-w-0 flex-1">
+                <div class="text-[11px] sm:text-sm font-extrabold text-slate-900 leading-tight tracking-tight uppercase truncate" id="site-header-school-name-top">YAYASAN AT TARBIYYAH</div>
+                <div class="text-[9px] sm:text-[11px] font-bold text-primary-700 leading-tight tracking-normal uppercase truncate" id="site-header-school-name-sub">WIJAYA KUSUMA SAMARINDA</div>
               </div>
             </a>
 
@@ -165,13 +165,13 @@
             </div>
 
             <!-- Mobile Quick Actions & Hamburger -->
-            <div class="flex lg:hidden items-center gap-2">
-              <a href="${base}login.html" class="px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:text-primary-700 bg-slate-100 hover:bg-slate-200/70 rounded-lg border border-slate-200 transition flex items-center gap-1 active:scale-95" title="SIAKAD">
+            <div class="flex lg:hidden items-center gap-1.5 shrink-0">
+              <a href="${base}login.html" class="px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:text-primary-700 bg-slate-100 hover:bg-slate-200/70 rounded-lg border border-slate-200 transition flex items-center gap-1 active:scale-95 shrink-0" title="SIAKAD">
                 <i class="fi fi-rr-graduation-cap text-[11px] text-slate-600"></i>
                 <span>SIAKAD</span>
               </a>
-              <button id="site-mobile-menu-btn" class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:text-primary-700 transition active:scale-95 shadow-sm" aria-label="Buka menu navigasi">
-                <i class="fi fi-rr-menu-burger text-base"></i>
+              <button id="site-mobile-menu-btn" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:text-primary-700 transition active:scale-95 shadow-sm shrink-0" aria-label="Buka menu navigasi">
+                <i class="fi fi-rr-menu-burger text-sm sm:text-base"></i>
               </button>
             </div>
           </div>
