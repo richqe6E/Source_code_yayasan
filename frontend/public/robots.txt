@@ -14,6 +14,7 @@ Allow: /kontak.html
 Allow: /ppdb.html
 Allow: /ppdb/status.html
 Allow: /login.html
+Allow: /google*.html
 Allow: /images/
 Allow: /css/
 Allow: /js/

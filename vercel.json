@@ -53,6 +53,7 @@
   "rewrites": [
     { "source": "/robots.txt", "destination": "/frontend/public/robots.txt" },
     { "source": "/sitemap.xml", "destination": "/frontend/public/sitemap.xml" },
+    { "source": "/google65a66b7608d95bce.html", "destination": "/frontend/public/google65a66b7608d95bce.html" },
     { "source": "/favicon.ico", "destination": "/frontend/public/favicon.ico" },
     { "source": "/favicon.png", "destination": "/frontend/public/favicon.png" },
     { "source": "/apple-touch-icon.png", "destination": "/frontend/public/apple-touch-icon.png" },
