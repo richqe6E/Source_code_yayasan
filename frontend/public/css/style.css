@@ -216,3 +216,80 @@ img.has-edge-outline,
   a { color: #000; text-decoration: underline; }
   .print-break { page-break-after: always; }
 }
+
+/* ======================================================== */
+/* 6. UNIVERSAL RESPONSIVE FLUID CARD & MOBILE ADAPTIVITY   */
+/* Enables elegant scaling down for smartphones (HP/mobile) */
+/* ======================================================== */
+@media (max-width: 639px) {
+  /* Enforce zero-overflow viewport boundary */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    position: relative;
+  }
+
+  /* Universal card radius scaling: proportioned for narrow screens */
+  .rounded-3xl {
+    border-radius: 1rem !important;
+  }
+  .rounded-2xl {
+    border-radius: 0.875rem !important;
+  }
+
+  /* Adaptive card & container padding scaling: compact & thumb-friendly */
+  .p-6, .p-7, .p-8, .p-9, .p-10, .p-12 {
+    padding: 0.875rem !important;
+  }
+  .px-6, .px-7, .px-8, .px-9, .px-10, .px-12 {
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+  }
+  .py-6, .py-7, .py-8, .py-9, .py-10, .py-12 {
+    padding-top: 0.875rem !important;
+    padding-bottom: 0.875rem !important;
+  }
+
+  /* Adaptive gaps between cards and list items */
+  .gap-6, .gap-8, .gap-10, .gap-12 {
+    gap: 0.75rem !important;
+  }
+
+  /* Mobile hero spacing: compact and balanced */
+  section[class*="py-14"],
+  section[class*="py-16"],
+  section[class*="py-20"] {
+    padding-top: 1.75rem !important;
+    padding-bottom: 1.75rem !important;
+  }
+
+  /* Prevent text and element blow-out on small screens */
+  *, ::before, ::after {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  /* Linimasa & Timeline items: thumb-friendly flexible layout */
+  #ppdb-timeline-container > div {
+    padding: 0.625rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+  #ppdb-timeline-container > div > span:first-child {
+    font-size: 0.75rem !important;
+    line-height: 1.25 !important;
+  }
+  #ppdb-timeline-container > div > span:last-child {
+    font-size: 0.6875rem !important;
+    padding: 0.125rem 0.5rem !important;
+  }
+
+  /* Accordion items: clean compact borders and touch padding */
+  #accordion-persyaratan-ppdb button {
+    padding: 0.625rem 0.75rem !important;
+  }
+  #accordion-persyaratan-ppdb .accordion-content {
+    padding: 0.5rem 0.75rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}

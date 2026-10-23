@@ -76,7 +76,7 @@
       }
     };
   </script>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20261023b">
   <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
 
   <!-- Instant PPDB Period Pre-Hydration (Zero-FOUC) -->
@@ -200,23 +200,23 @@
           <!-- Stepper Buttons / Badges -->
           <div class="grid grid-cols-5 gap-1 sm:gap-2 text-center select-none">
             <button type="button" onclick="goToStep(1)" id="step-nav-1" class="flex flex-col items-center gap-1 group py-1 text-primary-700 font-bold transition min-w-0 w-full overflow-hidden">
-              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-primary-100 transition shrink-0">1</span>
+              <span class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-[11px] sm:text-xs font-bold shadow-sm ring-2 sm:ring-4 ring-primary-100 transition shrink-0">1</span>
               <span class="text-[9px] sm:text-xs font-semibold truncate w-full text-center block tracking-tight">1. Siswa</span>
             </button>
             <button type="button" onclick="goToStep(2)" id="step-nav-2" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition min-w-0 w-full overflow-hidden">
-              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition shrink-0">2</span>
+              <span class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] sm:text-xs font-bold transition shrink-0">2</span>
               <span class="text-[9px] sm:text-xs font-semibold truncate w-full text-center block tracking-tight">2. Alamat</span>
             </button>
             <button type="button" onclick="goToStep(3)" id="step-nav-3" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition min-w-0 w-full overflow-hidden">
-              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition shrink-0">3</span>
+              <span class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] sm:text-xs font-bold transition shrink-0">3</span>
               <span class="text-[9px] sm:text-xs font-semibold truncate w-full text-center block tracking-tight">3. Ortu</span>
             </button>
             <button type="button" onclick="goToStep(4)" id="step-nav-4" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition min-w-0 w-full overflow-hidden">
-              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition shrink-0">4</span>
+              <span class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] sm:text-xs font-bold transition shrink-0">4</span>
               <span class="text-[9px] sm:text-xs font-semibold truncate w-full text-center block tracking-tight">4. Berkas</span>
             </button>
             <button type="button" onclick="goToStep(5)" id="step-nav-5" class="flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition min-w-0 w-full overflow-hidden">
-              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition shrink-0">5</span>
+              <span class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] sm:text-xs font-bold transition shrink-0">5</span>
               <span class="text-[9px] sm:text-xs font-semibold truncate w-full text-center block tracking-tight">5. Review</span>
             </button>
           </div>
@@ -860,11 +860,11 @@
     </section>
 
     <!-- Persyaratan & Jadwal Penting PPDB -->
-    <div id="jadwal-linimasa" class="grid lg:grid-cols-2 gap-6 mb-10 sm:mb-12 scroll-mt-24">
+    <div id="jadwal-linimasa" class="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-10 sm:mb-12 scroll-mt-24">
       <!-- Persyaratan & Kelengkapan Berkas (Clean Minimalist Accordion) -->
-      <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-7 md:p-8 shadow-sm" id="accordion-persyaratan-ppdb">
+      <div class="bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-3.5 sm:p-7 md:p-8 shadow-sm" id="accordion-persyaratan-ppdb">
         <div class="border-b border-slate-100 pb-4 mb-4">
-          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
             <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
@@ -878,7 +878,7 @@
         <div class="border border-slate-200/80 rounded-xl overflow-hidden divide-y divide-slate-100 bg-white" id="ppdb-requirements-accordion">
           <!-- Accordion Item 1: Dokumen Pokok -->
           <div class="transition-colors" id="acc-item-1">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-1')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-1')" class="w-full px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/></svg>
@@ -889,7 +889,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content px-4 pb-4 pt-1 text-xs text-slate-600 space-y-2.5 bg-slate-50/40">
+            <div class="accordion-content px-3 sm:px-4 pb-3 sm:pb-4 pt-1 text-xs text-slate-600 space-y-2.5 bg-slate-50/40">
               <div class="flex items-start gap-2.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-1.5 shrink-0"></span>
                 <span><strong>Akta Kelahiran:</strong> Scan atau foto lembar asli yang terbaca jelas (memuat nama lengkap, tempat/tanggal lahir, dan nama orang tua).</span>
@@ -903,7 +903,7 @@
 
           <!-- Accordion Item 2: Pas Foto Siswa -->
           <div class="transition-colors" id="acc-item-2">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-2')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-2')" class="w-full px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/></svg>
@@ -914,7 +914,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content hidden px-4 pb-4 pt-1 text-xs text-slate-600 space-y-2 bg-slate-50/40">
+            <div class="accordion-content hidden px-3 sm:px-4 pb-3 sm:pb-4 pt-1 text-xs text-slate-600 space-y-2 bg-slate-50/40">
               <div class="flex items-start gap-2.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-1.5 shrink-0"></span>
                 <span>Pas foto setengah badan dengan pakaian rapi, sopan, atau busana muslim/muslimah.</span>
@@ -928,7 +928,7 @@
 
           <!-- Accordion Item 3: Batasan Usia per Jenjang -->
           <div class="transition-colors" id="acc-item-3">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-3')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-3')" class="w-full px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -939,7 +939,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content hidden px-4 pb-4 pt-1 text-xs text-slate-600 bg-slate-50/40">
+            <div class="accordion-content hidden px-3 sm:px-4 pb-3 sm:pb-4 pt-1 text-xs text-slate-600 bg-slate-50/40">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                 <div class="p-2.5 bg-white rounded-lg border border-slate-200/70">
                   <span class="font-bold text-slate-800 block">PAUD Terpadu:</span>
@@ -963,7 +963,7 @@
 
           <!-- Accordion Item 4: Fleksibilitas Berkas -->
           <div class="transition-colors" id="acc-item-4">
-            <button type="button" onclick="togglePpdbAccordion('acc-item-4')" class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
+            <button type="button" onclick="togglePpdbAccordion('acc-item-4')" class="w-full px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center justify-between text-left hover:bg-slate-50/80 transition cursor-pointer select-none">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
@@ -974,7 +974,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div class="accordion-content hidden px-4 pb-4 pt-1 text-xs text-slate-600 bg-slate-50/40">
+            <div class="accordion-content hidden px-3 sm:px-4 pb-3 sm:pb-4 pt-1 text-xs text-slate-600 bg-slate-50/40">
               <p class="leading-relaxed">
                 Anda dapat mengunggah berkas sekarang pada Langkah 4 formulir di atas, atau melengkapinya kemudian dengan login ke <strong>Portal Siswa Mandiri</strong>. Verifikator TU Yayasan akan memeriksa dokumen dan memberikan status validasi secara transparan.
               </p>
@@ -984,27 +984,27 @@
       </div>
 
       <!-- Jadwal Resmi Dinamis -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-7 md:p-8 shadow-sm">
+      <div class="bg-white border border-slate-200/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-7 md:p-8 shadow-sm">
         <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
           <i class="fi fi-rr-calendar text-primary-600"></i>
           <span id="ppdb-timeline-title">Jadwal Linimasa PPDB 2026/2027</span>
         </h3>
-        <div id="ppdb-timeline-container" class="space-y-3 text-xs">
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center gap-2.5">
+        <div id="ppdb-timeline-container" class="space-y-2.5 sm:space-y-3 text-xs">
+          <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-2">
             <span class="font-bold text-slate-800 text-xs sm:text-sm">1. Pendaftaran Online</span>
-            <span id="timeline-reg-dates" class="font-semibold text-primary-700 bg-primary-50 px-2.5 py-1 rounded-md text-xs shrink-0 whitespace-nowrap">tanggal 17</span>
+            <span id="timeline-reg-dates" class="font-semibold text-primary-700 bg-primary-50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs shrink-0 whitespace-nowrap">tanggal 17</span>
           </div>
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center gap-2.5">
+          <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-2">
             <span class="font-bold text-slate-800 text-xs sm:text-sm">2. Verifikasi Berkas TU</span>
-            <span id="timeline-verif-dates" class="text-rose-600 font-semibold bg-rose-50 px-2.5 py-1 rounded-md text-xs shrink-0 whitespace-nowrap">TUTUP</span>
+            <span id="timeline-verif-dates" class="text-rose-600 font-semibold bg-rose-50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs shrink-0 whitespace-nowrap">TUTUP</span>
           </div>
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center gap-2.5">
+          <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-2">
             <span class="font-bold text-slate-800 text-xs sm:text-sm">3. Pengumuman Kelulusan</span>
-            <span id="timeline-ann-dates" class="text-rose-600 font-semibold bg-rose-50 px-2.5 py-1 rounded-md text-xs shrink-0 whitespace-nowrap">TUTUP</span>
+            <span id="timeline-ann-dates" class="text-rose-600 font-semibold bg-rose-50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs shrink-0 whitespace-nowrap">TUTUP</span>
           </div>
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center gap-2.5">
+          <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-2">
             <span class="font-bold text-slate-800 text-xs sm:text-sm">4. Daftar Ulang &amp; Penyerahan Berkas</span>
-            <span id="timeline-rereg-dates" class="text-rose-600 font-semibold bg-rose-50 px-2.5 py-1 rounded-md text-xs shrink-0 whitespace-nowrap">TUTUP</span>
+            <span id="timeline-rereg-dates" class="text-rose-600 font-semibold bg-rose-50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs shrink-0 whitespace-nowrap">TUTUP</span>
           </div>
         </div>
         <p id="timeline-notes" class="text-xs text-slate-700 mt-3 bg-sky-50 border border-sky-100 p-3 rounded-xl font-medium">Catatan Panitia: Pendaftaran Peserta Didik Baru Gelombang Masih di Tutup. Info Selanjutnya Tanyakan Riki</p>
@@ -1082,7 +1082,7 @@
   <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../shared/js/supabase-config.js'"></script>
   <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../shared/js/api.js'"></script>
   <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
-  <script src="js/public-shell.js"></script>
+  <script src="js/public-shell.js?v=20261023b"></script>
   <script src="js/app.js"></script>
 
   <script>
@@ -1396,21 +1396,21 @@
         const badge = navBtn.querySelector('span:first-child');
         
         if (i === targetStep) {
-          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-primary-700 font-bold transition';
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-primary-700 font-bold transition min-w-0 w-full overflow-hidden';
           if (badge) {
-            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-primary-100 transition';
+            badge.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-[11px] sm:text-xs font-bold shadow-sm ring-2 sm:ring-4 ring-primary-100 transition shrink-0';
             badge.textContent = String(i);
           }
         } else if (i < targetStep) {
-          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-primary-800 font-semibold transition cursor-pointer';
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-primary-800 font-semibold transition cursor-pointer min-w-0 w-full overflow-hidden';
           if (badge) {
-            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-700 text-white flex items-center justify-center text-xs font-bold shadow-sm transition';
-            badge.innerHTML = '<i class="fi fi-rr-check text-xs"></i>';
+            badge.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-700 text-white flex items-center justify-center text-[11px] sm:text-xs font-bold shadow-sm transition shrink-0';
+            badge.innerHTML = '<i class="fi fi-rr-check text-[11px] sm:text-xs"></i>';
           }
         } else {
-          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition cursor-pointer';
+          navBtn.className = 'flex flex-col items-center gap-1 group py-1 text-slate-400 font-medium transition cursor-pointer min-w-0 w-full overflow-hidden';
           if (badge) {
-            badge.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold transition';
+            badge.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[11px] sm:text-xs font-bold transition shrink-0';
             badge.textContent = String(i);
           }
         }
