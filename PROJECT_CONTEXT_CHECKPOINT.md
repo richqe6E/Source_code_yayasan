@@ -311,3 +311,9 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
      - **Pemberian Izin Bearer Token Supabase Storage:** Menambahkan token otorisasi admin pada *header* upload Supabase Storage.
      - **Pembersihan Logika Merge pi.js:** Menghapus || sch[k] === '' agar status foto yang dikosongkan/diperbarui tidak ditimpa kembali oleh foto lama.
      - **Perbaikan Pre-Hidrasi profil.html:** Memastikan foto yang dikosongkan otomatis menyembunyikan elemen <img> dan menampilkan inisial monogram tanpa jeda.
+
+10. **Pembersihan Keterangan Usia pada Program PAUD & TPQ (profil.html):**
+    - Menghapus teks biru keterangan rentang usia di bawah judul jenjang pada Section Program Pendidikan:
+      - Menghapus PAUD: Usia 2 – 4 Tahun • TK (A/B): Usia 4 – 6 Tahun di bawah judul *PAUD & TK Terpadu*.
+      - Menghapus Santri Usia 5 – 12 Tahun di bawah judul *Taman Pendidikan Al-Qur'an (TPQ)*.
+    - Menjaga tampilan judul dan ikon jenjang pendidikan tetap rapi, simetris, dan bersih sesuai permintaan pengguna.
