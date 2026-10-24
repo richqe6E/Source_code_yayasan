@@ -451,6 +451,13 @@
         console.warn('Gagal ambil data sekolah:', err);
       }
 
+      const org = school.struktur_organisasi || {};
+      const pembinaPhoto = school.pembina_photo || org.pembina_photo || '';
+      const pengawasPhoto = school.pengawas_photo || org.pengawas_photo || '';
+      const ketuaPhoto = school.ketua_photo || school.ketua_yayasan_photo || org.ketua_photo || org.ketua_yayasan_photo || '';
+      const sekretarisPhoto = school.sekretaris_photo || org.sekretaris_photo || '';
+      const bendaharaPhoto = school.bendahara_photo || org.bendahara_photo || '';
+
       area.innerHTML = `
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm max-w-4xl">
           <div class="border-b border-gray-200 pb-4 mb-6">
@@ -567,44 +574,153 @@
               </div>
             </div>
 
-            <!-- Bagian 5: Struktur Kepengurusan Organisasi (Bagan Pohon) -->
+            <!-- Bagian 5: Struktur Kepengurusan Organisasi (5 Posisi Inti) -->
             <div class="pt-4 border-t border-gray-100">
               <div class="flex items-center justify-between mb-3">
                 <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 flex items-center gap-1.5">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                  5. Struktur Kepengurusan Organisasi (Bagan Pohon)
+                  5. Struktur Kepengurusan Organisasi (5 Posisi Inti)
                 </h4>
-                <span class="text-[11px] font-semibold text-gray-500">Tampil Otomatis di Profil</span>
+                <span class="text-[11px] font-semibold text-gray-500">Tampil Otomatis di Profil Website</span>
               </div>
+              <p class="text-xs text-gray-500 mb-4">Kelola nama dan upload foto resmi untuk 5 pimpinan inti yayasan. Foto akan tampil di bagan pohon halaman profil publik.</p>
+              
               <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Dewan Pembina Yayasan</label>
-                  <input id="sch-pembina" type="text" value="${school.pembina || 'DJOKO IRIANDONO'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                <!-- 1. Dewan Pembina -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Dewan Pembina Yayasan</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2.5">
+                      <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white shrink-0 flex items-center justify-center relative shadow-xs">
+                        <img id="sch-pembina-preview" src="${pembinaPhoto}" alt="Dewan Pembina" class="w-full h-full object-cover ${pembinaPhoto ? '' : 'hidden'}">
+                        <div id="sch-pembina-monogram" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-sm ${pembinaPhoto ? 'hidden' : ''}">DI</div>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <input id="sch-pembina" type="text" value="${school.pembina || 'DJOKO IRIANDONO'}" class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-primary-500" placeholder="Nama Lengkap & Gelar">
+                        <input type="hidden" id="sch-pembina-photo" value="${pembinaPhoto}">
+                        <input type="file" id="sch-pembina-file" accept="image/*" class="hidden" onchange="handlePengurusPhoto(event, 'pembina')">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 pt-2 border-t border-slate-200/80">
+                    <button type="button" onclick="document.getElementById('sch-pembina-file').click()" class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded bg-white text-primary-700 border border-primary-200 hover:bg-primary-50 transition shadow-2xs">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Ganti / Upload Foto
+                    </button>
+                    <button type="button" id="sch-pembina-del-btn" onclick="clearPengurusPhoto('pembina')" class="${pembinaPhoto ? '' : 'hidden'} px-2 py-1 text-[11px] font-semibold rounded bg-white text-red-600 border border-red-200 hover:bg-red-50 transition shadow-2xs">Hapus</button>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Dewan Pengawas Yayasan</label>
-                  <input id="sch-pengawas" type="text" value="${school.pengawas || 'Suhardi'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+
+                <!-- 2. Dewan Pengawas -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Dewan Pengawas Yayasan</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2.5">
+                      <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white shrink-0 flex items-center justify-center relative shadow-xs">
+                        <img id="sch-pengawas-preview" src="${pengawasPhoto}" alt="Dewan Pengawas" class="w-full h-full object-cover ${pengawasPhoto ? '' : 'hidden'}">
+                        <div id="sch-pengawas-monogram" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-sm ${pengawasPhoto ? 'hidden' : ''}">SH</div>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <input id="sch-pengawas" type="text" value="${school.pengawas || 'Suhardi'}" class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-primary-500" placeholder="Nama Lengkap & Gelar">
+                        <input type="hidden" id="sch-pengawas-photo" value="${pengawasPhoto}">
+                        <input type="file" id="sch-pengawas-file" accept="image/*" class="hidden" onchange="handlePengurusPhoto(event, 'pengawas')">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 pt-2 border-t border-slate-200/80">
+                    <button type="button" onclick="document.getElementById('sch-pengawas-file').click()" class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded bg-white text-primary-700 border border-primary-200 hover:bg-primary-50 transition shadow-2xs">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Ganti / Upload Foto
+                    </button>
+                    <button type="button" id="sch-pengawas-del-btn" onclick="clearPengurusPhoto('pengawas')" class="${pengawasPhoto ? '' : 'hidden'} px-2 py-1 text-[11px] font-semibold rounded bg-white text-red-600 border border-red-200 hover:bg-red-50 transition shadow-2xs">Hapus</button>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Ketua Umum Yayasan *</label>
-                  <input id="sch-ketua" type="text" required value="${school.ketua_yayasan || school.headmaster_name || 'Makhrus'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+
+                <!-- 3. Ketua Umum Yayasan -->
+                <div class="p-3.5 bg-primary-50/50 border border-primary-200 rounded-xl flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-primary-800">Ketua Umum Yayasan *</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2.5">
+                      <div class="w-14 h-14 rounded-full border-2 border-primary-300 overflow-hidden bg-white shrink-0 flex items-center justify-center relative shadow-xs">
+                        <img id="sch-ketua-preview" src="${ketuaPhoto}" alt="Ketua Umum" class="w-full h-full object-cover ${ketuaPhoto ? '' : 'hidden'}">
+                        <div id="sch-ketua-monogram" class="w-full h-full flex items-center justify-center bg-primary-100 text-primary-800 font-extrabold text-sm ${ketuaPhoto ? 'hidden' : ''}">MK</div>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <input id="sch-ketua" type="text" required value="${school.ketua_yayasan || school.headmaster_name || 'Makhrus'}" class="w-full px-2.5 py-1.5 border border-primary-300 rounded-md text-xs font-semibold focus:ring-2 focus:ring-primary-500" placeholder="Nama Lengkap & Gelar">
+                        <input type="hidden" id="sch-ketua-photo" value="${ketuaPhoto}">
+                        <input type="file" id="sch-ketua-file" accept="image/*" class="hidden" onchange="handlePengurusPhoto(event, 'ketua')">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 pt-2 border-t border-primary-200/80">
+                    <button type="button" onclick="document.getElementById('sch-ketua-file').click()" class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded bg-white text-primary-700 border border-primary-200 hover:bg-primary-50 transition shadow-2xs">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Ganti / Upload Foto
+                    </button>
+                    <button type="button" id="sch-ketua-del-btn" onclick="clearPengurusPhoto('ketua')" class="${ketuaPhoto ? '' : 'hidden'} px-2 py-1 text-[11px] font-semibold rounded bg-white text-red-600 border border-red-200 hover:bg-red-50 transition shadow-2xs">Hapus</button>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Sekretaris Yayasan</label>
-                  <input id="sch-sekretaris" type="text" value="${school.sekretaris || 'Candra Gunawan'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+
+                <!-- 4. Sekretaris Yayasan -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Sekretaris Yayasan</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2.5">
+                      <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white shrink-0 flex items-center justify-center relative shadow-xs">
+                        <img id="sch-sekretaris-preview" src="${sekretarisPhoto}" alt="Sekretaris" class="w-full h-full object-cover ${sekretarisPhoto ? '' : 'hidden'}">
+                        <div id="sch-sekretaris-monogram" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-sm ${sekretarisPhoto ? 'hidden' : ''}">CG</div>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <input id="sch-sekretaris" type="text" value="${school.sekretaris || 'Candra Gunawan'}" class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-primary-500" placeholder="Nama Lengkap & Gelar">
+                        <input type="hidden" id="sch-sekretaris-photo" value="${sekretarisPhoto}">
+                        <input type="file" id="sch-sekretaris-file" accept="image/*" class="hidden" onchange="handlePengurusPhoto(event, 'sekretaris')">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 pt-2 border-t border-slate-200/80">
+                    <button type="button" onclick="document.getElementById('sch-sekretaris-file').click()" class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded bg-white text-primary-700 border border-primary-200 hover:bg-primary-50 transition shadow-2xs">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Ganti / Upload Foto
+                    </button>
+                    <button type="button" id="sch-sekretaris-del-btn" onclick="clearPengurusPhoto('sekretaris')" class="${sekretarisPhoto ? '' : 'hidden'} px-2 py-1 text-[11px] font-semibold rounded bg-white text-red-600 border border-red-200 hover:bg-red-50 transition shadow-2xs">Hapus</button>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Bendahara Yayasan</label>
-                  <input id="sch-bendahara" type="text" value="${school.bendahara || 'Sri Pragawati'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+
+                <!-- 5. Bendahara Yayasan -->
+                <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Bendahara Yayasan</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2.5">
+                      <div class="w-14 h-14 rounded-full border-2 border-slate-300 overflow-hidden bg-white shrink-0 flex items-center justify-center relative shadow-xs">
+                        <img id="sch-bendahara-preview" src="${bendaharaPhoto}" alt="Bendahara" class="w-full h-full object-cover ${bendaharaPhoto ? '' : 'hidden'}">
+                        <div id="sch-bendahara-monogram" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-sm ${bendaharaPhoto ? 'hidden' : ''}">SP</div>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <input id="sch-bendahara" type="text" value="${school.bendahara || 'Sri Pragawati'}" class="w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-primary-500" placeholder="Nama Lengkap & Gelar">
+                        <input type="hidden" id="sch-bendahara-photo" value="${bendaharaPhoto}">
+                        <input type="file" id="sch-bendahara-file" accept="image/*" class="hidden" onchange="handlePengurusPhoto(event, 'bendahara')">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 pt-2 border-t border-slate-200/80">
+                    <button type="button" onclick="document.getElementById('sch-bendahara-file').click()" class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded bg-white text-primary-700 border border-primary-200 hover:bg-primary-50 transition shadow-2xs">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Ganti / Upload Foto
+                    </button>
+                    <button type="button" id="sch-bendahara-del-btn" onclick="clearPengurusPhoto('bendahara')" class="${bendaharaPhoto ? '' : 'hidden'} px-2 py-1 text-[11px] font-semibold rounded bg-white text-red-600 border border-red-200 hover:bg-red-50 transition shadow-2xs">Hapus</button>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Kepala Sekolah PAUD / TK</label>
-                  <input id="sch-head-paud-tk" type="text" value="${(school.struktur_organisasi && school.struktur_organisasi.kepala_paud_tk) || 'Kepala Sekolah PAUD/TK'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1">Kepala / Koordinator TPQ</label>
-                  <input id="sch-head-tpq" type="text" value="${(school.struktur_organisasi && school.struktur_organisasi.kepala_tpq) || 'Koordinator TPQ Al-Qur\'an'}" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
-                </div>
+
               </div>
             </div>
 
@@ -677,14 +793,24 @@
           sekretaris: document.getElementById('sch-sekretaris').value.trim(),
           bendahara: document.getElementById('sch-bendahara').value.trim(),
           headmaster_name: document.getElementById('sch-ketua').value.trim(),
+          pembina_photo: document.getElementById('sch-pembina-photo') ? document.getElementById('sch-pembina-photo').value.trim() : '',
+          pengawas_photo: document.getElementById('sch-pengawas-photo') ? document.getElementById('sch-pengawas-photo').value.trim() : '',
+          ketua_photo: document.getElementById('sch-ketua-photo') ? document.getElementById('sch-ketua-photo').value.trim() : '',
+          ketua_yayasan_photo: document.getElementById('sch-ketua-photo') ? document.getElementById('sch-ketua-photo').value.trim() : '',
+          sekretaris_photo: document.getElementById('sch-sekretaris-photo') ? document.getElementById('sch-sekretaris-photo').value.trim() : '',
+          bendahara_photo: document.getElementById('sch-bendahara-photo') ? document.getElementById('sch-bendahara-photo').value.trim() : '',
           struktur_organisasi: {
             pembina: document.getElementById('sch-pembina').value.trim(),
             pengawas: document.getElementById('sch-pengawas').value.trim(),
             ketua_yayasan: document.getElementById('sch-ketua').value.trim(),
             sekretaris: document.getElementById('sch-sekretaris').value.trim(),
             bendahara: document.getElementById('sch-bendahara').value.trim(),
-            kepala_paud_tk: document.getElementById('sch-head-paud-tk') ? document.getElementById('sch-head-paud-tk').value.trim() : '',
-            kepala_tpq: document.getElementById('sch-head-tpq') ? document.getElementById('sch-head-tpq').value.trim() : ''
+            pembina_photo: document.getElementById('sch-pembina-photo') ? document.getElementById('sch-pembina-photo').value.trim() : '',
+            pengawas_photo: document.getElementById('sch-pengawas-photo') ? document.getElementById('sch-pengawas-photo').value.trim() : '',
+            ketua_photo: document.getElementById('sch-ketua-photo') ? document.getElementById('sch-ketua-photo').value.trim() : '',
+            ketua_yayasan_photo: document.getElementById('sch-ketua-photo') ? document.getElementById('sch-ketua-photo').value.trim() : '',
+            sekretaris_photo: document.getElementById('sch-sekretaris-photo') ? document.getElementById('sch-sekretaris-photo').value.trim() : '',
+            bendahara_photo: document.getElementById('sch-bendahara-photo') ? document.getElementById('sch-bendahara-photo').value.trim() : ''
           }
         };
 
@@ -716,6 +842,12 @@
                 ketua_yayasan: payload.ketua_yayasan,
                 sekretaris: payload.sekretaris,
                 bendahara: payload.bendahara,
+                pembina_photo: payload.pembina_photo,
+                pengawas_photo: payload.pengawas_photo,
+                ketua_photo: payload.ketua_photo,
+                ketua_yayasan_photo: payload.ketua_yayasan_photo,
+                sekretaris_photo: payload.sekretaris_photo,
+                bendahara_photo: payload.bendahara_photo,
                 struktur_organisasi: payload.struktur_organisasi
               });
             } catch (_) {}
@@ -792,6 +924,68 @@
       showToast(res.message || 'Pesan dihapus', res.success ? 'success' : 'error');
       if (res.success) renderTab();
     }
+
+    // Helper foto pengurus (Upload to Supabase Storage & Instant Preview)
+    window.handlePengurusPhoto = async function(e, key) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 3 * 1024 * 1024) {
+        showToast('Ukuran foto pengurus maksimal 3MB', 'error');
+        e.target.value = '';
+        return;
+      }
+
+      // 1. Instant Local Preview via FileReader
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const dataUrl = evt.target.result;
+        const img = document.getElementById(`sch-${key}-preview`);
+        const mono = document.getElementById(`sch-${key}-monogram`);
+        const hidden = document.getElementById(`sch-${key}-photo`);
+        const delBtn = document.getElementById(`sch-${key}-del-btn`);
+        if (img) {
+          img.src = dataUrl;
+          img.classList.remove('hidden');
+        }
+        if (mono) mono.classList.add('hidden');
+        if (hidden) hidden.value = dataUrl;
+        if (delBtn) delBtn.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+
+      // 2. Asynchronous Upload to Supabase Storage
+      try {
+        if (typeof window.uploadToSupabaseStorage === 'function') {
+          const ext = file.name.split('.').pop() || 'png';
+          const cleanName = `pengurus_${key}_${Date.now()}.${ext}`;
+          const url = await window.uploadToSupabaseStorage(file, cleanName);
+          if (url) {
+            const hidden = document.getElementById(`sch-${key}-photo`);
+            if (hidden) hidden.value = url;
+          }
+        }
+      } catch (err) {
+        console.warn(`Gagal upload foto ${key} ke Storage, menggunakan pratinjau Base64:`, err);
+      }
+    };
+
+    window.clearPengurusPhoto = function(key) {
+      const img = document.getElementById(`sch-${key}-preview`);
+      const mono = document.getElementById(`sch-${key}-monogram`);
+      const hidden = document.getElementById(`sch-${key}-photo`);
+      const delBtn = document.getElementById(`sch-${key}-del-btn`);
+      const fileInput = document.getElementById(`sch-${key}-file`);
+
+      if (img) {
+        img.src = '';
+        img.classList.add('hidden');
+      }
+      if (mono) mono.classList.remove('hidden');
+      if (hidden) hidden.value = '';
+      if (delBtn) delBtn.classList.add('hidden');
+      if (fileInput) fileInput.value = '';
+    };
 
     renderTab();
   </script>

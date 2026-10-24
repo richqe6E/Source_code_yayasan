@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 23 Oktober 2026 (Sesi 54 - Remediasi Logika Portal Admin & Siswa, Decommissioning Legacy Role Ortu, dan Restorasi Navigasi Sticky)
+**Terakhir Diperbarui:** 24 Oktober 2026 (Sesi 55 - Redesain Struktur Organisasi & Integrasi Upload Foto Wajah Pengurus: Eliminasi Total Kepala PAUD/TK & Koordinator TPQ, 5 Posisi Inti, Upload Foto Admin Portal, dan Zero-FOUC Pre-Hydration Profil Publik)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -252,3 +252,19 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Git Commit: `2d3dbb5` di branch `main` GitHub (`origin/main`).
    - Vercel: 100% aktif ter-deploy di `https://siyayasan.vercel.app`.
    - Status Working Tree: Bersih (`working tree clean`).
+
+### 🔹 J. Redesain Struktur Organisasi & Integrasi Upload Foto Pengurus (Sesi 55 — 24 Oktober 2026)
+1. **Eliminasi Total Kepala PAUD/TK & Koordinator TPQ:**
+   - Menghapus 2 posisi pelaksana teknis (Kepala Sekolah PAUD/TK dan Koordinator TPQ) dari form input Admin Portal (`content.html`) dan tampilan Bagan Pohon di Profil Publik (`profil.html`).
+   - Menghapus percabangan Tier 4 pada Desktop Architectural Tree dan Mobile Vertical Stepper.
+2. **5 Posisi Pimpinan Inti Yayasan:**
+   - Struktur kepengurusan resmi difokuskan pada 5 posisi inti: Dewan Pembina (DJOKO IRIANDONO), Dewan Pengawas (Suhardi), Ketua Umum (Makhrus), Sekretaris (Candra Gunawan), dan Bendahara (Sri Pragawati).
+3. **Fitur Upload & Manajemen Foto Pengurus di Portal Admin (`content.html`):**
+   - Membuat kartu manajemen foto & nama untuk ke-5 pengurus dengan circular preview, tombol file picker, tombol hapus foto, serta upload asinkron ke Supabase Storage (`siyayasan-uploads`) dengan fallback Base64 Data URL.
+   - Menyimpan URL foto (`pembina_photo`, `pengawas_photo`, `ketua_photo`/`ketua_yayasan_photo`, `sekretaris_photo`, `bendahara_photo`) ke `schools` dan `web_settings` via `api.js`.
+4. **Tampilan Dinamis & Monogram Fallback di Profil Publik (`profil.html`):**
+   - Menampilkan foto pengurus beresolusi proporsional di tengah kartu pohon organisasi desktop dan thumbnail stepper mobile.
+   - Jika foto belum diunggah, otomatis menampilkan monogram inisial nama yang elegan (`DI`, `SH`, `MK`, `CG`, `SP`).
+   - Menerapkan instant pre-hydration script di `<head>` membaca `siy_school_ext` untuk mencegah jeda/kedipan gambar (*Zero-FOUC*).
+5. **Zero-Regression & Sticky Header Preserved:**
+   - Memastikan navigasi website tetap menempel (*sticky*) tanpa ada penambahan `overflow-x: hidden` pada `html, body`. Seluruh modul portal admin, siswa, dan CMS website tetap bekerja normal dan stabil.

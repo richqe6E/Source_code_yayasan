@@ -107,6 +107,36 @@
           const el = document.getElementById('profil-budaya');
           if (el) el.textContent = d.budaya;
         }
+
+        // Instant Leadership Pre-Hydration (Zero-FOUC for 5 Core Leaders)
+        const org = d.struktur_organisasi || {};
+        const setOrg = (cls, val) => {
+          document.querySelectorAll('.' + cls).forEach(el => el.textContent = val);
+        };
+        const setPhoto = (key, url) => {
+          if (!url) return;
+          const img = document.getElementById('org-' + key + '-img');
+          const fb = document.getElementById('org-' + key + '-fallback');
+          const mImg = document.getElementById('m-org-' + key + '-img');
+          const mFb = document.getElementById('m-org-' + key + '-fallback');
+          if (img) { img.src = url; img.classList.remove('hidden'); }
+          if (fb) fb.classList.add('hidden');
+          if (mImg) { mImg.src = url; mImg.classList.remove('hidden'); }
+          if (mFb) mFb.classList.add('hidden');
+        };
+
+        if (d.pembina) setOrg('org-pembina', d.pembina);
+        if (d.pengawas) setOrg('org-pengawas', d.pengawas);
+        const ketua = d.ketua_yayasan || d.headmaster_name;
+        if (ketua) setOrg('org-ketua', ketua);
+        if (d.sekretaris) setOrg('org-sekretaris', d.sekretaris);
+        if (d.bendahara) setOrg('org-bendahara', d.bendahara);
+
+        setPhoto('pembina', d.pembina_photo || org.pembina_photo);
+        setPhoto('pengawas', d.pengawas_photo || org.pengawas_photo);
+        setPhoto('ketua', d.ketua_photo || d.ketua_yayasan_photo || org.ketua_photo || org.ketua_yayasan_photo);
+        setPhoto('sekretaris', d.sekretaris_photo || org.sekretaris_photo);
+        setPhoto('bendahara', d.bendahara_photo || org.bendahara_photo);
       } catch (_) {}
     })();
   </script>
@@ -325,8 +355,11 @@
           <!-- TIER 1: Dewan Pembina (Puncak Kebijakan) -->
           <div class="flex flex-col items-center">
             <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all text-center w-80 group">
-              <div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200/90 text-slate-800 font-extrabold text-sm flex items-center justify-center mx-auto mb-3 shadow-2xs group-hover:bg-slate-800 group-hover:text-white transition-colors">
-                <span>DI</span>
+              <div class="relative mx-auto mb-3 w-16 h-16 flex items-center justify-center">
+                <img id="org-pembina-img" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Dewan Pembina">
+                <div id="org-pembina-fallback" class="w-12 h-12 rounded-full bg-slate-100 border border-slate-200/90 text-slate-800 font-extrabold text-sm flex items-center justify-center shadow-2xs group-hover:bg-slate-800 group-hover:text-white transition-colors">
+                  <span id="org-pembina-initial">DI</span>
+                </div>
               </div>
               <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Dewan Pembina Yayasan</div>
               <h3 class="org-pembina text-base font-extrabold text-slate-900 tracking-tight" id="org-pembina">DJOKO IRIANDONO</h3>
@@ -350,8 +383,11 @@
               <div class="flex flex-col items-center w-72">
                 <div class="w-0.5 h-6 bg-slate-300"></div>
                 <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-600 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                  <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center mx-auto mb-2.5 shadow-2xs group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                    <span>SH</span>
+                  <div class="relative mx-auto mb-2.5 w-14 h-14 flex items-center justify-center">
+                    <img id="org-pengawas-img" class="w-14 h-14 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Dewan Pengawas">
+                    <div id="org-pengawas-fallback" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center shadow-2xs group-hover:bg-slate-700 group-hover:text-white transition-colors">
+                      <span id="org-pengawas-initial">SH</span>
+                    </div>
                   </div>
                   <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Dewan Pengawas</div>
                   <h3 class="org-pengawas text-sm font-bold text-slate-900 tracking-tight" id="org-pengawas">Suhardi</h3>
@@ -363,8 +399,11 @@
               <div class="flex flex-col items-center w-80">
                 <div class="w-0.5 h-6 bg-slate-300"></div>
                 <div class="bg-white border border-primary-200/90 border-t-4 border-t-primary-600 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all text-center w-full group ring-1 ring-primary-500/10">
-                  <div class="w-11 h-11 rounded-full bg-primary-50 border border-primary-200 text-primary-800 font-extrabold text-sm flex items-center justify-center mx-auto mb-3 shadow-2xs group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                    <span>MK</span>
+                  <div class="relative mx-auto mb-3 w-16 h-16 flex items-center justify-center">
+                    <img id="org-ketua-img" class="w-16 h-16 rounded-full object-cover border-2 border-primary-300 shadow-xs hidden" alt="Foto Ketua Umum Yayasan">
+                    <div id="org-ketua-fallback" class="w-11 h-11 rounded-full bg-primary-50 border border-primary-200 text-primary-800 font-extrabold text-sm flex items-center justify-center shadow-2xs group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                      <span id="org-ketua-initial">MK</span>
+                    </div>
                   </div>
                   <div class="text-[11px] font-bold uppercase tracking-wider text-primary-700 mb-1">Ketua Umum Yayasan</div>
                   <h3 class="org-ketua text-base font-extrabold text-slate-900 tracking-tight" id="org-ketua">Makhrus</h3>
@@ -390,8 +429,11 @@
                 <div class="flex flex-col items-center w-64">
                   <div class="w-0.5 h-6 bg-slate-300"></div>
                   <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                    <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center mx-auto mb-2 group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                      <span>CG</span>
+                    <div class="relative mx-auto mb-2 w-12 h-12 flex items-center justify-center">
+                      <img id="org-sekretaris-img" class="w-12 h-12 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Sekretaris Yayasan">
+                      <div id="org-sekretaris-fallback" class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center group-hover:bg-slate-700 group-hover:text-white transition-colors">
+                        <span id="org-sekretaris-initial">CG</span>
+                      </div>
                     </div>
                     <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Sekretaris Yayasan</div>
                     <h3 class="org-sekretaris text-sm font-bold text-slate-900 tracking-tight" id="org-sekretaris">Candra Gunawan</h3>
@@ -403,8 +445,11 @@
                 <div class="flex flex-col items-center w-64">
                   <div class="w-0.5 h-6 bg-slate-300"></div>
                   <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                    <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center mx-auto mb-2 group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                      <span>SP</span>
+                    <div class="relative mx-auto mb-2 w-12 h-12 flex items-center justify-center">
+                      <img id="org-bendahara-img" class="w-12 h-12 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Bendahara Yayasan">
+                      <div id="org-bendahara-fallback" class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center group-hover:bg-slate-700 group-hover:text-white transition-colors">
+                        <span id="org-bendahara-initial">SP</span>
+                      </div>
                     </div>
                     <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Bendahara Yayasan</div>
                     <h3 class="org-bendahara text-sm font-bold text-slate-900 tracking-tight" id="org-bendahara">Sri Pragawati</h3>
@@ -413,59 +458,22 @@
                 </div>
 
               </div>
-
-              <!-- Stem down to Unit Pelaksana Pendidikan -->
-              <div class="relative flex flex-col items-center">
-                <div class="w-0.5 h-10 bg-slate-300"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-slate-400 -mt-1 shadow-2xs"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TIER 4: Unit Pelaksana Teknis Pendidikan -->
-          <div class="w-full max-w-xl mx-auto flex flex-col items-center">
-            <div class="w-full h-0.5 bg-slate-300 -mt-1"></div>
-            <div class="w-full flex justify-between">
-              
-              <!-- Kepala PAUD & TK -->
-              <div class="flex flex-col items-center w-64">
-                <div class="w-0.5 h-6 bg-slate-300"></div>
-                <div class="bg-white border border-slate-200/90 border-t-4 border-t-primary-600 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                  <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary-50 group-hover:border-primary-300 transition-colors shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21V11M12 11C12 7.5 9.5 5 6 5C6 8.5 8.5 11 12 11ZM12 11C12 8 14.5 5.5 18 5.5C18 9 15.5 11 12 11Z"/></svg>
-                  </div>
-                  <div class="text-[10px] font-bold uppercase tracking-wider text-primary-700 mb-1">Kepala PAUD &amp; TK</div>
-                  <h3 class="org-kepala-paud-tk text-sm font-bold text-slate-900 tracking-tight" id="org-kepala-paud-tk">Kepala Sekolah PAUD/TK</h3>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Operasional Jenjang Usia Dini</p>
-                </div>
-              </div>
-
-              <!-- Koordinator TPQ -->
-              <div class="flex flex-col items-center w-64">
-                <div class="w-0.5 h-6 bg-slate-300"></div>
-                <div class="bg-white border border-slate-200/90 border-t-4 border-t-primary-600 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                  <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/80 text-primary-700 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary-50 group-hover:border-primary-300 transition-colors shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                  </div>
-                  <div class="text-[10px] font-bold uppercase tracking-wider text-primary-700 mb-1">Koordinator TPQ</div>
-                  <h3 class="org-kepala-tpq text-sm font-bold text-slate-900 tracking-tight" id="org-kepala-tpq">Koordinator TPQ Al-Qur'an</h3>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Bimbingan Al-Qur'an &amp; Tahfidz</p>
-                </div>
-              </div>
-
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- MOBILE VERTICAL STEPPER HIERARCHY (Natural vertical scroll, no horizontal overflow) -->
+      <!-- MOBILE VERTICAL STEPPER HIERARCHY (5 Core Leaders, no horizontal overflow) -->
       <div class="md:hidden space-y-4 max-w-sm mx-auto">
         
         <!-- Mobile Tier 1: Pembina -->
         <div class="bg-white border border-slate-200/90 border-l-4 border-l-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-          <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center shrink-0">
-            <span>DI</span>
+          <div class="relative w-11 h-11 shrink-0 flex items-center justify-center">
+            <img id="m-org-pembina-img" class="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Dewan Pembina">
+            <div id="m-org-pembina-fallback" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center">
+              <span>DI</span>
+            </div>
           </div>
           <div class="min-w-0">
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Dewan Pembina</span>
@@ -476,8 +484,11 @@
 
         <!-- Mobile Tier 2A: Pengawas -->
         <div class="bg-white border border-slate-200/90 border-l-4 border-l-slate-600 rounded-2xl p-4 shadow-sm flex items-center gap-3.5 ml-3">
-          <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center shrink-0">
-            <span>SH</span>
+          <div class="relative w-11 h-11 shrink-0 flex items-center justify-center">
+            <img id="m-org-pengawas-img" class="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Dewan Pengawas">
+            <div id="m-org-pengawas-fallback" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center">
+              <span>SH</span>
+            </div>
           </div>
           <div class="min-w-0">
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Dewan Pengawas</span>
@@ -488,8 +499,11 @@
 
         <!-- Mobile Tier 2B: Ketua Umum -->
         <div class="bg-white border border-primary-200 border-l-4 border-l-primary-600 rounded-2xl p-4 shadow-md flex items-center gap-3.5 ml-3">
-          <div class="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 text-primary-800 font-extrabold text-xs flex items-center justify-center shrink-0">
-            <span>MK</span>
+          <div class="relative w-11 h-11 shrink-0 flex items-center justify-center">
+            <img id="m-org-ketua-img" class="w-11 h-11 rounded-full object-cover border border-primary-200 shadow-xs hidden" alt="Ketua Umum Yayasan">
+            <div id="m-org-ketua-fallback" class="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 text-primary-800 font-extrabold text-xs flex items-center justify-center">
+              <span>MK</span>
+            </div>
           </div>
           <div class="min-w-0">
             <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 block">Ketua Umum Yayasan</span>
@@ -501,28 +515,27 @@
         <!-- Mobile Tier 3: Pengurus Harian (Sekretaris & Bendahara) -->
         <div class="grid grid-cols-2 gap-3 ml-6">
           <div class="bg-white border border-slate-200/90 border-t-3 border-t-slate-500 rounded-xl p-3 shadow-sm text-center">
-            <span class="text-[9px] font-bold uppercase text-slate-500 block mb-1">Sekretaris</span>
+            <div class="relative mx-auto mb-2 w-10 h-10 flex items-center justify-center">
+              <img id="m-org-sekretaris-img" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Sekretaris">
+              <div id="m-org-sekretaris-fallback" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] flex items-center justify-center">
+                <span>CG</span>
+              </div>
+            </div>
+            <span class="text-[9px] font-bold uppercase text-slate-500 block mb-0.5">Sekretaris</span>
             <h4 class="org-sekretaris text-xs font-bold text-slate-900 truncate">Candra Gunawan</h4>
             <p class="text-[10px] text-slate-500 truncate mt-0.5">Administrasi</p>
           </div>
+
           <div class="bg-white border border-slate-200/90 border-t-3 border-t-slate-500 rounded-xl p-3 shadow-sm text-center">
-            <span class="text-[9px] font-bold uppercase text-slate-500 block mb-1">Bendahara</span>
+            <div class="relative mx-auto mb-2 w-10 h-10 flex items-center justify-center">
+              <img id="m-org-bendahara-img" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Bendahara">
+              <div id="m-org-bendahara-fallback" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] flex items-center justify-center">
+                <span>SP</span>
+              </div>
+            </div>
+            <span class="text-[9px] font-bold uppercase text-slate-500 block mb-0.5">Bendahara</span>
             <h4 class="org-bendahara text-xs font-bold text-slate-900 truncate">Sri Pragawati</h4>
             <p class="text-[10px] text-slate-500 truncate mt-0.5">Keuangan</p>
-          </div>
-        </div>
-
-        <!-- Mobile Tier 4: Unit Pelaksana Pendidikan -->
-        <div class="grid grid-cols-2 gap-3 ml-6">
-          <div class="bg-white border border-slate-200/90 border-t-3 border-t-primary-600 rounded-xl p-3 shadow-sm text-center">
-            <span class="text-[9px] font-bold uppercase text-primary-700 block mb-1">Kepala PAUD/TK</span>
-            <h4 class="org-kepala-paud-tk text-xs font-bold text-slate-900 truncate">PAUD &amp; TK</h4>
-            <p class="text-[10px] text-slate-500 truncate mt-0.5">Usia Dini</p>
-          </div>
-          <div class="bg-white border border-slate-200/90 border-t-3 border-t-primary-600 rounded-xl p-3 shadow-sm text-center">
-            <span class="text-[9px] font-bold uppercase text-primary-700 block mb-1">Koord. TPQ</span>
-            <h4 class="org-kepala-tpq text-xs font-bold text-slate-900 truncate">TPQ Qur'an</h4>
-            <p class="text-[10px] text-slate-500 truncate mt-0.5">Tahfidz</p>
           </div>
         </div>
 
@@ -653,15 +666,63 @@
           function setOrgValue(id, val) {
             document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = val);
           }
-          if (d.pembina) setOrgValue('org-pembina', d.pembina);
-          if (d.pengawas) setOrgValue('org-pengawas', d.pengawas);
+          function getInitials(name, fallback = '') {
+            if (!name) return fallback;
+            const parts = name.trim().split(/\s+/);
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return parts[0].substring(0, 2).toUpperCase() || fallback;
+          }
+          function applyOrgPhoto(key, photoUrl) {
+            const img = document.getElementById('org-' + key + '-img');
+            const fb = document.getElementById('org-' + key + '-fallback');
+            const mImg = document.getElementById('m-org-' + key + '-img');
+            const mFb = document.getElementById('m-org-' + key + '-fallback');
+            if (photoUrl) {
+              if (img) { img.src = photoUrl; img.classList.remove('hidden'); }
+              if (fb) fb.classList.add('hidden');
+              if (mImg) { mImg.src = photoUrl; mImg.classList.remove('hidden'); }
+              if (mFb) mFb.classList.add('hidden');
+            } else {
+              if (img) { img.src = ''; img.classList.add('hidden'); }
+              if (fb) fb.classList.remove('hidden');
+              if (mImg) { mImg.src = ''; mImg.classList.add('hidden'); }
+              if (mFb) mFb.classList.remove('hidden');
+            }
+          }
+
+          if (d.pembina) {
+            setOrgValue('org-pembina', d.pembina);
+            const init = getInitials(d.pembina, 'DI');
+            document.querySelectorAll('#org-pembina-initial, #m-org-pembina-fallback span').forEach(el => el.textContent = init);
+          }
+          if (d.pengawas) {
+            setOrgValue('org-pengawas', d.pengawas);
+            const init = getInitials(d.pengawas, 'SH');
+            document.querySelectorAll('#org-pengawas-initial, #m-org-pengawas-fallback span').forEach(el => el.textContent = init);
+          }
           const ketua = d.ketua_yayasan || d.headmaster_name;
-          if (ketua) setOrgValue('org-ketua', ketua);
-          if (d.sekretaris) setOrgValue('org-sekretaris', d.sekretaris);
-          if (d.bendahara) setOrgValue('org-bendahara', d.bendahara);
+          if (ketua) {
+            setOrgValue('org-ketua', ketua);
+            const init = getInitials(ketua, 'MK');
+            document.querySelectorAll('#org-ketua-initial, #m-org-ketua-fallback span').forEach(el => el.textContent = init);
+          }
+          if (d.sekretaris) {
+            setOrgValue('org-sekretaris', d.sekretaris);
+            const init = getInitials(d.sekretaris, 'CG');
+            document.querySelectorAll('#org-sekretaris-initial, #m-org-sekretaris-fallback span').forEach(el => el.textContent = init);
+          }
+          if (d.bendahara) {
+            setOrgValue('org-bendahara', d.bendahara);
+            const init = getInitials(d.bendahara, 'SP');
+            document.querySelectorAll('#org-bendahara-initial, #m-org-bendahara-fallback span').forEach(el => el.textContent = init);
+          }
+
           const org = d.struktur_organisasi || {};
-          if (org.kepala_paud_tk) setOrgValue('org-kepala-paud-tk', org.kepala_paud_tk);
-          if (org.kepala_tpq) setOrgValue('org-kepala-tpq', org.kepala_tpq);
+          applyOrgPhoto('pembina', d.pembina_photo || org.pembina_photo);
+          applyOrgPhoto('pengawas', d.pengawas_photo || org.pengawas_photo);
+          applyOrgPhoto('ketua', d.ketua_photo || d.ketua_yayasan_photo || org.ketua_photo || org.ketua_yayasan_photo);
+          applyOrgPhoto('sekretaris', d.sekretaris_photo || org.sekretaris_photo);
+          applyOrgPhoto('bendahara', d.bendahara_photo || org.bendahara_photo);
         }
 
         if (ppdbRes && ppdbRes.success && ppdbRes.data) {
