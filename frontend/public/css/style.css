@@ -1,9 +1,11 @@
 /* SIYAYASAN - Shared styles (Aligned with jakubkrehel/skills: better-interface, better-ui, better-typography, better-colors) */
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: smooth !important;
+  scroll-padding-top: 5.5rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ======================================================== */
@@ -210,4 +212,53 @@ img.has-edge-outline,
   .card, .border, .shadow { border: 1px solid #ddd !important; box-shadow: none !important; }
   a { color: #000; text-decoration: underline; }
   .print-break { page-break-after: always; }
+}
+
+
+/* ======================================================== */
+/* 5. SCROLL REVEAL & COMFORTABLE SMOOTH SCROLLING          */
+/* ======================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.blur-reveal {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(28px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1), filter 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+}
+
+.blur-reveal.active {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
+
+.delay-75  { transition-delay: 75ms; }
+.delay-100 { transition-delay: 100ms; }
+.delay-150 { transition-delay: 150ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  .reveal, .blur-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
 }

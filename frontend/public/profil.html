@@ -157,7 +157,7 @@
   <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-14 sm:py-20 relative overflow-hidden">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 text-balance">
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 text-balance blur-reveal">
         Profil Yayasan At Tarbiyyah Wijaya Kusuma
       </h1>
       <p class="text-base sm:text-lg text-primary-100 max-w-2xl mx-auto leading-relaxed text-pretty">
@@ -170,7 +170,7 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-16">
 
     <!-- Section 1: Tentang Yayasan & Kalimat Pengantar -->
-    <section class="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm">
+    <section class="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm reveal">
       <div class="max-w-4xl mx-auto space-y-6">
         <div>
           <span class="block text-xs font-bold uppercase tracking-widest text-primary-700 mb-1">
@@ -340,7 +340,7 @@
     </section>
 
     <!-- Section 3.5: Struktur Inti Pengurus Yayasan (Executive Leadership Cards) -->
-    <section class="bg-slate-50/80 border border-slate-200/90 rounded-3xl p-6 sm:p-12 shadow-sm" id="struktur-organisasi">
+    <section class="bg-slate-50/80 border border-slate-200/90 rounded-3xl p-6 sm:p-12 shadow-sm reveal" id="struktur-organisasi">
       <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight text-balance">
           Struktur Kepengurusan Yayasan
@@ -425,7 +425,7 @@
     </section>
 
     <!-- Section 4: Legalitas & Akreditasi Resmi -->
-    <section class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm">
+    <section class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm reveal">
       <div class="mb-6 pb-4 border-b border-slate-100">
         <h2 class="text-xl font-bold text-slate-900">Legalitas &amp; Perizinan Resmi</h2>
         <p class="text-xs text-slate-500 mt-1">Lembaga terdaftar secara sah di Kementerian Hukum dan HAM serta Dinas Pendidikan.</p>
@@ -638,6 +638,7 @@
       document.addEventListener('DOMContentLoaded', loadProfilePageData);
     } else {
       loadProfilePageData();
+      if (typeof window.initScrollReveal === "function") window.initScrollReveal();
     }
   </script>
 </body>

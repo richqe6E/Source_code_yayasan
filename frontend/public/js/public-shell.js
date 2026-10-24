@@ -668,6 +668,48 @@
 
     // Hydrate dynamic school profile
     fetchAndHydrateSchool();
+
+    // Universal Scroll Reveal Initializer (Smooth scroll animation across all public pages)
+    initScrollReveal();
   };
   window.hydrateSchoolData = fetchAndHydrateSchool;
+
+  // Universal Scroll Reveal Initializer (Comfortable & smooth scroll effect across all public pages)
+  function initScrollReveal() {
+    if (typeof window === 'undefined') return;
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelectorAll('.reveal, .blur-reveal').forEach(el => el.classList.add('active'));
+      return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal, .blur-reveal').forEach(el => el.classList.add('active'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.08,
+      rootMargin: '0px 0px -30px 0px'
+    });
+
+    document.querySelectorAll('.reveal, .blur-reveal').forEach(el => {
+      observer.observe(el);
+    });
+  }
+
+  window.initScrollReveal = initScrollReveal;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initScrollReveal);
+  } else {
+    initScrollReveal();
+  }
 })();

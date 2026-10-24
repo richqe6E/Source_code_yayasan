@@ -86,7 +86,7 @@
   <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     <!-- Category Filter Bar (Client-Side Instant Filter) -->
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-200">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-200 reveal">
       <div class="flex flex-wrap items-center gap-2" id="category-filters">
         <button onclick="filterCategory('all', this)" class="category-btn active px-4 py-2 text-xs font-bold rounded-lg bg-primary-600 text-white shadow-sm transition active:scale-[0.98]">
           Semua Berita
@@ -110,7 +110,7 @@
     </div>
 
     <!-- News Grid -->
-    <div id="news-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+    <div id="news-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 reveal delay-100">
       <!-- Loading Skeleton Cards -->
       <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden p-4 space-y-4 animate-pulse">
         <div class="aspect-video bg-slate-200 rounded-xl"></div>

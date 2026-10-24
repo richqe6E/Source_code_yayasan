@@ -317,3 +317,13 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
       - Menghapus PAUD: Usia 2 – 4 Tahun • TK (A/B): Usia 4 – 6 Tahun di bawah judul *PAUD & TK Terpadu*.
       - Menghapus Santri Usia 5 – 12 Tahun di bawah judul *Taman Pendidikan Al-Qur'an (TPQ)*.
     - Menjaga tampilan judul dan ikon jenjang pendidikan tetap rapi, simetris, dan bersih sesuai permintaan pengguna.
+
+11. **Penerapan Efek Smooth & Comfortable Scroll di Seluruh Halaman Publik Website:**
+    - **Sistem Animasi Scroll Reveal Universal (style.css & public-shell.js):**
+      - Mengadopsi efek scroll beranda utama (index.html) ke seluruh halaman publik (profil.html, erita.html, genda.html, pengumuman.html, galeri.html, kontak.html, ppdb.html).
+      - Menyematkan kelas .reveal dan .blur-reveal dengan kurva easing premium cubic-bezier(0.16, 1, 0.3, 1) sehingga elemen dan kartu meluncur naik secara halus dan nyaman saat digulir (*scroll*).
+      - Menghubungkan IntersectionObserver universal pada public-shell.js yang otomatis aktif di seluruh halaman publik tanpa jeda.
+    - **Inersia & Momentum Scrolling:**
+      - Menetapkan scroll-behavior: smooth !important dan scroll-padding-top: 5.5rem agar navigasi anchor tidak terpotong oleh bilah sticky header.
+      - Menambahkan -webkit-overflow-scrolling: touch untuk kenyamanan navigasi di perangkat sentuh/iOS.
+      - Mendukung *accessibility* dengan prefers-reduced-motion untuk pengunjung yang mematikan animasi gerak.
