@@ -163,11 +163,13 @@
     try {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timeoutId = controller ? setTimeout(() => controller.abort(), 25000) : null;
+      const token = getToken();
+      const authHeader = token ? `Bearer ${token}` : `Bearer ${API_KEY}`;
       const res = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
           'apikey': API_KEY,
-          'Authorization': `Bearer ${API_KEY}`,
+          'Authorization': authHeader,
           'Content-Type': contentType,
           'x-upsert': 'true'
         },
@@ -2990,10 +2992,10 @@
           }
 
           for (const [k, v] of Object.entries(wsExt)) {
-            if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+            if (sch[k] === undefined || sch[k] === null) sch[k] = v;
           }
           for (const [k, v] of Object.entries(schExt)) {
-            if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+            if (sch[k] === undefined || sch[k] === null) sch[k] = v;
           }
           if (sch.school_name && !sch.name) sch.name = sch.school_name;
           if (sch.name && !sch.school_name) sch.school_name = sch.name;
@@ -3008,7 +3010,7 @@
             if (cachedExt) {
               const parsedLocal = JSON.parse(cachedExt);
               for (const [k, v] of Object.entries(parsedLocal)) {
-                if (sch[k] === undefined || sch[k] === null || sch[k] === '') sch[k] = v;
+                if (sch[k] === undefined || sch[k] === null) sch[k] = v;
               }
             }
           } catch (_) {}

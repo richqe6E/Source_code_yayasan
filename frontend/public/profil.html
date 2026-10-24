@@ -114,11 +114,15 @@
           document.querySelectorAll('.' + cls).forEach(el => el.textContent = val);
         };
         const setPhoto = (key, url) => {
-          if (!url) return;
           const img = document.getElementById('org-' + key + '-img');
           const fb = document.getElementById('org-' + key + '-fallback');
-          if (img) { img.src = url; img.classList.remove('hidden'); }
-          if (fb) fb.classList.add('hidden');
+          if (url) {
+            if (img) { img.src = url; img.classList.remove('hidden'); }
+            if (fb) fb.classList.add('hidden');
+          } else {
+            if (img) { img.src = ''; img.classList.add('hidden'); }
+            if (fb) fb.classList.remove('hidden');
+          }
         };
 
         if (d.pembina_jabatan || org.pembina_jabatan) setOrg('org-pembina-jabatan', d.pembina_jabatan || org.pembina_jabatan);

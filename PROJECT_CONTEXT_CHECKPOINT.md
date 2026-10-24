@@ -298,3 +298,16 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - **Sinkronisasi Data Dua Arah (pi.js):**
      - Memperluas payload schools.update dan web_settings.update untuk menyimpan secara persisten kolom jabatan (pembina_jabatan, pengawas_jabatan, ketua_jabatan, sekretaris_jabatan, endahara_jabatan) bersama foto dan nama pejabat.
      - Terintegrasi penuh ke Supabase dan caching sinkron lintas sesi.
+
+9. **Perbaikan & Optimalisasi Upload/Ganti Foto Pengurus Inti (content.html, pi.js, profil.html):**
+   - **Akar Masalah Foto Tidak Bisa Diganti/Diperbarui:**
+     1. *Batas Ukuran File (3MB):* Foto kamera smartphone modern umumnya berukuran 3.5MB - 10MB sehingga tertolak otomatis oleh validasi mentah client-side tanpa kompresi.
+     2. *Payload Size & Quota Exceeded:* Foto mentah yang dikonversi ke Base64 tanpa kompresi menghasilkan data > 3MB, melampaui batas PostgREST Supabase (HTTP 413) serta kuota browser localStorage (5MB), menyebabkan data baru gagal tersimpan di database dan cache.
+     3. *Race Condition:* FileReader async menimpa URL cloud storage, dan klik ulang input file tidak memicu onchange jika file yang dipilih sama.
+     4. *Logika Fallback Revert:* Pada schools.get, pengecekan sch[k] === '' memulihkan foto lama (seperti foto nyamuk) dari baris lain secara otomatis.
+   - **Solusi Komprehensif yang Diimplementasikan:**
+     - **Kompresi Gambar Otomatis Klien (HTML5 Canvas):** Mendukung unggahan file foto hingga 15MB. Foto secara otomatis di-*resize* ke resolusi optimal 600x600 px (JPEG 0.85) dengan ukuran super ringan (~30KB - 60KB), tajam, tanpa lag, dan 100% aman masuk ke database maupun storage.
+     - **Feedback Visual & Status Unggah:** Menampilkan indikator status *real-time* (Foto siap disimpan, Mengunggah ke Cloud Storage..., dsb.) serta opsi **Input URL** jika admin ingin menggunakan tautan foto eksternal langsung.
+     - **Pemberian Izin Bearer Token Supabase Storage:** Menambahkan token otorisasi admin pada *header* upload Supabase Storage.
+     - **Pembersihan Logika Merge pi.js:** Menghapus || sch[k] === '' agar status foto yang dikosongkan/diperbarui tidak ditimpa kembali oleh foto lama.
+     - **Perbaikan Pre-Hidrasi profil.html:** Memastikan foto yang dikosongkan otomatis menyembunyikan elemen <img> dan menampilkan inisial monogram tanpa jeda.
