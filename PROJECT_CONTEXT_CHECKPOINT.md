@@ -272,3 +272,8 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Mengganti teks pembuka hero lama (*"Membangun Generasi Cerdas..."*) menjadi kalimat penyambut hangat dan langsung: *"Selamat Datang di Website Resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda"*.
    - Menyederhanakan sub-judul pengantar menjadi ringkas, profesional, dan padat: *"Pusat sistem informasi daring terpadu untuk layanan PPDB online, administrasi, serta seluruh informasi resmi jenjang PAUD Terpadu, TK, dan TPQ"*.
    - Menghapus badge/kicker pill buatan ("Portal Layanan...") guna mematuhi larangan keras terhadap pola AI-slop, menjaga tipografi tetap bersih, anggun, dan langsung terpusat pada judul penyambut utama.
+7. **Fitur Tombol Bantuan WhatsApp Melayang (*Floating WhatsApp Support Button*) (`public-shell.js`):**
+   - Menambahkan tombol melayang WhatsApp resmi (`#25D366`, ikon squircle rounded sesuai standar aplikasi WhatsApp) di pojok kanan bawah (`fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50`).
+   - Selalu terlihat (*persistent across scroll*) saat pengunjung menjelajahi beranda dan seluruh halaman publik website.
+   - Mengarahkan pengunjung secara otomatis ke chat WhatsApp admin resmi yayasan (`081347142829`) dengan teks pembuka ramah seputar bantuan PPDB, administrasi, dan informasi lembaga.
+   - Terhubung dinamis dengan sinkronisasi nomor WhatsApp di database (`schools` / `web_settings`).
