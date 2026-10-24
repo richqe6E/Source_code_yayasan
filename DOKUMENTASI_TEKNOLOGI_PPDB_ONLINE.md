@@ -285,3 +285,4 @@ Saat calon pendaftar menekan tombol kirim formulir di `ppdb.html`, sistem melaku
 
 ---
 *Dokumentasi ini disusun secara komprehensif sebagai acuan teknis pemeliharaan, pengembangan fitur, dan audit kualitas sistem informasi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda.*
+

@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 23 Oktober 2026 — Sesi 53 (Verifikasi Google Search Console, Optimasi Mobile PageSpeed & Eliminasi Zero-FOUC Lintas Halaman - Selesai & Terverifikasi)*
+*Terakhir Diperbarui: 24 Oktober 2026 — Sesi 55 (Rombak Struktur Foto Pengurus, Universal Smooth Scroll, Tombol WA Melayang & Dokumentasi PPDB Online - Selesai & Terverifikasi)*
 
 ---
 
@@ -1754,6 +1754,24 @@ Mendaftarkan dan memverifikasi website ke Google Search Console, mengoptimasi as
    - Menghapus seluruh ikon centang biru (`fi-rr-check` & SVG checkmark) pada kartu Misi Utama dan Program Pendidikan PAUD, TK, TPQ di `profil.html` dan `index.html`.
    - Menggantinya dengan penanda titik piringan mikro proporsional (`w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0`) yang tenang, rapi, lapang, dan bebas polusi visual.
    - Menjaga 100% integritas logika kode dan ID binding CMS (`home-program-paud`, `profil-program-paud-tk`, dll.) serta membiarkan data teks database tetap utuh sesuai input admin.
+
+---
+
+### 🗓️ Sesi 54 & 55 — Rombak Struktur Foto Pengurus Yayasan, Universal Smooth Scroll, Tombol WA Melayang & Dokumentasi PPDB Online (24 Oktober 2026)
+
+**Pekerjaan:**
+1. Rombak total struktur pengurus yayasan: eliminasi Kepala PAUD/TK & Koordinator TPQ, fokus 5 pimpinan inti (Pembina, Pengawas, Ketua Umum, Sekretaris, Bendahara), hilangkan format diagram pohon menjadi kartu foto eksekutif murni (3 elemen: Jabatan di atas, Foto di tengah, Nama di bawah).
+2. Perbaikan sistem unggah foto pengurus di portal admin (`content.html` & `api.js`): implementasi kompresi otomatis sisi klien (HTML5 Canvas 600x600 px ~40KB), feedback status visual, dan pembersihan logika fallback merge `sch[k] === ''`.
+3. Penyempurnaan copywriting Beranda (`index.html`): judul pembuka penyambut hangat resmi yayasan, sub-judul ringkas profesional, serta penghapusan pill badge AI-slop.
+4. Fitur tombol melayang WhatsApp (*Floating WhatsApp Support Button*) di seluruh halaman publik website (`public-shell.js`) terhubung ke kontak admin yayasan.
+5. Pembersihan keterangan rentang usia berwarna biru pada kartu program PAUD & TPQ di `profil.html`.
+6. Implementasi universal smooth scrolling (`scroll-behavior: smooth !important`, `scroll-padding-top: 5.5rem`, `-webkit-overflow-scrolling: touch`) dan scroll reveal animation (`.reveal`, `.blur-reveal`, `IntersectionObserver`) di seluruh halaman publik.
+7. Penyusunan dokumen resmi arsitektur dan teknologi PPDB Online terpadu: `DOKUMENTASI_TEKNOLOGI_PPDB_ONLINE.md`.
+
+**Verifikasi & Status Produksi:**
+- Commit Git: `d25dc7d`, `e88c881`, `d04cb59`, `e7f10a2` di branch `main`.
+- Vercel: 100% aktif ter-deploy di `https://siyayasan.vercel.app`.
+- Status Working Tree: Bersih (`working tree clean`).
 
 ## 6. 📁 Struktur File Penting
 
