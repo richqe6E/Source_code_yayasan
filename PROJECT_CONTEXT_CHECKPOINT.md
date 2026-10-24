@@ -268,3 +268,7 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Menerapkan instant pre-hydration script di `<head>` membaca `siy_school_ext` untuk mencegah jeda/kedipan gambar (*Zero-FOUC*).
 5. **Zero-Regression & Sticky Header Preserved:**
    - Memastikan navigasi website tetap menempel (*sticky*) tanpa ada penambahan `overflow-x: hidden` pada `html, body`. Seluruh modul portal admin, siswa, dan CMS website tetap bekerja normal dan stabil.
+6. **Penyempurnaan Hero Headline & Copywriting Beranda (`index.html`):**
+   - Mengganti teks pembuka hero lama (*"Membangun Generasi Cerdas..."*) menjadi kalimat penyambut hangat dan langsung: *"Selamat Datang di Website Resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda"*.
+   - Menyederhanakan sub-judul pengantar menjadi ringkas, profesional, dan padat: *"Pusat sistem informasi daring terpadu untuk layanan PPDB online, administrasi, serta seluruh informasi resmi jenjang PAUD Terpadu, TK, dan TPQ"*.
+   - Menyertakan badge *"Portal Layanan & Sistem Informasi Daring"* agar pengunjung langsung memahami identitas dan fungsi website dalam hitungan detik saat pertama kali membuka.
