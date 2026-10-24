@@ -277,3 +277,24 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
    - Selalu terlihat (*persistent across scroll*) saat pengunjung menjelajahi beranda dan seluruh halaman publik website.
    - Mengarahkan pengunjung secara otomatis ke chat WhatsApp admin resmi yayasan (`081347142829`) dengan teks pembuka ramah seputar bantuan PPDB, administrasi, dan informasi lembaga.
    - Terhubung dinamis dengan sinkronisasi nomor WhatsApp di database (`schools` / `web_settings`).
+
+8. **Rombak Total Struktur Pengurus Yayasan Menjadi Kartu Foto Eksekutif & Sinkronisasi 3 Field Admin (profil.html, content.html, pi.js):**
+   - **Halaman Profil Publik (profil.html):**
+     - Menghilangkan sepenuhnya format diagram pohon, batang hierarki (stems), garis penghubung, serta stepper vertikal bertingkat.
+     - Menghapus badge/kicker buatan (pill badge) 'Tata Kelola Lembaga' guna menjaga estetika bebas AI-slop.
+     - Menyusun 5 pimpinan inti yayasan (Pembina, Pengawas, Ketua Yayasan, Sekretaris, Bendahara) dalam bentuk kartu foto eksekutif yang rapi, modern, dan profesional.
+     - Menampilkan secara strictly hanya 3 elemen esensial sesuai instruksi pengguna:
+       1. **Di atas foto:** Status jabatan yang diemban (dinamis dan editable dari admin, bebas kata berlebihan seperti 'Dewan').
+       2. **Tengah:** Foto resmi berbingkai portrait proporsional dengan fallback monogram inisial elegan.
+       3. **Di bawah foto:** Nama lengkap pejabat bersangkutan.
+     - Meniadakan seluruh sub-deskripsi atau keterangan tambahan yang tidak perlu di luar dari ketiga elemen inti tersebut.
+     - Menyediakan pre-hidrasi instan di <head> (milidetik ke-0) agar halaman langsung menampilkan data dan foto terbaru dari database/cache tanpa jeda rendering (Zero FOUC).
+   - **Portal Admin Pengaturan Identitas (content.html):**
+     - Memperbarui Bagian 5 (Struktur Kepengurusan Organisasi) menjadi kartu manajemen 3 field per orang:
+       1. *Jabatan* (input teks fleksibel dan tersinkronisasi)
+       2. *Foto Pejabat* (pratinjau instan, unggah ke Supabase Storage, dan tombol hapus)
+       3. *Nama Pejabat* (input teks nama lengkap)
+     - Menghapus kata-kata berlebihan seperti 'Dewan' sesuai ketetapan pengguna.
+   - **Sinkronisasi Data Dua Arah (pi.js):**
+     - Memperluas payload schools.update dan web_settings.update untuk menyimpan secara persisten kolom jabatan (pembina_jabatan, pengawas_jabatan, ketua_jabatan, sekretaris_jabatan, endahara_jabatan) bersama foto dan nama pejabat.
+     - Terintegrasi penuh ke Supabase dan caching sinkron lintas sesi.

@@ -3078,7 +3078,12 @@
             ketua_photo: params.ketua_photo !== undefined ? params.ketua_photo : (params.ketua_yayasan_photo !== undefined ? params.ketua_yayasan_photo : existingExt.ketua_photo),
             ketua_yayasan_photo: params.ketua_yayasan_photo !== undefined ? params.ketua_yayasan_photo : (params.ketua_photo !== undefined ? params.ketua_photo : existingExt.ketua_yayasan_photo),
             sekretaris_photo: params.sekretaris_photo !== undefined ? params.sekretaris_photo : existingExt.sekretaris_photo,
-            bendahara_photo: params.bendahara_photo !== undefined ? params.bendahara_photo : existingExt.bendahara_photo
+            bendahara_photo: params.bendahara_photo !== undefined ? params.bendahara_photo : existingExt.bendahara_photo,
+            pembina_jabatan: params.pembina_jabatan !== undefined ? params.pembina_jabatan : existingExt.pembina_jabatan,
+            pengawas_jabatan: params.pengawas_jabatan !== undefined ? params.pengawas_jabatan : existingExt.pengawas_jabatan,
+            ketua_jabatan: params.ketua_jabatan !== undefined ? params.ketua_jabatan : existingExt.ketua_jabatan,
+            sekretaris_jabatan: params.sekretaris_jabatan !== undefined ? params.sekretaris_jabatan : existingExt.sekretaris_jabatan,
+            bendahara_jabatan: params.bendahara_jabatan !== undefined ? params.bendahara_jabatan : existingExt.bendahara_jabatan
           };
           delete extPayload.hero_images;
           try {

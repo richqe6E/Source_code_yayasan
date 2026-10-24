@@ -117,13 +117,16 @@
           if (!url) return;
           const img = document.getElementById('org-' + key + '-img');
           const fb = document.getElementById('org-' + key + '-fallback');
-          const mImg = document.getElementById('m-org-' + key + '-img');
-          const mFb = document.getElementById('m-org-' + key + '-fallback');
           if (img) { img.src = url; img.classList.remove('hidden'); }
           if (fb) fb.classList.add('hidden');
-          if (mImg) { mImg.src = url; mImg.classList.remove('hidden'); }
-          if (mFb) mFb.classList.add('hidden');
         };
+
+        if (d.pembina_jabatan || org.pembina_jabatan) setOrg('org-pembina-jabatan', d.pembina_jabatan || org.pembina_jabatan);
+        if (d.pengawas_jabatan || org.pengawas_jabatan) setOrg('org-pengawas-jabatan', d.pengawas_jabatan || org.pengawas_jabatan);
+        const ketuaJabatan = d.ketua_jabatan || d.ketua_yayasan_jabatan || org.ketua_jabatan || org.ketua_yayasan_jabatan;
+        if (ketuaJabatan) setOrg('org-ketua-jabatan', ketuaJabatan);
+        if (d.sekretaris_jabatan || org.sekretaris_jabatan) setOrg('org-sekretaris-jabatan', d.sekretaris_jabatan || org.sekretaris_jabatan);
+        if (d.bendahara_jabatan || org.bendahara_jabatan) setOrg('org-bendahara-jabatan', d.bendahara_jabatan || org.bendahara_jabatan);
 
         if (d.pembina) setOrg('org-pembina', d.pembina);
         if (d.pengawas) setOrg('org-pengawas', d.pengawas);
@@ -334,211 +337,88 @@
       </div>
     </section>
 
-    <!-- Section 3.5: Struktur Inti Pengurus Yayasan (Architectural Executive Hierarchy) -->
+    <!-- Section 3.5: Struktur Inti Pengurus Yayasan (Executive Leadership Cards) -->
     <section class="bg-slate-50/80 border border-slate-200/90 rounded-3xl p-6 sm:p-12 shadow-sm" id="struktur-organisasi">
-      <div class="text-center max-w-2xl mx-auto mb-12">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/60 border border-slate-300/80 text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-3 shadow-2xs">
-          <span>Tata Kelola Lembaga</span>
-        </div>
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight text-balance">
           Struktur Kepengurusan Yayasan
         </h2>
         <p class="text-sm text-slate-600 mt-2 text-pretty leading-relaxed">
-          Hierarki tata kelola amanah dan kepemimpinan Yayasan At Tarbiyyah Wijaya Kusuma Samarinda dalam membina generasi berkarakter Qur'ani.
+          Pimpinan inti kepengurusan Yayasan At Tarbiyyah Wijaya Kusuma Samarinda.
         </p>
       </div>
 
-      <!-- DESKTOP ARCHITECTURAL TREE HIERARCHY (Hidden on mobile) -->
-      <div class="hidden md:block max-w-4xl mx-auto">
-        <div class="flex flex-col items-center">
+      <!-- EXECUTIVE LEADERSHIP CARDS (No diagram lines, strictly: Jabatan above photo, Photo in middle, Name below photo) -->
+      <div class="space-y-6 sm:space-y-8 max-w-5xl mx-auto">
+        <!-- Baris 1: 3 Pimpinan Utama -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          <!-- TIER 1: Dewan Pembina (Puncak Kebijakan) -->
-          <div class="flex flex-col items-center">
-            <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all text-center w-80 group">
-              <div class="relative mx-auto mb-3 w-16 h-16 flex items-center justify-center">
-                <img id="org-pembina-img" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Dewan Pembina">
-                <div id="org-pembina-fallback" class="w-12 h-12 rounded-full bg-slate-100 border border-slate-200/90 text-slate-800 font-extrabold text-sm flex items-center justify-center shadow-2xs group-hover:bg-slate-800 group-hover:text-white transition-colors">
-                  <span id="org-pembina-initial">DI</span>
-                </div>
+          <!-- 1. Pembina -->
+          <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group">
+            <span class="org-pembina-jabatan text-xs sm:text-sm font-bold uppercase tracking-wider text-primary-700 mb-4 block">Pembina</span>
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200/90 shadow-xs mb-4 flex items-center justify-center group-hover:border-primary-400 group-hover:shadow-md transition-all">
+              <img id="org-pembina-img" class="w-full h-full object-cover hidden" alt="Pembina">
+              <div id="org-pembina-fallback" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-2xl tracking-wider">
+                <span id="org-pembina-initial">DI</span>
               </div>
-              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Dewan Pembina Yayasan</div>
-              <h3 class="org-pembina text-base font-extrabold text-slate-900 tracking-tight" id="org-pembina">DJOKO IRIANDONO</h3>
-              <p class="text-xs text-slate-500 mt-1">Penasehat &amp; Kebijakan Strategis Lembaga</p>
             </div>
-
-            <!-- Stem 1 down with anchor node -->
-            <div class="relative flex flex-col items-center">
-              <div class="w-0.5 h-10 bg-slate-300"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-slate-400 -mt-1 shadow-2xs"></div>
-            </div>
+            <h3 class="org-pembina text-base sm:text-lg font-bold text-slate-900 tracking-tight" id="org-pembina">DJOKO IRIANDONO</h3>
           </div>
 
-          <!-- TIER 2: Dewan Pengawas & Ketua Umum Yayasan -->
-          <div class="w-full flex flex-col items-center">
-            <!-- Crossbar connecting Pengawas and Ketua -->
-            <div class="w-3/4 h-0.5 bg-slate-300 -mt-1"></div>
-
-            <div class="w-3/4 flex justify-between">
-              <!-- Dewan Pengawas -->
-              <div class="flex flex-col items-center w-72">
-                <div class="w-0.5 h-6 bg-slate-300"></div>
-                <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-600 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                  <div class="relative mx-auto mb-2.5 w-14 h-14 flex items-center justify-center">
-                    <img id="org-pengawas-img" class="w-14 h-14 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Dewan Pengawas">
-                    <div id="org-pengawas-fallback" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center shadow-2xs group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                      <span id="org-pengawas-initial">SH</span>
-                    </div>
-                  </div>
-                  <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Dewan Pengawas</div>
-                  <h3 class="org-pengawas text-sm font-bold text-slate-900 tracking-tight" id="org-pengawas">Suhardi</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Pengawasan Kepatuhan &amp; Akuntabilitas</p>
-                </div>
-              </div>
-
-              <!-- Ketua Umum Yayasan -->
-              <div class="flex flex-col items-center w-80">
-                <div class="w-0.5 h-6 bg-slate-300"></div>
-                <div class="bg-white border border-primary-200/90 border-t-4 border-t-primary-600 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all text-center w-full group ring-1 ring-primary-500/10">
-                  <div class="relative mx-auto mb-3 w-16 h-16 flex items-center justify-center">
-                    <img id="org-ketua-img" class="w-16 h-16 rounded-full object-cover border-2 border-primary-300 shadow-xs hidden" alt="Foto Ketua Umum Yayasan">
-                    <div id="org-ketua-fallback" class="w-11 h-11 rounded-full bg-primary-50 border border-primary-200 text-primary-800 font-extrabold text-sm flex items-center justify-center shadow-2xs group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                      <span id="org-ketua-initial">MK</span>
-                    </div>
-                  </div>
-                  <div class="text-[11px] font-bold uppercase tracking-wider text-primary-700 mb-1">Ketua Umum Yayasan</div>
-                  <h3 class="org-ketua text-base font-extrabold text-slate-900 tracking-tight" id="org-ketua">Makhrus</h3>
-                  <p class="text-xs text-slate-600 mt-1">Pimpinan Eksekutif &amp; Pengarah Operasional</p>
-                </div>
-
-                <!-- Stem down to Sekretaris & Bendahara -->
-                <div class="relative flex flex-col items-center">
-                  <div class="w-0.5 h-10 bg-slate-300"></div>
-                  <div class="w-2.5 h-2.5 rounded-full bg-slate-400 -mt-1 shadow-2xs"></div>
-                </div>
+          <!-- 2. Pengawas -->
+          <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group">
+            <span class="org-pengawas-jabatan text-xs sm:text-sm font-bold uppercase tracking-wider text-primary-700 mb-4 block">Pengawas</span>
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200/90 shadow-xs mb-4 flex items-center justify-center group-hover:border-primary-400 group-hover:shadow-md transition-all">
+              <img id="org-pengawas-img" class="w-full h-full object-cover hidden" alt="Pengawas">
+              <div id="org-pengawas-fallback" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-2xl tracking-wider">
+                <span id="org-pengawas-initial">SH</span>
               </div>
             </div>
+            <h3 class="org-pengawas text-base sm:text-lg font-bold text-slate-900 tracking-tight" id="org-pengawas">Suhardi</h3>
           </div>
 
-          <!-- TIER 3: Badan Pengurus Harian (Sekretaris & Bendahara) -->
-          <div class="w-full flex flex-col items-center">
-            <div class="w-full max-w-xl mx-auto flex flex-col items-center">
-              <div class="w-full h-0.5 bg-slate-300 -mt-1"></div>
-              <div class="w-full flex justify-between">
-                
-                <!-- Sekretaris -->
-                <div class="flex flex-col items-center w-64">
-                  <div class="w-0.5 h-6 bg-slate-300"></div>
-                  <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                    <div class="relative mx-auto mb-2 w-12 h-12 flex items-center justify-center">
-                      <img id="org-sekretaris-img" class="w-12 h-12 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Sekretaris Yayasan">
-                      <div id="org-sekretaris-fallback" class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                        <span id="org-sekretaris-initial">CG</span>
-                      </div>
-                    </div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Sekretaris Yayasan</div>
-                    <h3 class="org-sekretaris text-sm font-bold text-slate-900 tracking-tight" id="org-sekretaris">Candra Gunawan</h3>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Administrasi &amp; Tata Kelola Lembaga</p>
-                  </div>
-                </div>
-
-                <!-- Bendahara -->
-                <div class="flex flex-col items-center w-64">
-                  <div class="w-0.5 h-6 bg-slate-300"></div>
-                  <div class="bg-white border border-slate-200/90 border-t-4 border-t-slate-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all text-center w-full group">
-                    <div class="relative mx-auto mb-2 w-12 h-12 flex items-center justify-center">
-                      <img id="org-bendahara-img" class="w-12 h-12 rounded-full object-cover border-2 border-slate-200 shadow-xs hidden" alt="Foto Bendahara Yayasan">
-                      <div id="org-bendahara-fallback" class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                        <span id="org-bendahara-initial">SP</span>
-                      </div>
-                    </div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Bendahara Yayasan</div>
-                    <h3 class="org-bendahara text-sm font-bold text-slate-900 tracking-tight" id="org-bendahara">Sri Pragawati</h3>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Pengelolaan Keuangan &amp; Akuntansi</p>
-                  </div>
-                </div>
-
+          <!-- 3. Ketua Yayasan -->
+          <div class="bg-white border border-primary-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group sm:col-span-2 lg:col-span-1">
+            <span class="org-ketua-jabatan text-xs sm:text-sm font-bold uppercase tracking-wider text-primary-700 mb-4 block">Ketua Yayasan</span>
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-primary-50/60 border-2 border-primary-300 shadow-xs mb-4 flex items-center justify-center group-hover:border-primary-500 group-hover:shadow-md transition-all">
+              <img id="org-ketua-img" class="w-full h-full object-cover hidden" alt="Ketua Yayasan">
+              <div id="org-ketua-fallback" class="w-full h-full flex items-center justify-center bg-primary-50 text-primary-800 font-extrabold text-2xl tracking-wider">
+                <span id="org-ketua-initial">MK</span>
               </div>
             </div>
+            <h3 class="org-ketua text-base sm:text-lg font-extrabold text-slate-900 tracking-tight" id="org-ketua">Makhrus</h3>
           </div>
 
         </div>
-      </div>
 
-      <!-- MOBILE VERTICAL STEPPER HIERARCHY (5 Core Leaders, no horizontal overflow) -->
-      <div class="md:hidden space-y-4 max-w-sm mx-auto">
-        
-        <!-- Mobile Tier 1: Pembina -->
-        <div class="bg-white border border-slate-200/90 border-l-4 border-l-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-          <div class="relative w-11 h-11 shrink-0 flex items-center justify-center">
-            <img id="m-org-pembina-img" class="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Dewan Pembina">
-            <div id="m-org-pembina-fallback" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center">
-              <span>DI</span>
-            </div>
-          </div>
-          <div class="min-w-0">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Dewan Pembina</span>
-            <h3 class="org-pembina text-sm font-bold text-slate-900 truncate">DJOKO IRIANDONO</h3>
-            <p class="text-[11px] text-slate-500 truncate">Penasehat &amp; Kebijakan Strategis</p>
-          </div>
-        </div>
-
-        <!-- Mobile Tier 2A: Pengawas -->
-        <div class="bg-white border border-slate-200/90 border-l-4 border-l-slate-600 rounded-2xl p-4 shadow-sm flex items-center gap-3.5 ml-3">
-          <div class="relative w-11 h-11 shrink-0 flex items-center justify-center">
-            <img id="m-org-pengawas-img" class="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Dewan Pengawas">
-            <div id="m-org-pengawas-fallback" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center">
-              <span>SH</span>
-            </div>
-          </div>
-          <div class="min-w-0">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Dewan Pengawas</span>
-            <h3 class="org-pengawas text-sm font-bold text-slate-900 truncate">Suhardi</h3>
-            <p class="text-[11px] text-slate-500 truncate">Pengawasan Kepatuhan</p>
-          </div>
-        </div>
-
-        <!-- Mobile Tier 2B: Ketua Umum -->
-        <div class="bg-white border border-primary-200 border-l-4 border-l-primary-600 rounded-2xl p-4 shadow-md flex items-center gap-3.5 ml-3">
-          <div class="relative w-11 h-11 shrink-0 flex items-center justify-center">
-            <img id="m-org-ketua-img" class="w-11 h-11 rounded-full object-cover border border-primary-200 shadow-xs hidden" alt="Ketua Umum Yayasan">
-            <div id="m-org-ketua-fallback" class="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 text-primary-800 font-extrabold text-xs flex items-center justify-center">
-              <span>MK</span>
-            </div>
-          </div>
-          <div class="min-w-0">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 block">Ketua Umum Yayasan</span>
-            <h3 class="org-ketua text-sm font-extrabold text-slate-900 truncate">Makhrus</h3>
-            <p class="text-[11px] text-slate-600 truncate">Pimpinan Eksekutif Lembaga</p>
-          </div>
-        </div>
-
-        <!-- Mobile Tier 3: Pengurus Harian (Sekretaris & Bendahara) -->
-        <div class="grid grid-cols-2 gap-3 ml-6">
-          <div class="bg-white border border-slate-200/90 border-t-3 border-t-slate-500 rounded-xl p-3 shadow-sm text-center">
-            <div class="relative mx-auto mb-2 w-10 h-10 flex items-center justify-center">
-              <img id="m-org-sekretaris-img" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Sekretaris">
-              <div id="m-org-sekretaris-fallback" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] flex items-center justify-center">
-                <span>CG</span>
+        <!-- Baris 2: 2 Pimpinan (Sekretaris & Bendahara) Terpusat -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          
+          <!-- 4. Sekretaris -->
+          <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group">
+            <span class="org-sekretaris-jabatan text-xs sm:text-sm font-bold uppercase tracking-wider text-primary-700 mb-4 block">Sekretaris</span>
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200/90 shadow-xs mb-4 flex items-center justify-center group-hover:border-primary-400 group-hover:shadow-md transition-all">
+              <img id="org-sekretaris-img" class="w-full h-full object-cover hidden" alt="Sekretaris">
+              <div id="org-sekretaris-fallback" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-2xl tracking-wider">
+                <span id="org-sekretaris-initial">CG</span>
               </div>
             </div>
-            <span class="text-[9px] font-bold uppercase text-slate-500 block mb-0.5">Sekretaris</span>
-            <h4 class="org-sekretaris text-xs font-bold text-slate-900 truncate">Candra Gunawan</h4>
-            <p class="text-[10px] text-slate-500 truncate mt-0.5">Administrasi</p>
+            <h3 class="org-sekretaris text-base sm:text-lg font-bold text-slate-900 tracking-tight" id="org-sekretaris">Candra Gunawan</h3>
           </div>
 
-          <div class="bg-white border border-slate-200/90 border-t-3 border-t-slate-500 rounded-xl p-3 shadow-sm text-center">
-            <div class="relative mx-auto mb-2 w-10 h-10 flex items-center justify-center">
-              <img id="m-org-bendahara-img" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs hidden" alt="Bendahara">
-              <div id="m-org-bendahara-fallback" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[11px] flex items-center justify-center">
-                <span>SP</span>
+          <!-- 5. Bendahara -->
+          <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group">
+            <span class="org-bendahara-jabatan text-xs sm:text-sm font-bold uppercase tracking-wider text-primary-700 mb-4 block">Bendahara</span>
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200/90 shadow-xs mb-4 flex items-center justify-center group-hover:border-primary-400 group-hover:shadow-md transition-all">
+              <img id="org-bendahara-img" class="w-full h-full object-cover hidden" alt="Bendahara">
+              <div id="org-bendahara-fallback" class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-700 font-extrabold text-2xl tracking-wider">
+                <span id="org-bendahara-initial">SP</span>
               </div>
             </div>
-            <span class="text-[9px] font-bold uppercase text-slate-500 block mb-0.5">Bendahara</span>
-            <h4 class="org-bendahara text-xs font-bold text-slate-900 truncate">Sri Pragawati</h4>
-            <p class="text-[10px] text-slate-500 truncate mt-0.5">Keuangan</p>
+            <h3 class="org-bendahara text-base sm:text-lg font-bold text-slate-900 tracking-tight" id="org-bendahara">Sri Pragawati</h3>
           </div>
-        </div>
 
+        </div>
       </div>
     </section>
 
@@ -675,49 +555,54 @@
           function applyOrgPhoto(key, photoUrl) {
             const img = document.getElementById('org-' + key + '-img');
             const fb = document.getElementById('org-' + key + '-fallback');
-            const mImg = document.getElementById('m-org-' + key + '-img');
-            const mFb = document.getElementById('m-org-' + key + '-fallback');
             if (photoUrl) {
               if (img) { img.src = photoUrl; img.classList.remove('hidden'); }
               if (fb) fb.classList.add('hidden');
-              if (mImg) { mImg.src = photoUrl; mImg.classList.remove('hidden'); }
-              if (mFb) mFb.classList.add('hidden');
             } else {
               if (img) { img.src = ''; img.classList.add('hidden'); }
               if (fb) fb.classList.remove('hidden');
-              if (mImg) { mImg.src = ''; mImg.classList.add('hidden'); }
-              if (mFb) mFb.classList.remove('hidden');
             }
           }
 
+          const org = d.struktur_organisasi || {};
+
+          // Hydrate Jabatan
+          if (d.pembina_jabatan || org.pembina_jabatan) setOrgValue('org-pembina-jabatan', d.pembina_jabatan || org.pembina_jabatan);
+          if (d.pengawas_jabatan || org.pengawas_jabatan) setOrgValue('org-pengawas-jabatan', d.pengawas_jabatan || org.pengawas_jabatan);
+          const ketuaJabatan = d.ketua_jabatan || d.ketua_yayasan_jabatan || org.ketua_jabatan || org.ketua_yayasan_jabatan;
+          if (ketuaJabatan) setOrgValue('org-ketua-jabatan', ketuaJabatan);
+          if (d.sekretaris_jabatan || org.sekretaris_jabatan) setOrgValue('org-sekretaris-jabatan', d.sekretaris_jabatan || org.sekretaris_jabatan);
+          if (d.bendahara_jabatan || org.bendahara_jabatan) setOrgValue('org-bendahara-jabatan', d.bendahara_jabatan || org.bendahara_jabatan);
+
+          // Hydrate Nama & Initial Monograms
           if (d.pembina) {
             setOrgValue('org-pembina', d.pembina);
             const init = getInitials(d.pembina, 'DI');
-            document.querySelectorAll('#org-pembina-initial, #m-org-pembina-fallback span').forEach(el => el.textContent = init);
+            document.querySelectorAll('#org-pembina-initial').forEach(el => el.textContent = init);
           }
           if (d.pengawas) {
             setOrgValue('org-pengawas', d.pengawas);
             const init = getInitials(d.pengawas, 'SH');
-            document.querySelectorAll('#org-pengawas-initial, #m-org-pengawas-fallback span').forEach(el => el.textContent = init);
+            document.querySelectorAll('#org-pengawas-initial').forEach(el => el.textContent = init);
           }
           const ketua = d.ketua_yayasan || d.headmaster_name;
           if (ketua) {
             setOrgValue('org-ketua', ketua);
             const init = getInitials(ketua, 'MK');
-            document.querySelectorAll('#org-ketua-initial, #m-org-ketua-fallback span').forEach(el => el.textContent = init);
+            document.querySelectorAll('#org-ketua-initial').forEach(el => el.textContent = init);
           }
           if (d.sekretaris) {
             setOrgValue('org-sekretaris', d.sekretaris);
             const init = getInitials(d.sekretaris, 'CG');
-            document.querySelectorAll('#org-sekretaris-initial, #m-org-sekretaris-fallback span').forEach(el => el.textContent = init);
+            document.querySelectorAll('#org-sekretaris-initial').forEach(el => el.textContent = init);
           }
           if (d.bendahara) {
             setOrgValue('org-bendahara', d.bendahara);
             const init = getInitials(d.bendahara, 'SP');
-            document.querySelectorAll('#org-bendahara-initial, #m-org-bendahara-fallback span').forEach(el => el.textContent = init);
+            document.querySelectorAll('#org-bendahara-initial').forEach(el => el.textContent = init);
           }
 
-          const org = d.struktur_organisasi || {};
+          // Hydrate Photos
           applyOrgPhoto('pembina', d.pembina_photo || org.pembina_photo);
           applyOrgPhoto('pengawas', d.pengawas_photo || org.pengawas_photo);
           applyOrgPhoto('ketua', d.ketua_photo || d.ketua_yayasan_photo || org.ketua_photo || org.ketua_yayasan_photo);
