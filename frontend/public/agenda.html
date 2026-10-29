@@ -147,27 +147,35 @@
       }
 
       list.innerHTML = items.map(ev => {
-        const d = formatEventDate(ev.event_date || ev.start_date || ev.created_at);
+        const d = formatEventDate(ev.event_date || ev.date || ev.start_date || ev.created_at);
+        const eventTime = ev.time || '08.00 - 11.30 WITA';
+        const eventLocation = ev.location || 'Gedung Utama Yayasan At Tarbiyyah Samarinda';
+        const eventDesc = ev.description || ev.content || '';
+
         return `
           <article class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col sm:flex-row gap-5 sm:gap-7 items-start group">
-            <!-- Kolom Tanggal (Sesuai Brand Color Yayasan) -->
+            <!-- Kolom Tanggal -->
             <div class="sm:w-28 shrink-0 flex sm:flex-col items-baseline sm:items-start gap-2 sm:gap-0.5 sm:border-r sm:border-slate-100 sm:pr-6">
               <span class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight tabular-nums leading-none group-hover:text-primary-700 transition-colors">${d.day}</span>
               <span class="text-xs font-bold text-primary-700 uppercase tracking-wider sm:mt-1">${d.month} ${d.year}</span>
             </div>
 
-            <!-- Konten Agenda (Lega, Rapi, & Nyaman Dibaca) -->
+            <!-- Konten Agenda -->
             <div class="flex-1 min-w-0">
               <!-- Metadata: Waktu & Lokasi -->
-              <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-500 mb-2.5">
-                <span class="inline-flex items-center gap-1.5 font-medium text-slate-700">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 mb-2.5">
+                <span class="inline-flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200/80">
                   <i class="fi fi-rr-clock text-xs text-primary-600"></i>
-                  <span>${ev.time || '08.00 - 11.30 WITA'}</span>
+                  <span>${eventTime}</span>
                 </span>
-                <span class="inline-flex items-center gap-1.5 text-slate-600">
+                <span class="inline-flex items-center gap-1.5 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200/80">
                   <i class="fi fi-rr-marker text-xs text-primary-600"></i>
-                  <span>${ev.location || 'Gedung Utama Yayasan At Tarbiyyah Samarinda'}</span>
+                  <span>${eventLocation}</span>
                 </span>
+                ${ev.category ? `
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary-50 text-primary-700 border border-primary-200/50">
+                    ${ev.category}
+                  </span>` : ''}
               </div>
 
               <!-- Judul Agenda -->
@@ -176,13 +184,17 @@
               </h2>
 
               <!-- Deskripsi Agenda -->
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty">
-                ${ev.description || ''}
-              </p>
+              ${eventDesc ? `
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty whitespace-pre-line mb-3">
+                  ${eventDesc}
+                </p>
+              ` : ''}
             </div>
           </article>
         `;
       }).join('');
+
+      injectEventSchema(items);
     }
 
     loadEvents();

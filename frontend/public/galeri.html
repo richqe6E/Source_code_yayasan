@@ -93,18 +93,22 @@
     </div>
   </main>
 
-  <!-- Photo Lightbox Modal -->
-  <div id="photo-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="relative max-w-4xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800">
-      <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/80 transition" aria-label="Tutup">
-        <i class="fi fi-rr-cross-small text-xl"></i>
-      </button>
-      <div class="max-h-[75vh] flex items-center justify-center bg-black">
-        <img id="modal-img" src="" alt="Detail Foto" class="max-h-[75vh] w-auto object-contain">
-      </div>
-      <div class="p-5 bg-slate-900">
-        <h4 id="modal-title" class="text-base font-bold text-white mb-1"></h4>
-        <p id="modal-desc" class="text-xs text-slate-400"></p>
+  <!-- Photo Lightbox Modal (Clean, Immersive, Zero Black Letterbox) -->
+  <div id="photo-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-6 transition-all duration-300">
+    <!-- Floating Close Button -->
+    <button onclick="closeModal()" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 text-white backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg transition active:scale-95" aria-label="Tutup">
+      <i class="fi fi-rr-cross-small text-2xl"></i>
+    </button>
+    
+    <!-- Modal Inner: Auto-fits image width/height without any surrounding black box -->
+    <div class="relative max-w-[94vw] max-h-[92vh] inline-flex flex-col items-center justify-center">
+      <!-- The Photo Itself: Naturally bounded, rounded, clean drop-shadow -->
+      <img id="modal-img" src="" alt="Detail Foto" class="max-h-[76vh] sm:max-h-[80vh] max-w-[92vw] w-auto h-auto object-contain rounded-2xl shadow-2xl ring-1 ring-white/15 block bg-transparent">
+      
+      <!-- Sleek Floating Caption (Clean glassmorphism card that hugs content) -->
+      <div id="modal-caption-wrap" class="mt-3.5 max-w-xl w-fit px-5 py-2.5 bg-slate-900/85 backdrop-blur-md border border-white/10 rounded-xl text-center shadow-xl">
+        <h4 id="modal-title" class="text-xs sm:text-sm font-bold text-white leading-snug"></h4>
+        <p id="modal-desc" class="text-[11px] sm:text-xs text-slate-300 mt-0.5 leading-relaxed"></p>
       </div>
     </div>
   </div>
@@ -125,21 +129,40 @@
       const item = galleryItems[index];
       if (!item) return;
       document.getElementById('modal-img').src = item.image_url;
-      document.getElementById('modal-title').textContent = item.title || 'Foto Aktivitas Siswa';
-      document.getElementById('modal-desc').textContent = item.description || 'Dokumentasi resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda';
+      document.getElementById('modal-title').textContent = item.title || 'Foto Dokumentasi Yayasan';
+      const catText = item.category ? `[${item.category}] ` : '';
+      const desc = item.description || item.content || '';
+      const descEl = document.getElementById('modal-desc');
+      if (desc && desc !== item.title) {
+        descEl.textContent = catText + desc;
+        descEl.classList.remove('hidden');
+      } else if (item.category) {
+        descEl.textContent = item.category;
+        descEl.classList.remove('hidden');
+      } else {
+        descEl.classList.add('hidden');
+      }
       const m = document.getElementById('photo-modal');
       m.classList.remove('hidden');
       m.classList.add('flex');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
       const m = document.getElementById('photo-modal');
       m.classList.add('hidden');
       m.classList.remove('flex');
+      document.body.style.overflow = '';
     }
 
     document.getElementById('photo-modal').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) closeModal();
+      if (e.target.id === 'photo-modal' || e.target.closest('button')) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
     });
 
     async function loadGallery() {
@@ -173,9 +196,10 @@
       grid.innerHTML = galleryItems.map((g, i) => `
         <div onclick="openModal(${i})" class="group aspect-square bg-slate-100 rounded-2xl overflow-hidden relative cursor-pointer border border-slate-200/80 shadow-sm hover:shadow-md transition active:scale-[0.96]">
           <img src="${g.image_url}" alt="${g.title}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" loading="lazy">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 text-white">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 text-white">
             <span class="text-xs font-bold leading-snug line-clamp-1">${g.title}</span>
-            <span class="text-[10px] text-sky-300 mt-0.5 inline-flex items-center gap-1">
+            ${g.category ? `<span class="text-[10px] text-sky-200 mt-0.5 font-medium">${g.category}</span>` : ''}
+            <span class="text-[10px] text-sky-300 mt-1 inline-flex items-center gap-1 font-semibold">
               <i class="fi fi-rr-zoom-in text-[10px]"></i> Klik untuk perbesar
             </span>
           </div>

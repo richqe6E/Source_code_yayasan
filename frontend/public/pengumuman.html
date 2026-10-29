@@ -145,24 +145,45 @@
       list.innerHTML = items.map(a => {
         const dateFormatted = formatDateIndo(a.published_at || a.created_at);
         const category = a.category || 'Edaran';
+        const isPinned = a.is_pinned === true || a.is_pinned === 'true' || a.status === 'pinned';
+        
+        let audBadge = '';
+        const aud = a.target_audience || a.target_role || 'all';
+        if (aud === 'siswa') {
+          audBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60"><i class="fi fi-rr-user-graduate text-[10px]"></i> Santri &amp; Siswa</span>';
+        } else if (aud === 'calon_siswa') {
+          audBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/60"><i class="fi fi-rr-users text-[10px]"></i> Calon Siswa &amp; Wali (PPDB)</span>';
+        } else {
+          audBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/60"><i class="fi fi-rr-globe text-[10px]"></i> Umum</span>';
+        }
+
         return `
-          <article class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition">
+          <article class="bg-white border ${isPinned ? 'border-amber-300 ring-2 ring-amber-100/80 shadow-md' : 'border-slate-200/90 shadow-sm'} rounded-2xl p-5 sm:p-6 hover:shadow-md transition relative group">
+            ${isPinned ? `
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-amber-500 text-white shadow-sm mb-3.5">
+                <i class="fi fi-rr-thumbtack text-xs"></i>
+                <span>PENGUMUMAN PENTING (DISEMATKAN)</span>
+              </div>
+            ` : ''}
             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-primary-50 text-primary-800 border border-primary-200/60">
-                <i class="fi fi-rr-megaphone text-xs text-primary-600"></i>
-                <span>${category}</span>
-              </span>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-primary-50 text-primary-800 border border-primary-200/60">
+                  <i class="fi fi-rr-megaphone text-xs text-primary-600"></i>
+                  <span>${category}</span>
+                </span>
+                ${audBadge}
+              </div>
               <div class="flex items-center gap-1.5 text-xs text-slate-400">
                 <i class="fi fi-rr-calendar text-xs text-primary-600"></i>
                 <time class="tabular-nums font-medium">${dateFormatted}</time>
               </div>
             </div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2 leading-snug text-balance">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2.5 leading-snug text-balance group-hover:text-primary-700 transition-colors">
               ${a.title}
             </h3>
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty">
+            <div class="text-xs sm:text-sm text-slate-600 leading-relaxed text-pretty whitespace-pre-line">
               ${a.content || a.summary || ''}
-            </p>
+            </div>
           </article>
         `;
       }).join('');
