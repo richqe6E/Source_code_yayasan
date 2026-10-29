@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 24 Oktober 2026 (Sesi 55 - Selesai & Terverifikasi: Redesain Struktur Foto Pengurus Yayasan, Universal Smooth Scroll, Tombol WA Melayang, dan Dokumentasi Arsitektur PPDB Online)
+**Terakhir Diperbarui:** 29 Oktober 2026 (Sesi 56 - Selesai & Terverifikasi: Penyelarasan Form Manajemen Konten Admin, Pengumuman, Agenda, dan Redesain Lightbox Galeri Foto Bebas Celah Hitam)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -338,6 +338,32 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
       5. Portal Admin PPDB (`portal/admin/ppdb.html`): Buka/tutup gelombang 1-klik, kalender linimasa gelombang, multi-tab filter pendaftar, lightbox preview dokumen fisik, otomatisasi konversi calon siswa ke siswa aktif (penerbitan NIS, integrasi `students` & `student_documents`, rombel), dan generator pesan WhatsApp resmi yayasan.
       6. Layer API & Database (`api.js`): Skema `ppdb_registrations`, `ppdb_periods`, pembuatan akun instan calon siswa di tabel `users` (`role: 'calon_siswa'`), dual-storage offline-resilient local cache fallback.
       7. Keamanan, RBAC, privasi data santri, dan standar reliabilitas tinggi.
+
+---
+
+13. **Penyelarasan Penuh Form Manajemen Konten Admin & Redesain Lightbox Galeri Foto (Sesi 56 — Commit `02e3075`):**
+    - **Penyelarasan Form Input Konten Admin (`content.html`):**
+      - Merombak form modal generik menjadi adaptif per tab konten:
+        - *Tab Berita (`news`):* Judul, Kategori, Penulis/Sumber Berita (`form-author`), Foto Sampul (Upload/URL), Ringkasan Excerpt, Isi Berita Lengkap, dan Status Publikasi.
+        - *Tab Pengumuman (`announcements`):* Judul, Kategori/Jenis Edaran, Sasaran Audiens (`target_audience`: *Semua*, *Santri & Siswa*, *Calon Siswa & Wali*), Opsi Sematkan Paling Atas (`is_pinned`), Isi Pengumuman Lengkap, dan Status Publikasi. (Opsi foto & excerpt dihilangkan total karena pengumuman publik murni teks).
+        - *Tab Agenda Acara (`events`):* Judul Acara, Kategori, Tanggal Acara (`event_date`), Waktu/Jam Pelaksanaan (`time`), Lokasi Kegiatan (`location`), Rincian Acara, dan Status Publikasi. (Opsi foto cover dihilangkan total karena kartu agenda publik murni kalender teks).
+        - *Tab Galeri Foto (`gallery`):* Judul/Keterangan Foto, Kategori Album, Upload Foto WAJIB dengan validasi, Keterangan Tambahan/Caption. (Textarea artikel panjang berparagraf dihilangkan total).
+      - Menyesuaikan payload submit `apiCall()` agar data `time`, `location`, `target_audience`, `is_pinned`, dan `author` tersimpan presisi ke Supabase REST.
+      - Menyempurnakan daftar tabel di Admin dengan lencana info: lencana tanggal/jam/lokasi untuk Agenda, lencana audiens dan pin untuk Pengumuman, lencana penulis untuk Berita.
+    - **Penyelarasan Tampilan Publik (`agenda.html`, `pengumuman.html`, `berita.html`, `detail.html`):**
+      - `agenda.html`: Kartu agenda menampilkan tanggal di kiri, jam & lokasi di atas, judul, dan keterangan; bebas dari blok foto sesuai desain referensi. Menambahkan injeksi Schema.org `Event` (JSON-LD) untuk optimasi SEO Google Rich Snippets.
+      - `pengumuman.html`: Menampilkan lencana sasaran audiens (*Santri & Siswa*, *Calon Siswa & Wali*, *Umum*) dan penanda kartu **📌 PENGUMUMAN PENTING (DISEMATKAN)** untuk pengumuman yang di-pin.
+      - `berita.html` & `detail.html`: Menampilkan atribusi penulis (*author*) dinamis.
+    - **Redesain Total Lightbox Modal Galeri Foto (`galeri.html`):**
+      - Menghilangkan kontainer kaku `max-w-4xl` dan latar belakang hitam pekat `bg-black` yang sebelumnya memunculkan bilah hitam (*pillarbox*) di sisi kiri-kanan foto persegi/vertikal.
+      - Mengubah kontainer menjadi *shrink-to-fit* adaptif yang mengikuti rasio alami gambar (*square, portrait, landscape*) tanpa distorsi dan tanpa terpotong.
+      - Menggunakan backdrop kaca buram (*frosted glass backdrop* `bg-slate-950/85 backdrop-blur-md`).
+      - Menggunakan kartu caption *glassmorphism* elegan yang ramping di bawah foto.
+      - Menambahkan tombol tutup melayang di sudut atas, dukungan klik di luar foto, dan shortcut keyboard `Escape`.
+    - **Verifikasi & Status Produksi:**
+      - Seluruh kode bebas syntax error (`node --check` lulus 100%).
+      - Ter-commit dan ter-push ke GitHub `origin/main` (Commit `02e3075`).
+      - Ter-deploy dan terverifikasi live di Vercel Production (`https://siyayasan.vercel.app`).
 
 ---
 

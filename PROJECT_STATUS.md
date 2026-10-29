@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 24 Oktober 2026 — Sesi 55 (Rombak Struktur Foto Pengurus, Universal Smooth Scroll, Tombol WA Melayang & Dokumentasi PPDB Online - Selesai & Terverifikasi)*
+*Terakhir Diperbarui: 29 Oktober 2026 — Sesi 56 (Penyelarasan Form Manajemen Konten Admin, Pengumuman, Agenda & Redesain Lightbox Galeri Bebas Celah Hitam - Selesai & Terverifikasi)*
 
 ---
 
@@ -1772,6 +1772,37 @@ Mendaftarkan dan memverifikasi website ke Google Search Console, mengoptimasi as
 - Commit Git: `d25dc7d`, `e88c881`, `d04cb59`, `e7f10a2` di branch `main`.
 - Vercel: 100% aktif ter-deploy di `https://siyayasan.vercel.app`.
 - Status Working Tree: Bersih (`working tree clean`).
+
+### 🗓️ Sesi 56 — Penyelarasan Form Manajemen Konten Admin (Berita, Pengumuman, Agenda, Galeri) & Redesain Lightbox Galeri Foto Bebas Celah Hitam (29 Oktober 2026)
+
+**Pekerjaan:**
+1. **Audit Arsitektur Database Supabase:** Memverifikasi bahwa seluruh tabel (`news`, `announcements`, `events`, `galleries`) dan kolom (`time`, `location`, `target_audience`, `is_pinned`, `image_url`) sudah lengkap di Supabase Cloud tanpa perlu penambahan tabel/kolom baru.
+2. **Restrukturisasi Modal Form Admin (`content.html`):**
+   - Mengubah modal generik menjadi adaptif per modul:
+     - **Berita:** Judul, Kategori, Penulis (`form-author`), Foto Sampul (Upload/URL), Excerpt, Isi Berita Lengkap, Publikasi.
+     - **Pengumuman:** Judul, Kategori, Sasaran Audiens (`target_audience`), Sematkan (*Pin to Top*), Isi Surat/Pengumuman. (Opsi foto & excerpt dihilangkan total karena pengumuman publik murni teks).
+     - **Agenda Kegiatan:** Judul Acara, Kategori, Tanggal Acara, **Waktu/Jam Pelaksanaan** (`form-event-time`), **Lokasi Kegiatan** (`form-event-location`), Rincian Acara. (Opsi foto cover dihilangkan total karena kartu agenda publik murni kalender teks).
+     - **Galeri Foto:** Judul Foto, Kategori Album, **Upload Foto WAJIB** dengan validasi, Keterangan Tambahan/Caption. (Textarea artikel panjang berparagraf dihilangkan total).
+   - Menghubungkan payload submit `apiCall()` agar data `time`, `location`, `target_audience`, `is_pinned`, dan `author` tersimpan presisi ke Supabase REST.
+   - Menyempurnakan daftar tabel di Admin dengan lencana info: lencana tanggal/jam/lokasi untuk Agenda, lencana audiens dan pin untuk Pengumuman, lencana penulis untuk Berita.
+3. **Penyelarasan Tampilan Publik (`agenda.html`, `pengumuman.html`, `berita.html`, `detail.html`):**
+   - `agenda.html`: Kartu agenda menampilkan tanggal di kiri, jam & lokasi di atas, judul, dan keterangan; bebas dari blok foto sesuai desain referensi. Menambahkan injeksi Schema.org `Event` (JSON-LD) untuk optimasi SEO Google Rich Snippets.
+   - `pengumuman.html`: Menampilkan lencana sasaran audiens (*Santri & Siswa*, *Calon Siswa & Wali*, *Umum*) dan penanda kartu **📌 PENGUMUMAN PENTING (DISEMATKAN)** untuk pengumuman yang di-pin.
+   - `berita.html` & `detail.html`: Menampilkan atribusi penulis (*author*) dinamis.
+4. **Redesain Total Lightbox Modal Galeri Foto (`galeri.html`):**
+   - Menghilangkan kontainer kaku `max-w-4xl` dan latar belakang hitam pekat `bg-black` yang sebelumnya memunculkan bilah hitam (*pillarbox*) di sisi kiri-kanan foto persegi/vertikal.
+   - Mengubah kontainer menjadi *shrink-to-fit* adaptif yang mengikuti rasio alami gambar (*square, portrait, landscape*) tanpa distorsi dan tanpa terpotong.
+   - Menggunakan backdrop kaca buram (*frosted glass backdrop* `bg-slate-950/85 backdrop-blur-md`).
+   - Menggunakan kartu caption *glassmorphism* elegan yang ramping di bawah foto.
+   - Menambahkan tombol tutup melayang di sudut atas, dukungan klik di luar foto, dan shortcut keyboard `Escape`.
+
+**Verifikasi & Status Produksi:**
+- Commit Git: `02e3075` di branch `main`.
+- Vercel: 100% aktif ter-deploy dan terverifikasi live di `https://siyayasan.vercel.app`.
+- Seluruh file JavaScript lolos uji validasi sintaks node (`node --check` 100% valid).
+- Status Working Tree: Bersih (`working tree clean`).
+
+---
 
 ## 6. 📁 Struktur File Penting
 

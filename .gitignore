@@ -30,3 +30,6 @@ frontend/backups/*.json
 
 .vercel
 .vscode/
+
+# MCP local credentials
+.mcp.json
