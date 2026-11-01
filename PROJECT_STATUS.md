@@ -1,7 +1,7 @@
 # 📋 STATUS PROJEK & RIWAYAT PEKERJAAN (SIYAYASAN V2)
 > **Catatan:** File ini adalah *single source of truth* mengenai status, konfigurasi, riwayat perbaikan, dan hasil pengujian menyeluruh. Setiap sesi baru wajib membaca file ini dan `PROJECT_CONTEXT_CHECKPOINT.md` terlebih dahulu, serta **mengabaikan seluruh sistem/proses lama** (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, dll.).
 
-*Terakhir Diperbarui: 29 Oktober 2026 — Sesi 56 (Penyelarasan Form Manajemen Konten Admin, Pengumuman, Agenda & Redesain Lightbox Galeri Bebas Celah Hitam - Selesai & Terverifikasi)*
+*Terakhir Diperbarui: 1 November 2026 — Sesi 57 (Pembersihan Masif Repositori dari Legacy Apps Script, Google Sheets CSV, Dokumen Obsolet, Backup Dump Lokal, dan Penyatuan Routing Redirect PPDB - Selesai & Terverifikasi)*
 
 ---
 
@@ -795,7 +795,7 @@ Total checks: 171 OK: 171 BAD: 0
 ### 🗓️ Sesi 22 — Penyelarasan Arsitektur 2 Portal Resmi & Presisi UI Medsos Footer (09 Oktober 2026)
 - **Penegasan Mutlak Arsitektur 2-Portal (Admin Sekolah & Siswa):**
   - Mengonfirmasi kembali kesepakatan bahwa **Portal Guru dan Orang Tua SUDAH TIDAK DIPERLUKAN** dalam sistem V2.
-  - Membersihkan folder `guru/` dan `ortu/` dari direktori runtime aktif `frontend/portal/` (tersimpan aman di `.legacy_backup/portal_v1_guru_ortu/`).
+  - Membersihkan folder `guru/` dan `ortu/` dari direktori runtime aktif `frontend/portal/` (tersimpan aman di `portal_v1_guru_ortu/`).
   - Mengarahkan seluruh rute legacy (`/guru`, `/ortu`, `/portal/guru`, `/portal/ortu`) secara otomatis via HTTP 302 Redirect ke `/login.html` pada [dev-server.js](file:///d:/Projek%20Landing%20page%20yayasan/PROJEK%20WEBSIDE%20YAYASAN%20V2/frontend/dev-server.js) dan [vercel.json](file:///d:/Projek%20Landing%20page%20yayasan/PROJEK%20WEBSIDE%20YAYASAN%20V2/frontend/vercel.json).
   - Memperbarui [shared/js/auth.js](file:///d:/Projek%20Landing%20page%20yayasan/PROJEK%20WEBSIDE%20YAYASAN%20V2/frontend/shared/js/auth.js) `getPortalRedirect()` agar secara eksklusif hanya mengarahkan ke `/admin/dashboard.html` atau `/siswa/dashboard.html`.
 - **Perbaikan Presisi UI Tombol Media Sosial Footer & Drawer Publik:**
@@ -1182,7 +1182,7 @@ Pengembangan strategi **Dual-Engine Pipeline** antara **Gemini 4 Argon (di brows
    - Menghapus handler laporan `attendance` dan `development`.
    - Mengganti `module === 'parent'` dengan modul publik `contact` yang merespons sukses pengiriman pesan kontak.
 5. **Sinkronisasi Skema SQL Supabase & Migrasi Idempoten ([database/](database/)):**
-   - Memindahkan `database/supabase_schema.sql` lama ke `.legacy_backup/supabase_schema.sql` untuk mencegah referensi skema usang.
+   - Memindahkan `database/supabase_schema.sql` lama ke `supabase_schema.sql` untuk mencegah referensi skema usang.
    - Memperbarui [database/MASTER_SUPABASE_SETUP_V2.sql](database/MASTER_SUPABASE_SETUP_V2.sql): Mengganti tabel `academic_records` dengan tabel `teachers` dan `contact_messages`, memperbarui array aktivasi RLS untuk menyertakan kedua tabel baru.
    - Memperbarui [database/patch_missing_columns.sql](database/patch_missing_columns.sql): Menambahkan script DROP tabel usang (`academic_records`, `developments`, `attendance`), pembuatan tabel `teachers` dan `contact_messages`, penambahan kolom patch pada `students`, `schools`, dan `web_settings`, serta RLS policies yang aman.
 6. **Hardening Uji Otomatis & Pembaruan Snapshot:**
@@ -1355,7 +1355,7 @@ Saat status PPDB ditutup oleh pihak sekolah, kartu peringatan *"Pendaftaran PPDB
 ### 🗓️ Sesi 40 — Remediasi Komprehensif Direktif Audit Agen Argon & Integrasi TDD (19 Oktober 2026)
 
 **Latar Belakang & Analisis Direktif:**
-1. Pengguna meminta penelaahan menyeluruh atas laporan audit Agen Argon (`directive_antigravity_siyayasan_v2.md`) dengan batasan ketat: tidak melakukan perubahan yang melanggar arsitektur 2-portal resmi atau reaktivasi modul usang di `.legacy_backup/`, serta mematuhi aturan Zero-Green (Oceanic Blue: `#0284c7`).
+1. Pengguna meminta penelaahan menyeluruh atas laporan audit Agen Argon (`directive_antigravity_siyayasan_v2.md`) dengan batasan ketat: tidak melakukan perubahan yang melanggar arsitektur 2-portal resmi atau reaktivasi modul usang di ``, serta mematuhi aturan Zero-Green (Oceanic Blue: `#0284c7`).
 2. **Klarifikasi & Verifikasi Fakta Source Code:**
    - Halaman modul pembayaran siswa adalah `frontend/portal/siswa/spp.html`, bukan `pembayaran.html`.
    - Teks `"14+ Tahun Pengabdian"` tidak ada di kode (hanya badge `"Perjalanan Sejak 2010"` di `profil.html`).
@@ -1861,9 +1861,34 @@ frontend/
     │   └── status.html     <- Cek status registrasi PPDB
     └── login.html          <- Login SIAKAD (Tab Siswa & Admin)
 
-.legacy_backup/
-└── portal_v1_guru_ortu/    <- Arsip aman modul guru & orang tua (nonaktif)
+
+
 ```
+
+---
+
+### 🗓️ Sesi 57 — Pembersihan Masif Repositori dari Legacy Apps Script, Google Sheets, Dokumen Obsolet, dan Aset Menganggur (1 November 2026)
+
+**Pekerjaan:**
+1. **Pembersihan Total Peninggalan Google Apps Script & Google Sheets:**
+   - Menghapus folder `apps-script/` (seluruh 27 file `.gs` dan konfigurasi clasp).
+   - Menghapus `database/headers/` (33 file CSV) & `database/seed/` (10 file CSV).
+   - Menulis ulang `database/README.md` baru khusus skema PostgreSQL Supabase (`MASTER_SUPABASE_SETUP_V2.sql` dan patch DDL).
+   - Menghapus `.claude/settings.local.json`.
+2. **Pembersihan Arsip Lama & Dokumentasi Obsolet:**
+   - Menghapus folder `` (arsip portal guru & ortu v1).
+   - Menghapus folder `docs/` beserta isinya (`SETUP_DATABASE.md`, `DataDictionary.md`, diagram Draw.io Google Sheets, PRD/SRD 5 role lama, dan rencana sesi lampau).
+   - Menghapus dokumen root usang: `BLUEPRINT_SIYAYASAN.md` (129 KB), `directive_antigravity_siyayasan_v2.md` (26 KB), `FRONTEND_STRUCTURE_AND_FEATURES.md` (14 KB), dan `HANDOVER.md` (13 KB).
+3. **Pembersihan File Dump Cadangan Lokal, Aset Media, dan Konfigurasi Redundan:**
+   - Menghapus `frontend/backups/` (14 file dump JSON cadangan lokal ~3.5 MB).
+   - Menghapus `frontend/public/videos/` (`vector-login.mp4` dan duplikat `education-animation.json`).
+   - Menghapus `frontend/public/images/logo-polnes.png` dan `frontend/shared/images/` (duplikat logo & campus).
+   - Menghapus file konfigurasi duplikat: `frontend/vercel.json` dan `frontend/start-server.cmd`.
+   - Menghapus file stub redirect HTML (`register.html`, `ppdb/form-paud.html`, `ppdb/form-tpq.html`) dan mengalihkannya via HTTP 308 di `vercel.json` dan `dev-server.js` ke `ppdb.html#formulir-pendaftaran`.
+4. **Perapian Skrip Pengujian:**
+   - Menghapus 4 skrip pengujian ad-hoc dari root dan 10 skrip dari `frontend/`. Suite pengujian resmi dipertahankan terpusat di `tests/`.
+5. **Pembaruan README & Dokumentasi:**
+   - Memperbarui `README.md` dengan pohon struktur folder yang ringkas, bersih, dan daftar dokumentasi resmi.
 
 ---
 

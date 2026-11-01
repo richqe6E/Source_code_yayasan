@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(clasp push *)",
-      "Bash(curl -sS -L --max-time 20 -X POST https://script.google.com/macros/s/AKfycbwurx2TOtbQfGJzEl3C443V1K4ESrP5ggMCarv51UQcEPdovqLuCaqZ8nUo05K2I0_x/exec?path=api/v1/auth/login -H 'Origin: https://siyayasan-portal.vercel.app' -H 'Content-Type: application/json' --data-raw '{\"email\":\"admin@yayasan.sch.id\",\"password\":\"admin123\"}' -o /tmp/post_v.txt -w 'STATUS: %{http_code}\\\\nALLOW_ORIGIN: %header{access-control-allow-origin}\\\\nALLOW_METHODS: %header{access-control-allow-methods}\\\\nALLOW_HEADERS: %header{access-control-allow-headers}\\\\n' -i)"
-    ]
-  }
-}

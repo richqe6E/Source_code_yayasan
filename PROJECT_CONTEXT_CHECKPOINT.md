@@ -1,5 +1,5 @@
 # 📌 DOKUMEN KONTEKS & CHECKPOINT RESMI PROYEK SIYAYASAN V2
-**Terakhir Diperbarui:** 29 Oktober 2026 (Sesi 56 - Selesai & Terverifikasi: Penyelarasan Form Manajemen Konten Admin, Pengumuman, Agenda, dan Redesain Lightbox Galeri Foto Bebas Celah Hitam)
+**Terakhir Diperbarui:** 1 November 2026 (Sesi 57 - Selesai & Terverifikasi: Pembersihan Masif Repositori dari Legacy Apps Script, Google Sheets CSV, Dokumen Obsolet, Backup Dump Lokal, dan Penyatuan Routing Redirect PPDB)
 **Status Sistem:** ✅ Production & Database 100% Operasional, Live Verified (`https://siyayasan.vercel.app` & Supabase Cloud).  
 **Mandat Konteks:** **HANYA gunakan arsitektur sistem baru ini (Supabase Cloud + Vercel 2-Portal). Seluruh proses/sistem lama (Google Apps Script, Portal Guru, Portal Orang Tua, Password Guru, Rapor Elektronik Siswa, & Kolom Status Verifikasi Berkas tanpa backend) resmi dihapus dan tidak digunakan lagi.**
 
@@ -364,6 +364,29 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
       - Seluruh kode bebas syntax error (`node --check` lulus 100%).
       - Ter-commit dan ter-push ke GitHub `origin/main` (Commit `02e3075`).
       - Ter-deploy dan terverifikasi live di Vercel Production (`https://siyayasan.vercel.app`).
+
+---
+
+14. **Pembersihan Masif Repositori dari Legacy Apps Script, Google Sheets, Dokumen Obsolet, dan Aset Menganggur (Sesi 57 — 1 November 2026):**
+    - **Pembersihan Total Legacy Apps Script & Spreadsheet:**
+      - Menghapus folder `apps-script/` (seluruh 27 file `.gs` dan konfigurasi clasp).
+      - Menghapus `database/headers/` (33 file CSV) & `database/seed/` (10 file CSV) peninggalan Google Sheets.
+      - Menulis ulang `database/README.md` baru yang profesional mendokumentasikan skrip SQL PostgreSQL Supabase (`MASTER_SUPABASE_SETUP_V2.sql` dan berkas patch).
+      - Menghapus `.claude/settings.local.json` (perintah izin clasp push / webhook Apps Script).
+    - **Pembersihan Arsip Lama & Dokumentasi Obsolet:**
+      - Menghapus folder `.legacy_backup/` (seluruh arsip portal guru & ortu v1).
+      - Menghapus folder `docs/` beserta isinya (`SETUP_DATABASE.md`, `DataDictionary.md`, PRD/SRD, diagram Draw.io Google Sheets, dan superpower plans masa lampau).
+      - Menghapus dokumen root usang yang bertentangan dengan hasil akhir sistem (`BLUEPRINT_SIYAYASAN.md`, `directive_antigravity_siyayasan_v2.md`, `FRONTEND_STRUCTURE_AND_FEATURES.md`, `HANDOVER.md`).
+    - **Pembersihan Backup Dump Lokal, Aset Media, dan Konfigurasi Redundan:**
+      - Menghapus `frontend/backups/` (14 file dump JSON cadangan lokal ~3.5 MB).
+      - Menghapus `frontend/public/videos/` (`vector-login.mp4` dan duplikat `education-animation.json`).
+      - Menghapus `frontend/public/images/logo-polnes.png` dan folder `frontend/shared/images/` (duplikat logo & campus).
+      - Menghapus file konfigurasi duplikat: `frontend/vercel.json` dan `frontend/start-server.cmd`.
+      - Menghapus file stub redirect HTML (`register.html`, `ppdb/form-paud.html`, `ppdb/form-tpq.html`) dan mengalihkannya langsung via HTTP 308 Permanent Redirect di `vercel.json` dan `dev-server.js` menuju `ppdb.html#formulir-pendaftaran`.
+    - **Perapian Skrip Pengujian:**
+      - Menghapus 4 skrip pengujian ad-hoc dari root (`test-e2e-lifecycle.js`, dll.) dan 10 skrip dari `frontend/` (`test-cms-e2e.js`, dll.). Suite pengujian resmi dipertahankan terpusat di `tests/`.
+    - **Pembaruan README & Dokumentasi:**
+      - Memperbarui `README.md` dengan pohon struktur folder yang ringkas, bersih, dan daftar dokumentasi resmi.
 
 ---
 

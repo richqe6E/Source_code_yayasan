@@ -34,7 +34,9 @@ function resolveFilePath(reqPath) {
   if (p === '/portal/siswa' || p === '/portal/siswa/') return { redirect: '/siswa/dashboard.html' };
   if (p === '/guru' || p === '/guru/' || p === '/ortu' || p === '/ortu/' || p === '/portal/guru' || p === '/portal/ortu') return { redirect: '/login.html' };
   if (p === '/login') return { redirect: '/login.html' };
-  if (p === '/register') return { redirect: '/register.html' };
+  if (p === '/register' || p === '/register.html' || p === '/form-paud.html' || p === '/form-tpq.html' || p === '/ppdb/form-paud.html' || p === '/ppdb/form-tpq.html') {
+    return { redirect: '/ppdb.html#formulir-pendaftaran' };
+  }
   if (p === '/ppdb') return { redirect: '/ppdb.html' };
   if (p === '/berita') return { redirect: '/berita.html' };
 
@@ -58,7 +60,7 @@ function resolveFilePath(reqPath) {
   if (p.includes('/js/')) {
     return { file: path.join(BASE_DIR, 'public', p.substring(p.indexOf('/js/'))) };
   }
-  if (p.startsWith('/videos/') || p.startsWith('/assets/')) {
+  if (p.startsWith('/assets/')) {
     return { file: path.join(BASE_DIR, 'public', p) };
   }
 
@@ -81,8 +83,6 @@ function resolveFilePath(reqPath) {
   if (p.startsWith('/ppdb/')) {
     return { file: path.join(BASE_DIR, 'public', p) };
   }
-  if (p === '/form-paud.html') return { file: path.join(BASE_DIR, 'public/ppdb/form-paud.html') };
-  if (p === '/form-tpq.html') return { file: path.join(BASE_DIR, 'public/ppdb/form-tpq.html') };
   if (p === '/status.html') return { file: path.join(BASE_DIR, 'public/ppdb/status.html') };
 
   if (p.startsWith('/berita/')) {

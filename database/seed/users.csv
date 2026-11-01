@@ -1,6 +1,0 @@
-id,email,password_hash,full_name,phone,role_id,status,linked_entity_id,linked_entity_type,last_login,failed_login_count,locked_until,email_verified,created_at,created_by,updated_at,updated_by,is_deleted
-USR-2026-00001,superadmin@yayasan.sch.id,$2a$10$DEMO_HASH_REPLACE_AFTER_FIRST_LOGIN,Ketua Yayasan,081234567890,ROLE-2026-00001,active,,none,,0,,TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
-USR-2026-00002,admin@yayasan.sch.id,$2a$10$DEMO_HASH_REPLACE_AFTER_FIRST_LOGIN,Andi Wijaya (Admin TU),081234567891,ROLE-2026-00002,active,,admin,,0,,TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
-USR-2026-00003,guru@yayasan.sch.id,$2a$10$DEMO_HASH_REPLACE_AFTER_FIRST_LOGIN,Rina Mulyani (Guru TK),081234567892,ROLE-2026-00003,active,,teacher,,0,,TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
-USR-2026-00004,ortu@yayasan.sch.id,$2a$10$DEMO_HASH_REPLACE_AFTER_FIRST_LOGIN,Siti Nurhaliza (Orang Tua),081234567893,ROLE-2026-00004,active,,parent,,0,,TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
-USR-2026-00005,pendaftar@example.com,$2a$10$DEMO_HASH_REPLACE_AFTER_FIRST_LOGIN,Calon Orang Tua,,ROLE-2026-00005,active,,pendaftar,,0,,TRUE,2026-09-12T00:00:00Z,system,2026-09-12T00:00:00Z,system,FALSE
