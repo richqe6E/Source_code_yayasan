@@ -3828,41 +3828,300 @@
           const repType = params.report_type || 'students';
           let headers = [];
           let rows = [];
+          let summary = {};
 
-          if (repType === 'students') {
-            headers = ['No', 'NIS', 'Nama Lengkap', 'Kelas', 'Jenis Kelamin', 'Nama Wali', 'No. HP / WA', 'Status'];
-            const stu = await supabaseRest('students?status=eq.active&select=*&order=full_name.asc').catch(() => []);
-            rows = (stu || []).map((s, idx) => [
-              idx + 1,
-              s.nis || '-',
-              s.full_name || s.name || '-',
-              s.class_name || s.kelas_sekarang || s.class_id || '-',
-              s.gender === 'L' ? 'Laki-laki' : (s.gender === 'P' ? 'Perempuan' : (s.gender || '-')),
-              s.parent_name || s.father_name || s.mother_name || '-',
-              s.parent_phone || s.phone || '-',
-              (s.status || 'active').toUpperCase()
-            ]);
-          } else if (repType === 'payments' || repType === 'finance') {
-            headers = ['No', 'No. Tagihan', 'Nama Siswa', 'Keterangan / Periode', 'Nominal (Rp)', 'Jatuh Tempo', 'Status Tagihan'];
-            const inv = await supabaseRest('invoices?select=*').catch(() => []);
-            let list = inv || [];
-            if (params.month) {
-              list = list.filter(i => (i.due_date && i.due_date.startsWith(params.month)) || (i.period && i.period.includes(params.month)) || (i.month && i.month.includes(params.month)));
+          // Helper: normalisasi pencocokan bulan
+          const monthHelper = (mStr) => {
+            if (!mStr) return { iso: '', idn: '', moNum: '' };
+            const s = String(mStr).trim();
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            if (/^\d{4}-\d{2}$/.test(s)) {
+              const [yr, mo] = s.split('-');
+              const idx = parseInt(mo, 10) - 1;
+              return { iso: s, idn: (months[idx] ? `${months[idx]} ${yr}` : s), moNum: mo, monthName: months[idx] || '' };
             }
-            rows = list.map((i, idx) => [
-              idx + 1,
-              i.invoice_number || '-',
-              i.student_name || '-',
-              i.description || i.item_name || i.period || i.month || '-',
-              Number(i.amount || 0).toLocaleString('id-ID'),
-              i.due_date || '-',
-              i.status === 'paid' ? 'LUNAS' : (i.status === 'menunggu_verifikasi' ? 'MENUNGGU VERIFIKASI' : 'BELUM LUNAS')
+            return { iso: '', idn: s, moNum: '', monthName: s };
+          };
+
+          // 1. LAPORAN DATA SISWA AKTIF & ROMBEL
+          if (repType === 'students') {
+            headers = ['No', 'NIS', 'Nama Lengkap', 'Kelas / Rombel', 'L/P', 'Tempat & Tgl Lahir', 'Nama Wali', 'No. HP / WA', 'SPP/Bulan', 'Status'];
+            let q = 'students?select=*&order=full_name.asc';
+            if (params.status && params.status !== 'all') {
+              q += `&status=eq.${encodeURIComponent(params.status)}`;
+            } else if (!params.status) {
+              q += '&status=eq.active';
+            }
+            if (params.class_id) {
+              q += `&class_id=eq.${encodeURIComponent(params.class_id)}`;
+            }
+            const stu = await supabaseRest(q).catch(() => []);
+            let list = stu || [];
+            if (params.level) {
+              const lv = String(params.level).toLowerCase();
+              list = list.filter(s => (s.class_name && s.class_name.toLowerCase().includes(lv)) || (s.level && s.level.toLowerCase().includes(lv)));
+            }
+
+            let maleCount = 0;
+            let femaleCount = 0;
+            rows = list.map((s, idx) => {
+              const isMale = (s.gender || 'L').toUpperCase() === 'L';
+              if (isMale) maleCount++; else femaleCount++;
+              const bDate = s.birth_date ? s.birth_date.slice(0, 10) : '';
+              const bPlaceDate = [s.birth_place, bDate].filter(Boolean).join(', ') || '-';
+              const sppAmt = Number(s.monthly_spp_amount || 150000);
+              return [
+                idx + 1,
+                s.nis || '-',
+                s.full_name || s.name || '-',
+                s.class_name || s.kelas_sekarang || s.class_id || '-',
+                isMale ? 'L' : 'P',
+                bPlaceDate,
+                s.parent_name || s.father_name || s.mother_name || '-',
+                s.parent_phone || s.phone || '-',
+                'Rp ' + sppAmt.toLocaleString('id-ID'),
+                (s.status || 'active').toUpperCase()
+              ];
+            });
+
+            summary = {
+              total_students: list.length,
+              male_count: maleCount,
+              female_count: femaleCount
+            };
+          }
+
+          // 2. LAPORAN DATA GURU & TENAGA PENDIDIK
+          else if (repType === 'teachers') {
+            headers = ['No', 'NIP / ID', 'Nama Lengkap & Gelar', 'L/P', 'Pendidikan', 'Jabatan / Tugas Mengajar', 'No. HP / WA', 'Status'];
+            let q = 'teachers?select=*&order=full_name.asc';
+            if (params.status && params.status !== 'all') {
+              const isAct = params.status === 'active';
+              q += `&status=eq.${isAct ? 'active' : 'inactive'}`;
+            }
+            const teachers = await supabaseRest(q).catch(() => []);
+            let list = teachers || [];
+            let actCount = 0;
+            rows = list.map((t, idx) => {
+              const isAct = t.status === 'active' || t.is_active === true;
+              if (isAct) actCount++;
+              return [
+                idx + 1,
+                t.nip || t.id || '-',
+                t.full_name || t.name || '-',
+                (t.gender || 'L').toUpperCase() === 'L' ? 'L' : 'P',
+                t.education || 'S1',
+                t.position || t.specialization || 'Guru Kelas',
+                t.phone || '-',
+                isAct ? 'AKTIF' : 'NONAKTIF'
+              ];
+            });
+
+            summary = {
+              total_teachers: list.length,
+              active_count: actCount,
+              inactive_count: list.length - actCount
+            };
+          }
+
+          // 3. LAPORAN REKAPITULASI KEUANGAN & STATUS SPP (General Invoices)
+          else if (repType === 'payments' || repType === 'finance') {
+            headers = ['No', 'No. Tagihan', 'Nama Siswa', 'Kelas', 'Keterangan / Periode', 'Nominal Tagihan (Rp)', 'Jatuh Tempo', 'Status Tagihan'];
+            const [inv, stuList] = await Promise.all([
+              supabaseRest('invoices?select=*&order=due_date.desc').catch(() => []),
+              supabaseRest('students?select=id,class_id,class_name').catch(() => [])
             ]);
-          } else if (repType === 'ppdb') {
-            headers = ['No', 'No. Pendaftaran', 'Nama Calon Siswa', 'Jalur / Jenjang', 'Nama Wali', 'No. HP', 'Status', 'Tgl Daftar'];
-            const regs = await supabaseRest('ppdb_registrations?select=*').catch(() => []);
+            let list = inv || [];
+            const stuMap = new Map((stuList || []).map(s => [s.id, s]));
+
+            if (params.month) {
+              const mParsed = monthHelper(params.month);
+              list = list.filter(i => {
+                const due = i.due_date || '';
+                const per = String(i.period || i.month || i.description || '');
+                if (mParsed.iso && due.startsWith(mParsed.iso)) return true;
+                if (mParsed.idn && per.toLowerCase().includes(mParsed.idn.toLowerCase())) return true;
+                if (mParsed.monthName && per.toLowerCase().includes(mParsed.monthName.toLowerCase())) return true;
+                return false;
+              });
+            }
+
+            if (params.class_id) {
+              list = list.filter(i => {
+                const s = stuMap.get(i.student_id);
+                return s && (s.class_id === params.class_id || s.class_name === params.class_id);
+              });
+            }
+
+            if (params.status && params.status !== 'all') {
+              list = list.filter(i => (i.status || 'unpaid').toLowerCase() === params.status.toLowerCase());
+            }
+
+            let totalBills = 0;
+            let paidAmount = 0;
+            let unpaidAmount = 0;
+            let pendingAmount = 0;
+            let paidCount = 0;
+            let unpaidCount = 0;
+            let pendingCount = 0;
+
+            rows = list.map((i, idx) => {
+              const amt = Number(i.amount || 0);
+              totalBills += amt;
+              const st = (i.status || 'unpaid').toLowerCase();
+              let statusLabel = 'BELUM LUNAS';
+              if (st === 'paid') {
+                statusLabel = 'LUNAS';
+                paidAmount += amt;
+                paidCount++;
+              } else if (st === 'menunggu_verifikasi' || st === 'pending') {
+                statusLabel = 'MENUNGGU VERIFIKASI';
+                pendingAmount += amt;
+                pendingCount++;
+              } else {
+                unpaidAmount += amt;
+                unpaidCount++;
+              }
+
+              const stu = stuMap.get(i.student_id);
+              const className = (stu && stu.class_name) || '-';
+
+              return [
+                idx + 1,
+                i.invoice_number || '-',
+                i.student_name || '-',
+                className,
+                i.description || i.item_name || i.period || i.month || '-',
+                amt.toLocaleString('id-ID'),
+                i.due_date || '-',
+                statusLabel
+              ];
+            });
+
+            summary = {
+              total_bills: totalBills,
+              paid_amount: paidAmount,
+              unpaid_amount: unpaidAmount,
+              pending_amount: pendingAmount,
+              total_count: list.length,
+              paid_count: paidCount,
+              unpaid_count: unpaidCount,
+              pending_count: pendingCount,
+              collection_rate: totalBills > 0 ? Math.round((paidAmount / totalBills) * 100) : 0
+            };
+          }
+
+          // 4. LAPORAN REKAPITULASI TUNGGAKAN SISWA (Arrears Report)
+          else if (repType === 'arrears') {
+            headers = ['No', 'No. Tagihan', 'NIS', 'Nama Siswa', 'Kelas', 'Bulan / Periode SPP', 'Nominal Tunggakan (Rp)', 'Jatuh Tempo'];
+            const [inv, stuList] = await Promise.all([
+              supabaseRest('invoices?status=eq.unpaid&select=*&order=due_date.asc').catch(() => []),
+              supabaseRest('students?select=id,nis,class_id,class_name').catch(() => [])
+            ]);
+            let list = inv || [];
+            const stuMap = new Map((stuList || []).map(s => [s.id, s]));
+
+            if (params.month) {
+              const mParsed = monthHelper(params.month);
+              list = list.filter(i => {
+                const due = i.due_date || '';
+                const per = String(i.period || i.month || i.description || '');
+                if (mParsed.iso && due.startsWith(mParsed.iso)) return true;
+                if (mParsed.idn && per.toLowerCase().includes(mParsed.idn.toLowerCase())) return true;
+                if (mParsed.monthName && per.toLowerCase().includes(mParsed.monthName.toLowerCase())) return true;
+                return false;
+              });
+            }
+
+            if (params.class_id) {
+              list = list.filter(i => {
+                const s = stuMap.get(i.student_id);
+                return s && (s.class_id === params.class_id || s.class_name === params.class_id);
+              });
+            }
+
+            let totalArrears = 0;
+            rows = list.map((i, idx) => {
+              const amt = Number(i.amount || 0);
+              totalArrears += amt;
+              const stu = stuMap.get(i.student_id);
+              return [
+                idx + 1,
+                i.invoice_number || '-',
+                (stu && stu.nis) || '-',
+                i.student_name || '-',
+                (stu && stu.class_name) || '-',
+                i.month || i.period || i.description || '-',
+                amt.toLocaleString('id-ID'),
+                i.due_date || '-'
+              ];
+            });
+
+            summary = {
+              total_arrears_amount: totalArrears,
+              total_arrears_count: list.length
+            };
+          }
+
+          // 5. LAPORAN PENERIMAAN KAS SPP TERVERIFIKASI (Verified Cash-In)
+          else if (repType === 'cash_in') {
+            headers = ['No', 'No. Tagihan', 'Tgl Pelunasan', 'Nama Siswa', 'Kelas', 'Keterangan SPP', 'Nominal Masuk Kas (Rp)', 'Metode'];
+            const [inv, stuList] = await Promise.all([
+              supabaseRest('invoices?status=eq.paid&select=*&order=paid_at.desc').catch(() => []),
+              supabaseRest('students?select=id,nis,class_id,class_name').catch(() => [])
+            ]);
+            let list = inv || [];
+            const stuMap = new Map((stuList || []).map(s => [s.id, s]));
+
+            if (params.month) {
+              const mParsed = monthHelper(params.month);
+              list = list.filter(i => {
+                const paidDate = i.paid_at ? i.paid_at.slice(0, 7) : (i.due_date ? i.due_date.slice(0, 7) : '');
+                const per = String(i.period || i.month || i.description || '');
+                if (mParsed.iso && paidDate === mParsed.iso) return true;
+                if (mParsed.idn && per.toLowerCase().includes(mParsed.idn.toLowerCase())) return true;
+                if (mParsed.monthName && per.toLowerCase().includes(mParsed.monthName.toLowerCase())) return true;
+                return false;
+              });
+            }
+
+            if (params.class_id) {
+              list = list.filter(i => {
+                const s = stuMap.get(i.student_id);
+                return s && (s.class_id === params.class_id || s.class_name === params.class_id);
+              });
+            }
+
+            let totalCash = 0;
+            rows = list.map((i, idx) => {
+              const amt = Number(i.amount || 0);
+              totalCash += amt;
+              const stu = stuMap.get(i.student_id);
+              const pDate = i.paid_at ? i.paid_at.slice(0, 10) : (i.due_date || '-');
+              return [
+                idx + 1,
+                i.invoice_number || '-',
+                pDate,
+                i.student_name || '-',
+                (stu && stu.class_name) || '-',
+                i.description || i.item_name || i.month || '-',
+                amt.toLocaleString('id-ID'),
+                (i.payment_method || 'Transfer Bank').toUpperCase()
+              ];
+            });
+
+            summary = {
+              total_cash_in: totalCash,
+              total_transactions: list.length
+            };
+          }
+
+          // 6. LAPORAN PENDAFTARAN SANTRI BARU (PPDB)
+          else if (repType === 'ppdb') {
+            headers = ['No', 'No. Pendaftaran', 'Nama Calon Siswa', 'Jalur / Jenjang', 'Tahun Ajaran', 'Nama Wali', 'No. HP / WA', 'Status', 'Tgl Daftar'];
+            const regs = await supabaseRest('ppdb_registrations?select=*&order=created_at.desc').catch(() => []);
             let list = regs || [];
-            if (params.academic_year) {
+            if (params.academic_year && params.academic_year !== 'all') {
               const yrPrefix = String(params.academic_year).split('/')[0].trim();
               list = list.filter(r => {
                 const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
@@ -3873,30 +4132,89 @@
                 return !yrPrefix || regStr.includes(yrPrefix) || dtStr.startsWith(yrPrefix);
               });
             }
-            rows = list.map((r, idx) => [
-              idx + 1,
-              r.registration_number || r.registration_no || '-',
-              r.full_name || r.child_name || '-',
-              r.level || (r.form_metadata && r.form_metadata.program_level) || (r.form_type || 'PAUD').toUpperCase(),
-              r.father_name || r.parent_name || '-',
-              r.phone || r.father_phone || '-',
-              (r.status || 'pending').toUpperCase(),
-              (r.registration_date || r.created_at || '').slice(0, 10)
+
+            if (params.status && params.status !== 'all') {
+              list = list.filter(r => (r.status || 'pending').toLowerCase() === params.status.toLowerCase());
+            }
+
+            let pendingCount = 0;
+            let approvedCount = 0;
+            let convertedCount = 0;
+            let rejectedCount = 0;
+
+            rows = list.map((r, idx) => {
+              const st = (r.status || 'pending').toLowerCase();
+              if (st === 'approved' || st === 'accepted') approvedCount++;
+              else if (st === 'converted') convertedCount++;
+              else if (st === 'rejected') rejectedCount++;
+              else pendingCount++;
+
+              const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
+              const yName = r.academic_year || meta.academic_year || '2026/2027';
+
+              return [
+                idx + 1,
+                r.registration_number || r.registration_no || '-',
+                r.full_name || r.child_name || '-',
+                r.level || meta.program_level || (r.form_type || 'PAUD').toUpperCase(),
+                yName,
+                r.father_name || r.parent_name || '-',
+                r.phone || r.father_phone || '-',
+                st.toUpperCase(),
+                (r.registration_date || r.created_at || '').slice(0, 10)
+              ];
+            });
+
+            summary = {
+              total_registrations: list.length,
+              pending_count: pendingCount,
+              approved_count: approvedCount,
+              converted_count: convertedCount,
+              rejected_count: rejectedCount
+            };
+          }
+
+          // 7. RINGKASAN EKSEKUTIF YAYASAN (Executive Overview)
+          else if (repType === 'all') {
+            headers = ['No', 'Bidang Operasional Yayasan', 'Metrik Utama', 'Jumlah / Nominal', 'Keterangan'];
+            const [stu, tea, cls, inv, regs] = await Promise.all([
+              supabaseRest('students?status=eq.active&select=id,gender').catch(() => []),
+              supabaseRest('teachers?status=eq.active&select=id').catch(() => []),
+              supabaseRest('classes?select=id,student_count').catch(() => []),
+              supabaseRest('invoices?select=amount,status').catch(() => []),
+              supabaseRest('ppdb_registrations?select=id,status').catch(() => [])
             ]);
-          } else if (repType === 'all') {
-            headers = ['No', 'Modul Data', 'Jumlah Entitas Terdaftar', 'Keterangan'];
-            const [stu, cls, inv, regs] = await Promise.all([
-              supabaseRest('students?status=eq.active&select=id').catch(() => []),
-              supabaseRest('classes?select=id').catch(() => []),
-              supabaseRest('invoices?select=id').catch(() => []),
-              supabaseRest('ppdb_registrations?select=id').catch(() => [])
-            ]);
+
+            const activeStudents = (stu || []).length;
+            const activeTeachers = (tea || []).length;
+            const totalClasses = (cls || []).length;
+            const ppdbTotal = (regs || []).length;
+            const ppdbAccepted = (regs || []).filter(r => ['approved', 'accepted', 'converted'].includes((r.status || '').toLowerCase())).length;
+
+            const totalInvoiceAmt = (inv || []).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+            const totalPaidAmt = (inv || []).filter(i => i.status === 'paid').reduce((s, i) => s + (Number(i.amount) || 0), 0);
+            const totalArrearsAmt = totalInvoiceAmt - totalPaidAmt;
+            const rate = totalInvoiceAmt > 0 ? Math.round((totalPaidAmt / totalInvoiceAmt) * 100) : 0;
+
             rows = [
-              [1, 'Siswa Aktif', `${(stu || []).length} Siswa`, 'Terdaftar di database yayasan'],
-              [2, 'Rombongan Belajar (Kelas)', `${(cls || []).length} Kelas`, 'Tahun Ajaran 2026/2027'],
-              [3, 'Tagihan SPP Tercatat', `${(inv || []).length} Tagihan`, 'Total transaksi keuangan'],
-              [4, 'Pendaftar PPDB', `${(regs || []).length} Berkas`, 'Penerimaan siswa baru']
+              [1, 'Akademik & Kesiswaan', 'Santri / Murid Aktif', `${activeStudents} Siswa`, 'Santri terdaftar aktif di database yayasan'],
+              [2, 'Sumber Daya Manusia', 'Tenaga Pendidik (Guru)', `${activeTeachers} Guru`, 'Guru dan ustadz/ustadzah aktif mengajar'],
+              [3, 'Rombongan Belajar', 'Kelas / Rombel', `${totalClasses} Kelas`, 'Kelas jenjang PAUD & TPQ'],
+              [4, 'Penerimaan Siswa Baru', 'Pendaftar PPDB Online', `${ppdbTotal} Berkas (${ppdbAccepted} Diterima)`, 'Total pendaftaran siswa baru'],
+              [5, 'Keuangan & SPP', 'Total Tagihan SPP Diterbitkan', 'Rp ' + totalInvoiceAmt.toLocaleString('id-ID'), 'Target penerimaan keuangan yayasan'],
+              [6, 'Keuangan & SPP', 'Realisasi Kas Masuk (Lunas)', 'Rp ' + totalPaidAmt.toLocaleString('id-ID'), `Efektivitas penerimaan: ${rate}%`],
+              [7, 'Keuangan & SPP', 'Piutang / Tunggakan Santri', 'Rp ' + totalArrearsAmt.toLocaleString('id-ID'), 'Kewajiban pembayaran santri yang belum dilunasi']
             ];
+
+            summary = {
+              active_students: activeStudents,
+              active_teachers: activeTeachers,
+              total_classes: totalClasses,
+              total_target: totalInvoiceAmt,
+              total_collected: totalPaidAmt,
+              total_arrears: totalArrearsAmt,
+              collection_rate: rate
+            };
           }
 
           return {
@@ -3905,6 +4223,7 @@
               report_type: repType,
               headers,
               rows,
+              summary,
               total: rows.length,
               generated_at: new Date().toISOString()
             },

@@ -229,7 +229,7 @@
         Shell.setText('fin-invoice', formatIDR(sppTarget));
         Shell.setText('fin-paid', formatIDR(sppCollected));
         Shell.setText('fin-outstanding', formatIDR(Math.max(0, sppTarget - sppCollected)));
-        Shell.setText('fin-pending', pendingVerify);
+        Shell.setText('fin-pending', pendingVerify ? `${pendingVerify} Transaksi` : '0 Transaksi');
 
         renderActivityFeed();
       } catch (err) {

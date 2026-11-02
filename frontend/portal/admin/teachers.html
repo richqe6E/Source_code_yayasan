@@ -28,7 +28,17 @@
           <h2 class="text-base font-semibold text-gray-900">Daftar Guru</h2>
           <span id="teacher-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-100 text-primary-800">Memuat data...</span>
         </div>
-        <button onclick="openTeacherModal()" class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700">+ Tambah Guru</button>
+        <div class="flex items-center gap-2">
+          <button onclick="printTeachersReport()" class="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-md shadow-sm transition inline-flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Cetak Guru</span>
+          </button>
+          <button onclick="exportTeachersToExcel()" class="px-3 py-1.5 bg-white border border-gray-300 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-md shadow-sm transition inline-flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Ekspor Excel</span>
+          </button>
+          <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-primary-600 text-white text-xs font-semibold rounded-md hover:bg-primary-700 transition">+ Tambah Guru</button>
+        </div>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <input id="filter-search" type="text" placeholder="Cari nama/NIP..." class="px-3 py-2 border border-gray-300 rounded-md text-sm">
@@ -104,12 +114,14 @@
       onRefresh: loadTeachers
     });
 
+    let teachersCache = [];
+
     async function loadTeachers() {
       Shell.hideError();
       const stopSpin = Shell.startRefresh();
       const search = document.getElementById('filter-search').value;
       const active = document.getElementById('filter-active').value;
-      const params = { per_page: 50 };
+      const params = { per_page: 100 };
       if (search) params.search = search;
       if (active !== '') params.is_active = active;
 
@@ -124,6 +136,7 @@
           return;
         }
         const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.teachers)) || []);
+        teachersCache = items;
         const badge = document.getElementById('teacher-count-badge');
         if (badge) badge.textContent = items.length + ' Tenaga Pendidik';
         if (items.length === 0) {
@@ -206,6 +219,154 @@
       showToast(res.message, res.success ? 'success' : 'error');
       if (res.success) { closeTeacherModal(); loadTeachers(); }
     });
+
+    function printTeachersReport() {
+      if (teachersCache.length === 0) {
+        showToast('Tidak ada data guru untuk dicetak.', 'warning');
+        return;
+      }
+
+      const activeFilter = document.getElementById('filter-active').value;
+      const statusText = activeFilter === 'true' ? 'Aktif Mengajar Saja' : (activeFilter === 'false' ? 'Nonaktif Saja' : 'Semua Status');
+      const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const activeCount = teachersCache.filter(t => t.is_active).length;
+      const inactiveCount = teachersCache.filter(t => !t.is_active).length;
+
+      const printWindow = window.open('', '_blank', 'width=900,height=900');
+      if (!printWindow) {
+        alert('Mohon izinkan pop-up peramban untuk mencetak rekap data guru.');
+        return;
+      }
+
+      const rowsHtml = teachersCache.map((t, idx) => `
+        <tr>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-family: monospace; text-align: center;">${idx + 1}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-family: monospace;">${t.nip || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">${t.full_name || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0;">${t.email || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-family: monospace; font-size: 11px;">${t.phone || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0;">${t.specialization || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: center;">${t.start_date || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: center;">
+            <span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold; background: ${t.is_active ? '#e0f2fe' : '#f1f5f9'}; color: ${t.is_active ? '#0369a1' : '#475569'};">
+              ${t.is_active ? 'Aktif' : 'Nonaktif'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>Laporan Data Tenaga Pendidik - Yayasan At Tarbiyyah Wijaya Kusuma</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 32px; color: #0f172a; line-height: 1.4; font-size: 11px; }
+            .kop { text-align: center; border-bottom: 3px double #0284c7; padding-bottom: 10px; margin-bottom: 20px; }
+            .kop h1 { margin: 0; color: #0369a1; font-size: 18px; font-weight: 800; }
+            .kop p { margin: 2px 0 0; font-size: 11px; color: #64748b; }
+            .title { text-align: center; margin-bottom: 16px; }
+            .title h2 { margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; color: #1e293b; }
+            .meta-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; margin-bottom: 16px; font-size: 11px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 11px; }
+            th { background: #f1f5f9; padding: 8px; text-align: left; font-weight: 700; color: #475569; border-bottom: 2px solid #cbd5e1; }
+            .ttd-wrap { display: flex; justify-content: space-between; margin-top: 36px; font-size: 11px; }
+            .ttd { text-align: center; width: 220px; }
+            @media print { .no-print { display: none !important; } }
+          </style>
+        </head>
+        <body>
+          <div class="kop">
+            <h1>YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</h1>
+            <p>TPQ Ulinnuha (TPQ Pagi &amp; Tahfidz) &bull; KB Ulinnuha (PAUD)</p>
+            <p>Jl. Wijaya Kusuma V-A No. 38, Samarinda Ulu | Telp/WA: 0813-4714-2829</p>
+          </div>
+          <div class="title">
+            <h2>Laporan Rekapitulasi Guru &amp; Tenaga Kependidikan</h2>
+            <p style="margin: 3px 0 0; color: #64748b;">Per Tanggal: ${today}</p>
+          </div>
+          <div class="meta-box">
+            <div><strong>Filter Status:</strong> ${statusText}</div>
+            <div><strong>Total Pendidik:</strong> ${teachersCache.length} Orang</div>
+            <div><strong>Komposisi:</strong> ${activeCount} Aktif Mengajar &bull; ${inactiveCount} Nonaktif</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 35px; text-align: center;">No</th>
+                <th>NIP</th>
+                <th>Nama Lengkap</th>
+                <th>Email</th>
+                <th>No. HP</th>
+                <th>Spesialisasi / Bidang</th>
+                <th style="text-align: center;">Tgl Bergabung</th>
+                <th style="text-align: center;">Status</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+          <div class="ttd-wrap">
+            <div class="ttd">
+              <p>Mengetahui,<br>Ketua Yayasan,</p>
+              <br><br><br>
+              <p><strong>( Makhrus )</strong></p>
+            </div>
+            <div class="ttd">
+              <p>Samarinda, ${today}<br>Bagian Administrasi &amp; TU,</p>
+              <br><br><br>
+              <p><strong>( Sri Pragawati )</strong></p>
+            </div>
+          </div>
+          <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" style="padding: 10px 24px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Cetak Rekap Guru Ini</button>
+          </div>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    function exportTeachersToExcel() {
+      if (teachersCache.length === 0) {
+        showToast('Tidak ada data guru untuk diekspor.', 'warning');
+        return;
+      }
+
+      const headers = ['No', 'NIP', 'Nama Lengkap', 'Email', 'No Telepon / HP', 'Spesialisasi / Bidang', 'Tanggal Mulai', 'Status Keaktifan'];
+      const rows = [headers];
+
+      teachersCache.forEach((t, idx) => {
+        rows.push([
+          idx + 1,
+          `"${t.nip || '-'}"`,
+          `"${(t.full_name || '-').replace(/"/g, '""')}"`,
+          `"${(t.email || '-').replace(/"/g, '""')}"`,
+          `"${t.phone || '-'}"`,
+          `"${(t.specialization || '-').replace(/"/g, '""')}"`,
+          `"${t.start_date || '-'}"`,
+          `"${t.is_active ? 'Aktif' : 'Nonaktif'}"`
+        ]);
+      });
+
+      const activeCount = teachersCache.filter(t => t.is_active).length;
+      const inactiveCount = teachersCache.filter(t => !t.is_active).length;
+      rows.push([]);
+      rows.push(['', '', 'TOTAL TENAGA PENDIDIK', teachersCache.length, '', '', 'KOMPOSISI AKTIF', `${activeCount} Aktif, ${inactiveCount} Nonaktif`]);
+
+      const csvContent = '\uFEFF' + rows.map(r => r.join(',')).join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Data_Guru_Yayasan_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('File Excel Data Guru berhasil diunduh.', 'success');
+    }
 
     loadTeachers();
   </script>
