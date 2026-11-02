@@ -1530,11 +1530,7 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div class="space-y-1">
                 <h4 class="text-base font-extrabold text-slate-900">Data Pendaftaran Anak Didik Baru (KB Ulinnuha / PAUD)</h4>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-xs pt-1">
-                  <div><span class="text-slate-500">Tahun Pelajaran:</span> <strong class="text-slate-800">${escapeHtml(snap.academicYear)}</strong></div>
-                  <div><span class="text-slate-500">No. Induk:</span> <em class="text-slate-500">Diisi Admin</em></div>
-                  <div><span class="text-slate-500">Kelompok:</span> <em class="text-slate-500">Diisi Admin</em></div>
-                </div>
+                <p class="text-xs text-slate-500 pt-1">Tahun Pelajaran: <strong class="text-slate-800">${escapeHtml(snap.academicYear)}</strong></p>
               </div>
               ${photoHtml}
             </div>
@@ -1861,7 +1857,6 @@
         <tr><td class="lbl">B.1. Ayah (${escapeHtml(snap.father.status)})</td><td class="val">${escapeHtml(snap.father.name)} &bull; ${escapeHtml(snap.father.job)} &bull; Pend: ${escapeHtml(snap.father.education)} &bull; Telp: ${escapeHtml(snap.father.phone || '-')}</td></tr>
         <tr><td class="lbl">B.2. Ibu (${escapeHtml(snap.mother.status)})</td><td class="val">${escapeHtml(snap.mother.name)} &bull; ${escapeHtml(snap.mother.job)} &bull; Pend: ${escapeHtml(snap.mother.education)} &bull; Telp: ${escapeHtml(snap.mother.phone || '-')}</td></tr>
         <tr><td class="lbl">D. Jarak &amp; Transportasi</td><td class="val">${escapeHtml(snap.distance || '-')} / ${escapeHtml(snap.transportation)}</td></tr>
-        <tr><td class="lbl">No. Induk &amp; Kelompok</td><td class="val" style="color:#0369a1;">Diisi oleh Admin / Guru setelah siswa diterima</td></tr>
       ` : `
         <tr><td class="lbl">Jenjang Pendidikan</td><td class="val">TPQ ULINNUHA — ${escapeHtml(snap.jenjang)}</td></tr>
         <tr><td class="lbl">1. Nama Lengkap</td><td class="val">${escapeHtml(snap.studentName)}</td></tr>
@@ -1875,7 +1870,7 @@
         <tr><td class="lbl">10. Ayah</td><td class="val">${escapeHtml(snap.father.name)} &bull; Pekerjaan: ${escapeHtml(snap.father.job)} &bull; Pendidikan: ${escapeHtml(snap.father.education)}</td></tr>
         <tr><td class="lbl">11. Ibu</td><td class="val">${escapeHtml(snap.mother.name)} &bull; Pekerjaan: ${escapeHtml(snap.mother.job)} &bull; Pendidikan: ${escapeHtml(snap.mother.education)}</td></tr>
         ${snap.guardian ? `<tr><td class="lbl">12. Wali</td><td class="val">${escapeHtml(snap.guardian.name)} (${escapeHtml(snap.guardian.relation)}) &bull; ${escapeHtml(snap.guardian.job)}</td></tr>` : ''}
-        <tr><td class="lbl">13. Pendaftaran (Tgl Masuk &amp; NIS Lokal)</td><td class="val" style="color:#0369a1;">Tgl Daftar: ${today} &bull; Tgl Masuk &amp; NIS Lokal diisi oleh Admin Yayasan</td></tr>
+        <tr><td class="lbl">Tanggal Pendaftaran</td><td class="val">${today}</td></tr>
       `;
 
       printWindow.document.write(`

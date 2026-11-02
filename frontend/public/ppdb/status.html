@@ -245,10 +245,11 @@
                 <span class="inline-block px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200 mb-1.5">Formulir Buku Induk Anak Didik PAUD</span>
                 <h4 class="font-display font-extrabold text-lg text-slate-900">${r.student_name || '-'}</h4>
                 <p class="text-xs text-slate-500 mt-0.5">Tahun Pelajaran: <strong>${academicYear}</strong></p>
+                ${(assignedNis || assignedClass) ? `
                 <div class="flex flex-wrap gap-2 mt-2 text-[11px]">
-                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">No. Induk: <strong>${assignedNis || 'Diisi oleh Admin Yayasan'}</strong></span>
-                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Kelompok: <strong>${assignedClass || 'Diisi oleh Admin Yayasan'}</strong></span>
-                </div>
+                  ${assignedNis ? `<span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">No. Induk: <strong>${assignedNis}</strong></span>` : ''}
+                  ${assignedClass ? `<span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Kelompok: <strong>${assignedClass}</strong></span>` : ''}
+                </div>` : ''}
               </div>
               <div class="shrink-0 flex flex-col items-center">
                 ${photoUrl
@@ -332,9 +333,9 @@
                 <h4 class="font-display font-extrabold text-lg text-slate-900">${r.student_name || '-'}</h4>
                 <p class="text-xs text-slate-500 mt-0.5">Tahun Pelajaran: <strong>${academicYear}</strong></p>
                 <div class="flex flex-wrap gap-2 mt-2 text-[11px]">
-                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">13.a. Tgl Daftar: <strong>${r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-'}</strong></span>
-                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">13.b. Tgl Masuk: <strong>${assignedEntryDate || 'Diisi Admin Yayasan'}</strong></span>
-                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">13.c. NIS Lokal: <strong>${assignedNis || 'Diisi Admin Yayasan'}</strong></span>
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Tgl Daftar: <strong>${r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-'}</strong></span>
+                  ${assignedEntryDate ? `<span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Tgl Masuk: <strong>${assignedEntryDate}</strong></span>` : ''}
+                  ${assignedNis ? `<span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">NIS Lokal: <strong>${assignedNis}</strong></span>` : ''}
                 </div>
               </div>
               <div class="shrink-0 flex flex-col items-center">
@@ -438,7 +439,7 @@
 
       const rowsHtml = isPaud ? `
         <tr><td class="lbl">Tahun Pelajaran</td><td><strong>${academicYear}</strong></td></tr>
-        <tr><td class="lbl">Nomor Induk / Kelompok</td><td><strong>${assignedNis}</strong> / <strong>${assignedClass}</strong></td></tr>
+        ${(assignedNis !== 'Diisi Admin Yayasan' && assignedNis) ? `<tr><td class="lbl">Nomor Induk / Kelompok</td><td><strong>${assignedNis}</strong> / <strong>${assignedClass}</strong></td></tr>` : ''}
         <tr><td class="lbl">1.a. Nama Lengkap Anak</td><td><strong>${r.student_name || '-'}</strong></td></tr>
         <tr><td class="lbl">1.b. Nama Panggilan</td><td>${r.nickname || metaObj.nickname || '-'}</td></tr>
         <tr><td class="lbl">2. Jenis Kelamin</td><td>${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</td></tr>
@@ -453,7 +454,7 @@
         <tr><td class="lbl">D. Jarak &amp; Transportasi</td><td>${metaObj.distance_km ? metaObj.distance_km + ' KM' : '-'} / ${metaObj.transport_mode || '-'}</td></tr>
       ` : `
         <tr><td class="lbl">Jenjang Program / Thn Pelajaran</td><td><strong>${r.level || '-'} (${academicYear})</strong></td></tr>
-        <tr><td class="lbl">13. Pendaftaran (Tgl Masuk &amp; NIS Lokal)</td><td>Tgl Masuk: <strong>${assignedEntryDate}</strong> | NIS Lokal: <strong>${assignedNis}</strong></td></tr>
+        ${(assignedNis !== 'Diisi Admin Yayasan' && assignedNis) ? `<tr><td class="lbl">Tgl Masuk &amp; NIS Lokal</td><td>Tgl Masuk: <strong>${assignedEntryDate}</strong> | NIS Lokal: <strong>${assignedNis}</strong></td></tr>` : ''}
         <tr><td class="lbl">1. Nama Lengkap Santri</td><td><strong>${r.student_name || '-'}</strong></td></tr>
         <tr><td class="lbl">2. Nama Panggilan</td><td>${r.nickname || metaObj.nickname || '-'}</td></tr>
         <tr><td class="lbl">3. Jenis Kelamin</td><td>${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</td></tr>
