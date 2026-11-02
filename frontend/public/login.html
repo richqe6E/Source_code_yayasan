@@ -189,7 +189,7 @@
         <div>
           <div class="mb-1.5">
             <label for="identifier" id="identifier-label" class="block text-xs font-bold text-slate-700">
-              Nomor Induk Siswa (NIS) *
+              NIS Lokal / Nomor Registrasi PPDB *
             </label>
           </div>
 
@@ -203,7 +203,7 @@
               name="identifier" 
               required
               autocomplete="username"
-              placeholder="Contoh: 2026001" 
+              placeholder="Contoh: 2026001 atau REG-2026-0001" 
               class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 text-sm font-medium text-slate-800 placeholder-slate-400 outline-none transition"
             >
           </div>
@@ -383,8 +383,8 @@
       } else {
         tabSiswa.className = 'flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5 font-semibold';
         tabAdmin.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5 font-semibold';
-        label.textContent = 'Nomor Induk Siswa (NIS) *';
-        input.placeholder = 'Contoh: 2026001';
+        label.textContent = 'NIS Lokal / Nomor Registrasi PPDB *';
+        input.placeholder = 'Contoh: 2026001 atau REG-2026-0001';
         input.type = 'text';
         icon.className = 'fi fi-rr-graduation-cap text-base';
       }
@@ -444,9 +444,9 @@
         if (body) {
           body.innerHTML = `
             <div class="p-3.5">
-              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Nomor Induk Siswa (NIS)</div>
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">NIS Lokal atau Nomor Registrasi PPDB (Anak Usia &lt; 3 Tahun)</div>
               <div class="text-slate-700 mt-1 leading-relaxed">
-                Masukkan NIS terdaftar Anda (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">2026001</code>). NIS tertera pada kartu pelajar atau bukti formulir pendaftaran PPDB.
+                Bagi santri aktif yang telah diterima, masukkan <strong>NIS Lokal</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">2026001</code>). Bagi pendaftar baru PPDB (termasuk anak usia dini &lt; 3 tahun yang belum memiliki NIS), gunakan <strong>Nomor Registrasi PPDB</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">REG-2026-0001</code>) atau Email pendaftaran.
               </div>
             </div>
             <div class="p-3.5">

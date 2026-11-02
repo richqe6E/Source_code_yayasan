@@ -163,7 +163,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
               </div>
             </div>
-            <div class="text-lg font-extrabold text-slate-900" id="card-kelas">PAUD / TK Terpadu</div>
+            <div class="text-lg font-extrabold text-slate-900" id="card-kelas">TPQ / KB Ulinnuha</div>
             <div class="text-xs text-slate-500 mt-1" id="card-semester">Tahun Ajaran 2026/2027</div>
           </div>
 
@@ -306,7 +306,7 @@
               <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                 <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 mb-1.5">PPDB Online</span>
                 <h4 class="text-xs font-bold text-slate-900">Penerimaan Siswa Baru Dibuka</h4>
-                <p class="text-[11px] text-slate-600 mt-1">Pendaftaran calon santri PAUD, TK, dan TPQ telah dibuka. Bagikan informasi ini kepada keluarga &amp; kerabat.</p>
+                <p class="text-[11px] text-slate-600 mt-1">Pendaftaran calon santri TPQ Ulinnuha (TPQ Pagi &amp; Jenjang Tahfidz Pra PTPT / PTPT) serta KB Ulinnuha (PAUD) telah dibuka. Bagikan informasi ini kepada keluarga &amp; kerabat.</p>
               </div>
             </div>
           </div>
@@ -379,7 +379,7 @@
 
         if (isSiswaAktif) {
           const nis = student.nis || user.nis || '-';
-          document.getElementById('student-meta').textContent = `NIS: ${nis} • ${student.kelas_sekarang || student.class_name || 'PAUD / TK Terpadu'}`;
+          document.getElementById('student-meta').textContent = `NIS Lokal: ${nis} • ${student.kelas_sekarang || student.class_name || student.level || 'TPQ / KB Ulinnuha'}`;
           document.getElementById('section-siswa-aktif').classList.remove('hidden');
           document.getElementById('section-calon-siswa').classList.add('hidden');
 
@@ -388,7 +388,8 @@
         } else {
           const regNo = student.registration_number || student.reg_number || (user.username && user.username.startsWith('REG') ? user.username : '') || ('REG-' + new Date().getFullYear() + '-' + String(student.id || '').slice(-4));
           const stDesc = (student.status_pendaftaran === 'accepted' || student.status === 'accepted' || student.status === 'approved') ? 'Diterima' : 'Menunggu Validasi';
-          document.getElementById('student-meta').textContent = `Nomor Pendaftaran: ${regNo} • Status: ${stDesc}`;
+          const progLevel = student.level || 'TPQ Pagi / KB Ulinnuha';
+          document.getElementById('student-meta').textContent = `No. Pendaftaran: ${regNo} • Program: ${progLevel} • Status: ${stDesc} (NIS Lokal diterbitkan Admin saat Diterima)`;
           document.getElementById('section-calon-siswa').classList.remove('hidden');
           document.getElementById('section-siswa-aktif').classList.add('hidden');
 
@@ -410,7 +411,7 @@
     }
 
     async function loadSiswaAktifData(student, user) {
-      document.getElementById('card-kelas').textContent = student.kelas_sekarang || student.class_name || 'PAUD / TK Terpadu';
+      document.getElementById('card-kelas').textContent = student.kelas_sekarang || student.class_name || student.level || 'TPQ / KB Ulinnuha';
       document.getElementById('card-semester').textContent = student.semester_sekarang || 'Tahun Ajaran 2026/2027';
       
       // Populate Identitas

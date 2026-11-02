@@ -56,7 +56,26 @@
           <h2 class="text-base font-bold text-slate-900">Data Pribadi Siswa / Santri</h2>
         </div>
 
+        <div class="p-3.5 rounded-xl bg-primary-50/70 border border-primary-200 text-xs text-slate-700">
+          <strong class="text-primary-900">Ketentuan NIS Lokal &amp; Anak di Bawah 3 Tahun:</strong> Anak usia dini (&lt; 3 tahun) belum memiliki NIS saat pendaftaran. <strong>NIS Lokal</strong> resmi diterbitkan oleh Admin TU setelah ananda diterima. Kolom NIK (16 digit KK) bersifat opsional bagi anak di bawah 3 tahun yang KK-nya masih dalam proses.
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="level" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Jenjang Program PPDB</label>
+            <select id="level" name="level" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+              <option value="TPQ Pagi">A. TPQ Ulinnuha — Jenjang TPQ Pagi (Qiraati 5 Jilid)</option>
+              <option value="Tahfidz Pra PTPT">B.1. Jenjang Tahfidz — Pra PTPT (60x Khotam)</option>
+              <option value="Tahfidz PTPT">B.2. Jenjang Tahfidz — PTPT (Kelas 1–6 • Juz 1–30)</option>
+              <option value="KB Ulinnuha (PAUD)">C. KB Ulinnuha (PAUD • NPSN 69840840)</option>
+            </select>
+          </div>
+          <div>
+            <label for="age_category" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kategori Usia Santri</label>
+            <select id="age_category" name="age_category" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+              <option value="Usia Dini (<= 3 Tahun)">Usia Dini (Maksimal / Di Bawah 3 Tahun — Tanpa NIS Awal)</option>
+              <option value="Usia Reguler (> 3 Tahun)">Usia Reguler (Lebih dari 3 Tahun ke Atas)</option>
+            </select>
+          </div>
           <div class="sm:col-span-2">
             <label for="full_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Nama Lengkap (Sesuai Akte Kelahiran) <span class="text-red-500">*</span>
@@ -104,6 +123,21 @@
           </div>
 
           <div class="sm:col-span-2">
+          <div>
+            <label for="nik" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nomor NIK Anak (16 Digit KK — Opsional Usia &lt; 3 Thn)</label>
+            <input type="text" id="nik" name="nik" maxlength="16" placeholder="16 digit NIK KK (Boleh dikosongkan bagi usia < 3 thn)" class="block w-full px-3.5 py-2.5 text-sm font-mono bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="child_order" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Anak Ke-</label>
+              <input type="number" id="child_order" min="1" max="15" placeholder="1" class="block w-full px-3 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+            </div>
+            <div>
+              <label for="siblings_count" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Jml Saudara</label>
+              <input type="number" id="siblings_count" min="0" max="20" placeholder="2" class="block w-full px-3 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+            </div>
+          </div>
+          <div class="sm:col-span-2">
             <label for="address" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Alamat Tempat Tinggal Lengkap <span class="text-red-500">*</span>
             </label>
@@ -121,7 +155,39 @@
           <h2 class="text-base font-bold text-slate-900">Data Orang Tua / Wali</h2>
         </div>
 
+        <div class="p-3.5 rounded-xl bg-primary-50/70 border border-primary-200 text-xs text-slate-700">
+          <strong class="text-primary-900">Ketentuan NIS Lokal &amp; Anak di Bawah 3 Tahun:</strong> Anak usia dini (&lt; 3 tahun) belum memiliki NIS saat pendaftaran. <strong>NIS Lokal</strong> resmi diterbitkan oleh Admin TU setelah ananda diterima. Kolom NIK (16 digit KK) bersifat opsional bagi anak di bawah 3 tahun yang KK-nya masih dalam proses.
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="level" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Jenjang Program PPDB</label>
+            <select id="level" name="level" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+              <option value="TPQ Pagi">A. TPQ Ulinnuha — Jenjang TPQ Pagi (Qiraati 5 Jilid)</option>
+              <option value="Tahfidz Pra PTPT">B.1. Jenjang Tahfidz — Pra PTPT (60x Khotam)</option>
+              <option value="Tahfidz PTPT">B.2. Jenjang Tahfidz — PTPT (Kelas 1–6 • Juz 1–30)</option>
+              <option value="KB Ulinnuha (PAUD)">C. KB Ulinnuha (PAUD • NPSN 69840840)</option>
+            </select>
+          </div>
+          <div>
+            <label for="age_category" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kategori Usia Santri</label>
+            <select id="age_category" name="age_category" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+              <option value="Usia Dini (<= 3 Tahun)">Usia Dini (Maksimal / Di Bawah 3 Tahun — Tanpa NIS Awal)</option>
+              <option value="Usia Reguler (> 3 Tahun)">Usia Reguler (Lebih dari 3 Tahun ke Atas)</option>
+            </select>
+          </div>
+          <div>
+          <div>
+            <label for="phone_2" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Telpon (2) / Nomor HP Cadangan</label>
+            <input type="tel" id="phone_2" name="phone_2" placeholder="08xxxxxxxxxx (Opsional)" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+          <div>
+            <label for="father_job" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pekerjaan Ayah</label>
+            <input type="text" id="father_job" name="father_job" placeholder="Karyawan Swasta, Wiraswasta, PNS, dll." class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+          <div>
+            <label for="mother_job" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pekerjaan Ibu</label>
+            <input type="text" id="mother_job" name="mother_job" placeholder="Ibu Rumah Tangga, PNS, Swasta, dll." class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
           <div>
             <label for="father_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Nama Ayah Kandung <span class="text-red-500">*</span>
@@ -230,6 +296,16 @@
           document.getElementById('mother_name').value = s.mother_name || '';
           document.getElementById('parent_phone').value = s.parent_phone || s.phone || user.phone || '';
           document.getElementById('parent_email').value = s.parent_email || user.email || '';
+          let meta = (s.form_metadata && typeof s.form_metadata === 'object') ? s.form_metadata : {};
+          if (typeof s.notes === 'string' && s.notes.trim().startsWith('{')) { try { meta = { ...JSON.parse(s.notes), ...meta }; } catch (_) {} }
+          if (s.level && document.getElementById('level')) document.getElementById('level').value = s.level;
+          if (meta.age_category && document.getElementById('age_category')) document.getElementById('age_category').value = meta.age_category;
+          if (document.getElementById('nik')) document.getElementById('nik').value = s.nik || meta.nik || '';
+          if (document.getElementById('child_order')) document.getElementById('child_order').value = s.child_order || meta.child_order || '';
+          if (document.getElementById('siblings_count')) document.getElementById('siblings_count').value = s.siblings_count || meta.siblings_count || '';
+          if (document.getElementById('phone_2')) document.getElementById('phone_2').value = s.phone_2 || meta.phone_2 || '';
+          if (document.getElementById('father_job')) document.getElementById('father_job').value = (meta.father && meta.father.job) || '';
+          if (document.getElementById('mother_job')) document.getElementById('mother_job').value = (meta.mother && meta.mother.job) || '';
         }
       } catch (err) {
         console.error('Error fetching student profile:', err);
@@ -257,7 +333,15 @@
         father_name: document.getElementById('father_name').value.trim(),
         mother_name: document.getElementById('mother_name').value.trim(),
         parent_phone: document.getElementById('parent_phone').value.trim(),
-        parent_email: document.getElementById('parent_email').value.trim()
+        parent_email: document.getElementById('parent_email').value.trim(),
+        level: document.getElementById('level') ? document.getElementById('level').value : undefined,
+        age_category: document.getElementById('age_category') ? document.getElementById('age_category').value : undefined,
+        nik: document.getElementById('nik') ? document.getElementById('nik').value.trim() : undefined,
+        child_order: document.getElementById('child_order') ? document.getElementById('child_order').value.trim() : undefined,
+        siblings_count: document.getElementById('siblings_count') ? document.getElementById('siblings_count').value.trim() : undefined,
+        phone_2: document.getElementById('phone_2') ? document.getElementById('phone_2').value.trim() : undefined,
+        father_job: document.getElementById('father_job') ? document.getElementById('father_job').value.trim() : undefined,
+        mother_job: document.getElementById('mother_job') ? document.getElementById('mother_job').value.trim() : undefined
       };
 
       try {

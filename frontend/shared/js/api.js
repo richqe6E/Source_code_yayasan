@@ -265,7 +265,34 @@
                 matchedUser = users[0];
               } else {
                 // Look up student by NIS
-                const students = await supabaseRest(`students?nis=eq.${encodeURIComponent(rawIdentifier)}&select=*`);
+                if (!matchedUser && String(rawIdentifier).toUpperCase().startsWith('REG')) {
+                  const regRows = await supabaseRest(`ppdb_registrations?or=(registration_number.eq.${encodeURIComponent(rawIdentifier.toUpperCase())},registration_no.eq.${encodeURIComponent(rawIdentifier.toUpperCase())},id.eq.${encodeURIComponent(rawIdentifier.toUpperCase())})&select=*`).catch(() => []);
+                  if (regRows && regRows.length > 0) {
+                    const r = regRows[0];
+                    const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
+                    const bDate = String(r.birth_date || r.student_birth_date || '').trim();
+                    const customPass = String(meta.password || meta.account_password || '').trim();
+                    const regNoStr = r.registration_number || r.registration_no || rawIdentifier.toUpperCase();
+                    const isConverted = String(r.status || '').toLowerCase() === 'converted';
+                    matchedUser = {
+                      id: meta.user_id || ('USR-' + regNoStr),
+                      email: r.parent_email || `${regNoStr.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`,
+                      username: regNoStr,
+                      nis: r.converted_nis || meta.converted_nis || meta.nis || '',
+                      password_hash: customPass || bDate,
+                      birth_date: bDate,
+                      full_name: r.full_name || r.student_name || r.child_name || 'Calon Santri',
+                      name: r.full_name || r.student_name || r.child_name || 'Calon Santri',
+                      phone: r.parent_phone || r.phone || '',
+                      role: isConverted ? 'siswa_aktif' : 'calon_siswa',
+                      role_label: isConverted ? 'Siswa Aktif' : 'Calon Siswa / Pendaftar',
+                      status: 'active',
+                      student_id: meta.student_id || r.student_id || null,
+                      is_password_changed: true
+                    };
+                  }
+                }
+                const students = !matchedUser ? await supabaseRest(`students?nis=eq.${encodeURIComponent(rawIdentifier)}&select=*`) : [];
                 if (students && students.length > 0) {
                   studentRecord = students[0];
                   if (studentRecord.user_id) {
@@ -840,6 +867,20 @@
                 : `ppdb_registrations?full_name=eq.${encodeURIComponent(student.full_name || currentUser.full_name || '')}&select=*`;
               const regs = await supabaseRest(regQuery).catch(() => []);
               if (regs && regs[0]) {
+                const r = regs[0];
+                student.level = r.level || student.level || '';
+                student.form_type = r.form_type || student.form_type || '';
+                student.notes = r.notes || student.notes || '';
+                student.form_metadata = r.form_metadata || student.form_metadata || null;
+                if (!student.nickname && r.nickname) student.nickname = r.nickname;
+                if (!student.gender && (r.gender || r.student_gender)) student.gender = r.gender || r.student_gender;
+                if (!student.birth_place && (r.birth_place || r.student_birth_place)) student.birth_place = r.birth_place || r.student_birth_place;
+                if (!student.birth_date && (r.birth_date || r.student_birth_date)) student.birth_date = r.birth_date || r.student_birth_date;
+                if (!student.address && r.address) student.address = r.address;
+                if (!student.father_name && r.father_name) student.father_name = r.father_name;
+                if (!student.mother_name && r.mother_name) student.mother_name = r.mother_name;
+                if (!student.parent_phone && (r.parent_phone || r.phone)) student.parent_phone = r.parent_phone || r.phone;
+                if (!student.parent_email && r.parent_email) student.parent_email = r.parent_email;
                 student.registration_number = regs[0].registration_number || regs[0].registration_no;
                 student.status_pendaftaran = regs[0].status || student.status_pendaftaran;
                 if (!student.photo_url && regs[0].photo_url) student.photo_url = regs[0].photo_url;
@@ -882,6 +923,8 @@
             if (newPhone !== undefined) { regPatch.parent_phone = newPhone; regPatch.phone = newPhone; }
             if (payload.parent_email !== undefined) regPatch.parent_email = payload.parent_email;
             if (payload.address !== undefined) regPatch.address = payload.address;
+            if (payload.nik !== undefined) regPatch.nik = payload.nik;
+            if (payload.notes !== undefined) regPatch.notes = payload.notes;
             if (Object.keys(regPatch).length > 0 && currentUser) {
               const regFilter = (currentUser.username && String(currentUser.username).startsWith('REG'))
                 ? `registration_number=eq.${encodeURIComponent(currentUser.username)}`
@@ -1991,7 +2034,9 @@
             combined = combined.filter(r => {
               const rFt = (r.form_type || '').toLowerCase();
               const rLvl = (r.level || '').toLowerCase();
-              if (ft === 'paud') return rFt === 'paud' || rFt === 'tk' || rLvl.includes('paud') || rLvl.includes('tk');
+              if (ft === 'paud' || ft === 'kb_ulinnuha') return rFt === 'paud' || rFt === 'kb' || rLvl.includes('paud') || rLvl.includes('kb');
+              if (ft === 'tpq_pagi') return (rFt === 'tpq' || rFt === 'tpq_pagi' || rLvl.includes('tpq')) && !rLvl.includes('tahfidz') && !rLvl.includes('ptpt');
+              if (ft === 'tahfidz') return rFt === 'tahfidz' || rLvl.includes('tahfidz') || rLvl.includes('ptpt');
               if (ft === 'tpq') return rFt === 'tpq' || rLvl.includes('tpq');
               return rFt === ft;
             });
@@ -2040,7 +2085,7 @@
           const gender = params.gender || params.student_gender || 'L';
           const birthPlace = params.birth_place || params.student_birth_place || 'Samarinda';
           const birthDate = params.birth_date || params.student_birth_date || '2021-01-01';
-          const level = params.form_type === 'tpq' ? 'TPQ' : (params.level || 'PAUD');
+          const level = params.level || (params.form_type === 'tpq' ? 'TPQ Pagi' : (params.form_type === 'tahfidz' ? 'Tahfidz Pra PTPT' : 'KB Ulinnuha (PAUD)'));
           const address = params.address || '';
           const password = params.password || (typeof birthDate === 'string' ? birthDate.replace(/-/g, '') : '123456');
 
@@ -2635,6 +2680,8 @@
           const metaWithNis = {
             ...(reg.form_metadata || {}),
             converted_nis: studentNis,
+            local_nis: studentNis,
+            entry_date: params.entry_date || new Date().toISOString().slice(0, 10),
             nis: studentNis,
             class_name: targetClassName,
             student_id: stuId,

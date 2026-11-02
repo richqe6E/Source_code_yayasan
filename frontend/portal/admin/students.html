@@ -347,7 +347,7 @@
         tbody.innerHTML = filtered.map(s => {
           const cls = classesCache.find(c => c.id === (s.class_id || s.current_class_id));
           const className = (cls && cls.name) || s.kelas_sekarang || s.class_name || 'Belum diatur';
-          const levelName = (cls && cls.level) || 'PAUD/TK';
+          const levelName = (cls && cls.level) || s.level || 'TPQ / KB Ulinnuha';
 
           return `
           <tr class="hover:bg-gray-50/80 transition group">

@@ -55,7 +55,7 @@
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
       <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">Cek Status Penerimaan PPDB</h1>
       <p class="text-primary-100 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-        Pantau proses verifikasi berkas pendaftaran dan pengumuman penerimaan calon siswa PAUD, TK A, TK B, maupun TPQ secara transparan dan real-time.
+        Pantau proses verifikasi berkas pendaftaran dan pengumuman penerimaan calon santri TPQ Ulinnuha (TPQ Pagi &amp; Jenjang Tahfidz Pra PTPT / PTPT) serta KB Ulinnuha (PAUD) secara transparan dan real-time.
       </p>
     </div>
   </section>
@@ -158,7 +158,13 @@
         const birthDate = r.student_birth_date || r.birth_date || r.child_birth_date || '';
         const createdAt = r.created_at || r.registration_date || '';
         const rawStatus = (r.status || 'pending').toLowerCase();
-        const jenjang = (r.level || r.form_type || 'PAUD/TK').toUpperCase();
+        const jenjang = (r.level || r.form_type || 'TPQ Pagi').toUpperCase();
+        let metaObj = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
+        if (typeof r.notes === 'string' && r.notes.trim().startsWith('{')) { try { metaObj = { ...JSON.parse(r.notes), ...metaObj }; } catch (_) {} }
+        const ageCat = metaObj.age_category || '';
+        const pkbmTrack = metaObj.pkbm_track || '';
+        const subTahfidz = metaObj.pra_ptpt_level || metaObj.ptpt_class || metaObj.paud_origin || '';
+        const entryDate = metaObj.entry_date || '';
         const parentName = r.parent_name || r.father_name || r.mother_name || '-';
         const parentPhone = r.parent_phone || r.phone || r.father_phone || '-';
         let nis = r.converted_nis || r.nis || r.student_nis || (r.form_metadata && (r.form_metadata.converted_nis || r.form_metadata.nis)) || '';
@@ -352,7 +358,12 @@
 
             <dl class="grid sm:grid-cols-2 gap-4 text-xs mb-5">
               <div><dt class="text-slate-500 mb-0.5">Nama Lengkap Calon Siswa</dt><dd class="font-bold text-slate-900 text-sm">${escapeHtml(childName)}</dd></div>
-              <div><dt class="text-slate-500 mb-0.5">Jenjang / Unit Tujuan</dt><dd class="font-bold text-primary-700 uppercase">${escapeHtml(jenjang)}</dd></div>
+              <div><dt class="text-slate-500 mb-0.5">Jenjang / Program Tujuan</dt><dd class="font-bold text-primary-700 uppercase">${escapeHtml(jenjang)}</dd></div>
+              ${ageCat ? `<div><dt class="text-slate-500 mb-0.5">Kategori Usia</dt><dd class="font-semibold text-slate-800">${escapeHtml(ageCat)}</dd></div>` : ''}
+              ${subTahfidz ? `<div><dt class="text-slate-500 mb-0.5">Rincian Level / Kelas</dt><dd class="font-semibold text-slate-800">${escapeHtml(subTahfidz)}</dd></div>` : ''}
+              ${pkbmTrack ? `<div><dt class="text-slate-500 mb-0.5">Jalur Pendidikan Kesetaraan (PKBM)</dt><dd class="font-semibold text-slate-800">${escapeHtml(pkbmTrack)}</dd></div>` : ''}
+              ${entryDate ? `<div><dt class="text-slate-500 mb-0.5">Tanggal Masuk Resmi</dt><dd class="font-bold text-emerald-700">${escapeHtml(entryDate)}</dd></div>` : ''}
+              ${!nis ? `<div><dt class="text-slate-500 mb-0.5">Status NIS Lokal</dt><dd class="font-semibold text-amber-700">Diterbitkan Admin TU setelah Diterima (Login Portal gunakan ${escapeHtml(regNo)})</dd></div>` : ''}
               ${nis ? `<div><dt class="text-slate-500 mb-0.5">Nomor Induk Siswa (NIS Resmi)</dt><dd class="font-bold text-primary-800 font-mono text-sm">${escapeHtml(nis)}</dd></div>` : ''}
               ${className ? `<div><dt class="text-slate-500 mb-0.5">Kelas / Rombongan Belajar</dt><dd class="font-bold text-slate-800">${escapeHtml(className)}</dd></div>` : ''}
               <div><dt class="text-slate-500 mb-0.5">Tanggal Lahir</dt><dd class="font-medium text-slate-800">${birthDate || '-'}</dd></div>
@@ -448,7 +459,7 @@
         <body>
           <div class="kop">
             <h1>YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</h1>
-            <p>Pendidikan Terpadu: PAUD, Taman Kanak-Kanak (TK A &amp; TK B) dan TPQ</p>
+            <p>Program Resmi: TPQ Ulinnuha (TPQ Pagi &amp; Jenjang Tahfidz Pra PTPT / PTPT) &bull; KB Ulinnuha (PAUD NPSN 69840840)</p>
             <p>Jl. Wijaya Kusuma V-A No. 38, Samarinda Ulu | WhatsApp Resmi: 0813-4714-2829</p>
           </div>
           <div class="title">

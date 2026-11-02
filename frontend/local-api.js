@@ -434,7 +434,46 @@ function handleApiRequest(apiPath, params, method) {
         };
       }
 
-      return { success: false, message: 'Akun tidak ditemukan. Periksa Email atau NIS Anda.', error: { code: 'UNAUTHORIZED', message: 'Akun tidak ditemukan' } };
+      // 3. Cek DB.ppdb_registrations (Calon Siswa via No. Registrasi REG-...)
+      const regMatch = DB.ppdb_registrations.find(r =>
+        (r.registration_number && r.registration_number.toLowerCase() === idLower) ||
+        (r.id && r.id.toLowerCase() === idLower) ||
+        (r.email && r.email.toLowerCase() === idLower)
+      );
+      if (regMatch) {
+        const bDate = String(regMatch.birth_date || regMatch.student_birth_date || '').trim();
+        const bDateClean = bDate.replace(/[^0-9]/g, '');
+        const passClean = password.replace(/[^0-9]/g, '');
+        let ddmmyyyy = '';
+        if (bDate && bDate.includes('-')) {
+          const parts = bDate.split('-');
+          if (parts.length === 3) ddmmyyyy = parts[2] + parts[1] + parts[0];
+        }
+        const matchesPwd = (regMatch.password && regMatch.password === password) ||
+                           password === bDate || password === ddmmyyyy ||
+                           (passClean.length >= 6 && (passClean === bDateClean || passClean === ddmmyyyy));
+        if (!matchesPwd) {
+          return { success: false, message: 'Password salah.', error: { code: 'UNAUTHORIZED', message: 'Password salah.' } };
+        }
+        const isConv = regMatch.status === 'converted';
+        const regUser = {
+          id: 'USR-' + regMatch.registration_number,
+          username: regMatch.registration_number,
+          name: regMatch.nickname || regMatch.full_name,
+          full_name: regMatch.full_name,
+          email: regMatch.email || `${regMatch.registration_number.toLowerCase()}@pendaftar.yayasan.sch.id`,
+          role: isConv ? { code: 'siswa_aktif', name: 'Siswa Aktif' } : { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' },
+          role_label: isConv ? 'Siswa Aktif' : 'Calon Siswa / Pendaftar',
+          nis: regMatch.converted_nis || '',
+          student_id: regMatch.student_id || regMatch.id,
+          is_password_changed: true
+        };
+        const token = 'TOKEN-CALON-' + regMatch.registration_number + '-' + Date.now();
+        SESSIONS.set(token, regUser);
+        return { success: true, data: { token, user: regUser } };
+      }
+
+      return { success: false, message: 'Akun tidak ditemukan. Periksa Email, NIS, atau Nomor Registrasi Anda.', error: { code: 'UNAUTHORIZED', message: 'Akun tidak ditemukan' } };
     }
 
     if (action === 'change_password') {
@@ -540,6 +579,8 @@ function handleApiRequest(apiPath, params, method) {
           family_card: familyCard
         },
         notes: params.notes || '',
+        password: params.password || '',
+        form_metadata: params.form_metadata || { ...params },
         status: 'pending',
         created_at: new Date().toISOString(),
         registration_date: new Date().toISOString().split('T')[0]
@@ -617,7 +658,16 @@ function handleApiRequest(apiPath, params, method) {
         );
       }
       if (params.form_type) {
-        list = list.filter(r => String(r.form_type).toLowerCase() === String(params.form_type).toLowerCase() || String(r.level).toLowerCase() === String(params.form_type).toLowerCase());
+        const ft = String(params.form_type).toLowerCase();
+        list = list.filter(r => {
+          const rFt = String(r.form_type || '').toLowerCase();
+          const rLvl = String(r.level || '').toLowerCase();
+          if (ft === 'paud' || ft === 'kb_ulinnuha') return rFt === 'paud' || rFt === 'kb' || rLvl.includes('paud') || rLvl.includes('kb');
+          if (ft === 'tpq_pagi') return (rFt === 'tpq' || rFt === 'tpq_pagi' || rLvl.includes('tpq')) && !rLvl.includes('tahfidz') && !rLvl.includes('ptpt');
+          if (ft === 'tahfidz') return rFt === 'tahfidz' || rLvl.includes('tahfidz') || rLvl.includes('ptpt');
+          if (ft === 'tpq') return rFt === 'tpq' || rFt === 'tahfidz' || rLvl.includes('tpq') || rLvl.includes('tahfidz') || rLvl.includes('ptpt');
+          return rFt === ft || rLvl === ft;
+        });
       }
       return {
         success: true,
