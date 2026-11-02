@@ -1,0 +1,23 @@
+# Task Execution Tracker — Operational Workflow Redesign
+
+- [x] **Phase 1 (P0): Pondasi Keuangan & Keamanan Akun**
+  - [x] TASK-01: Perbaikan Nominal SPP Santri Baru & Fleksibilitas Tarif Berjenjang
+  - [x] TASK-02: Pengamanan Kredensial Portal Siswa (Salted Hash & Mandatory Force Change)
+- [x] **Phase 2 (P1): Optimasi CMS & Tagihan Massal**
+  - [x] TASK-03: Optimasi Upload Gambar CMS (Client-side WebP) & Pembersihan Gambar Bawaan
+  - [x] TASK-04: Optimasi Simpan Semua Pengaturan CMS (Anti-Bloat & De-duplikasi HTTP)
+  - [x] TASK-05: Redesain Tagihan Massal SPP (Bulk Insert & Anti-Duplicate Guard)
+- [x] **Phase 3 (P1): Workflow PPDB & Alur Tolak Bukti**
+  - [x] TASK-06: Alur Penolakan Bukti Bayar SPP dengan Alasan & Fasilitas Unggah Ulang
+  - [x] TASK-07: Filter Periode & Isolasi Tahun Ajaran PPDB
+  - [x] TASK-08: Fitur Penerimaan Siswa Secara Massal (Bulk Acceptance)
+- [x] **Phase 4 (P1): Aktivasi Massal & Sinkronisasi Siswa**
+  - [x] TASK-09: Fitur Konversi Siswa Aktif Secara Massal (Bulk Student Activation)
+  - [x] TASK-10: Sinkronisasi 36 Field PPDB ke Modal Edit & Form Tambah Siswa Baru
+- [x] **Phase 5 (P2): Standarisasi & Optimasi Admin**
+  - [x] TASK-11: Standarisasi Format Nominal Rupiah Baku (Rp150.000)
+  - [x] TASK-12: Field Email Guru Bersifat Opsional
+  - [x] TASK-13: Optimasi Performa Simpan Portal Admin (Retry PostgREST & Activity Log)
+- [x] **Phase 6 (P3): Final Polish & Verifikasi Menyeluruh**
+  - [x] TASK-14: Penyempurnaan Visual & Feedback Toast Interaktif
+  - [x] Pengujian Regresi & Verifikasi Sistem

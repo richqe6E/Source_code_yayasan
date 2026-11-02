@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -180,8 +180,8 @@
   <section class="relative overflow-hidden bg-primary-950 text-white min-h-[520px] lg:min-h-[600px] flex items-center">
     <!-- Slider Images Container (Controlled via JS & Instant Local Cache) -->
     <div id="hero-slider-container" class="absolute inset-0">
-      <!-- Foto asli beranda sekolah sebagai fallback terverifikasi (bebas dari foto template atau banner yang sudah dihapus) -->
-      <div class="hero-slide active bg-cover bg-center" style="background-image: url('https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1792469386750_srz5t.jpg'), url('/images/school-campus.jpg');"></div>
+      <!-- Foto latar beranda sekolah resmi (dikelola penuh melalui CMS Banner) -->
+      <div class="hero-slide active bg-cover bg-center" style="background-image: url('/images/school-campus.jpg');"></div>
     </div>
     <script>
       (function() {
@@ -593,7 +593,7 @@
 
         function renderSlides(images) {
           if (!Array.isArray(images) || images.length === 0) {
-            sliderContainer.innerHTML = '<div class="hero-slide active bg-cover bg-center" style="background-image: url(\'https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1792469386750_srz5t.jpg\'), url(\'/images/school-campus.jpg\');"></div>';
+            sliderContainer.innerHTML = '<div class="hero-slide active bg-cover bg-center" style="background-image: url(\'/images/school-campus.jpg\');"></div>';
             return;
           }
           sliderContainer.innerHTML = images.map((img, i) => `

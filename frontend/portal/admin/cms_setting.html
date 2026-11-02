@@ -742,36 +742,37 @@
       };
 
       try {
-        const res = await apiCall('web_settings', 'update', payload);
-        if (res.success) {
-          try { localStorage.setItem('siy_hero_cache', JSON.stringify(currentHeroImages)); } catch (_) {}
-          // Sinkronisasi otomatis ke modul schools agar seluruh endpoint website terintegrasi
-          try {
-            await apiCall('schools', 'update', {
-              name: payload.school_name,
-              address: payload.address,
-              campus_note: payload.campus_note,
-              operational_hours: payload.operational_hours,
-              maps_url: payload.maps_url,
-              maps_embed_url: payload.maps_embed_url,
-              phone: payload.phone,
-              email: payload.email,
-              whatsapp_number: payload.whatsapp,
-              facebook_url: payload.facebook_url,
-              instagram_url: payload.instagram_url,
-              youtube_url: payload.youtube_url,
-              footer_bg_url: payload.footer_bg_url
-            });
-          } catch (_) {}
+        const schoolPayload = {
+          name: payload.school_name,
+          address: payload.address,
+          campus_note: payload.campus_note,
+          operational_hours: payload.operational_hours,
+          maps_url: payload.maps_url,
+          maps_embed_url: payload.maps_embed_url,
+          phone: payload.phone,
+          email: payload.email,
+          whatsapp_number: payload.whatsapp,
+          facebook_url: payload.facebook_url,
+          instagram_url: payload.instagram_url,
+          youtube_url: payload.youtube_url,
+          footer_bg_url: payload.footer_bg_url
+        };
 
+        const [res] = await Promise.all([
+          apiCall('web_settings', 'update', payload),
+          apiCall('schools', 'update', schoolPayload).catch(e => console.warn('Sync to schools non-critical:', e))
+        ]);
+
+        if (res && res.success) {
+          try { localStorage.setItem('siy_hero_cache', JSON.stringify(currentHeroImages)); } catch (_) {}
           showToast('Seluruh pengaturan website & lokasi sekolah berhasil diperbarui!', 'success');
           // Clear session cache so visitors immediately see new settings
           sessionStorage.removeItem('siyayasan_school_profile');
         } else {
-          showToast(res.message || 'Gagal menyimpan pengaturan', 'error');
+          showToast(res ? res.message : 'Gagal menyimpan pengaturan', 'error');
         }
       } catch (err) {
-        showToast('Terjadi kesalahan sistem saat menyimpan', 'error');
+        showToast('Terjadi kesalahan sistem saat menyimpan: ' + (err.message || err), 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Simpan Semua Pengaturan';

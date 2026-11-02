@@ -277,9 +277,17 @@
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Nominal per Siswa (Rp) *</label>
-            <input id="bulk-amount" type="number" required value="150000" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <label class="block text-xs font-bold text-gray-700 mb-1">Skema Nominal SPP *</label>
+            <select id="bulk-fee-mode" onchange="toggleBulkFeeMode()" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500">
+              <option value="student_spp">Sesuai Profil Siswa / Jenjang (Disarankan)</option>
+              <option value="custom">Nominal Seragam Manual (Rp)</option>
+            </select>
           </div>
+        </div>
+        <div id="bulk-custom-amount-wrap" class="hidden">
+          <label class="block text-xs font-bold text-gray-700 mb-1">Nominal Seragam per Siswa (Rp) *</label>
+          <input id="bulk-amount" type="number" value="150000" oninput="document.getElementById('bulk-amount-preview').textContent = formatIDR(this.value)" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <span id="bulk-amount-preview" class="text-[11px] text-primary-700 font-bold mt-1 block">Rp150.000</span>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Jatuh Tempo *</label>
@@ -287,12 +295,49 @@
         </div>
 
         <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-900">
-          💡 Tagihan akan otomatis masuk ke akun Portal Siswa masing-masing siswa yang bersangkutan.
+          💡 Tagihan akan otomatis masuk ke akun Portal Siswa masing-masing siswa yang bersangkutan tanpa risiko duplikasi.
         </div>
 
         <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
           <button type="button" onclick="closeBulkInvModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
           <button id="btn-save-bulk-inv" type="submit" class="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl shadow-sm transition">Terbitkan Massal Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Tolak Pembayaran & Bukti Transfer -->
+  <div id="reject-payment-modal" class="hidden fixed inset-0 z-50 bg-gray-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-5 max-w-md w-full shadow-2xl border border-gray-100" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center pb-3 mb-3 border-b border-gray-100">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600">Konfirmasi Penolakan</span>
+          <h4 class="text-sm font-bold text-gray-900">Tolak Bukti Transfer Pembayaran</h4>
+        </div>
+        <button onclick="closeRejectPaymentModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 text-xl font-bold">&times;</button>
+      </div>
+      <form id="reject-payment-form" class="space-y-3">
+        <input type="hidden" id="reject-payment-id">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Alasan Penolakan *</label>
+          <select id="reject-reason-select" required class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-rose-500">
+            <option value="Struk / Bukti transfer buram atau tidak terbaca">Struk / Bukti transfer buram atau tidak terbaca</option>
+            <option value="Nominal pembayaran tidak sesuai dengan tagihan">Nominal pembayaran tidak sesuai dengan tagihan</option>
+            <option value="Rekening bank tujuan transfer salah">Rekening bank tujuan transfer salah</option>
+            <option value="Foto struk terpotong atau informasi tidak lengkap">Foto struk terpotong atau informasi tidak lengkap</option>
+            <option value="Lainnya">Alasan Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Catatan Tambahan untuk Santri / Wali (Opsional)</label>
+          <textarea id="reject-notes" rows="3" placeholder="Contoh: Mohon foto ulang bukti transfer dengan pencahayaan terang..." class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-rose-500"></textarea>
+        </div>
+        <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-[11px] text-rose-800">
+          ⚠️ Status tagihan siswa akan dikembalikan menjadi <strong>Belum Lunas</strong> dan santri dapat mengunggah ulang bukti transfer baru di Portal Siswa.
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-gray-100">
+          <button type="button" onclick="closeRejectPaymentModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50">Batal</button>
+          <button id="btn-confirm-reject-pay" type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">Tolak &amp; Kembalikan Tagihan</button>
         </div>
       </form>
     </div>
@@ -667,6 +712,16 @@
     });
 
     // Modal Bulk Invoice
+    function toggleBulkFeeMode() {
+      const mode = document.getElementById('bulk-fee-mode').value;
+      const wrap = document.getElementById('bulk-custom-amount-wrap');
+      if (mode === 'custom') {
+        wrap.classList.remove('hidden');
+      } else {
+        wrap.classList.add('hidden');
+      }
+    }
+
     function openBulkInvoiceModal() {
       document.getElementById('bulk-inv-modal').classList.remove('hidden');
       document.getElementById('bulk-due').value = new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10);
@@ -677,6 +732,8 @@
       const ySel = document.getElementById('bulk-year-select');
       if (mSel && curMonth) mSel.value = curMonth;
       if (ySel && curYear) ySel.value = curYear;
+      document.getElementById('bulk-fee-mode').value = 'student_spp';
+      toggleBulkFeeMode();
     }
     function closeBulkInvModal() {
       document.getElementById('bulk-inv-modal').classList.add('hidden');
@@ -688,7 +745,8 @@
       const mSel = document.getElementById('bulk-month-select');
       const ySel = document.getElementById('bulk-year-select');
       const month = mSel && ySel ? `${mSel.value} ${ySel.value}` : 'Oktober 2026';
-      const amount = parseFloat(document.getElementById('bulk-amount').value);
+      const feeMode = document.getElementById('bulk-fee-mode').value;
+      const customAmount = parseFloat(document.getElementById('bulk-amount').value) || 150000;
       const dueDate = document.getElementById('bulk-due').value;
 
       const btn = document.getElementById('btn-save-bulk-inv');
@@ -696,13 +754,15 @@
       btn.textContent = 'Menerbitkan Massal...';
 
       try {
-        const res = await apiCall('invoices', 'create_bulk', {
+        const payload = {
           class_id: classId,
           month: month,
           item_name: `SPP ${month}`,
-          amount: amount,
-          due_date: dueDate
-        });
+          due_date: dueDate,
+          use_student_spp: feeMode === 'student_spp',
+          amount: feeMode === 'student_spp' ? 'auto' : customAmount
+        };
+        const res = await apiCall('invoices', 'create_bulk', payload);
         showToast(res.message || 'Tagihan massal berhasil diterbitkan', res.success ? 'success' : 'error');
         if (res.success) {
           closeBulkInvModal();
@@ -710,19 +770,62 @@
           loadKpis();
         }
       } catch (err) {
-        showToast('Gagal menerbitkan tagihan massal', 'error');
+        showToast('Gagal menerbitkan tagihan massal: ' + (err.message || err), 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Terbitkan Massal Sekarang';
       }
     });
 
+    // Modal Tolak Bukti Transfer
+    function openRejectPaymentModal(id) {
+      document.getElementById('reject-payment-id').value = id;
+      document.getElementById('reject-notes').value = '';
+      document.getElementById('reject-reason-select').selectedIndex = 0;
+      document.getElementById('reject-payment-modal').classList.remove('hidden');
+    }
+    function closeRejectPaymentModal() {
+      document.getElementById('reject-payment-modal').classList.add('hidden');
+    }
+
+    document.getElementById('reject-payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('reject-payment-id').value;
+      const reason = document.getElementById('reject-reason-select').value;
+      const notes = document.getElementById('reject-notes').value.trim();
+      const btn = document.getElementById('btn-confirm-reject-pay');
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
+      try {
+        const res = await apiCall('payments', 'reject', {
+          id: id,
+          rejection_reason: reason,
+          reason: reason,
+          notes: notes
+        });
+        showToast(res.message || 'Pembayaran ditolak', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeRejectPaymentModal();
+          loadVerifications();
+          loadInvoices();
+          loadKpis();
+        }
+      } catch (err) {
+        showToast('Gagal menolak pembayaran: ' + (err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Tolak & Kembalikan Tagihan';
+      }
+    });
+
     // Verifikasi Pembayaran
     async function verifyPayment(id, isApproved) {
-      if (!isApproved && !confirm('Tolak pembayaran ini? Tagihan siswa akan dikembalikan ke status Belum Lunas.')) return;
-      const action = isApproved ? 'verify' : 'reject';
-      const res = await apiCall('payments', action, { id });
-      showToast(res.message || 'Pembayaran diperbarui', res.success ? 'success' : 'error');
+      if (!isApproved) {
+        openRejectPaymentModal(id);
+        return;
+      }
+      const res = await apiCall('payments', 'verify', { id });
+      showToast(res.message || 'Pembayaran disetujui', res.success ? 'success' : 'error');
       if (res.success) {
         loadVerifications();
         loadInvoices();

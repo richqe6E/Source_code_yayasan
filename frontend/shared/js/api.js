@@ -26,6 +26,32 @@
 
   let isSupabaseOffline = false;
 
+  // Web Crypto Salted SHA-256 Hashing Helper
+  function generateSalt(len = 16) {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      const arr = new Uint8Array(len);
+      window.crypto.getRandomValues(arr);
+      return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+  }
+
+  async function hashPassword(plainText, salt = '') {
+    if (!plainText && plainText !== 0) return '';
+    const str = String(plainText) + String(salt || '');
+    try {
+      if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+        const enc = new TextEncoder();
+        const data = enc.encode(str);
+        const hashBuf = await window.crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (_) {}
+    let h = 0;
+    for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
+    return 'fallback_' + Math.abs(h);
+  }
+
   function normalizeApiResponse(json) {
     if (!json || typeof json !== 'object') return json;
     if (json.success && json.data) {
@@ -134,12 +160,67 @@
     }
   }
 
-  // Upload file/base64 to Supabase Storage
-  async function uploadToSupabaseStorage(fileOrBase64, filenamePrefix = 'upload') {
-    let blob, ext = 'png', contentType = 'image/png';
+  // Client-Side Image Optimizer / WebP Converter (Canvas Resizing)
+  async function optimizeImageForUpload(fileOrBlob, maxWidth = 1920, maxHeight = 1080, quality = 0.82) {
+    if (typeof window === 'undefined') return fileOrBlob;
+    if (!(fileOrBlob instanceof Blob || fileOrBlob instanceof File)) return fileOrBlob;
+    if (!fileOrBlob.type || !fileOrBlob.type.startsWith('image/')) return fileOrBlob;
+    if (fileOrBlob.type === 'image/svg+xml' || fileOrBlob.type === 'image/gif') return fileOrBlob;
 
-    if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:')) {
-      const match = fileOrBase64.match(/^data:([^;]+);base64,(.+)$/);
+    return new Promise((resolve) => {
+      try {
+        const img = new Image();
+        const url = URL.createObjectURL(fileOrBlob);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let w = img.width;
+          let h = img.height;
+          if (w > maxWidth || h > maxHeight) {
+            const ratio = Math.min(maxWidth / w, maxHeight / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          if (canvas.toBlob) {
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const newName = (fileOrBlob.name || 'image').replace(/\.[^.]+$/, '') + '.webp';
+                resolve(new File([blob], newName, { type: 'image/webp' }));
+              } else {
+                resolve(fileOrBlob);
+              }
+            }, 'image/webp', quality);
+          } else {
+            resolve(fileOrBlob);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(fileOrBlob);
+        };
+        img.src = url;
+      } catch (_) {
+        resolve(fileOrBlob);
+      }
+    });
+  }
+
+  // Upload file/base64 to Supabase Storage (Optimized with WebP compression)
+  async function uploadToSupabaseStorage(fileOrBase64, filenamePrefix = 'upload') {
+    let source = fileOrBase64;
+    if (source instanceof Blob || source instanceof File) {
+      source = await optimizeImageForUpload(source);
+    }
+
+    let blob, ext = 'webp', contentType = 'image/webp';
+
+    if (typeof source === 'string' && source.startsWith('data:')) {
+      const match = source.match(/^data:([^;]+);base64,(.+)$/);
       if (match) {
         contentType = match[1];
         ext = contentType.split('/')[1] || 'png';
@@ -148,21 +229,21 @@
         for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
         blob = new Blob([array], { type: contentType });
       }
-    } else if (fileOrBase64 instanceof Blob || fileOrBase64 instanceof File) {
-      blob = fileOrBase64;
-      contentType = fileOrBase64.type || 'application/octet-stream';
-      const parts = (fileOrBase64.name || '').split('.');
+    } else if (source instanceof Blob || source instanceof File) {
+      blob = source;
+      contentType = source.type || 'image/webp';
+      const parts = (source.name || '').split('.');
       if (parts.length > 1) ext = parts.pop();
     }
 
-    if (!blob) return fileOrBase64; // Return original if already a URL or unrecognized
+    if (!blob) return source; // Return original if already a URL or unrecognized
 
     const filename = `${filenamePrefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
     const uploadUrl = `${API_URL}/storage/v1/object/${STORAGE_BUCKET}/${filename}`;
 
     try {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = controller ? setTimeout(() => controller.abort(), 25000) : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 15000) : null;
       const token = getToken();
       const authHeader = token ? `Bearer ${token}` : `Bearer ${API_KEY}`;
       const res = await fetch(uploadUrl, {
@@ -195,14 +276,14 @@
     });
   }
 
-  // Activity Log helper
-  async function recordActivityLog(actionType, entityType, detailsText, entityId = '') {
+  // Activity Log helper (Non-blocking / Fire-and-forget for instant CRUD performance)
+  function recordActivityLog(actionType, entityType, detailsText, entityId = '') {
     try {
       let sess = null;
       try {
         sess = JSON.parse(localStorage.getItem('siy_user') || localStorage.getItem('siyayasan_session_v2') || 'null');
       } catch (_) {}
-      await supabaseRest('activity_logs', 'POST', {
+      supabaseRest('activity_logs', 'POST', {
         id: 'LOG-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
         user_id: sess?.id || 'USR-001',
         user_name: sess?.full_name || sess?.name || 'Admin',
@@ -210,7 +291,7 @@
         module: entityType || 'sistem',
         details: String(detailsText || '') + (entityId ? ` [ID: ${entityId}]` : ''),
         created_at: new Date().toISOString()
-      });
+      }).catch(() => {});
     } catch (_) {}
   }
 
@@ -431,8 +512,31 @@
             return { success: false, message: 'Akun tidak ditemukan. Periksa Email atau NIS Anda.' };
           }
 
-          // Check password
-          if (matchedUser.password_hash !== password) {
+          // Check password (Dual-Mode: Salted Hash with lazy migration for legacy plaintext)
+          let passwordMatched = false;
+          if (matchedUser.password_salt) {
+            const calcHash = await hashPassword(password, matchedUser.password_salt);
+            if (calcHash === matchedUser.password_hash) {
+              passwordMatched = true;
+            }
+          }
+
+          if (!passwordMatched && matchedUser.password_hash === password) {
+            passwordMatched = true;
+            // Lazy migration: upgrade legacy plaintext password to salted hash
+            try {
+              const newSalt = generateSalt();
+              const newHash = await hashPassword(password, newSalt);
+              supabaseRest(`users?id=eq.${encodeURIComponent(matchedUser.id)}`, 'PATCH', {
+                password_hash: newHash,
+                password_salt: newSalt
+              }).catch(() => {});
+              matchedUser.password_hash = newHash;
+              matchedUser.password_salt = newSalt;
+            } catch (_) {}
+          }
+
+          if (!passwordMatched) {
             // Check if initial login with birthdate or fallback
             let passedBirthdate = false;
             if (!matchedUser.birth_date && !studentRecord) {
@@ -474,7 +578,7 @@
             }
           }
 
-          if (matchedUser.is_password_changed === false) {
+          if (matchedUser.is_password_changed === false || matchedUser.must_change_password === true) {
             needsPasswordChange = true;
           }
 
@@ -486,10 +590,12 @@
           const userPayload = { 
             ...matchedUser, 
             role: roleObj, 
-            needs_password_change: needsPasswordChange,
+            needs_password_change: Boolean(needsPasswordChange || matchedUser.must_change_password),
+            must_change_password: Boolean(needsPasswordChange || matchedUser.must_change_password),
             student_id: studentId 
           };
           delete userPayload.password_hash;
+          delete userPayload.password_salt;
           const token = 'siy_' + matchedUser.id + '_' + Date.now();
 
           // Update last login
@@ -500,7 +606,8 @@
             data: { 
               token, 
               user: userPayload, 
-              needs_password_change: needsPasswordChange,
+              needs_password_change: Boolean(needsPasswordChange || matchedUser.must_change_password),
+              must_change_password: Boolean(needsPasswordChange || matchedUser.must_change_password),
               message: 'Login berhasil' 
             }
           };
@@ -598,12 +705,27 @@
           const users = await supabaseRest(`users?id=eq.${encodeURIComponent(targetUserId)}&select=*`);
           if (!users || users.length === 0) return { success: false, message: 'User tidak ditemukan' };
           
-          if (!params.skip_old && users[0].password_hash !== params.old_password) {
-            return { success: false, message: 'Password lama salah' };
+          if (!params.skip_old) {
+            let oldMatches = false;
+            if (users[0].password_salt) {
+              const calcOld = await hashPassword(params.old_password, users[0].password_salt);
+              if (calcOld === users[0].password_hash) oldMatches = true;
+            }
+            if (!oldMatches && users[0].password_hash === params.old_password) {
+              oldMatches = true;
+            }
+            if (!oldMatches) {
+              return { success: false, message: 'Password lama salah' };
+            }
           }
 
+          const newSalt = generateSalt();
+          const newHash = await hashPassword(params.new_password, newSalt);
+
           await supabaseRest(`users?id=eq.${encodeURIComponent(targetUserId)}`, 'PATCH', {
-            password_hash: params.new_password,
+            password_hash: newHash,
+            password_salt: newSalt,
+            must_change_password: false,
             is_password_changed: true,
             updated_at: new Date().toISOString()
           });
@@ -612,6 +734,7 @@
           if (currentUser && currentUser.id === targetUserId) {
             currentUser.is_password_changed = true;
             currentUser.needs_password_change = false;
+            currentUser.must_change_password = false;
             localStorage.setItem('siy_user', JSON.stringify(currentUser));
           }
 
@@ -1679,7 +1802,9 @@
             semester_sekarang: params.semester_sekarang || 'Semester 1 (Ganjil)',
             status_kenaikan: params.status_kenaikan || 'Aktif',
             status: params.status || 'active',
-            attendance_pct: params.attendance_pct !== undefined ? Number(params.attendance_pct) : 100
+            attendance_pct: params.attendance_pct !== undefined ? Number(params.attendance_pct) : 100,
+            monthly_spp_amount: params.monthly_spp_amount !== undefined ? Number(params.monthly_spp_amount) : 150000,
+            form_metadata: params.form_metadata || {}
           };
           const res = await supabaseRest('students', 'POST', payload);
           // Update student count in class
@@ -1735,6 +1860,8 @@
           if (params.status_kenaikan !== undefined) payload.status_kenaikan = params.status_kenaikan;
           if (params.status !== undefined) payload.status = params.status;
           if (params.photo_url !== undefined) payload.photo_url = params.photo_url;
+          if (params.monthly_spp_amount !== undefined) payload.monthly_spp_amount = Number(params.monthly_spp_amount);
+          if (params.form_metadata !== undefined) payload.form_metadata = params.form_metadata;
           payload.updated_at = new Date().toISOString();
 
           const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
@@ -1961,11 +2088,12 @@
         if (action === 'create_bulk') {
           const classId = params.class_id;
           const month = params.month || 'Oktober 2026';
-          const amount = Number(params.amount) || 150000;
+          const defaultAmount = Number(params.amount) || 150000;
+          const useTiered = params.use_student_spp === true || params.amount === 'auto';
           const dueDate = params.due_date || new Date().toISOString().slice(0, 10);
           const itemName = params.item_name || `SPP ${month}`;
 
-          let studentsQuery = 'students?status=eq.active&select=id,full_name,nis,class_id';
+          let studentsQuery = 'students?status=eq.active&select=id,full_name,nis,class_id,monthly_spp_amount';
           if (classId) studentsQuery += `&class_id=eq.${encodeURIComponent(classId)}`;
           const students = await supabaseRest(studentsQuery);
 
@@ -1977,8 +2105,9 @@
           const existingInvs = await supabaseRest('invoices?select=id,student_id,month,period,description,status');
           const targetKey = getInvoiceMonthKey(month);
 
-          const createdInvoices = [];
+          const payloadArray = [];
           const skippedStudents = [];
+          const timestamp = Date.now();
 
           for (let i = 0; i < students.length; i++) {
             const stu = students[i];
@@ -1997,22 +2126,36 @@
               continue;
             }
 
-            const invId = 'INV-' + Date.now() + '-' + i;
-            const invNum = 'INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4) + '/' + (createdInvoices.length + 1);
-            const invPayload = {
+            const invId = 'INV-' + timestamp + '-' + i;
+            const invNum = 'INV/' + new Date().getFullYear() + '/' + String(timestamp).slice(-4) + '/' + (payloadArray.length + 1);
+            const stuAmount = useTiered ? (Number(stu.monthly_spp_amount) || defaultAmount) : defaultAmount;
+
+            payloadArray.push({
               id: invId,
               invoice_number: invNum,
               student_id: stu.id,
               student_name: stu.full_name,
               month: month,
               period: month,
-              amount: amount,
+              amount: stuAmount,
               due_date: dueDate,
               status: 'unpaid',
               description: itemName
-            };
-            await supabaseRest('invoices', 'POST', invPayload).catch(() => {});
-            createdInvoices.push(invPayload);
+            });
+          }
+
+          let createdInvoices = [];
+          if (payloadArray.length > 0) {
+            try {
+              const res = await supabaseRest('invoices', 'POST', payloadArray);
+              createdInvoices = Array.isArray(res) && res.length > 0 ? res : payloadArray;
+            } catch (postErr) {
+              // Fallback per-row jika batch insert tidak didukung konfigurasi tertentu
+              for (const single of payloadArray) {
+                await supabaseRest('invoices', 'POST', single).catch(() => {});
+              }
+              createdInvoices = payloadArray;
+            }
           }
 
           let msg = `Berhasil menerbitkan ${createdInvoices.length} tagihan SPP baru untuk ${month}`;
@@ -2124,11 +2267,22 @@
           return { success: true, data: pay, message: 'Pembayaran disetujui' };
         }
         if (action === 'reject') {
-          const updated = await supabaseRest(`payments?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', {
+          const patchObj = {
             status: 'rejected',
-            notes: params.notes || params.reason || ''
-          });
-          const pay = updated[0];
+            notes: params.notes || params.reason || 'Bukti pembayaran ditolak admin TU'
+          };
+          if (params.rejection_reason || params.reason) {
+            patchObj.rejection_reason = params.rejection_reason || params.reason;
+          }
+          let updated = null;
+          try {
+            updated = await supabaseRest(`payments?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', patchObj);
+          } catch (pErr) {
+            delete patchObj.rejection_reason;
+            patchObj.notes = `[Ditolak: ${params.rejection_reason || params.reason || '-'}] ${params.notes || ''}`.trim();
+            updated = await supabaseRest(`payments?id=eq.${encodeURIComponent(params.id)}`, 'PATCH', patchObj);
+          }
+          const pay = updated && updated[0];
           if (pay && pay.invoice_id) {
             await supabaseRest(`invoices?id=eq.${encodeURIComponent(pay.invoice_id)}`, 'PATCH', { status: 'unpaid' }).catch(() => {});
           }
@@ -2210,6 +2364,15 @@
           }
 
           // Terapkan filter ketat pada combined list agar filter status & jenjang selalu akurat
+          if (params.academic_year && params.academic_year !== 'all') {
+            const targetYear = params.academic_year.trim();
+            combined = combined.filter(r => {
+              const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
+              const rowYear = r.academic_year || meta.academic_year || '';
+              if (!rowYear && targetYear === '2026/2027') return true;
+              return rowYear === targetYear;
+            });
+          }
           if (params.status && params.status !== 'all') {
             if (params.status === 'approved' || params.status === 'accepted') {
               combined = combined.filter(r => {
@@ -2811,7 +2974,19 @@
             if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
           }
           const customPpdbPass = String(reg.password || reg.account_password || (reg.form_metadata && (reg.form_metadata.password || reg.form_metadata.account_password)) || '').trim();
-          const adminSetPass = params.portal_password ? String(params.portal_password).trim() : ''; const initialPassword = adminSetPass || customPpdbPass || birthDatePassword;
+          const adminSetPass = params.portal_password ? String(params.portal_password).trim() : ''; 
+          const initialPassword = adminSetPass || customPpdbPass || birthDatePassword;
+          const initialSalt = generateSalt();
+          const initialHashedPassword = await hashPassword(initialPassword, initialSalt);
+
+          // 4B. Tentukan Tarif Nominal SPP Bulanan Sesuai Kebijakan Jenjang & Override Admin
+          const defaultProgramFee = (lvl) => {
+            const l = String(lvl || '').toLowerCase();
+            if (l.includes('paud') || l.includes('kb')) return 200000;
+            if (l.includes('tahfidz')) return 175000;
+            return 150000; // TPQ Pagi / Standar
+          };
+          const targetSppAmount = Number(params.spp_amount || params.monthly_spp_amount || params.amount) || defaultProgramFee(reg.level || reg.form_type) || 150000;
 
           const regNo = reg.registration_number || reg.registration_no || '';
           const pendaftarEmail = `${regNo.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
@@ -2837,10 +3012,12 @@
             role_label: 'Siswa Aktif',
             nis: studentNis,
             student_id: stuId,
-            password_hash: initialPassword,
+            password_hash: initialHashedPassword,
+            password_salt: initialSalt,
+            must_change_password: true,
             birth_date: birthDateStr,
             fallback_dob_password: birthDatePassword,
-            is_password_changed: Boolean(adminSetPass || customPpdbPass),
+            is_password_changed: false,
             status: 'active'
           };
 
@@ -2876,6 +3053,7 @@
             semester_sekarang: 'Semester 1',
             status_kenaikan: 'Aktif',
             status_pendaftaran: 'accepted',
+            monthly_spp_amount: targetSppAmount,
             nik: reg.nik || (reg.form_metadata && reg.form_metadata.nik) || null,
             level: reg.level || (reg.form_metadata && reg.form_metadata.program_level) || null,
             program: reg.level || (reg.form_metadata && reg.form_metadata.program_level) || null,
@@ -2891,7 +3069,8 @@
               nis: studentNis,
               class_name: targetClassName,
               entry_date: params.entry_date || new Date().toISOString().slice(0, 10),
-              portal_password: initialPassword
+              monthly_spp_amount: targetSppAmount,
+              portal_password: '[TERENKRIPSI]'
             },
             is_active: true,
             parent_name: reg.parent_name || reg.father_name || reg.mother_name || '',
@@ -2950,7 +3129,9 @@
             ...(reg.form_metadata || {}),
             converted_nis: studentNis,
             local_nis: studentNis,
-            entry_date: params.entry_date || new Date().toISOString().slice(0, 10), portal_password: initialPassword,
+            entry_date: params.entry_date || new Date().toISOString().slice(0, 10),
+            monthly_spp_amount: targetSppAmount,
+            portal_password: '[TERENKRIPSI]',
             nis: studentNis,
             class_name: targetClassName,
             student_id: stuId,
@@ -3007,7 +3188,7 @@
                 student_name: studentName,
                 month: currentMonthName,
                 period: `${currentYear}/${currentYear + 1}`,
-                amount: 150000,
+                amount: targetSppAmount,
                 due_date: invDueDate,
                 status: 'unpaid',
                 description: `SPP Bulan ${currentMonthName} ${currentYear} (Santri Baru)`
@@ -3039,6 +3220,80 @@
               summary_text: summaryText
             },
             message: `Siswa berhasil diaktifkan dengan NIS: ${studentNis}`
+          };
+        }
+        if (action === 'bulk_accept') {
+          const decisions = params.decisions || []; // [{ id, status: 'approved' | 'rejected' | 'pending', notes: '' }]
+          if (!Array.isArray(decisions) || decisions.length === 0) {
+            return { success: false, message: 'Tidak ada keputusan calon siswa yang dikirimkan' };
+          }
+
+          let approvedCount = 0;
+          let rejectedCount = 0;
+          let pendingCount = 0;
+
+          for (const item of decisions) {
+            const st = item.status || 'approved';
+            const notes = item.notes || '';
+            const patchObj = { status: st };
+            if (notes) patchObj.notes = notes;
+            try {
+              await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(item.id)}`, 'PATCH', patchObj);
+              if (st === 'approved' || st === 'accepted') approvedCount++;
+              else if (st === 'rejected') rejectedCount++;
+              else pendingCount++;
+            } catch (_) {}
+          }
+
+          recordActivityLog('BULK_ACCEPT_PPDB', 'ppdb', `Penerimaan massal: ${approvedCount} diterima, ${rejectedCount} ditolak, ${pendingCount} dipertimbangkan`);
+
+          return {
+            success: true,
+            message: `Keputusan massal berhasil disimpan: ${approvedCount} Diterima, ${rejectedCount} Ditolak, ${pendingCount} Dipertimbangkan.`
+          };
+        }
+        if (action === 'bulk_convert') {
+          const items = params.items || [];
+          if (!Array.isArray(items) || items.length === 0) {
+            return { success: false, message: 'Tidak ada santri yang dipilih untuk aktivasi massal' };
+          }
+
+          const results = [];
+          const failed = [];
+
+          for (const item of items) {
+            try {
+              const res = await apiCall('ppdb', 'convert', {
+                id: item.id,
+                class_id: item.class_id || params.class_id || 'CLS-001',
+                nis: item.nis || undefined,
+                spp_amount: item.spp_amount || params.spp_amount,
+                portal_password: item.portal_password || params.portal_password,
+                entry_date: item.entry_date || params.entry_date || new Date().toISOString().slice(0, 10),
+                auto_spp: params.auto_spp !== false
+              });
+              if (res && res.success) {
+                results.push(res.data);
+              } else {
+                failed.push({ id: item.id, message: res ? res.message : 'Gagal konversi' });
+              }
+            } catch (err) {
+              failed.push({ id: item.id, message: err.message || 'Terjadi kesalahan sistem' });
+            }
+          }
+
+          recordActivityLog('BULK_CONVERT_PPDB', 'students', `Aktivasi massal ${results.length} santri baru menjadi siswa aktif`);
+
+          let msg = `Berhasil mengaktivasi ${results.length} santri baru menjadi Siswa Aktif.`;
+          if (failed.length > 0) {
+            msg += ` (${failed.length} data gagal: ${failed.map(f => f.message).slice(0, 2).join(', ')})`;
+          }
+
+          return {
+            success: true,
+            data: results,
+            failed: failed,
+            message: msg
           };
         }
       }
@@ -3910,7 +4165,7 @@
   }
 
   function formatIDR(n) {
-    return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
+    return 'Rp' + (Number(n) || 0).toLocaleString('id-ID');
   }
   function formatDate(iso) {
     if (!iso) return '-';
@@ -3932,4 +4187,5 @@
   window.formatDate = formatDate;
   window.formatDateTime = formatDateTime;
   window.uploadToSupabaseStorage = uploadToSupabaseStorage;
+  window.optimizeImageForUpload = optimizeImageForUpload;
 })();

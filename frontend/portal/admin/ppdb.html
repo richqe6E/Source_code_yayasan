@@ -34,10 +34,20 @@
           <p id="admin-ppdb-period-text" class="text-xs text-gray-500 mt-0.5">Tahun Ajaran 2026/2027 • Jadwal resmi aktif</p>
         </div>
       </div>
-      <button onclick="openPeriodModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs sm:text-sm font-semibold rounded-md shadow-sm transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-        Atur Jadwal &amp; Buka/Tutup PPDB
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openBulkAcceptModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-md shadow-sm transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Penerimaan Massal
+        </button>
+        <button onclick="openBulkConvertModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-md shadow-sm transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          Aktivasi Santri Massal
+        </button>
+        <button onclick="openPeriodModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs sm:text-sm font-semibold rounded-md shadow-sm transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          Atur Periode &amp; Jadwal
+        </button>
+      </div>
     </div>
 
     <!-- Tabs -->
@@ -52,8 +62,13 @@
     </div>
 
     <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <input id="filter-search" type="text" onkeyup="if(event.key==='Enter') loadPpdb()" placeholder="Cari nama atau no. pendaftaran..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+        <select id="filter-academic-year" onchange="loadPpdb()" class="px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-primary-950 focus:ring-2 focus:ring-primary-500 focus:outline-none">
+          <option value="2026/2027" selected>Tahun Ajaran 2026/2027 (Aktif)</option>
+          <option value="2025/2026">Tahun Ajaran 2025/2026 (Arsip)</option>
+          <option value="all">Semua Periode Pendaftaran</option>
+        </select>
         <select id="filter-type" onchange="loadPpdb()" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
           <option value="">Semua Program (TPQ Pagi, Tahfidz, KB Ulinnuha)</option>
           <option value="tpq_pagi">A. TPQ Ulinnuha — Jenjang TPQ Pagi</option>
@@ -222,6 +237,133 @@
     </div>
   </div>
 
+  <!-- Modal Penerimaan Siswa Massal (Bulk Acceptance) -->
+  <div id="bulk-accept-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Penerimaan Calon Siswa Secara Massal</h3>
+          <p class="text-xs text-gray-500">Tentukan status penerimaan untuk seluruh pendaftar yang belum diverifikasi (Status Pending)</p>
+        </div>
+        <button type="button" onclick="closeBulkAcceptModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+        <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900">
+          <div>
+            <strong>Panduan:</strong> Secara default seluruh pendaftar berstatus <strong>Diterima</strong>. Jika terdapat santri yang tidak lulus atau ditunda, ubah status pada baris pendaftar bersangkutan di bawah.
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="setAllBulkAccept('approved')" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg font-bold text-[11px] hover:bg-emerald-700">Set Semua Diterima</button>
+            <button type="button" onclick="setAllBulkAccept('rejected')" class="px-2.5 py-1 bg-red-600 text-white rounded-lg font-bold text-[11px] hover:bg-red-700">Set Semua Ditolak</button>
+          </div>
+        </div>
+
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200 text-xs">
+            <thead class="bg-gray-50 text-gray-600 font-semibold uppercase">
+              <tr>
+                <th class="py-2.5 px-3 text-left">No. Registrasi</th>
+                <th class="py-2.5 px-3 text-left">Nama Calon Santri</th>
+                <th class="py-2.5 px-3 text-left">Program</th>
+                <th class="py-2.5 px-3 text-left">Keputusan Status</th>
+                <th class="py-2.5 px-3 text-left">Catatan Keputusan (Opsional)</th>
+              </tr>
+            </thead>
+            <tbody id="bulk-accept-tbody" class="divide-y divide-gray-200 bg-white">
+              <tr><td colspan="5" class="py-6 text-center text-gray-400">Memuat data calon santri...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <span id="bulk-accept-summary" class="text-xs font-semibold text-gray-600">0 Pendaftar Terpilih</span>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeBulkAcceptModal()" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-white">Batal</button>
+          <button id="btn-save-bulk-accept" type="button" onclick="submitBulkAccept()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm">Terapkan Keputusan Penerimaan Massal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Aktivasi Santri Massal (Bulk Student Activation) -->
+  <div id="bulk-convert-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Aktivasi Santri Massal ke Portal Siswa</h3>
+          <p class="text-xs text-gray-500">Konversi pendaftar yang sudah DITERIMA (Approved) menjadi Siswa Aktif, menerbitkan NIS, akun portal, dan tagihan SPP perdana.</p>
+        </div>
+        <button type="button" onclick="closeBulkConvertModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+        <div class="grid sm:grid-cols-3 gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl text-xs">
+          <div>
+            <label class="block font-bold text-blue-900 mb-1">Kelas Penempatan Awal *</label>
+            <select id="bulk-convert-class" class="w-full px-3 py-2 border border-blue-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500 bg-white">
+              <!-- populated dynamically from classes -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-blue-900 mb-1">Skema Sandi Login Portal *</label>
+            <select id="bulk-convert-pass-scheme" class="w-full px-3 py-2 border border-blue-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="dob">Tanggal Lahir Santri (DDMMYYYY) [Disarankan]</option>
+              <option value="custom">Password Seragam (Yayasan2026)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-blue-900 mb-1">Tarif SPP Bulanan *</label>
+            <select id="bulk-convert-spp-mode" class="w-full px-3 py-2 border border-blue-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="tiered">Otomatis Sesuai Jenjang (PAUD: 200rb, Tahfidz: 175rb, TPQ: 150rb)</option>
+              <option value="150000">Seragam Rp150.000</option>
+              <option value="175000">Seragam Rp175.000</option>
+              <option value="200000">Seragam Rp200.000</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-gray-600 px-1">
+          <label class="inline-flex items-center gap-2 cursor-pointer font-semibold">
+            <input type="checkbox" id="bulk-convert-select-all" onchange="toggleSelectAllConvert(this.checked)" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span>Pilih Semua Santri Diterima</span>
+          </label>
+          <span id="bulk-convert-count-label" class="font-bold text-blue-700">0 santri dipilih</span>
+        </div>
+
+        <div class="border border-gray-200 rounded-xl overflow-hidden max-h-72 overflow-y-auto">
+          <table class="min-w-full divide-y divide-gray-200 text-xs">
+            <thead class="bg-gray-50 text-gray-600 font-semibold uppercase sticky top-0">
+              <tr>
+                <th class="py-2.5 px-3 text-center w-10">Pilih</th>
+                <th class="py-2.5 px-3 text-left">No. Pendaftaran</th>
+                <th class="py-2.5 px-3 text-left">Nama Calon Santri</th>
+                <th class="py-2.5 px-3 text-left">Program</th>
+                <th class="py-2.5 px-3 text-left">Estimasi SPP</th>
+              </tr>
+            </thead>
+            <tbody id="bulk-convert-tbody" class="divide-y divide-gray-200 bg-white">
+              <tr><td colspan="5" class="py-6 text-center text-gray-400">Memuat data santri diterima...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 leading-relaxed">
+          🔒 <strong>Keamanan:</strong> Kredensial awal santri dienkripsi menggunakan Web Crypto Salted SHA-256. Setiap santri yang pertama kali login akan langsung diwajibkan mengganti kata sandi pribadi.
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <span class="text-xs text-gray-500">Tagihan SPP perdana akan otomatis diterbitkan</span>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeBulkConvertModal()" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-white">Batal</button>
+          <button id="btn-save-bulk-convert" type="button" onclick="submitBulkConvert()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm">Aktivasi Santri Terpilih Sekarang</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../../shared/js/supabase-config.js"></script>
   <script src="../../shared/js/auth.js"></script>
   <script src="../../shared/js/api.js"></script>
@@ -339,10 +481,12 @@
       const stopSpin = Shell.startRefresh();
       const params = { per_page: 50 };
       if (currentTab !== 'all') params.status = currentTab;
-      const search = document.getElementById('filter-search').value;
-      const type = document.getElementById('filter-type').value;
+      const search = document.getElementById('filter-search')?.value;
+      const type = document.getElementById('filter-type')?.value;
+      const year = document.getElementById('filter-academic-year')?.value;
       if (search) params.search = search;
       if (type) params.form_type = type;
+      if (year && year !== 'all') params.academic_year = year;
 
       const tbody = document.getElementById('ppdb-tbody');
       tbody.innerHTML = Shell.skeletonRows(7, 4);
@@ -413,8 +557,10 @@
     function resetPpdbFilter() {
       const searchInput = document.getElementById('filter-search');
       const typeSelect = document.getElementById('filter-type');
+      const yearSelect = document.getElementById('filter-academic-year');
       if (searchInput) searchInput.value = '';
       if (typeSelect) typeSelect.value = '';
+      if (yearSelect) yearSelect.value = (currentPeriod && currentPeriod.academic_year) || '2026/2027';
       currentTab = 'all';
       document.querySelectorAll('.ppdb-tab').forEach(b => {
         b.classList.remove('border-primary-600', 'text-primary-700');
@@ -426,6 +572,197 @@
         allBtn.classList.add('border-primary-600', 'text-primary-700');
       }
       loadPpdb();
+    }
+
+    // ==========================================
+    // BULK ACCEPTANCE (Penerimaan Siswa Massal)
+    // ==========================================
+    let bulkAcceptCandidates = [];
+
+    function openBulkAcceptModal() {
+      bulkAcceptCandidates = currentPpdbItems.filter(r => r.status === 'pending');
+      if (bulkAcceptCandidates.length === 0) {
+        showToast('Tidak ada calon santri dengan status Pending yang menunggu keputusan pada filter ini.', 'info');
+        return;
+      }
+
+      const tbody = document.getElementById('bulk-accept-tbody');
+      tbody.innerHTML = bulkAcceptCandidates.map((r) => {
+        const childName = r.student_name || r.child_name || r.full_name || '-';
+        const regNo = r.registration_number || r.registration_no || r.id || '-';
+        const formType = (r.level || r.form_type || '-').toUpperCase();
+
+        return `
+          <tr data-reg-id="${r.id}">
+            <td class="py-2.5 px-3 font-mono font-bold text-gray-700">${regNo}</td>
+            <td class="py-2.5 px-3 font-semibold text-gray-900">${childName}</td>
+            <td class="py-2.5 px-3 text-gray-600">${formType}</td>
+            <td class="py-2.5 px-3">
+              <select id="bulk-st-${r.id}" class="bulk-accept-status-select px-2.5 py-1 border border-gray-300 rounded-lg font-semibold text-xs focus:ring-2 focus:ring-emerald-500">
+                <option value="approved" selected class="text-emerald-700 font-bold">✓ Diterima (Approved)</option>
+                <option value="rejected" class="text-red-700 font-bold">✕ Tidak Diterima (Rejected)</option>
+                <option value="pending" class="text-amber-700 font-bold">⏳ Dipertimbangkan (Pending)</option>
+              </select>
+            </td>
+            <td class="py-2.5 px-3">
+              <input type="text" id="bulk-notes-${r.id}" placeholder="Catatan opsional..." class="w-full px-2.5 py-1 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500">
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('bulk-accept-summary').textContent = `${bulkAcceptCandidates.length} Calon Santri Pending Siap Ditetapkan`;
+      document.getElementById('bulk-accept-modal').classList.remove('hidden');
+    }
+
+    function closeBulkAcceptModal() {
+      document.getElementById('bulk-accept-modal').classList.add('hidden');
+    }
+
+    function setAllBulkAccept(status) {
+      document.querySelectorAll('.bulk-accept-status-select').forEach(sel => {
+        sel.value = status;
+      });
+    }
+
+    async function submitBulkAccept() {
+      const btn = document.getElementById('btn-save-bulk-accept');
+      btn.disabled = true;
+      btn.textContent = 'Menerapkan Keputusan...';
+
+      const decisions = bulkAcceptCandidates.map(r => ({
+        id: r.id,
+        status: document.getElementById('bulk-st-' + r.id)?.value || 'approved',
+        notes: document.getElementById('bulk-notes-' + r.id)?.value.trim() || ''
+      }));
+
+      try {
+        const res = await apiCall('ppdb', 'bulk_accept', { decisions });
+        showToast(res.message || 'Keputusan massal berhasil diterapkan', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeBulkAcceptModal();
+          loadPpdb();
+        }
+      } catch (err) {
+        showToast('Gagal memproses keputusan massal: ' + (err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Terapkan Keputusan Penerimaan Massal';
+      }
+    }
+
+    // ==========================================
+    // BULK ACTIVATION (Aktivasi Santri Massal)
+    // ==========================================
+    let bulkConvertCandidates = [];
+
+    async function openBulkConvertModal() {
+      bulkConvertCandidates = currentPpdbItems.filter(r => r.status === 'approved' || r.status === 'accepted');
+      if (bulkConvertCandidates.length === 0) {
+        showToast('Tidak ada calon santri dengan status Diterima (Approved) pada periode ini yang siap diaktivasi.', 'info');
+        return;
+      }
+
+      // Populate classes dropdown
+      let classes = [];
+      try {
+        const cr = await apiCall('classes', 'list', { per_page: 100 });
+        const raw = cr.data && (cr.data.classes || cr.data.items || (Array.isArray(cr.data) ? cr.data : []));
+        classes = Array.isArray(raw) ? raw : [];
+      } catch (_) {}
+
+      const classSel = document.getElementById('bulk-convert-class');
+      if (classes.length > 0) {
+        classSel.innerHTML = classes.map(c => `<option value="${c.id}">${c.name} (${c.level || '-'})</option>`).join('');
+      } else {
+        classSel.innerHTML = '<option value="CLS-001">Kelas Standar Santri Baru</option>';
+      }
+
+      const tbody = document.getElementById('bulk-convert-tbody');
+      tbody.innerHTML = bulkConvertCandidates.map(r => {
+        const childName = r.student_name || r.child_name || r.full_name || '-';
+        const regNo = r.registration_number || r.registration_no || r.id || '-';
+        const formType = (r.level || r.form_type || '-').toUpperCase();
+        const isPaud = String(formType).includes('PAUD') || String(formType).includes('KB');
+        const isTahfidz = String(formType).includes('TAHFIDZ');
+        const estSpp = isPaud ? 200000 : (isTahfidz ? 175000 : 150000);
+
+        return `
+          <tr>
+            <td class="py-2.5 px-3 text-center">
+              <input type="checkbox" class="bulk-convert-chk rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="${r.id}" checked onchange="updateBulkConvertCount()">
+            </td>
+            <td class="py-2.5 px-3 font-mono font-bold text-gray-700">${regNo}</td>
+            <td class="py-2.5 px-3 font-semibold text-gray-900">${childName}</td>
+            <td class="py-2.5 px-3 text-gray-600">${formType}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-blue-700">${formatIDR(estSpp)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('bulk-convert-select-all').checked = true;
+      updateBulkConvertCount();
+      document.getElementById('bulk-convert-modal').classList.remove('hidden');
+    }
+
+    function closeBulkConvertModal() {
+      document.getElementById('bulk-convert-modal').classList.add('hidden');
+    }
+
+    function toggleSelectAllConvert(checked) {
+      document.querySelectorAll('.bulk-convert-chk').forEach(c => c.checked = checked);
+      updateBulkConvertCount();
+    }
+
+    function updateBulkConvertCount() {
+      const selected = document.querySelectorAll('.bulk-convert-chk:checked').length;
+      document.getElementById('bulk-convert-count-label').textContent = `${selected} dari ${bulkConvertCandidates.length} santri dipilih`;
+      document.getElementById('btn-save-bulk-convert').disabled = selected === 0;
+    }
+
+    async function submitBulkConvert() {
+      const selectedBoxes = document.querySelectorAll('.bulk-convert-chk:checked');
+      if (selectedBoxes.length === 0) {
+        showToast('Pilih setidaknya 1 santri untuk diaktivasi', 'warning');
+        return;
+      }
+
+      const classId = document.getElementById('bulk-convert-class').value;
+      const passScheme = document.getElementById('bulk-convert-pass-scheme').value;
+      const sppMode = document.getElementById('bulk-convert-spp-mode').value;
+
+      const btn = document.getElementById('btn-save-bulk-convert');
+      btn.disabled = true;
+      btn.textContent = `Mengaktivasi ${selectedBoxes.length} Santri...`;
+
+      const items = [];
+      selectedBoxes.forEach(chk => {
+        const regId = chk.value;
+        let sppAmount = undefined;
+        if (sppMode !== 'tiered') {
+          sppAmount = Number(sppMode) || 150000;
+        }
+        items.push({
+          id: regId,
+          class_id: classId,
+          spp_amount: sppAmount,
+          portal_password: passScheme === 'custom' ? 'Yayasan2026' : undefined
+        });
+      });
+
+      try {
+        const res = await apiCall('ppdb', 'bulk_convert', { items, class_id: classId });
+        showToast(res.message || 'Santri berhasil diaktivasi secara massal', res.success ? 'success' : 'error');
+        if (res.success) {
+          closeBulkConvertModal();
+          loadPpdb();
+        }
+      } catch (err) {
+        showToast('Gagal memproses aktivasi massal: ' + (err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Aktivasi Santri Terpilih Sekarang';
+      }
     }
 
     async function viewDetail(id) {
@@ -824,6 +1161,8 @@
         optionsHtml = classes.map(c => `<option value="${c.id}">${c.name} (${c.level || ''})</option>`).join('');
       }
 
+      const defaultSppAmount = isPaud ? 200000 : (String(targetJenjang || '').toLowerCase().includes('tahfidz') ? 175000 : 150000);
+
       const modal = document.createElement('div');
       modal.className = 'fixed inset-0 z-50 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4';
       modal.innerHTML = `
@@ -845,6 +1184,11 @@
               <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
             </div>
             <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Nominal Iuran SPP Bulanan (Rp) *</label>
+              <input type="number" id="cm-spp-amount" step="5000" value="${defaultSppAmount}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-gray-900 focus:ring-2 focus:ring-primary-500">
+              <span class="text-[11px] text-primary-700 font-semibold block mt-1" id="cm-spp-hint">Nominal: ${typeof formatIDR === 'function' ? formatIDR(defaultSppAmount) : ('Rp' + defaultSppAmount.toLocaleString('id-ID'))}</span>
+            </div>
+            <div>
               <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">${isPaud ? 'Tanggal Diterima Masuk *' : '13.b. Tanggal Masuk Resmi *'}</label>
               <input type="date" id="cm-entry-date" value="${new Date().toISOString().split('T')[0]}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono text-gray-900 focus:ring-2 focus:ring-primary-500">
             </div>
@@ -860,7 +1204,7 @@
               <input type="checkbox" id="cm-auto-spp" checked class="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
               <span class="text-xs text-slate-700">
                 <strong class="font-bold text-slate-900 block">Terbitkan Tagihan SPP Bulan Pertama Otomatis</strong>
-                Buat tagihan SPP awal sebesar <span class="font-semibold text-primary-700">Rp 150.000</span> agar langsung muncul di Portal Siswa.
+                Buat tagihan SPP perdana sesuai nominal yang ditentukan di atas agar langsung muncul di Portal Siswa.
               </span>
             </label>
             <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
@@ -877,11 +1221,22 @@
       modal.querySelector('#cm-gen-pass').onclick = () => {
         modal.querySelector('#cm-portal-password').value = 'AT' + String(Math.floor(100000 + Math.random() * 900000));
       };
+
+      const sppIn = modal.querySelector('#cm-spp-amount');
+      const sppHint = modal.querySelector('#cm-spp-hint');
+      if (sppIn && sppHint) {
+        sppIn.oninput = () => {
+          const val = Number(sppIn.value) || 0;
+          sppHint.textContent = 'Nominal: ' + (typeof formatIDR === 'function' ? formatIDR(val) : ('Rp' + val.toLocaleString('id-ID')));
+        };
+      }
+
       modal.querySelector('#cm-ok').onclick = async () => {
         const classId = modal.querySelector('#cm-class').value;
         const nis = modal.querySelector('#cm-nis').value.trim();
         const portalPassword = modal.querySelector('#cm-portal-password').value.trim();
         const autoSpp = modal.querySelector('#cm-auto-spp') ? modal.querySelector('#cm-auto-spp').checked : true;
+        const sppAmount = Number(modal.querySelector('#cm-spp-amount')?.value) || defaultSppAmount;
         if (!classId) { showToast('Pilih kelompok/kelas terlebih dahulu', 'warning'); return; }
         if (!nis) { showToast('Masukkan Nomor Induk / NIS Lokal siswa', 'warning'); return; }
         if (!portalPassword) { showToast('Masukkan Sandi Portal Siswa', 'warning'); return; }
@@ -899,7 +1254,8 @@
             local_nis: nis,
             entry_date: entryDate,
             portal_password: portalPassword,
-            auto_spp: autoSpp
+            auto_spp: autoSpp,
+            spp_amount: sppAmount
           });
           if (res.success && res.data) {
             close();
