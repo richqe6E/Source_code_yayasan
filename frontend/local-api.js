@@ -397,7 +397,8 @@ function handleApiRequest(apiPath, params, method) {
                                  password === ddmmyyyy || 
                                  (passClean.length >= 6 && passClean === bDateClean) || 
                                  (passClean.length >= 6 && passClean === ddmmyyyy);
-        const matchesCustomPwd = student.password && student.password === password;
+        const matchesCustomPwd = (student.password && student.password === password) || 
+                                 (student.portal_password && student.portal_password === password);
 
         if (!matchesBirthdate && !matchesCustomPwd) {
           return { 
@@ -766,6 +767,9 @@ function handleApiRequest(apiPath, params, method) {
       const targetClass = DB.classes.find(c => c.id === (params.class_id || 'CLS-001')) || {};
       const studentName = reg.child_name || reg.full_name || reg.student_name || 'Santri Baru';
       const studentBirthDate = reg.birth_date || reg.student_birth_date || '2020-01-01';
+      const meta = (reg.form_metadata && typeof reg.form_metadata === 'object') ? reg.form_metadata : {};
+      const targetPass = params.portal_password || (studentBirthDate ? studentBirthDate.replace(/\D/g, '') : ('ortu' + String(nextSeq).padStart(3, '0')));
+      const entryDate = params.entry_date || new Date().toISOString().split('T')[0];
 
       const newStu = {
         id: 'STU-' + String(nextSeq).padStart(3, '0'),
@@ -773,19 +777,44 @@ function handleApiRequest(apiPath, params, method) {
         full_name: studentName,
         name: studentName,
         child_name: studentName,
-        nickname: reg.nickname || '',
-        gender: reg.gender || reg.student_gender || 'L',
+        nickname: reg.nickname || meta.nickname || '',
+        gender: reg.gender || reg.student_gender || meta.gender || 'L',
         class_id: params.class_id || 'CLS-001',
         class_name: targetClass.name || 'PAUD A - Bintang Kecil',
-        birth_place: reg.birth_place || reg.student_birth_place || 'Samarinda',
+        level: reg.level || meta.jenjang || 'TPQ Pagi',
+        birth_place: reg.birth_place || reg.student_birth_place || meta.birth_place || 'Samarinda',
         birth_date: studentBirthDate,
+        entry_date: entryDate,
         parent_id: 'PAR-' + String(nextSeq).padStart(3, '0'),
-        parent_name: reg.parent_name || reg.father_name || reg.mother_name || '-',
+        parent_name: reg.parent_name || reg.father_name || reg.mother_name || (meta.father && meta.father.name) || '-',
         parent_email: reg.parent_email || reg.email || '',
-        parent_phone: reg.parent_phone || reg.phone || reg.father_phone || '',
-        phone: reg.phone || reg.parent_phone || '',
-        photo_url: reg.photo_url || reg.child_photo_url || '',
-        address: reg.address || '',
+        parent_phone: reg.parent_phone || reg.phone || reg.father_phone || (meta.father && meta.father.phone) || '',
+        phone: reg.phone || reg.parent_phone || (meta.father && meta.father.phone) || '',
+        photo_url: reg.photo_url || reg.child_photo_url || (meta.uploaded_files && meta.uploaded_files.photo_url) || '',
+        address: reg.address || meta.address || '',
+        nik: reg.nik || meta.nik || '',
+        child_order: reg.child_order || meta.child_order || '',
+        siblings_count: reg.siblings_count ?? meta.siblings_count ?? '',
+        father_name: reg.father_name || (meta.father && meta.father.name) || '',
+        father_job: (meta.father && meta.father.job) || meta.father_job || '',
+        father_education: (meta.father && meta.father.education) || meta.father_education || '',
+        father_phone: (meta.father && meta.father.phone) || meta.father_phone || '',
+        mother_name: reg.mother_name || (meta.mother && meta.mother.name) || '',
+        mother_job: (meta.mother && meta.mother.job) || meta.mother_job || '',
+        mother_education: (meta.mother && meta.mother.education) || meta.mother_education || '',
+        mother_phone: (meta.mother && meta.mother.phone) || meta.mother_phone || '',
+        religion: meta.religion || 'Islam',
+        citizenship: meta.citizenship || 'Indonesia (WNI)',
+        child_status: meta.child_status || 'Anak Kandung',
+        daily_language: meta.daily_language || '',
+        special_traits: meta.special_traits || '',
+        distance_km: meta.distance_km || '',
+        transport_mode: meta.transport_mode || '',
+        guardian: meta.guardian || null,
+        mutasi: meta.mutasi || null,
+        form_metadata: meta,
+        password: targetPass,
+        portal_password: targetPass,
         status: 'active'
       };
       DB.students.push(newStu);
@@ -797,7 +826,9 @@ function handleApiRequest(apiPath, params, method) {
           id: 'USR-' + targetNis,
           email: newStu.parent_email || `${targetNis}@siswa.yayasan.sch.id`,
           nis: targetNis,
-          password_hash: studentBirthDate.replace(/\D/g, ''),
+          username: targetNis,
+          password: targetPass,
+          password_hash: targetPass,
           full_name: studentName,
           name: studentName,
           phone: newStu.parent_phone,
@@ -806,13 +837,39 @@ function handleApiRequest(apiPath, params, method) {
           status: 'active',
           student_id: newStu.id
         });
+      } else {
+        existingUser.password = targetPass;
+        existingUser.password_hash = targetPass;
       }
 
       reg.status = 'converted';
       reg.converted_nis = targetNis;
       reg.student_id = newStu.id;
       reg.class_name = newStu.class_name;
-      const defaultPass = studentBirthDate ? studentBirthDate.replace(/\D/g, '') : ('ortu' + String(nextSeq).padStart(3, '0'));
+      reg.portal_password = targetPass;
+      reg.entry_date = entryDate;
+
+      // Terbitkan Tagihan SPP bulan pertama otomatis jika diminta
+      if (params.auto_spp && DB.invoices) {
+        const now = new Date();
+        const monthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const currentMonth = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+        DB.invoices.push({
+          id: 'INV-' + newStu.id + '-' + now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'),
+          invoice_number: 'INV/' + now.getFullYear() + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + newStu.nis,
+          student_id: newStu.id,
+          student_name: newStu.full_name,
+          month: currentMonth,
+          item_name: 'SPP Bulan Pertama (' + currentMonth + ')',
+          period: '2026/2027',
+          amount: 150000,
+          due_date: new Date(now.getFullYear(), now.getMonth(), 10).toISOString().split('T')[0],
+          status: 'unpaid',
+          description: 'Tagihan SPP Awal Pendaftaran Siswa Baru'
+        });
+      }
+
+      const defaultPass = targetPass;
       const initialCredentials = {
         student_name: newStu.full_name,
         username: targetNis,
@@ -899,24 +956,51 @@ function handleApiRequest(apiPath, params, method) {
         return { success: false, message: 'Data siswa tidak ditemukan', error: { code: 'NOT_FOUND' } };
       }
       const parent = DB.parents ? DB.parents.find(p => p.id === targetStudent.parent_id) : null;
+      const meta = (targetStudent.form_metadata && typeof targetStudent.form_metadata === 'object') ? targetStudent.form_metadata : {};
       const profileData = {
+        ...meta,
         ...targetStudent,
         name: targetStudent.full_name || targetStudent.name,
         full_name: targetStudent.full_name || targetStudent.name,
         child_name: targetStudent.child_name || targetStudent.full_name || targetStudent.name,
-        kelas_sekarang: targetStudent.class_name || targetStudent.kelas_sekarang || 'TK B Terpadu',
+        kelas_sekarang: targetStudent.class_name || targetStudent.kelas_sekarang || 'Kelas Santri',
         semester_sekarang: targetStudent.semester_sekarang || 'Semester 1 • TA 2026/2027',
         status_kenaikan: targetStudent.status_kenaikan || 'Aktif',
-        father_name: targetStudent.father_name || (parent ? parent.father_name || parent.name : 'Bapak Muhammad Fauzi'),
-        father_phone: targetStudent.father_phone || (parent ? parent.phone : '081234567893'),
-        mother_name: targetStudent.mother_name || (parent ? parent.mother_name : 'Ibu Siti Aminah'),
-        address: targetStudent.address || (parent ? parent.address : 'Jl. Ahmad Yani No. 88, Samarinda'),
-        religion: targetStudent.religion || 'Islam',
-        nik: targetStudent.nik || '6472010101210001',
-        previous_school: targetStudent.previous_school || 'KB Al-Ihsan',
-        blood_type: targetStudent.blood_type || 'O',
-        hobbies: targetStudent.hobbies || 'Mewarnai & Bersepeda',
-        aspirations: targetStudent.aspirations || 'Dokter / Guru'
+        father_name: targetStudent.father_name || (meta.father && meta.father.name) || (parent ? parent.father_name || parent.name : ''),
+        father_phone: targetStudent.father_phone || (meta.father && meta.father.phone) || targetStudent.parent_phone || (parent ? parent.phone : ''),
+        father_job: targetStudent.father_job || (meta.father && meta.father.job) || '',
+        father_education: targetStudent.father_education || (meta.father && meta.father.education) || '',
+        father_ttl: targetStudent.father_ttl || (meta.father && meta.father.ttl) || '',
+        father_religion: targetStudent.father_religion || (meta.father && meta.father.religion) || 'Islam',
+        father_phone_office: targetStudent.father_phone_office || (meta.father && meta.father.phone_office) || targetStudent.phone_2 || '',
+        mother_name: targetStudent.mother_name || (meta.mother && meta.mother.name) || (parent ? parent.mother_name : ''),
+        mother_phone: targetStudent.mother_phone || (meta.mother && meta.mother.phone) || '',
+        mother_job: targetStudent.mother_job || (meta.mother && meta.mother.job) || '',
+        mother_education: targetStudent.mother_education || (meta.mother && meta.mother.education) || '',
+        mother_ttl: targetStudent.mother_ttl || (meta.mother && meta.mother.ttl) || '',
+        mother_religion: targetStudent.mother_religion || (meta.mother && meta.mother.religion) || 'Islam',
+        address: targetStudent.address || meta.address || (parent ? parent.address : ''),
+        religion: targetStudent.religion || meta.religion || 'Islam',
+        citizenship: targetStudent.citizenship || meta.citizenship || 'Indonesia (WNI)',
+        nik: targetStudent.nik || meta.nik || '',
+        child_order: targetStudent.child_order || meta.child_order || '',
+        siblings_count: targetStudent.siblings_count ?? meta.siblings_count ?? '',
+        siblings_step: targetStudent.siblings_step ?? meta.siblings_step ?? '',
+        siblings_adopted: targetStudent.siblings_adopted ?? meta.siblings_adopted ?? '',
+        child_status: targetStudent.child_status || meta.child_status || 'Anak Kandung',
+        daily_language: targetStudent.daily_language || meta.daily_language || '',
+        special_traits: targetStudent.special_traits || meta.special_traits || '',
+        distance_km: targetStudent.distance_km || meta.distance_km || '',
+        transport_mode: targetStudent.transport_mode || meta.transport_mode || '',
+        guardian_name: targetStudent.guardian_name || (meta.guardian && meta.guardian.name) || '',
+        guardian_relation: targetStudent.guardian_relation || (meta.guardian && meta.guardian.relation) || '',
+        guardian_job: targetStudent.guardian_job || (meta.guardian && meta.guardian.job) || '',
+        guardian_education: targetStudent.guardian_education || (meta.guardian && meta.guardian.education) || '',
+        guardian_phone: targetStudent.guardian_phone || (meta.guardian && meta.guardian.phone) || '',
+        previous_school: targetStudent.previous_school || meta.previous_school || '',
+        blood_type: targetStudent.blood_type || meta.blood_type || '',
+        hobbies: targetStudent.hobbies || meta.hobbies || '',
+        aspirations: targetStudent.aspirations || meta.aspirations || ''
       };
       return { success: true, data: profileData };
     }

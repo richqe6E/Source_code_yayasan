@@ -237,7 +237,7 @@
                   <span class="text-primary-200 block text-[11px] font-medium mb-1">Panduan Login ke Portal Siswa:</span>
                   <p class="text-xs text-white leading-relaxed">
                     <strong>Username:</strong> NIS Anda (${escapeHtml(nis || 'Gunakan NIS Anda')})<br>
-                    <strong>Password Awal:</strong> Tanggal Lahir Siswa format DDMMYYYY (cth: 12052020) atau password yang Anda buat saat pendaftaran<br>
+                    ${r.portal_password ? `<strong>Sandi Portal Siswa:</strong> <span class="font-mono font-bold bg-white/20 px-1.5 py-0.5 rounded text-white">${escapeHtml(r.portal_password)}</span><br>` : `<strong>Sandi Masuk:</strong> Sandi resmi yang diberikan Tata Usaha / Admin, atau Tanggal Lahir Siswa format DDMMYYYY (cth: 12052020)<br>`}
                     <span class="text-[11px] text-primary-100 italic">*Anda dapat melihat status &amp; jadwal pembayaran SPP bulanan di Portal Siswa.</span>
                   </p>
                 </div>

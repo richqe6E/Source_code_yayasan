@@ -841,7 +841,7 @@
               <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">13.b. Tanggal Masuk Resmi *</label>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">${isPaud ? 'Tanggal Diterima Masuk *' : '13.b. Tanggal Masuk Resmi *'}</label>
               <input type="date" id="cm-entry-date" value="${new Date().toISOString().split('T')[0]}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono text-gray-900 focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
