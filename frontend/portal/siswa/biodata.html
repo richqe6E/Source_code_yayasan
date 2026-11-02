@@ -56,7 +56,7 @@
           <h2 class="text-base font-bold text-slate-900">Data Pribadi Siswa / Santri</h2>
         </div>
 
-        <div class="p-3.5 rounded-xl bg-primary-50/70 border border-primary-200 text-xs text-slate-700">
+        <div class="hidden">
           <strong class="text-primary-900">Ketentuan NIS Lokal &amp; Anak di Bawah 3 Tahun:</strong> Anak usia dini (&lt; 3 tahun) belum memiliki NIS saat pendaftaran. <strong>NIS Lokal</strong> resmi diterbitkan oleh Admin TU setelah ananda diterima. Kolom NIK (16 digit KK) bersifat opsional bagi anak di bawah 3 tahun yang KK-nya masih dalam proses.
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -72,7 +72,7 @@
           <div>
             <label for="age_category" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kategori Usia Santri</label>
             <select id="age_category" name="age_category" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
-              <option value="Usia Dini (<= 3 Tahun)">Usia Dini (Maksimal / Di Bawah 3 Tahun — Tanpa NIS Awal)</option>
+              <option value="Usia Dini (<= 3 Tahun)">Usia Dini (Maksimal / Di Bawah 3 Tahun)</option>
               <option value="Usia Reguler (> 3 Tahun)">Usia Reguler (Lebih dari 3 Tahun ke Atas)</option>
             </select>
           </div>
@@ -124,8 +124,8 @@
 
           <div class="sm:col-span-2">
           <div>
-            <label for="nik" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nomor NIK Anak (16 Digit KK — Opsional Usia &lt; 3 Thn)</label>
-            <input type="text" id="nik" name="nik" maxlength="16" placeholder="16 digit NIK KK (Boleh dikosongkan bagi usia < 3 thn)" class="block w-full px-3.5 py-2.5 text-sm font-mono bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+            <label for="nik" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nomor NIK (16 Digit Sesuai KK) <span class="text-red-500">*</span></label>
+            <input type="text" id="nik" name="nik" required maxlength="16" placeholder="16 digit NIK sesuai Kartu Keluarga" class="block w-full px-3.5 py-2.5 text-sm font-mono bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -155,7 +155,7 @@
           <h2 class="text-base font-bold text-slate-900">Data Orang Tua / Wali</h2>
         </div>
 
-        <div class="p-3.5 rounded-xl bg-primary-50/70 border border-primary-200 text-xs text-slate-700">
+        <div class="hidden">
           <strong class="text-primary-900">Ketentuan NIS Lokal &amp; Anak di Bawah 3 Tahun:</strong> Anak usia dini (&lt; 3 tahun) belum memiliki NIS saat pendaftaran. <strong>NIS Lokal</strong> resmi diterbitkan oleh Admin TU setelah ananda diterima. Kolom NIK (16 digit KK) bersifat opsional bagi anak di bawah 3 tahun yang KK-nya masih dalam proses.
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -171,7 +171,7 @@
           <div>
             <label for="age_category" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kategori Usia Santri</label>
             <select id="age_category" name="age_category" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
-              <option value="Usia Dini (<= 3 Tahun)">Usia Dini (Maksimal / Di Bawah 3 Tahun — Tanpa NIS Awal)</option>
+              <option value="Usia Dini (<= 3 Tahun)">Usia Dini (Maksimal / Di Bawah 3 Tahun)</option>
               <option value="Usia Reguler (> 3 Tahun)">Usia Reguler (Lebih dari 3 Tahun ke Atas)</option>
             </select>
           </div>

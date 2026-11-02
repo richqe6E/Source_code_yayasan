@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Profil resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda: Visi, Misi, Struktur Organisasi, dan Program Pendidikan PAUD/TK dan TPQ di Kota Samarinda.">
+  <meta name="description" content="Profil resmi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda: Visi, Misi, Struktur Organisasi, serta Program TPQ Ulinnuha dan KB Ulinnuha (PAUD) di Kota Samarinda.">
   <title>Profil Yayasan - Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</title>
   <!-- Favicon / Brand Logo -->
   <link rel="icon" type="image/png" href="/images/logo.png">
@@ -90,11 +90,11 @@
             el.innerHTML = paras.map(p => '<p class="text-justify [text-align-last:left]">' + p.replace(/\n/g, '<br>') + '</p>').join('');
           }
         }
-        if (d.visi) {
+        if (d.visi && d.visi.includes('9 Tahun')) {
           const el = document.getElementById('profil-visi');
           if (el) el.textContent = d.visi;
         }
-        if (d.misi) {
+        if (false && d.misi) {
           const el = document.getElementById('profil-misi');
           if (el) {
             let items = Array.isArray(d.misi) ? d.misi : (typeof d.misi === 'string' ? d.misi.split('\n').map(s=>s.trim()).filter(Boolean) : []);
@@ -209,7 +209,7 @@
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Visi Lembaga</h3>
           <p id="profil-visi" class="text-sm text-slate-600 leading-relaxed text-justify [text-align-last:left]">
-            Mewujudkan generasi anak usia dini yang berakhlak mulia, cerdas, mandiri, ceria, dan cinta Al-Quran.
+            Mewujudkan Anak Hafal Al-Qur&#39;an di Bawah Usia 9 Tahun, Hafal Tanpa Menghafal, serta membentuk generasi berakhlak mulia, cerdas, dan mandiri.
           </p>
         </div>
 
@@ -223,7 +223,7 @@
             <ul class="space-y-2.5 text-xs sm:text-sm text-slate-700">
               <li class="flex items-start gap-2.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-                <span>Menyelenggarakan pembelajaran PAUD &amp; TK yang aktif, kreatif, dan menyenangkan.</span>
+                <span>Menyelenggarakan TPQ Pagi (Metode Qiraati 5 Jilid) &amp; Jenjang Tahfidz (Pra PTPT &amp; PTPT Juz 1–30).</span>
               </li>
               <li class="flex items-start gap-2.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
@@ -231,7 +231,7 @@
               </li>
               <li class="flex items-start gap-2.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-                <span>Membimbing santri membaca Al-Quran dengan tartil melalui metode tilawati di TPQ At Tarbiyyah.</span>
+                <span>Menyelenggarakan KB Ulinnuha (PAUD) serta backup pendidikan kesetaraan resmi pemerintah melalui PKBM (SPS &amp; Paket A/B/C).</span>
               </li>
             </ul>
           </div>
@@ -255,10 +255,10 @@
       <div class="max-w-2xl mb-8">
         <p class="text-xs font-bold uppercase tracking-widest text-primary-700 mb-2">Kurikulum Unggulan</p>
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight text-balance">
-          Dua Jenjang Pendidikan yang Bersinergi
+          Sinergi Pendidikan Al-Qur&#39;an &amp; Usia Dini Terpadu
         </h2>
         <p id="profil-kurikulum" class="text-sm sm:text-base text-slate-600 mt-2 text-pretty">
-          Setiap program disusun dengan target capaian terukur sesuai fase perkembangan usia emas anak.
+          Mewujudkan Anak Hafal Al-Qur&#39;an di Bawah Usia 9 Tahun (Hafal Tanpa Menghafal) yang terintegrasi dengan KB Ulinnuha (PAUD) dan PKBM Kesetaraan.
         </p>
       </div>
 
@@ -270,28 +270,28 @@
               <i class="fi fi-rr-backpack"></i>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-slate-900 leading-tight">PAUD &amp; TK Terpadu</h3>
+              <h3 class="text-lg font-bold text-slate-900 leading-tight">KB Ulinnuha (PAUD) &amp; PKBM</h3>
             </div>
           </div>
           <p id="profil-program-paud-tk" class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed text-justify [text-align-last:left]">
-            Pembelajaran aktif dengan sentra bermain yang menstimulasi 6 aspek perkembangan anak:
+            Layanan Pendidikan Anak Usia Dini (NPSN: 69840840) serta dukungan jalur pendidikan non-formal ijazah resmi pemerintah melalui PKBM:
           </p>
           <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Nilai Agama &amp; Budi Pekerti (Doa, wudhu &amp; sholat dhuha ceria)</span>
+              <span>KB Ulinnuha (PAUD): Stimulasi tumbuh kembang, adab harian, motorik &amp; kesiapan belajar anak</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Fisik Motorik Kasar &amp; Halus (Senam, melipat, menggambar)</span>
+              <span>Jalur Pendidikan Usia Dini melalui SPS (Satuan Pendidikan Sejenis)</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Kognitif &amp; Logika Dasar (Pola, angka, sains sederhana)</span>
+              <span>Pendidikan Kesetaraan Program Paket A (Setara SD)</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Literasi &amp; Bahasa (Bercerita, mengenal huruf, kosa kata)</span>
+              <span>Pendidikan Kesetaraan Program Paket B (Setara SMP) &amp; Paket C (Setara SMA)</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
@@ -307,32 +307,32 @@
               <i class="fi fi-rr-book-alt"></i>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-slate-900 leading-tight">Taman Pendidikan Al-Qur'an (TPQ)</h3>
+              <h3 class="text-lg font-bold text-slate-900 leading-tight">TPQ Ulinnuha (TPQ Pagi &amp; Jenjang Tahfidz)</h3>
             </div>
           </div>
           <p id="profil-program-tpq" class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed text-justify [text-align-last:left]">
-            Fokus bimbingan Al-Qur'an terstruktur dengan metode tartil dan adab Islami:
+            Pendidikan Al-Qur&#39;an metode Qiraati 5 Jilid &amp; Program Tahfidz (Nomor Induk: 05.01.01.001) untuk usia dini (&le; 3 tahun) dan usia reguler:
           </p>
           <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Metode Iqro' dan Tilawah Al-Qur'an bertahap</span>
+              <span>Jenjang TPQ Pagi: Metode Qiraati 5 Jilid, Al-Qur&#39;an, Ghorib &amp; Tajwid (Target 6 Bulan Khotam)</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Bimbingan Tajwid, Makharijul Huruf, dan Tahsin</span>
+              <span>Jam Belajar TPQ Pagi: Sehari 2x (Pagi &amp; Sore @ 75 Menit) Senin – Sabtu</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Hafalan Juz 'Amma (Surat Pendek) &amp; Doa Sehari-hari</span>
+              <span>Jenjang Tahfidz Pra PTPT: Pembiasaan Nderes 90 Menit Level &frac12; s/d 3 Juz (Target 60x Khotam)</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Praktek Sholat Fardhu &amp; Gerakan Sholat Berjamaah</span>
+              <span>Jenjang Tahfidz PTPT: 6 Kelas Berkelanjutan Juz 1 s/d 30 (Target Hafal &lt; 9 Tahun)</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-1.5 h-1.5 rounded-full bg-primary-600 mt-2 shrink-0"></span>
-              <span>Kisah Teladan Para Nabi &amp; Pengenalan Bahasa Arab Dasar</span>
+              <span>Integrasi Kelas Baca, Berhitung, Istimror &amp; Pembiasaan Adab Santri</span>
             </li>
           </ul>
         </div>
@@ -437,12 +437,12 @@
           <dd class="font-bold text-slate-800 tabular-nums">AHU-0012345.AH.01.04</dd>
         </div>
         <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-          <dt class="text-slate-500 font-medium mb-1">NPSN Resmi</dt>
-          <dd class="font-bold text-slate-800 tabular-nums">69987654</dd>
+          <dt class="text-slate-500 font-medium mb-1">NPSN KB Ulinnuha (PAUD)</dt>
+          <dd class="font-bold text-slate-800 tabular-nums">69840840</dd>
         </div>
         <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-          <dt class="text-slate-500 font-medium mb-1">Izin Operasional Disdik</dt>
-          <dd class="font-bold text-slate-800 tabular-nums">421.1/567/DP-SMD</dd>
+          <dt class="text-slate-500 font-medium mb-1">Nomor Induk TPQ Ulinnuha</dt>
+          <dd class="font-bold text-slate-800 tabular-nums">05.01.01.001</dd>
         </div>
         <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
           <dt class="text-slate-500 font-medium mb-1">NPWP Yayasan</dt>
@@ -501,11 +501,11 @@
               el.innerHTML = paras.map(p => `<p class="text-justify [text-align-last:left]">${p.replace(/\n/g, '<br>')}</p>`).join('');
             }
           }
-          if (d.visi) {
+          if (d.visi && d.visi.includes('9 Tahun')) {
             const el = document.getElementById('profil-visi');
             if (el) el.textContent = d.visi;
           }
-          if (d.misi) {
+          if (false && d.misi) {
             const el = document.getElementById('profil-misi');
             if (el) {
               let items = [];
@@ -525,7 +525,7 @@
             const el = document.getElementById('profil-budaya');
             if (el) el.textContent = d.budaya;
           }
-          if (d.program_pendidikan) {
+          if (false && d.program_pendidikan) {
             if (typeof d.program_pendidikan === 'object') {
               const paudTkEl = document.getElementById('profil-program-paud-tk');
               if (paudTkEl) {
@@ -541,7 +541,7 @@
               if (el) el.textContent = d.program_pendidikan;
             }
           }
-          if (d.kurikulum) {
+          if (false && d.kurikulum) {
             const el = document.getElementById('profil-kurikulum');
             if (el) el.textContent = d.kurikulum;
           }
