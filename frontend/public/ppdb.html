@@ -1538,98 +1538,398 @@
            </div>`;
 
       if (snap.isPaud) {
+        let siblingStr = '-';
+        const kandung = snap.siblingsCount || '0';
+        const tiri = snap.siblingsStep || '0';
+        const angkat = snap.siblingsAdopted || '0';
+        if (tiri !== '0' || angkat !== '0') {
+          siblingStr = `${kandung} Orang (Kandung: ${kandung}, Tiri: ${tiri}, Angkat: ${angkat})`;
+        } else {
+          siblingStr = `${kandung} Orang (Kandung)`;
+        }
+
+        const hasMutasi = Boolean(snap.mutasi && (snap.mutasi.date || snap.mutasi.origin || (snap.mutasi.group && snap.mutasi.group !== '-')));
+        const hasOtherInfo = Boolean(snap.distance || snap.transportation);
+
         return `
-          <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 space-y-5">
             <!-- Header Buku Induk PAUD + Pasfoto -->
-            <div class="flex flex-col-reverse sm:flex-row items-center sm:items-start justify-between gap-3 pb-3.5 border-b border-slate-200">
-              <div class="space-y-1 min-w-0 text-center sm:text-left">
-                <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[10px] uppercase tracking-wider inline-block">KB Ulinnuha (PAUD)</span>
-                <h4 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug">${escapeHtml(snap.studentName)}</h4>
-                <p class="text-xs text-slate-500">Tahun Pelajaran: <strong class="text-slate-800">${escapeHtml(snap.academicYear)}</strong></p>
+            <div class="flex flex-col-reverse sm:flex-row items-center sm:items-start justify-between gap-4 pb-4 border-b border-slate-200">
+              <div class="space-y-1 min-w-0 text-center sm:text-left flex-1">
+                <span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[10px] uppercase tracking-wider inline-block">Buku Induk Anak Didik KB Ulinnuha (PAUD)</span>
+                <h4 class="text-base sm:text-xl font-extrabold text-slate-900 leading-tight">${escapeHtml(snap.studentName)}</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Tahun Pelajaran: <strong class="text-slate-800">${escapeHtml(snap.academicYear)}</strong></p>
               </div>
               ${photoHtml}
             </div>
 
             <!-- A. Identitas Anak Didik -->
             <div>
-              <h5 class="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-2 text-primary-800">A. Identitas Anak Didik</h5>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">1.a. Nama Lengkap:</span><span class="font-bold text-slate-900 text-xs sm:text-right break-words">${escapeHtml(snap.studentName)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">1.b. Nama Panggilan:</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${escapeHtml(snap.nickname)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">2. Jenis Kelamin:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.genderLabel)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">3. Tempat, Tgl Lahir:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.birthFormatted)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">No. NIK:</span><span class="font-mono font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.nik)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">5. Agama:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.religion)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">6. Kewarganegaraan:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.citizenship)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">7. Anak ke:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.childOrder || '-')}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">8. Jml Saudara:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">Kandung: ${escapeHtml(snap.siblingsCount)} | Tiri: ${escapeHtml(snap.siblingsStep)} | Angkat: ${escapeHtml(snap.siblingsAdopted)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">9. Status Anak:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.childStatus)}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">10. Bahasa:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.language || '-')}</span></div>
-                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">11. Ciri Khusus:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.specialNotes || '-')}</span></div>
-                <div class="sm:col-span-2 py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">4. Alamat Rumah:</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${escapeHtml(snap.address)}, Kel. ${escapeHtml(snap.subdistrict)}, Kec. ${escapeHtml(snap.district)}, ${escapeHtml(snap.city)}, ${escapeHtml(snap.province)}</span></div>
+              <div class="flex items-center gap-2 border-b-2 border-primary-600/25 pb-2 mb-3.5">
+                <div class="w-2 h-4 bg-primary-600 rounded-sm"></div>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900">A. Identitas Anak Didik</h5>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-xs">
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">1.a. Nama Lengkap</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <strong class="font-bold text-slate-900 flex-1 break-words">${escapeHtml(snap.studentName)}</strong>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">1.b. Nama Panggilan</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1 break-words">${escapeHtml(snap.nickname)}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">2. Jenis Kelamin</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.genderLabel)}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">3. Tempat, Tgl Lahir</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.birthFormatted)}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">5. Agama</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.religion)}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">6. Kewarganegaraan</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.citizenship)}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">7. Anak ke</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.childOrder || '-')}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">8. Jumlah Saudara</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${siblingStr}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">9. Status Anak</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.childStatus)}</span>
+                </div>
+
+                <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">10. Bahasa Sehari-hari</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.language || '-')}</span>
+                </div>
+
+                <div class="sm:col-span-2 py-2 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-1.5">
+                  <div class="flex items-center gap-1.5 w-32 sm:w-36 shrink-0">
+                    <span class="text-slate-500 font-medium text-[11px]">4. Alamat Rumah</span>
+                    <span class="text-slate-400 select-none text-[11px] hidden sm:inline">:</span>
+                  </div>
+                  <span class="font-semibold text-slate-800 flex-1 break-words leading-relaxed">${escapeHtml(snap.address)}, Kel. ${escapeHtml(snap.subdistrict)}, Kec. ${escapeHtml(snap.district)}, ${escapeHtml(snap.city)}, ${escapeHtml(snap.province)}</span>
+                </div>
+
+                <div class="sm:col-span-2 py-2 border-b border-slate-100 flex items-start gap-1.5">
+                  <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">11. Ciri-ciri Khusus</span>
+                  <span class="text-slate-400 select-none text-[11px]">:</span>
+                  <span class="font-semibold text-slate-800 flex-1 break-words">${escapeHtml(snap.specialNotes || '-')}</span>
+                </div>
               </div>
             </div>
 
             <!-- B. Identifikasi Orang Tua / Wali -->
             <div>
-              <h5 class="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-2 text-primary-800">B. Identifikasi Orang Tua / Wali</h5>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div class="font-bold text-slate-800 border-b border-slate-200/60 pb-1">1. ${escapeHtml(snap.father.status)}</div>
-                  <div class="flex justify-between gap-2 pt-0.5"><span class="text-slate-500 text-[11px]">Nama:</span> <strong class="text-right">${escapeHtml(snap.father.name)}</strong></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">TTL / Agama:</span> <span class="text-right">${escapeHtml(snap.father.birth || '-')} / ${escapeHtml(snap.father.religion)}</span></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">Pendidikan:</span> <span class="text-right">${escapeHtml(snap.father.education)}</span></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">Pekerjaan:</span> <span class="text-right">${escapeHtml(snap.father.job)}</span></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">Telepon:</span> <span class="font-mono text-right">${escapeHtml(snap.father.phone || '-')}</span></div>
+              <div class="flex items-center gap-2 border-b-2 border-primary-600/25 pb-2 mb-3.5">
+                <div class="w-2 h-4 bg-primary-600 rounded-sm"></div>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900">B. Identifikasi Orang Tua / Wali</h5>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Card Data Ayah -->
+                <div class="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-2.5">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <span class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                      <i class="fi fi-rr-user text-primary-600 text-xs"></i> 1. Data Ayah
+                    </span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-primary-50 text-primary-700 border border-primary-200">
+                      ${escapeHtml(snap.father.status)}
+                    </span>
+                  </div>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Nama Lengkap</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <strong class="font-bold text-slate-900 flex-1 break-words">${escapeHtml(snap.father.name)}</strong>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">No. Telepon/HP</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="font-mono font-bold text-primary-700 flex-1">${escapeHtml(snap.father.phone || '-')}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Pendidikan</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="text-slate-800 flex-1">${escapeHtml(snap.father.education)}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Pekerjaan</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="text-slate-800 flex-1">${escapeHtml(snap.father.job)}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">TTL / Agama</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="text-slate-800 flex-1">${escapeHtml(snap.father.birth || '-')} / ${escapeHtml(snap.father.religion)}</span>
+                    </div>
+                    ${snap.father.office_phone ? `
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Telp Kantor</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="font-mono text-slate-700 flex-1">${escapeHtml(snap.father.office_phone)}</span>
+                    </div>` : ''}
+                  </div>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div class="font-bold text-slate-800 border-b border-slate-200/60 pb-1">2. ${escapeHtml(snap.mother.status)}</div>
-                  <div class="flex justify-between gap-2 pt-0.5"><span class="text-slate-500 text-[11px]">Nama:</span> <strong class="text-right">${escapeHtml(snap.mother.name)}</strong></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">TTL / Agama:</span> <span class="text-right">${escapeHtml(snap.mother.birth || '-')} / ${escapeHtml(snap.mother.religion)}</span></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">Pendidikan:</span> <span class="text-right">${escapeHtml(snap.mother.education)}</span></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">Pekerjaan:</span> <span class="text-right">${escapeHtml(snap.mother.job)}</span></div>
-                  <div class="flex justify-between gap-2"><span class="text-slate-500 text-[11px]">Telepon:</span> <span class="font-mono text-right">${escapeHtml(snap.mother.phone || '-')}</span></div>
+
+                <!-- Card Data Ibu -->
+                <div class="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-2.5">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <span class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                      <i class="fi fi-rr-user text-rose-500 text-xs"></i> 2. Data Ibu
+                    </span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                      ${escapeHtml(snap.mother.status)}
+                    </span>
+                  </div>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Nama Lengkap</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <strong class="font-bold text-slate-900 flex-1 break-words">${escapeHtml(snap.mother.name)}</strong>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">No. Telepon/HP</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="font-mono font-bold text-primary-700 flex-1">${escapeHtml(snap.mother.phone || '-')}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Pendidikan</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="text-slate-800 flex-1">${escapeHtml(snap.mother.education)}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Pekerjaan</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="text-slate-800 flex-1">${escapeHtml(snap.mother.job)}</span>
+                    </div>
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">TTL / Agama</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="text-slate-800 flex-1">${escapeHtml(snap.mother.birth || '-')} / ${escapeHtml(snap.mother.religion)}</span>
+                    </div>
+                    ${snap.mother.office_phone ? `
+                    <div class="flex items-start gap-1.5">
+                      <span class="w-24 shrink-0 text-slate-500 text-[11px]">Telp Kantor</span>
+                      <span class="text-slate-400 select-none">:</span>
+                      <span class="font-mono text-slate-700 flex-1">${escapeHtml(snap.mother.office_phone)}</span>
+                    </div>` : ''}
+                  </div>
                 </div>
               </div>
+
+              ${snap.guardian ? `
+                <div class="mt-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                  <div class="font-bold text-slate-900 border-b border-slate-200 pb-1 flex items-center justify-between">
+                    <span>3. Data Wali</span>
+                    <span class="text-[10px] text-slate-500 font-normal">Hubungan: <strong>${escapeHtml(snap.guardian.relation || '-')}</strong></span>
+                  </div>
+                  <div class="grid sm:grid-cols-3 gap-2 pt-1 text-slate-700">
+                    <div><span class="text-[11px] text-slate-500">Nama:</span> <strong>${escapeHtml(snap.guardian.name)}</strong></div>
+                    <div><span class="text-[11px] text-slate-500">Pekerjaan:</span> <span>${escapeHtml(snap.guardian.job || '-')}</span></div>
+                    <div><span class="text-[11px] text-slate-500">Pendidikan:</span> <span>${escapeHtml(snap.guardian.education || '-')}</span></div>
+                  </div>
+                </div>` : ''}
             </div>
 
-            <!-- D. Keterangan Lain-lain -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
-              <div class="flex justify-between gap-2"><span class="text-slate-500">Jarak ke Sekolah:</span> <strong class="text-slate-800">${escapeHtml(snap.distance || '-')}</strong></div>
-              <div class="flex justify-between gap-2"><span class="text-slate-500">Pergi dengan:</span> <strong class="text-slate-800">${escapeHtml(snap.transportation)}</strong></div>
-            </div>
+            <!-- C. Mutasi (Hanya jika ada) & D. Keterangan Lain-lain -->
+            ${hasMutasi ? `
+            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2 text-xs">
+              <div class="flex items-center gap-1.5 font-bold text-amber-900 pb-1.5 border-b border-amber-200/80">
+                <i class="fi fi-rr-exchange text-xs"></i> C. Data Mutasi (Siswa Pindahan)
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-800 pt-0.5">
+                <div><span class="text-[11px] text-amber-900/70 block font-medium">1. Diterima Tanggal:</span> <strong>${escapeHtml(snap.mutasi.date || '-')}</strong></div>
+                <div><span class="text-[11px] text-amber-900/70 block font-medium">2. Di Kelompok:</span> <strong>${escapeHtml(snap.mutasi.group || '-')}</strong></div>
+                <div><span class="text-[11px] text-amber-900/70 block font-medium">3. Berasal Dari / Pindah:</span> <strong>${escapeHtml(snap.mutasi.origin || '-')}</strong></div>
+              </div>
+            </div>` : ''}
+
+            ${hasOtherInfo ? `
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex flex-wrap items-center gap-3 text-slate-700">
+              <span class="font-bold text-slate-800 flex items-center gap-1.5"><i class="fi fi-rr-info text-primary-600"></i> Keterangan:</span>
+              ${snap.distance ? `<span>Jarak Tempat Tinggal ke TK: <strong>${escapeHtml(snap.distance)} KM</strong></span>` : ''}
+              ${snap.distance && snap.transportation ? `<span class="text-slate-300">&bull;</span>` : ''}
+              ${snap.transportation ? `<span>Pergi ke TK dengan: <strong>${escapeHtml(snap.transportation)}</strong></span>` : ''}
+            </div>` : ''}
           </div>
         `;
       }
 
       // Format Hasil TPQ Ulinnuha
       return `
-        <div class="bg-white border border-slate-200 rounded-2xl p-3.5 sm:p-5 space-y-4">
-          <div class="flex flex-col-reverse sm:flex-row items-center sm:items-start justify-between gap-3 pb-3.5 border-b border-slate-200">
-            <div class="space-y-1 min-w-0 text-center sm:text-left">
-              <span class="px-2.5 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold text-[10px] uppercase tracking-wider inline-block">TPQ Ulinnuha &bull; ${escapeHtml(snap.jenjang)}</span>
-              <h4 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug">${escapeHtml(snap.studentName)}</h4>
-              <p class="text-xs text-slate-500">Tahun Pelajaran: <strong>${escapeHtml(snap.academicYear)}</strong></p>
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 space-y-5">
+          <div class="flex flex-col-reverse sm:flex-row items-center sm:items-start justify-between gap-4 pb-4 border-b border-slate-200">
+            <div class="space-y-1 min-w-0 text-center sm:text-left flex-1">
+              <span class="px-2.5 py-1 rounded-md bg-sky-50 text-sky-800 border border-sky-200 font-bold text-[10px] uppercase tracking-wider inline-block">Formulir Pendaftaran Santri Baru TPQ</span>
+              <h4 class="text-base sm:text-xl font-extrabold text-slate-900 leading-tight">${escapeHtml(snap.studentName)}</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Jenjang: <strong class="text-slate-800">${escapeHtml(snap.jenjang)}</strong> &bull; Tahun Pelajaran: <strong class="text-slate-800">${escapeHtml(snap.academicYear)}</strong></p>
             </div>
             ${photoHtml}
           </div>
 
           <div>
-            <h5 class="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-2 text-primary-800">A. Identitas Santri &amp; Orang Tua</h5>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">1. Nama Lengkap:</span><span class="font-bold text-slate-900 text-xs sm:text-right break-words">${escapeHtml(snap.studentName)}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">2. Nama Panggilan:</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${escapeHtml(snap.nickname)}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">3. Jenis Kelamin:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.genderLabel)}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">4. Tempat/Tgl Lahir:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.birthFormatted)}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">5. Anak ke:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.childOrder || '-')}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">6. Jumlah Saudara:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.siblingsCount || '-')}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">7. No. NIK:</span><span class="font-mono font-bold text-slate-900 text-xs sm:text-right">${escapeHtml(snap.nik)}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">9. Kontak Telpon (1):</span><span class="font-mono font-bold text-primary-700 text-xs sm:text-right">${escapeHtml(snap.primaryPhone)}</span></div>
-              <div class="sm:col-span-2 py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">8. Alamat Rumah:</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${escapeHtml(snap.address)}, Kel. ${escapeHtml(snap.subdistrict)}, Kec. ${escapeHtml(snap.district)}, ${escapeHtml(snap.city)}, ${escapeHtml(snap.province)}</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">10. Ayah:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.father.name)} (${escapeHtml(snap.father.job)} &bull; ${escapeHtml(snap.father.education)})</span></div>
-              <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">11. Ibu:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.mother.name)} (${escapeHtml(snap.mother.job)} &bull; ${escapeHtml(snap.mother.education)})</span></div>
-              ${snap.guardian ? `<div class="sm:col-span-2 py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">12. Wali:</span><span class="font-semibold text-slate-800 text-xs sm:text-right">${escapeHtml(snap.guardian.name)} (${escapeHtml(snap.guardian.job)} &bull; ${escapeHtml(snap.guardian.education)} &bull; ${escapeHtml(snap.guardian.relation)})</span></div>` : ''}
+            <div class="flex items-center gap-2 border-b-2 border-sky-600/25 pb-2 mb-3.5">
+              <div class="w-2 h-4 bg-sky-600 rounded-sm"></div>
+              <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900">A. Identitas Santri</h5>
             </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-xs">
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">1. Nama Lengkap</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <strong class="font-bold text-slate-900 flex-1 break-words">${escapeHtml(snap.studentName)}</strong>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">2. Nama Panggilan</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-semibold text-slate-800 flex-1 break-words">${escapeHtml(snap.nickname)}</span>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">3. Jenis Kelamin</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.genderLabel)}</span>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">4. Tempat / Tgl Lahir</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.birthFormatted)}</span>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">5. Anak ke</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.childOrder || '-')}</span>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">6. Jumlah Saudara</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-semibold text-slate-800 flex-1">${escapeHtml(snap.siblingsCount || '-')} Orang</span>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">7. No. NIK Santri</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-mono font-bold text-slate-900 flex-1">${escapeHtml(snap.nik)}</span>
+              </div>
+
+              <div class="py-2 border-b border-slate-100 flex items-start gap-1.5">
+                <span class="w-32 sm:w-36 shrink-0 text-slate-500 font-medium text-[11px]">9. Kontak Telpon (1)</span>
+                <span class="text-slate-400 select-none text-[11px]">:</span>
+                <span class="font-mono font-bold text-primary-700 flex-1">${escapeHtml(snap.primaryPhone)}</span>
+              </div>
+
+              <div class="sm:col-span-2 py-2 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-1.5">
+                <div class="flex items-center gap-1.5 w-32 sm:w-36 shrink-0">
+                  <span class="text-slate-500 font-medium text-[11px]">8. Alamat Rumah</span>
+                  <span class="text-slate-400 select-none text-[11px] hidden sm:inline">:</span>
+                </div>
+                <span class="font-semibold text-slate-800 flex-1 break-words leading-relaxed">${escapeHtml(snap.address)}, Kel. ${escapeHtml(snap.subdistrict)}, Kec. ${escapeHtml(snap.district)}, ${escapeHtml(snap.city)}, ${escapeHtml(snap.province)}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- B. Identitas Orang Tua / Wali -->
+          <div>
+            <div class="flex items-center gap-2 border-b-2 border-sky-600/25 pb-2 mb-3.5">
+              <div class="w-2 h-4 bg-sky-600 rounded-sm"></div>
+              <h5 class="text-xs font-bold uppercase tracking-wider text-slate-900">B. Identitas Orang Tua / Wali</h5>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Card Data Ayah -->
+              <div class="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-2">
+                <div class="font-bold text-xs text-slate-900 pb-2 border-b border-slate-200 flex items-center gap-1.5">
+                  <i class="fi fi-rr-user text-primary-600 text-xs"></i> 10. Data Ayah
+                </div>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex items-start gap-1.5">
+                    <span class="w-24 shrink-0 text-slate-500 text-[11px]">a. Nama Ayah</span>
+                    <span class="text-slate-400 select-none">:</span>
+                    <strong class="font-bold text-slate-900 flex-1 break-words">${escapeHtml(snap.father.name)}</strong>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="w-24 shrink-0 text-slate-500 text-[11px]">b. Pekerjaan</span>
+                    <span class="text-slate-400 select-none">:</span>
+                    <span class="text-slate-800 flex-1">${escapeHtml(snap.father.job)}</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="w-24 shrink-0 text-slate-500 text-[11px]">c. Pendidikan</span>
+                    <span class="text-slate-400 select-none">:</span>
+                    <span class="text-slate-800 flex-1">${escapeHtml(snap.father.education)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Data Ibu -->
+              <div class="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-2">
+                <div class="font-bold text-xs text-slate-900 pb-2 border-b border-slate-200 flex items-center gap-1.5">
+                  <i class="fi fi-rr-user text-rose-500 text-xs"></i> 11. Data Ibu
+                </div>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex items-start gap-1.5">
+                    <span class="w-24 shrink-0 text-slate-500 text-[11px]">a. Nama Ibu</span>
+                    <span class="text-slate-400 select-none">:</span>
+                    <strong class="font-bold text-slate-900 flex-1 break-words">${escapeHtml(snap.mother.name)}</strong>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="w-24 shrink-0 text-slate-500 text-[11px]">b. Pekerjaan</span>
+                    <span class="text-slate-400 select-none">:</span>
+                    <span class="text-slate-800 flex-1">${escapeHtml(snap.mother.job)}</span>
+                  </div>
+                  <div class="flex items-start gap-1.5">
+                    <span class="w-24 shrink-0 text-slate-500 text-[11px]">c. Pendidikan</span>
+                    <span class="text-slate-400 select-none">:</span>
+                    <span class="text-slate-800 flex-1">${escapeHtml(snap.mother.education)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            ${snap.guardian ? `
+              <div class="mt-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                <div class="font-bold text-slate-900 border-b border-slate-200 pb-1 flex items-center justify-between">
+                  <span>12. Data Wali</span>
+                  <span class="text-[10px] text-slate-500 font-normal">Hubungan: <strong>${escapeHtml(snap.guardian.relation || '-')}</strong></span>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-2 pt-1 text-slate-700">
+                  <div><span class="text-[11px] text-slate-500">Nama:</span> <strong>${escapeHtml(snap.guardian.name)}</strong></div>
+                  <div><span class="text-[11px] text-slate-500">Pekerjaan:</span> <span>${escapeHtml(snap.guardian.job || '-')}</span></div>
+                  <div><span class="text-[11px] text-slate-500">Pendidikan:</span> <span>${escapeHtml(snap.guardian.education || '-')}</span></div>
+                </div>
+              </div>` : ''}
           </div>
         </div>
       `;
