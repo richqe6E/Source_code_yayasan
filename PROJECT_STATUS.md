@@ -1873,10 +1873,11 @@ frontend/
 1. **Pembersihan Total Peninggalan Google Apps Script & Google Sheets:**
    - Menghapus folder `apps-script/` (seluruh 27 file `.gs` dan konfigurasi clasp).
    - Menghapus `database/headers/` (33 file CSV) & `database/seed/` (10 file CSV).
-   - Menulis ulang `database/README.md` baru khusus skema PostgreSQL Supabase (`MASTER_SUPABASE_SETUP_V2.sql` dan patch DDL).
+   - Merampingkan `database/` menjadi 2 berkas SQL resmi (`MASTER_SUPABASE_SETUP_V2.sql` dan `patch_missing_columns.sql`) serta menghapus 2 patch riwayat lama yang redundan.
+   - Menulis ulang `database/README.md` baru khusus skema PostgreSQL Supabase.
    - Menghapus `.claude/settings.local.json`.
 2. **Pembersihan Arsip Lama & Dokumentasi Obsolet:**
-   - Menghapus folder `` (arsip portal guru & ortu v1).
+   - Menghapus folder `.legacy_backup/` (arsip portal guru & ortu v1).
    - Menghapus folder `docs/` beserta isinya (`SETUP_DATABASE.md`, `DataDictionary.md`, diagram Draw.io Google Sheets, PRD/SRD 5 role lama, dan rencana sesi lampau).
    - Menghapus dokumen root usang: `BLUEPRINT_SIYAYASAN.md` (129 KB), `directive_antigravity_siyayasan_v2.md` (26 KB), `FRONTEND_STRUCTURE_AND_FEATURES.md` (14 KB), dan `HANDOVER.md` (13 KB).
 3. **Pembersihan File Dump Cadangan Lokal, Aset Media, dan Konfigurasi Redundan:**

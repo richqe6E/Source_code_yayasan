@@ -371,7 +371,8 @@ Semua test suite dan simulasi operasional browser live berjalan **100% LULUS**:
     - **Pembersihan Total Legacy Apps Script & Spreadsheet:**
       - Menghapus folder `apps-script/` (seluruh 27 file `.gs` dan konfigurasi clasp).
       - Menghapus `database/headers/` (33 file CSV) & `database/seed/` (10 file CSV) peninggalan Google Sheets.
-      - Menulis ulang `database/README.md` baru yang profesional mendokumentasikan skrip SQL PostgreSQL Supabase (`MASTER_SUPABASE_SETUP_V2.sql` dan berkas patch).
+      - Merampingkan `database/` menjadi 2 berkas SQL esensial (`MASTER_SUPABASE_SETUP_V2.sql` dan `patch_missing_columns.sql`) serta menghapus 2 patch riwayat lama yang redundan (`foundation` & `phase1_columns`).
+      - Menulis ulang `database/README.md` baru yang profesional mendokumentasikan skrip SQL PostgreSQL Supabase.
       - Menghapus `.claude/settings.local.json` (perintah izin clasp push / webhook Apps Script).
     - **Pembersihan Arsip Lama & Dokumentasi Obsolet:**
       - Menghapus folder `.legacy_backup/` (seluruh arsip portal guru & ortu v1).

@@ -69,7 +69,7 @@ Source_code_yayasan/
 │   └── package.json         # Konfigurasi package & metadata
 ├── database/
 │   ├── MASTER_SUPABASE_SETUP_V2.sql  # Skema DDL master basis data Supabase PostgreSQL
-│   ├── patch_*.sql                   # Berkas patch migrasi & penyesuaian kolom Supabase
+│   ├── patch_missing_columns.sql     # Skrip migrasi & penyesuaian kolom live Supabase
 │   └── README.md                     # Panduan setup & inisialisasi basis data Supabase
 ├── tests/                   # Test suite E2E, integrasi alur kerja, dan validasi skema
 ├── .agents/                 # Konfigurasi agen coding, tools, & custom skills
