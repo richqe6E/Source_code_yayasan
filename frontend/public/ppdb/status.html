@@ -37,38 +37,38 @@
     </div>
   </header>
 
-  <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8">
+  <main class="flex-1 py-8 sm:py-12 px-3 sm:px-6 lg:px-8">
     <div class="max-w-3xl mx-auto">
 
       <!-- SEARCH BOX -->
-      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 p-6 sm:p-10 mb-8">
+      <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 p-4 sm:p-8 mb-6 sm:mb-8">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center shrink-0">
             <i data-lucide="file-search" class="w-5 h-5"></i>
           </div>
           <div>
-            <h1 class="font-display text-xl sm:text-2xl font-extrabold text-slate-900">Cek Status &amp; Lembar Data PPDB</h1>
-            <p class="text-xs text-slate-500">Masukkan Nomor Registrasi Anda untuk melihat lembar hasil pendaftaran, status penerimaan, Nomor Induk / NIS Lokal, dan Sandi Portal Siswa</p>
+            <h1 class="font-display text-lg sm:text-2xl font-extrabold text-slate-900 leading-tight">Cek Status &amp; Lembar Data PPDB</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Masukkan Nomor Registrasi Anda untuk melihat lembar hasil pendaftaran, status penerimaan, Nomor Induk / NIS Lokal, dan Sandi Portal Siswa</p>
           </div>
         </div>
 
-        <form onsubmit="handleCheckStatus(event)" class="mt-6 flex flex-col sm:flex-row gap-3">
+        <form onsubmit="handleCheckStatus(event)" class="mt-5 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
           <div class="relative flex-1">
             <i data-lucide="hash" class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
             <input type="text" id="reg-input" required placeholder="Contoh: REG-2026-001"
-              class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-300 text-sm font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-600" />
+              class="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl border border-slate-300 text-sm font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-600" />
           </div>
-          <button type="submit" id="btn-search" class="px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-lg shadow-sky-600/20 transition-all flex items-center justify-center gap-2">
+          <button type="submit" id="btn-search" class="w-full sm:w-auto px-6 py-3 sm:py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-bold text-sm shadow-md shadow-sky-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0">
             <i data-lucide="search" class="w-4 h-4"></i> Cek Status
           </button>
         </form>
 
         <!-- Quick Demo Pills -->
-        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <span>Contoh Nomor:</span>
-          <button type="button" onclick="fillAndSearch('REG-2026-001')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold transition-colors">REG-2026-001</button>
-          <button type="button" onclick="fillAndSearch('REG-2026-002')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold transition-colors">REG-2026-002</button>
-          <button type="button" onclick="fillAndSearch('REG-2026-003')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold transition-colors">REG-2026-003</button>
+        <div class="mt-4 flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs text-slate-500">
+          <span class="text-[11px] sm:text-xs">Contoh Nomor:</span>
+          <button type="button" onclick="fillAndSearch('REG-2026-001')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold text-xs transition-colors">REG-2026-001</button>
+          <button type="button" onclick="fillAndSearch('REG-2026-002')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold text-xs transition-colors">REG-2026-002</button>
+          <button type="button" onclick="fillAndSearch('REG-2026-003')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold text-xs transition-colors">REG-2026-003</button>
         </div>
       </div>
 
@@ -192,7 +192,7 @@
       let officialAccountBox = '';
       if (r.status === 'converted' || r.status === 'accepted') {
         officialAccountBox = `
-          <div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg mb-6">
+          <div class="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg mb-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-bold uppercase tracking-wider mb-1">Diterbitkan Oleh Admin Sekolah</span>
@@ -200,12 +200,12 @@
                 <p class="font-mono text-2xl sm:text-3xl font-extrabold tracking-tight mt-0.5">${assignedNis || 'Sedang Diterbitkan'}</p>
                 <p class="text-xs text-emerald-100 mt-1">${isPaud ? 'Kelompok' : 'Kelas / Jenjang'}: <strong>${assignedClass || r.level || '-'}</strong> ${assignedEntryDate ? '&bull; Tgl Masuk: <strong>' + assignedEntryDate + '</strong>' : ''}</p>
               </div>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <button type="button" onclick="printOfficialLetter()"
-                  class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs transition-colors flex items-center gap-1.5">
+                  class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                   <i data-lucide="printer" class="w-4 h-4"></i> Cetak Lembar Resmi
                 </button>
-                <a href="../login.html" class="px-5 py-2.5 rounded-xl bg-white text-emerald-900 font-bold text-xs hover:bg-emerald-50 transition-colors flex items-center gap-1.5 shadow-sm">
+                <a href="../login.html" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-emerald-900 font-bold text-xs hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5 shadow-sm">
                   <i data-lucide="log-in" class="w-4 h-4"></i> Login Portal Siswa
                 </a>
               </div>
@@ -213,11 +213,11 @@
             <div class="mt-4 pt-3 border-t border-white/15 grid sm:grid-cols-2 gap-3 text-xs text-emerald-50">
               <div class="p-3 rounded-xl bg-white/10 border border-white/15">
                 <span class="block text-[10px] uppercase tracking-wider text-emerald-200 font-bold">Username Login Portal Siswa</span>
-                <span class="font-mono font-extrabold text-sm text-white">${assignedNis || '-'}</span>
+                <span class="font-mono font-extrabold text-sm text-white select-all">${assignedNis || '-'}</span>
               </div>
               <div class="p-3 rounded-xl bg-white/10 border border-white/15">
                 <span class="block text-[10px] uppercase tracking-wider text-emerald-200 font-bold">Sandi / Password Portal Siswa (Dari Admin)</span>
-                <span class="font-mono font-extrabold text-sm text-amber-200">${assignedPassword || 'Hubungi Admin TU / Gunakan Tgl Lahir (DDMMYYYY)'}</span>
+                <span class="font-mono font-extrabold text-sm text-amber-200 select-all">${assignedPassword || 'Hubungi Admin TU / Gunakan Tgl Lahir (DDMMYYYY)'}</span>
               </div>
             </div>
           </div>`;
@@ -226,10 +226,10 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 mb-6">
             <div class="text-xs text-amber-900">
               <p class="font-bold">Menunggu Penerbitan Nomor Induk / NIS &amp; Sandi Portal oleh Admin</p>
-              <p class="text-amber-700 mt-0.5">Setelah Admin Sekolah memvalidasi pendaftaran Anda, Nomor Induk / NIS Lokal, Kelompok/Kelas, dan Sandi Login Portal Siswa akan tampil di halaman ini.</p>
+              <p class="text-amber-700 mt-0.5 leading-relaxed">Setelah Admin Sekolah memvalidasi pendaftaran Anda, Nomor Induk / NIS Lokal, Kelompok/Kelas, dan Sandi Login Portal Siswa akan tampil di halaman ini.</p>
             </div>
             <button type="button" onclick="printOfficialLetter()"
-              class="shrink-0 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm">
+              class="w-full sm:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
               <i data-lucide="printer" class="w-4 h-4 text-sky-600"></i> Cetak Lembar Data PPDB
             </button>
           </div>`;
@@ -238,7 +238,7 @@
       let formattedSheetHtml = '';
       if (isPaud) {
         formattedSheetHtml = `
-          <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
+          <div class="p-4 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
             <!-- Header PAUD + Pasfoto -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
@@ -263,19 +263,19 @@
             <!-- A. Identitas Anak Didik -->
             <div>
               <h5 class="text-xs font-extrabold uppercase tracking-wider text-sky-800 mb-2.5">A. Identitas Anak Didik</h5>
-              <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">1.a. Nama Lengkap</span><span class="font-bold text-slate-900 text-right">${r.student_name || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">1.b. Nama Panggilan</span><span class="font-semibold text-slate-800 text-right">${r.nickname || metaObj.nickname || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">2. Jenis Kelamin</span><span class="font-semibold text-slate-800 text-right">${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">3. Tempat, Tgl Lahir</span><span class="font-semibold text-slate-800 text-right">${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">4. Alamat Rumah (Jalan, Desa, Kec., Kab/Kota, Prov.)</span><span class="font-semibold text-slate-800 text-right">${r.address || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">5. Agama</span><span class="font-semibold text-slate-800 text-right">${metaObj.religion || 'Islam'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">6. Kewarganegaraan</span><span class="font-semibold text-slate-800 text-right">${metaObj.citizenship || 'WNI'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">7. Anak ke</span><span class="font-semibold text-slate-800 text-right">${r.child_order || metaObj.child_order || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">8. Jml Saudara (Kandung / Tiri / Angkat)</span><span class="font-semibold text-slate-800 text-right">${r.siblings_count ?? metaObj.siblings_count ?? '-'} / ${metaObj.siblings_step || '0'} / ${metaObj.siblings_adopted || '0'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">9. Status Anak</span><span class="font-semibold text-slate-800 text-right">${metaObj.child_status || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">10. Bahasa Sehari-hari</span><span class="font-semibold text-slate-800 text-right">${metaObj.daily_language || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">11. Ciri-ciri Khusus</span><span class="font-semibold text-slate-800 text-right">${metaObj.special_traits || '-'}</span></div>
+              <div class="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">1.a. Nama Lengkap</span><span class="font-bold text-slate-900 text-xs xs:text-right break-words">${r.student_name || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">1.b. Nama Panggilan</span><span class="font-semibold text-slate-800 text-xs xs:text-right break-words">${r.nickname || metaObj.nickname || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">2. Jenis Kelamin</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">3. Tempat, Tgl Lahir</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">5. Agama</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${metaObj.religion || 'Islam'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">6. Kewarganegaraan</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${metaObj.citizenship || 'WNI'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">7. Anak ke</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.child_order || metaObj.child_order || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">8. Jml Saudara</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.siblings_count ?? metaObj.siblings_count ?? '-'} / ${metaObj.siblings_step || '0'} / ${metaObj.siblings_adopted || '0'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">9. Status Anak</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${metaObj.child_status || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">10. Bahasa Sehari-hari</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${metaObj.daily_language || '-'}</span></div>
+                <div class="sm:col-span-2 py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">4. Alamat Rumah</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${r.address || '-'}</span></div>
+                <div class="sm:col-span-2 py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">11. Ciri-ciri Khusus</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${metaObj.special_traits || '-'}</span></div>
               </div>
             </div>
 
@@ -290,7 +290,7 @@
                   <p><span class="text-slate-500">c. Agama:</span> ${metaObj.father_religion || 'Islam'}</p>
                   <p><span class="text-slate-500">d. Pendidikan:</span> ${fatherEdu}</p>
                   <p><span class="text-slate-500">e. Pekerjaan:</span> ${fatherJob}</p>
-                  <p><span class="text-slate-500">f. Telp Rumah/HP &amp; Kantor:</span> ${metaObj.father_phone_home || r.parent_phone || '-'} / ${metaObj.father_phone_office || '-'}</p>
+                  <p class="break-words"><span class="text-slate-500">f. Telp Rumah/HP &amp; Kantor:</span> ${metaObj.father_phone_home || r.parent_phone || '-'} / ${metaObj.father_phone_office || '-'}</p>
                 </div>
                 <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                   <p class="font-bold text-slate-800 border-b border-slate-200 pb-1">2. Data Ibu (${metaObj.mother_relation || 'Ibu Kandung'})</p>
@@ -299,7 +299,7 @@
                   <p><span class="text-slate-500">c. Agama:</span> ${metaObj.mother_religion || 'Islam'}</p>
                   <p><span class="text-slate-500">d. Pendidikan:</span> ${motherEdu}</p>
                   <p><span class="text-slate-500">e. Pekerjaan:</span> ${motherJob}</p>
-                  <p><span class="text-slate-500">f. Telp Rumah/HP &amp; Kantor:</span> ${metaObj.mother_phone_home || '-'} / ${metaObj.mother_phone_office || '-'}</p>
+                  <p class="break-words"><span class="text-slate-500">f. Telp Rumah/HP &amp; Kantor:</span> ${metaObj.mother_phone_home || '-'} / ${metaObj.mother_phone_office || '-'}</p>
                 </div>
               </div>
               ${metaObj.guardian_name ? `
@@ -325,7 +325,7 @@
           </div>`;
       } else {
         formattedSheetHtml = `
-          <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
+          <div class="p-4 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
             <!-- Header TPQ + Pasfoto -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
@@ -350,16 +350,16 @@
             <!-- A. Identitas Santri -->
             <div>
               <h5 class="text-xs font-extrabold uppercase tracking-wider text-sky-800 mb-2.5">A. Identitas Santri</h5>
-              <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">1. Nama Lengkap</span><span class="font-bold text-slate-900 text-right">${r.student_name || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">2. Nama Panggilan</span><span class="font-semibold text-slate-800 text-right">${r.nickname || metaObj.nickname || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">3. Jenis Kelamin</span><span class="font-semibold text-slate-800 text-right">${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">4. Tempat / Tanggal Lahir</span><span class="font-semibold text-slate-800 text-right">${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">5. Anak ke</span><span class="font-semibold text-slate-800 text-right">${r.child_order || metaObj.child_order || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">6. Jumlah Saudara</span><span class="font-semibold text-slate-800 text-right">${r.siblings_count ?? metaObj.siblings_count ?? '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">7. Nomor NIK Santri</span><span class="font-mono font-bold text-slate-900 text-right">${r.nik || metaObj.nik || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">8. Alamat Rumah (Prov., Kab/Kota, Kec., Desa, Alamat)</span><span class="font-semibold text-slate-800 text-right">${r.address || '-'}</span></div>
-                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">9. Kontak Telpon (1)</span><span class="font-semibold text-slate-800 text-right">${r.parent_phone || '-'}</span></div>
+              <div class="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">1. Nama Lengkap</span><span class="font-bold text-slate-900 text-xs xs:text-right break-words">${r.student_name || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">2. Nama Panggilan</span><span class="font-semibold text-slate-800 text-xs xs:text-right break-words">${r.nickname || metaObj.nickname || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">3. Jenis Kelamin</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">4. Tempat / Tgl Lahir</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">5. Anak ke</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.child_order || metaObj.child_order || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">6. Jumlah Saudara</span><span class="font-semibold text-slate-800 text-xs xs:text-right">${r.siblings_count ?? metaObj.siblings_count ?? '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">7. Nomor NIK Santri</span><span class="font-mono font-bold text-slate-900 text-xs xs:text-right">${r.nik || metaObj.nik || '-'}</span></div>
+                <div class="py-1.5 border-b border-slate-100 flex flex-col xs:flex-row xs:items-baseline xs:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">9. Kontak Telpon (1)</span><span class="font-semibold text-slate-800 text-xs xs:text-right font-mono">${r.parent_phone || '-'}</span></div>
+                <div class="sm:col-span-2 py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5"><span class="text-slate-500 text-[11px] shrink-0">8. Alamat Rumah</span><span class="font-semibold text-slate-800 text-xs sm:text-right break-words">${r.address || '-'}</span></div>
               </div>
             </div>
 
@@ -386,19 +386,19 @@
       }
 
       container.innerHTML = `
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 overflow-hidden">
-          <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 overflow-hidden">
+          <div class="p-4 sm:p-7 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nomor Registrasi</span>
-              <h2 class="font-mono text-2xl font-extrabold text-slate-900 mt-0.5">${r.registration_number}</h2>
+              <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Nomor Registrasi</span>
+              <h2 class="font-mono text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">${r.registration_number}</h2>
             </div>
-            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold ${st.badge}">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full border text-xs font-bold ${st.badge} self-start sm:self-auto">
               <i data-lucide="${st.icon}" class="w-4 h-4"></i> ${st.label}
             </span>
           </div>
 
-          <div class="p-6 sm:p-8">
-            <p class="text-sm text-slate-600 leading-relaxed mb-6">${st.desc}</p>
+          <div class="p-4 sm:p-7">
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5 sm:mb-6">${st.desc}</p>
 
             ${officialAccountBox}
 
