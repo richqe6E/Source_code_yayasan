@@ -59,8 +59,6 @@
           <option value="tpq_pagi">A. TPQ Ulinnuha — Jenjang TPQ Pagi</option>
           <option value="tahfidz">B. TPQ Ulinnuha — Jenjang Tahfidz (Pra PTPT &amp; PTPT)</option>
           <option value="paud">C. KB Ulinnuha (PAUD)</option>
-
-
         </select>
         <div class="flex items-center gap-2">
           <button onclick="loadPpdb()" class="flex-1 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700 transition">Filter</button>
@@ -76,11 +74,11 @@
             <tr>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">No. Pendaftaran</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Nama Anak</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Jenis</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Program</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Orang Tua</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tgl Daftar</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi Validasi &amp; Aktivasi</th>
             </tr>
           </thead>
           <tbody id="ppdb-tbody" class="bg-white divide-y divide-gray-200">
@@ -108,7 +106,7 @@
           <p class="text-xs text-gray-500 mt-1">Saat ditutup, tombol isi formulir di halaman publik akan otomatis hilang dan digantikan pemberitahuan pendaftaran ditutup.</p>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Tahun Ajaran / Periode</label>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Tahun Pelajaran / Periode</label>
           <input id="p-academic-year" type="text" placeholder="Contoh: 2026/2027" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
         </div>
         <div class="border-t border-gray-100 pt-3">
@@ -133,8 +131,8 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Catatan Tambahan untuk Calon Pendaftar (Opsional)</label>
-          <textarea id="p-notes" rows="2" placeholder="Catatan opsional yang tampil di bawah jadwal penting..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"></textarea>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Catatan Tambahan untuk Calon Pendaftar</label>
+          <textarea id="p-notes" rows="2" placeholder="Catatan yang tampil di bawah jadwal penting..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"></textarea>
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
           <button type="button" onclick="closePeriodModal()" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">Batal</button>
@@ -144,11 +142,14 @@
     </div>
   </div>
 
-  <!-- Modal Detail Pendaftaran -->
+  <!-- Modal Detail & Validasi Pendaftaran -->
   <div id="ppdb-detail-modal" class="hidden fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
-      <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-        <h3 class="text-base font-semibold text-gray-900">Detail Pendaftaran Calon Siswa</h3>
+    <div class="bg-white rounded-xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl">
+      <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 sticky top-0 z-10">
+        <div>
+          <h3 class="text-base font-bold text-gray-900">Tinjau &amp; Validasi Formulir Pendaftaran</h3>
+          <p class="text-xs text-gray-500">Seluruh data yang diinput oleh calon siswa/orang tua saat pendaftaran PPDB</p>
+        </div>
         <button onclick="document.getElementById('ppdb-detail-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
       </div>
       <div id="ppdb-detail-body" class="p-5"></div>
@@ -198,9 +199,6 @@
               <option value="Tahfidz Pra PTPT">B.1. Jenjang Tahfidz — Pra PTPT</option>
               <option value="Tahfidz PTPT">B.2. Jenjang Tahfidz — PTPT (Kelas 1–6)</option>
               <option value="KB Ulinnuha (PAUD)">C. KB Ulinnuha (PAUD)</option>
-
-
-
             </select>
           </div>
           <div>
@@ -211,17 +209,9 @@
             <label class="block text-xs font-semibold text-gray-700 mb-1">No. WhatsApp / HP *</label>
             <input type="text" id="edit-parent-phone" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-primary-500">
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Email Orang Tua</label>
-            <input type="email" id="edit-parent-email" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
-          </div>
           <div class="sm:col-span-2">
             <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Tinggal</label>
             <textarea id="edit-address" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500"></textarea>
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Catatan Tambahan</label>
-            <input type="text" id="edit-notes" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
           </div>
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
@@ -246,7 +236,7 @@
       active: 'ppdb.html',
       portalLabel: 'Portal Admin',
       title: 'Manajemen PPDB',
-      subtitle: 'Verifikasi, kelola calon siswa, & atur periode pendaftaran',
+      subtitle: 'Tinjau formulir PAUD & TPQ, validasi berkas, serta terbitkan NIS / Nomor Induk & Sandi Portal Siswa',
       showRefresh: true,
       onRefresh: () => { loadPpdbPeriod(); loadPpdb(); }
     });
@@ -254,6 +244,20 @@
     let currentTab = 'all';
     let currentPeriod = null;
     let currentPpdbItems = [];
+
+    function parseAdminMeta(r) {
+      let metaObj = {};
+      if (r.form_metadata && typeof r.form_metadata === 'object') {
+        metaObj = { ...r.form_metadata };
+      }
+      if (r.notes && typeof r.notes === 'string' && r.notes.trim().startsWith('{')) {
+        try {
+          const parsed = JSON.parse(r.notes);
+          metaObj = { ...parsed, ...metaObj };
+        } catch (_) {}
+      }
+      return metaObj;
+    }
 
     async function loadPpdbPeriod() {
       try {
@@ -276,7 +280,7 @@
             badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 uppercase';
             badge.textContent = 'TUTUP (FORMULIR DISEMBUNYIKAN)';
           }
-          text.textContent = `Tahun Ajaran ${currentPeriod.academic_year || '2026/2027'} • Linimasa jadwal aktif di website publik`;
+          text.textContent = `Tahun Pelajaran ${currentPeriod.academic_year || '2026/2027'} • Linimasa jadwal aktif di website publik`;
         }
       } catch (err) {
         console.warn('Gagal memuat status periode PPDB:', err);
@@ -372,10 +376,10 @@
             <td class="px-4 py-3 text-sm text-gray-600 tabular-nums whitespace-nowrap">${formatDate(dateCreated)}</td>
             <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs rounded font-medium ${ppdbStatus(r.status)}">${r.status}</span></td>
             <td class="px-4 py-3 text-sm whitespace-nowrap space-x-1.5">
-              <button onclick="viewDetail('${r.id}')" class="text-primary-700 hover:text-primary-900 font-medium">Lihat</button>
+              <button onclick="viewDetail('${r.id}')" class="text-primary-700 hover:text-primary-900 font-semibold">Tinjau Data</button>
               <button onclick="openEditModal('${r.id}')" class="text-amber-700 hover:text-amber-900 font-medium">Edit</button>
-              ${r.status === 'pending' ? `<button onclick="approveReg('${r.id}')" class="text-primary-700 hover:text-primary-900 font-medium">Setujui</button><button onclick="rejectReg('${r.id}')" class="text-red-700 hover:text-red-900 font-medium">Tolak</button>` : ''}
-              ${r.status === 'approved' || r.status === 'accepted' ? `<button onclick="convertReg('${r.id}')" class="text-blue-700 hover:text-blue-900 font-bold">Convert ke Siswa</button>` : ''}
+              ${r.status === 'pending' ? `<button onclick="approveReg('${r.id}')" class="text-emerald-700 hover:text-emerald-900 font-medium">Validasi</button><button onclick="convertReg('${r.id}')" class="text-blue-700 hover:text-blue-900 font-bold">Buat NIS &amp; Sandi</button><button onclick="rejectReg('${r.id}')" class="text-red-700 hover:text-red-900 font-medium">Tolak</button>` : ''}
+              ${r.status === 'approved' || r.status === 'accepted' ? `<button onclick="convertReg('${r.id}')" class="text-blue-700 hover:text-blue-900 font-bold">Buat NIS &amp; Sandi Portal</button>` : ''}
               ${r.status === 'converted' ? `<span class="inline-block px-1.5 py-0.5 text-[11px] font-semibold text-blue-700 bg-blue-50 rounded border border-blue-200">Siswa Aktif</span>` : ''}
               <button onclick="deleteReg('${r.id}')" class="text-gray-400 hover:text-red-700 font-medium text-xs ml-1" title="Hapus berkas">&times; Hapus</button>
             </td>
@@ -389,7 +393,7 @@
     }
 
     function ppdbStatus(status) {
-      return { pending: 'bg-yellow-100 text-yellow-700', approved: 'bg-primary-100 text-primary-700', accepted: 'bg-primary-100 text-primary-700', rejected: 'bg-red-100 text-red-700', converted: 'bg-blue-100 text-blue-700' }[status] || 'bg-gray-100 text-gray-700';
+      return { pending: 'bg-yellow-100 text-yellow-700', approved: 'bg-primary-100 text-primary-700', accepted: 'bg-emerald-100 text-emerald-700', rejected: 'bg-red-100 text-red-700', converted: 'bg-blue-100 text-blue-700' }[status] || 'bg-gray-100 text-gray-700';
     }
 
     function switchTab(tab) {
@@ -426,60 +430,202 @@
 
     async function viewDetail(id) {
       const res = await apiCall('ppdb', 'get', { id });
-      if (!res.success) { showToast(res.message, 'error'); return; }
+      if (!res.success || !res.data) { showToast(res.message || 'Gagal memuat detail', 'error'); return; }
       const r = res.data;
-      const childName = r.student_name || r.child_name || r.full_name || '-';
-      const parentName = r.parent_name || r.father_name || r.mother_name || '-';
-      const formType = (r.level || r.form_type || 'PAUD').toUpperCase();
-      const birthDate = r.student_birth_date || r.birth_date || r.child_birth_date || '-';
-      const birthPlace = r.student_birth_place || r.birth_place || '-';
-      const genderCode = r.student_gender || r.child_gender || r.gender || 'L';
-      const gender = genderCode === 'L' ? 'Laki-laki (L)' : 'Perempuan (P)';
-      const phone = r.parent_phone || r.phone || r.father_phone || '-';
-      const email = r.parent_email || r.email || '-';
-      const photo = r.photo_url || r.child_photo_url || (r.documents_url && r.documents_url.photo) || (r.form_metadata && r.form_metadata.uploaded_files && r.form_metadata.uploaded_files.photo_url) || '';
-      const birthCert = r.birth_certificate_url || (r.documents_url && r.documents_url.birth_certificate) || (r.form_metadata && r.form_metadata.uploaded_files && r.form_metadata.uploaded_files.birth_certificate_url) || '';
-      const familyCard = r.family_card_url || (r.documents_url && r.documents_url.family_card) || (r.form_metadata && r.form_metadata.uploaded_files && r.form_metadata.uploaded_files.family_card_url) || '';
+      const meta = parseAdminMeta(r);
+      const isPaud = (r.level && r.level.toLowerCase().includes('paud')) || (r.level && r.level.toLowerCase().includes('kb')) || r.form_type === 'paud' || meta.form_type === 'paud';
 
-      window.__currentPpdbDocs = {
-        photo: photo,
-        akta: birthCert,
-        kk: familyCard
-      };
+      const childName = r.student_name || r.child_name || r.full_name || '-';
+      const nickname = r.nickname || meta.nickname || '-';
+      const birthDate = r.student_birth_date || r.birth_date || r.child_birth_date || '-';
+      const birthPlace = r.student_birth_place || r.birth_place || meta.birth_place || '-';
+      const genderCode = r.student_gender || r.child_gender || r.gender || 'L';
+      const gender = genderCode === 'P' ? 'Perempuan (P)' : 'Laki-laki (L)';
+      const phone = r.parent_phone || r.phone || meta.father_phone_home || '-';
+      const academicYear = meta.academic_year || (currentPeriod && currentPeriod.academic_year) || '2026/2027';
+
+      const assignedNis = r.converted_nis || meta.converted_nis || meta.local_nis || meta.nis || 'Belum Diterbitkan';
+      const assignedClass = r.class_name || meta.class_name || 'Belum Ditempatkan';
+      const assignedEntryDate = meta.entry_date || r.entry_date || '-';
+      const assignedPass = meta.portal_password || r.portal_password || 'Belum Dibuat Admin';
+
+      const fatherObj = meta.father || {};
+      const motherObj = meta.mother || {};
+      const guardianObj = meta.guardian || {};
+      const mutasiObj = meta.mutasi || {};
+
+      const fatherName = meta.father_name || fatherObj.name || r.father_name || r.parent_name || '-';
+      const fatherJob = meta.father_job || fatherObj.job || '-';
+      const fatherEdu = meta.father_education || fatherObj.education || '-';
+      const fatherTtl = meta.father_ttl || fatherObj.ttl || '-';
+      const fatherRel = meta.father_religion || fatherObj.religion || 'Islam';
+      const fatherStatus = meta.father_relation || fatherObj.relation || 'Ayah Kandung';
+      const fatherPhoneHome = meta.father_phone_home || fatherObj.phone_home || phone;
+      const fatherPhoneOffice = meta.father_phone_office || fatherObj.phone_office || '-';
+
+      const motherName = meta.mother_name || motherObj.name || r.mother_name || '-';
+      const motherJob = meta.mother_job || motherObj.job || '-';
+      const motherEdu = meta.mother_education || motherObj.education || '-';
+      const motherTtl = meta.mother_ttl || motherObj.ttl || '-';
+      const motherRel = meta.mother_religion || motherObj.religion || 'Islam';
+      const motherStatus = meta.mother_relation || motherObj.relation || 'Ibu Kandung';
+      const motherPhoneHome = meta.mother_phone_home || motherObj.phone_home || '-';
+      const motherPhoneOffice = meta.mother_phone_office || motherObj.phone_office || '-';
+
+      const guardianName = meta.guardian_name || guardianObj.name || '';
+      const guardianJob = meta.guardian_job || guardianObj.job || '-';
+      const guardianEdu = meta.guardian_education || guardianObj.education || '-';
+      const guardianRel = meta.guardian_relation || guardianObj.relation || '-';
+
+      const photo = r.photo_url || r.child_photo_url || (r.documents_url && r.documents_url.photo) || (meta.uploaded_files && meta.uploaded_files.photo_url) || '';
+      const birthCert = r.birth_certificate_url || (r.documents_url && r.documents_url.birth_certificate) || (meta.uploaded_files && meta.uploaded_files.birth_certificate_url) || '';
+      const familyCard = r.family_card_url || (r.documents_url && r.documents_url.family_card) || (meta.uploaded_files && meta.uploaded_files.family_card_url) || '';
+
+      window.__currentPpdbDocs = { photo, akta: birthCert, kk: familyCard };
+
+      const formSpecificDetails = isPaud ? `
+        <div class="space-y-4">
+          <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 grid sm:grid-cols-3 gap-2 text-xs">
+            <div><span class="text-gray-500 block">Tahun Pelajaran:</span><strong class="text-gray-900">${academicYear}</strong></div>
+            <div><span class="text-gray-500 block">Nomor Induk (Admin):</span><strong class="font-mono text-emerald-800">${assignedNis}</strong></div>
+            <div><span class="text-gray-500 block">Kelompok (Admin):</span><strong class="text-emerald-800">${assignedClass}</strong></div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-2">A. Identitas Anak Didik (PAUD)</h4>
+            <div class="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">1.a. Nama Lengkap:</span><span class="font-bold text-gray-900">${childName}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">1.b. Nama Panggilan:</span><span class="font-semibold">${nickname}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">2. Jenis Kelamin:</span><span class="font-semibold">${gender}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">3. Tempat, Tgl Lahir:</span><span class="font-semibold">${birthPlace}, ${birthDate}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70 sm:col-span-2"><span class="text-gray-500">4. Alamat Rumah:</span><span class="font-semibold text-right">${r.address || '-'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">5. Agama:</span><span class="font-semibold">${meta.religion || 'Islam'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">6. Kewarganegaraan:</span><span class="font-semibold">${meta.citizenship || 'WNI'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">7. Anak ke:</span><span class="font-semibold">${r.child_order || meta.child_order || '-'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">8. Saudara (Kandung/Tiri/Angkat):</span><span class="font-semibold">${r.siblings_count ?? meta.siblings_count ?? '-'} / ${meta.siblings_step || '0'} / ${meta.siblings_adopted || '0'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">9. Status Anak:</span><span class="font-semibold">${meta.child_status || '-'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">10. Bahasa Sehari-hari:</span><span class="font-semibold">${meta.daily_language || '-'}</span></div>
+              <div class="flex justify-between py-1 sm:col-span-2"><span class="text-gray-500">11. Ciri-ciri Khusus:</span><span class="font-semibold">${meta.special_traits || '-'}</span></div>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-2">B. Identifikasi Orang Tua / Wali</h4>
+            <div class="grid sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+                <div class="font-bold text-gray-900 border-b border-gray-200 pb-1">1. ${fatherStatus}</div>
+                <div><span class="text-gray-500">a. Nama:</span> <strong>${fatherName}</strong></div>
+                <div><span class="text-gray-500">b. TTL:</span> ${fatherTtl}</div>
+                <div><span class="text-gray-500">c. Agama:</span> ${fatherRel}</div>
+                <div><span class="text-gray-500">d. Pendidikan:</span> ${fatherEdu}</div>
+                <div><span class="text-gray-500">e. Pekerjaan:</span> ${fatherJob}</div>
+                <div><span class="text-gray-500">f. Telp Rumah/HP &amp; Kantor:</span> ${fatherPhoneHome} / ${fatherPhoneOffice}</div>
+              </div>
+              <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+                <div class="font-bold text-gray-900 border-b border-gray-200 pb-1">2. ${motherStatus}</div>
+                <div><span class="text-gray-500">a. Nama:</span> <strong>${motherName}</strong></div>
+                <div><span class="text-gray-500">b. TTL:</span> ${motherTtl}</div>
+                <div><span class="text-gray-500">c. Agama:</span> ${motherRel}</div>
+                <div><span class="text-gray-500">d. Pendidikan:</span> ${motherEdu}</div>
+                <div><span class="text-gray-500">e. Pekerjaan:</span> ${motherJob}</div>
+                <div><span class="text-gray-500">f. Telp Rumah/HP &amp; Kantor:</span> ${motherPhoneHome} / ${motherPhoneOffice}</div>
+              </div>
+            </div>
+            ${guardianName ? `<div class="mt-2 p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-xs"><strong>Data Wali:</strong> ${guardianName} • Pekerjaan: ${guardianJob} • Pendidikan: ${guardianEdu} • Hubungan: ${guardianRel}</div>` : ''}
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+              <div class="font-bold text-gray-900">C. Mutasi</div>
+              <div><span class="text-gray-500">1. Diterima Tanggal:</span> ${meta.mutasi_date || mutasiObj.date || '-'}</div>
+              <div><span class="text-gray-500">2. Di Kelompok:</span> ${meta.mutasi_group || mutasiObj.group || '-'}</div>
+              <div><span class="text-gray-500">3. Berasal / Pindah:</span> ${meta.mutasi_origin || mutasiObj.origin || '-'}</div>
+            </div>
+            <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+              <div class="font-bold text-gray-900">D. Keterangan Lain-lain</div>
+              <div><span class="text-gray-500">1. Jarak ke Sekolah:</span> ${meta.distance_km ? meta.distance_km + ' KM' : '-'}</div>
+              <div><span class="text-gray-500">2. Pergi ke Sekolah Dengan:</span> ${meta.transport_mode || '-'}</div>
+            </div>
+          </div>
+        </div>
+      ` : `
+        <div class="space-y-4">
+          <div class="p-3.5 rounded-xl bg-sky-50/70 border border-sky-200 grid sm:grid-cols-3 gap-2 text-xs">
+            <div><span class="text-gray-500 block">13.a. Tanggal Daftar:</span><strong class="text-gray-900">${formatDate(r.created_at)}</strong></div>
+            <div><span class="text-gray-500 block">13.b. Tanggal Masuk:</span><strong class="text-sky-800">${assignedEntryDate}</strong></div>
+            <div><span class="text-gray-500 block">13.c. NIS Lokal:</span><strong class="font-mono text-sky-800">${assignedNis}</strong></div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-primary-700 mb-2">A. Identitas Santri (${r.level || 'TPQ'})</h4>
+            <div class="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">1. Nama Lengkap:</span><span class="font-bold text-gray-900">${childName}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">2. Nama Panggilan:</span><span class="font-semibold">${nickname}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">3. Jenis Kelamin:</span><span class="font-semibold">${gender}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">4. Tempat / Tgl Lahir:</span><span class="font-semibold">${birthPlace}, ${birthDate}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">5. Anak ke:</span><span class="font-semibold">${r.child_order || meta.child_order || '-'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70"><span class="text-gray-500">6. Jumlah Saudara:</span><span class="font-semibold">${r.siblings_count ?? meta.siblings_count ?? '-'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70 sm:col-span-2"><span class="text-gray-500">7. No. NIK:</span><span class="font-mono font-bold">${r.nik || meta.nik || '-'}</span></div>
+              <div class="flex justify-between py-1 border-b border-gray-200/70 sm:col-span-2"><span class="text-gray-500">8. Alamat Rumah:</span><span class="font-semibold text-right">${r.address || '-'}</span></div>
+              <div class="flex justify-between py-1 sm:col-span-2"><span class="text-gray-500">9. Kontak Telpon (1):</span><span class="font-mono font-bold">${phone}</span></div>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+              <div class="font-bold text-gray-900 border-b border-gray-200 pb-1">10. Data Ayah</div>
+              <div><span class="text-gray-500">a. Nama Ayah:</span> <strong>${fatherName}</strong></div>
+              <div><span class="text-gray-500">b. Pekerjaan Ayah:</span> ${fatherJob}</div>
+              <div><span class="text-gray-500">c. Pendidikan Ayah:</span> ${fatherEdu}</div>
+            </div>
+            <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 space-y-1">
+              <div class="font-bold text-gray-900 border-b border-gray-200 pb-1">11. Data Ibu</div>
+              <div><span class="text-gray-500">a. Nama Ibu:</span> <strong>${motherName}</strong></div>
+              <div><span class="text-gray-500">b. Pekerjaan Ibu:</span> ${motherJob}</div>
+              <div><span class="text-gray-500">c. Pendidikan Ibu:</span> ${motherEdu}</div>
+            </div>
+          </div>
+          ${guardianName ? `<div class="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-xs"><strong>12. Data Wali:</strong> ${guardianName} • Pekerjaan: ${guardianJob} • Pendidikan: ${guardianEdu} • Hubungan: ${guardianRel}</div>` : ''}
+        </div>
+      `;
 
       document.getElementById('ppdb-detail-body').innerHTML = `
-        <dl class="grid grid-cols-2 gap-3 text-sm">
-          <div><dt class="text-gray-500 text-xs">No. Pendaftaran</dt><dd class="font-mono font-bold text-gray-900">${r.registration_number || r.id}</dd></div>
-          <div><dt class="text-gray-500 text-xs">Status Penerimaan</dt><dd><span class="px-2 py-0.5 text-xs rounded font-medium ${ppdbStatus(r.status)}">${r.status}</span></dd></div>
-          <div><dt class="text-gray-500 text-xs">Nama Calon Siswa</dt><dd class="font-bold text-gray-900">${childName}</dd></div>
-          <div><dt class="text-gray-500 text-xs">Jenjang Pendidikan</dt><dd class="font-semibold text-primary-700">${formType}</dd></div>
-          <div><dt class="text-gray-500 text-xs">Tempat &amp; Tgl Lahir</dt><dd class="font-mono">${birthPlace}, ${birthDate}</dd></div>
-          <div><dt class="text-gray-500 text-xs">Jenis Kelamin</dt><dd>${gender}</dd></div>
-          <div><dt class="text-gray-500 text-xs">Nama Orang Tua / Wali</dt><dd class="font-medium">${parentName}</dd></div>
-          <div><dt class="text-gray-500 text-xs">No. WhatsApp / HP</dt><dd class="font-mono font-semibold text-gray-900">${phone}</dd></div>
-          <div class="col-span-2"><dt class="text-gray-500 text-xs">Email Orang Tua</dt><dd>${email}</dd></div>
-          <div class="col-span-2"><dt class="text-gray-500 text-xs">Alamat Lengkap</dt><dd class="text-gray-800">${r.address || '-'}</dd></div>
-          <div class="col-span-2 border-t border-gray-100 pt-3">
-            <dt class="text-gray-500 text-xs mb-2 font-semibold">Berkas Dokumen Pendaftaran (Pas Foto, Akta Kelahiran, Kartu Keluarga):</dt>
-            <dd class="space-y-2.5">
-              ${photo ? `
-                <div class="flex items-center gap-3">
-                  <img src="${photo}" onclick="openPpdbDocPreview('Pas Foto 3x4 - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.photo)" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition" title="Klik untuk pratinjau Pas Foto">
-                  <div>
-                    <div class="text-xs font-bold text-gray-800">Pas Foto Calon Siswa (3x4)</div>
-                    <button type="button" onclick="openPpdbDocPreview('Pas Foto 3x4 - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.photo)" class="mt-1 inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100 transition">
-                      Lihat Pas Foto
-                    </button>
-                  </div>
-                </div>` : '<div class="text-xs text-gray-400 italic">Pas Foto belum diunggah</div>'}
-              <div class="flex flex-wrap gap-2 pt-1">
-                ${birthCert ? `<button type="button" onclick="openPpdbDocPreview('Akta Kelahiran - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.akta)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Lihat Akta Kelahiran</button>` : '<span class="text-xs text-gray-400 italic">Akta Kelahiran belum diunggah</span>'}
-                ${familyCard ? `<button type="button" onclick="openPpdbDocPreview('Kartu Keluarga (KK) - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.kk)" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Lihat Kartu Keluarga</button>` : '<span class="text-xs text-gray-400 italic">Kartu Keluarga belum diunggah</span>'}
-              </div>
-            </dd>
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-200">
+            <div>
+              <span class="text-xs text-gray-500">No. Pendaftaran:</span>
+              <span class="font-mono font-bold text-sm text-gray-900 ml-1">${r.registration_number || r.id}</span>
+              <span class="ml-2 px-2 py-0.5 text-xs rounded font-medium ${ppdbStatus(r.status)}">${r.status}</span>
+            </div>
+            <div class="text-xs text-gray-600">
+              Sandi Portal Siswa: <strong class="font-mono text-primary-700">${assignedPass}</strong>
+            </div>
           </div>
-          ${r.notes ? `<div class="col-span-2 border-t border-gray-100 pt-3"><dt class="text-gray-500 text-xs font-semibold mb-0.5">Catatan Pendaftar:</dt><dd class="text-xs text-gray-700 bg-gray-50 p-2.5 rounded-lg border border-gray-200 whitespace-pre-wrap">${formatPpdbNotes(r.notes)}</dd></div>` : ''}
-        </dl>
+
+          ${formSpecificDetails}
+
+          <div class="border-t border-gray-200 pt-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Berkas Lampiran (Pasfoto, Akta Kelahiran, Kartu Keluarga)</h4>
+            <div class="flex flex-wrap items-center gap-3">
+              ${photo ? `
+                <div class="flex items-center gap-2.5 p-2 rounded-xl border border-gray-200 bg-gray-50">
+                  <img src="${photo}" onclick="openPpdbDocPreview('Pas Foto 3x4 - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.photo)" class="w-14 h-16 object-cover rounded-lg border border-gray-300 cursor-pointer">
+                  <div>
+                    <div class="text-xs font-bold text-gray-800">Pasfoto Anak</div>
+                    <button type="button" onclick="openPpdbDocPreview('Pas Foto 3x4 - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.photo)" class="mt-1 px-2.5 py-1 bg-sky-50 text-sky-700 border border-sky-200 rounded-md text-xs font-semibold hover:bg-sky-100">Lihat Pasfoto</button>
+                  </div>
+                </div>` : '<span class="text-xs text-gray-400 italic">Pasfoto belum diunggah</span>'}
+              ${birthCert ? `<button type="button" onclick="openPpdbDocPreview('Akta Kelahiran - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.akta)" class="px-3 py-2 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100">Lihat Akta Kelahiran</button>` : '<span class="text-xs text-gray-400 italic">Akta Kelahiran belum diunggah</span>'}
+              ${familyCard ? `<button type="button" onclick="openPpdbDocPreview('Kartu Keluarga (KK) - ${childName.replace(/'/g, "\\'")}', window.__currentPpdbDocs.kk)" class="px-3 py-2 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold hover:bg-sky-100">Lihat Kartu Keluarga (KK)</button>` : '<span class="text-xs text-gray-400 italic">Kartu Keluarga belum diunggah</span>'}
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-end gap-2 pt-4 border-t border-gray-200">
+            ${r.status === 'pending' ? `<button type="button" onclick="document.getElementById('ppdb-detail-modal').classList.add('hidden'); approveReg('${r.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg">Validasi Berkas (Setujui)</button>` : ''}
+            ${r.status !== 'converted' ? `<button type="button" onclick="document.getElementById('ppdb-detail-modal').classList.add('hidden'); convertReg('${r.id}')" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-lg shadow-sm">Terbitkan NIS / No. Induk &amp; Buat Sandi Portal</button>` : ''}
+            <button type="button" onclick="document.getElementById('ppdb-detail-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Tutup</button>
+          </div>
+        </div>
       `;
       document.getElementById('ppdb-detail-modal').classList.remove('hidden');
     }
@@ -521,41 +667,6 @@
       modal.classList.remove('hidden');
     }
 
-    function formatPpdbNotes(rawNotes) {
-      if (!rawNotes) return '';
-      const str = String(rawNotes).trim();
-      if (str.startsWith('{')) {
-        try {
-          const parsed = JSON.parse(str);
-          const parsedLines = [];
-          if (parsed.age_category) parsedLines.push('Kategori Usia: ' + parsed.age_category);
-          if (parsed.nik) parsedLines.push('NIK: ' + parsed.nik);
-          else parsedLines.push('NIK: Belum diisi (Anak < 3 Thn / Menyusul)');
-          if (parsed.qiraati_diploma) parsedLines.push('Ijazah TPQ Qiraati: ' + parsed.qiraati_diploma);
-          if (parsed.pra_ptpt_level) parsedLines.push('Level Nderes Pra PTPT: ' + parsed.pra_ptpt_level);
-          if (parsed.ptpt_class) parsedLines.push('Kelas Tahfidz PTPT: ' + parsed.ptpt_class);
-          if (parsed.paud_origin) parsedLines.push('Asal Masuk KB Ulinnuha: ' + parsed.paud_origin);
-          if (parsed.pkbm_track) parsedLines.push('Jalur Kesetaraan PKBM: ' + parsed.pkbm_track);
-          if (parsed.child_order || parsed.siblings_count) parsedLines.push(`Anak ke-${parsed.child_order || '-'} dari ${parsed.siblings_count || '0'} Sdr Kandung (Tiri: ${parsed.siblings_step || '0'}, Angkat: ${parsed.siblings_adopted || '0'}) • Status: ${parsed.child_status || 'Kandung'}`);
-          if (parsed.phone_2) parsedLines.push('Telpon (2) Cadangan: ' + parsed.phone_2);
-          if (parsed.father && parsed.father.name) parsedLines.push(`Ayah: ${parsed.father.name} (${parsed.father.job || '-'}, Pend: ${parsed.father.education || '-'})`);
-          if (parsed.mother && parsed.mother.name) parsedLines.push(`Ibu: ${parsed.mother.name} (${parsed.mother.job || '-'}, Pend: ${parsed.mother.education || '-'})`);
-          if (parsed.guardian && parsed.guardian.name) parsedLines.push(`Wali: ${parsed.guardian.name} (${parsed.guardian.relation || '-'}, Pekerjaan: ${parsed.guardian.job || '-'}, Pend: ${parsed.guardian.education || '-'})`);
-          if (parsed.special_notes) parsedLines.push('Ciri Khusus/Kesehatan: ' + parsed.special_notes);
-          if (parsedLines.length > 0) return parsedLines.join('\n');
-          if (parsed.notes) parts.push(parsed.notes);
-          if (parsed.child && parsed.child.medical_notes && parsed.child.medical_notes !== '-') {
-            parts.push('Riwayat Kesehatan: ' + parsed.child.medical_notes);
-          }
-          if (parsed.program && parsed.program.reason) {
-            parts.push('Alasan Memilih: ' + parsed.program.reason);
-          }
-          return parts.length > 0 ? parts.join(' | ') : 'Pendaftaran Online Reguler';
-        } catch (_) {}
-      }
-      return str;
-    }
-
     async function openEditModal(id) {
       try {
         const res = await apiCall('ppdb', 'get', { id });
@@ -571,9 +682,7 @@
         document.getElementById('edit-level').value = r.level || (r.form_type === 'paud' ? 'KB Ulinnuha (PAUD)' : (r.form_type === 'tahfidz' ? 'Tahfidz Pra PTPT' : 'TPQ Pagi'));
         document.getElementById('edit-parent-name').value = r.parent_name || r.father_name || r.mother_name || '';
         document.getElementById('edit-parent-phone').value = r.parent_phone || r.phone || '';
-        document.getElementById('edit-parent-email').value = r.parent_email || r.email || '';
         document.getElementById('edit-address').value = r.address || '';
-        document.getElementById('edit-notes').value = formatPpdbNotes(r.notes || '');
 
         document.getElementById('ppdb-edit-modal').classList.remove('hidden');
       } catch (err) {
@@ -604,10 +713,7 @@
         parent_name: document.getElementById('edit-parent-name').value.trim(),
         parent_phone: document.getElementById('edit-parent-phone').value.trim(),
         phone: document.getElementById('edit-parent-phone').value.trim(),
-        parent_email: document.getElementById('edit-parent-email').value.trim(),
-        email: document.getElementById('edit-parent-email').value.trim(),
-        address: document.getElementById('edit-address').value.trim(),
-        notes: document.getElementById('edit-notes').value.trim()
+        address: document.getElementById('edit-address').value.trim()
       };
 
       try {
@@ -642,9 +748,8 @@
     }
 
     async function approveReg(id) {
-      const notes = prompt('Catatan verifikasi (opsional):');
-      const res = await apiCall('ppdb', 'approve', { id, notes: notes || '' });
-      showToast(res.message, res.success ? 'success' : 'error');
+      const res = await apiCall('ppdb', 'approve', { id });
+      showToast(res.message || 'Berkas pendaftar berhasil divalidasi', res.success ? 'success' : 'error');
       if (res.success) loadPpdb();
     }
 
@@ -657,11 +762,10 @@
     }
 
     async function convertReg(id) {
-      // Ambil data pendaftar untuk mengetahui jenjang pilihan
       const applicant = (currentPpdbItems || []).find(x => String(x.id) === String(id)) || {};
       const targetJenjang = (applicant.level || applicant.form_type || applicant.jenjang || '').toUpperCase().trim();
+      const isPaud = targetJenjang.includes('PAUD') || targetJenjang.includes('KB');
 
-      // Ambil daftar kelas untuk dropdown tujuan
       let classes = [];
       try {
         const cr = await apiCall('classes', 'list', { per_page: 100 });
@@ -675,8 +779,12 @@
       }
 
       const defaultNis = '2026' + String(Math.floor(1000 + Math.random() * 9000));
+      let defaultPass = 'AT' + String(Math.floor(1000 + Math.random() * 9000));
+      if (applicant.birth_date && String(applicant.birth_date).includes('-')) {
+        const parts = String(applicant.birth_date).split('-');
+        if (parts.length === 3) defaultPass = `${parts[2]}${parts[1]}${parts[0]}`;
+      }
 
-      // Filter kelas yang cocok dengan jenjang pendaftar (dukung format TK_A, TK A, TKA, TK_B, KB, PAUD, TPQ)
       const normTarget = targetJenjang.replace(/[_\-]/g, ' ').replace(/\s+/g, ' ').trim();
       const compactTarget = targetJenjang.replace(/[\s_\-]/g, '');
 
@@ -684,27 +792,19 @@
         const rawCLevel = (c.level || c.grade_level || c.name || '').toUpperCase();
         const normCLevel = rawCLevel.replace(/[_\-]/g, ' ').replace(/\s+/g, ' ').trim();
         const compactCLevel = rawCLevel.replace(/[\s_\-]/g, '');
-
-        if (compactTarget.includes('TKA') || normTarget.includes('TK A')) {
-          return compactCLevel.includes('TKA') || normCLevel.includes('TK A');
-        }
-        if (compactTarget.includes('TKB') || normTarget.includes('TK B')) {
-          return compactCLevel.includes('TKB') || normCLevel.includes('TK B');
-        }
         if (normTarget.includes('PAUD') || normTarget.includes('BERMAIN') || /\bKB\b/.test(normTarget)) {
-          return normCLevel.includes('PAUD') || normCLevel.includes('BERMAIN') || /\bKB\b/.test(normCLevel);
+          return normCLevel.includes('PAUD') || normCLevel.includes('BERMAIN') || /\bKB\b/.test(normCLevel) || normCLevel.includes('TK');
         }
         if (normTarget.includes('TAHFIDZ') || normTarget.includes('PTPT')) {
           return normCLevel.includes('TAHFIDZ') || normCLevel.includes('PTPT') || normCLevel.includes('TPQ');
+        }
         if (normTarget.includes('TPQ') || compactTarget.includes('TPQ')) {
           return normCLevel.includes('TPQ') || compactCLevel.includes('TPQ');
         }
-        if (normTarget.includes('TK')) return normCLevel.includes('TK');
         return false;
       });
 
       const otherClasses = classes.filter(c => !matchingClasses.includes(c));
-
       let optionsHtml = '';
       if (matchingClasses.length > 0) {
         optionsHtml += `<optgroup label="Sesuai Jenjang (${targetJenjang || 'Pendaftar'})">`;
@@ -725,28 +825,32 @@
       modal.innerHTML = `
         <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
           <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-            <h3 class="text-base font-bold text-gray-900">Aktivasi Siswa Baru (PPDB)</h3>
+            <h3 class="text-base font-bold text-gray-900">Terbitkan NIS / No. Induk &amp; Sandi Portal</h3>
             <button id="cm-close" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
           </div>
           <div class="p-5 space-y-4">
             <p class="text-xs text-gray-600 leading-relaxed">
-              Pendaftar akan diaktifkan menjadi <strong>Siswa Aktif</strong>. Akun Portal Siswa otomatis aktif dengan username berupa <strong>NIS</strong> dan kata sandi awal berupa <strong>Tanggal Lahir</strong> atau password pendaftaran.
+              Tetapkan <strong>${isPaud ? 'Nomor Induk & Kelompok (PAUD)' : 'NIS Lokal, Tanggal Masuk & Kelas (TPQ)'}</strong> serta <strong>Sandi Login Portal Siswa</strong>. Informasi ini akan otomatis tampil saat siswa mengecek Nomor Pendaftaran di halaman Cek Status.
             </p>
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">13.c. NIS Lokal / Nomor Induk Siswa *</label>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">${isPaud ? 'Nomor Induk Siswa (PAUD) *' : '13.c. NIS Lokal Santri (TPQ) *'}</label>
               <input type="text" id="cm-nis" name="cm_nis" value="${defaultNis}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-gray-900 focus:ring-2 focus:ring-primary-500">
-
-              <span class="text-[11px] text-gray-500">Menerbitkan NIS Lokal resmi bagi santri (khususnya anak usia &lt; 3 tahun yang belum memiliki NIS saat daftar).</span>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">${isPaud ? 'Kelompok / Kelas PAUD *' : 'Kelas Tujuan TPQ / Tahfidz *'}</label>
+              <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
             </div>
             <div>
               <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">13.b. Tanggal Masuk Resmi *</label>
               <input type="date" id="cm-entry-date" value="${new Date().toISOString().split('T')[0]}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono text-gray-900 focus:ring-2 focus:ring-primary-500">
-
-              <span class="text-[11px] text-gray-400">Sesuai Form TPQ Poin 13.b (Tanggal Masuk Santri Baru).</span>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Kelas Tujuan (Jenjang: ${targetJenjang || '-'}) *</label>
-              <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Buat Sandi / Password Portal Siswa *</label>
+                <button type="button" id="cm-gen-pass" class="text-[11px] font-bold text-primary-600 hover:underline">Generate Sandi Baru</button>
+              </div>
+              <input type="text" id="cm-portal-password" value="${defaultPass}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-primary-800 bg-primary-50/40 focus:ring-2 focus:ring-primary-500">
+              <span class="text-[11px] text-gray-500">Siswa akan login ke Portal Siswa menggunakan <strong>NIS</strong> dan <strong>Sandi</strong> di atas.</span>
             </div>
             <label class="flex items-start gap-2.5 p-3 rounded-xl bg-sky-50 border border-sky-200 cursor-pointer">
               <input type="checkbox" id="cm-auto-spp" checked class="mt-0.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
@@ -757,7 +861,7 @@
             </label>
             <div class="flex justify-end gap-2 pt-3 border-t border-gray-200">
               <button id="cm-cancel" class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Batal</button>
-              <button id="cm-ok" class="px-5 py-2 bg-primary-600 text-white text-xs font-bold rounded-lg hover:bg-primary-700 shadow-md shadow-primary-600/20">Aktivasi Siswa</button>
+              <button id="cm-ok" class="px-5 py-2 bg-primary-600 text-white text-xs font-bold rounded-lg hover:bg-primary-700 shadow-md shadow-primary-600/20">Simpan &amp; Aktifkan Siswa</button>
             </div>
           </div>
         </div>`;
@@ -766,44 +870,57 @@
       const close = () => modal.remove();
       modal.querySelector('#cm-close').onclick = close;
       modal.querySelector('#cm-cancel').onclick = close;
+      modal.querySelector('#cm-gen-pass').onclick = () => {
+        modal.querySelector('#cm-portal-password').value = 'AT' + String(Math.floor(100000 + Math.random() * 900000));
+      };
       modal.querySelector('#cm-ok').onclick = async () => {
         const classId = modal.querySelector('#cm-class').value;
         const nis = modal.querySelector('#cm-nis').value.trim();
+        const portalPassword = modal.querySelector('#cm-portal-password').value.trim();
         const autoSpp = modal.querySelector('#cm-auto-spp') ? modal.querySelector('#cm-auto-spp').checked : true;
-        if (!classId) { showToast('Pilih kelas terlebih dahulu', 'warning'); return; }
-        if (!nis) { showToast('Masukkan NIS siswa', 'warning'); return; }
+        if (!classId) { showToast('Pilih kelompok/kelas terlebih dahulu', 'warning'); return; }
+        if (!nis) { showToast('Masukkan Nomor Induk / NIS Lokal siswa', 'warning'); return; }
+        if (!portalPassword) { showToast('Masukkan Sandi Portal Siswa', 'warning'); return; }
 
         const okBtn = modal.querySelector('#cm-ok');
         okBtn.disabled = true; okBtn.textContent = 'Mengaktifkan...';
 
         try {
-        const entryDateEl = modal.querySelector('#cm-entry-date');
-        const entryDate = entryDateEl ? entryDateEl.value : new Date().toISOString().split('T')[0];
-        const res = await apiCall('ppdb', 'convert', { id, class_id: classId, nis, local_nis: nis, entry_date: entryDate, auto_spp: autoSpp });
+          const entryDateEl = modal.querySelector('#cm-entry-date');
+          const entryDate = entryDateEl ? entryDateEl.value : new Date().toISOString().split('T')[0];
+          const res = await apiCall('ppdb', 'convert', {
+            id,
+            class_id: classId,
+            nis,
+            local_nis: nis,
+            entry_date: entryDate,
+            portal_password: portalPassword,
+            auto_spp: autoSpp
+          });
           if (res.success && res.data) {
             close();
-            showConvertSuccessModal(res.data);
+            showConvertSuccessModal(res.data, portalPassword);
             loadPpdb();
           } else {
             showToast(res.message || 'Gagal mengaktifkan siswa', 'error');
-            okBtn.disabled = false; okBtn.textContent = 'Aktivasi Siswa';
+            okBtn.disabled = false; okBtn.textContent = 'Simpan & Aktifkan Siswa';
           }
         } catch (e) {
           showToast('Gagal mengaktifkan siswa', 'error');
-          okBtn.disabled = false; okBtn.textContent = 'Aktivasi Siswa';
+          okBtn.disabled = false; okBtn.textContent = 'Simpan & Aktifkan Siswa';
         }
       };
     }
 
-    function showConvertSuccessModal(data) {
+    function showConvertSuccessModal(data, customPortalPass) {
       const s = data.student || {};
       const nis = data.nis || s.nis || '-';
       const className = data.class_name || s.class_name || '-';
       const studentName = s.full_name || s.name || '-';
       const creds = data.initial_credentials || {};
-      const defaultPassword = creds.default_password || s.birth_date || '-';
+      const defaultPassword = customPortalPass || creds.default_password || s.birth_date || '-';
       const loginUrl = creds.login_url || (window.location.origin + '/login.html');
-      const copyText = `AKSES PORTAL SISWA YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\nNama Siswa: ${studentName}\nNIS (Username): ${nis}\nPassword Awal: ${defaultPassword}\nLink Portal: ${loginUrl}\n\n*Catatan: Segera buat kata sandi baru saat pertama kali login.`;
+      const copyText = `AKSES PORTAL SISWA YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\nNama Siswa: ${studentName}\nNIS / No. Induk (Username): ${nis}\nKelompok / Kelas: ${className}\nSandi Portal Siswa: ${defaultPassword}\nLink Portal: ${loginUrl}`;
 
       const succModal = document.createElement('div');
       succModal.className = 'fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4';
@@ -813,25 +930,20 @@
             <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </div>
-            <h3 class="text-lg font-bold">Siswa Berhasil Diaktifkan!</h3>
-            <p class="text-xs text-primary-100 mt-0.5">Siswa resmi terdaftar di database yayasan dan dapat mengakses Portal Siswa.</p>
+            <h3 class="text-lg font-bold">NIS &amp; Sandi Portal Berhasil Diterbitkan!</h3>
+            <p class="text-xs text-primary-100 mt-0.5">Data ini kini otomatis tampil saat siswa mengecek Nomor Pendaftaran di halaman Cek Status PPDB.</p>
           </div>
 
           <div class="p-6 space-y-4 text-xs">
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 font-mono">
               <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">Nama Siswa:</span><span class="font-bold text-slate-900">${studentName}</span></div>
-              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">NIS (Login ID):</span><span class="font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">${nis}</span></div>
-              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">Kelas Masuk:</span><span class="font-bold text-slate-800 font-sans">${className}</span></div>
-              <div class="flex justify-between items-center border-t border-slate-200 pt-2"><span class="text-slate-500 font-sans">Password Awal:</span><span class="font-bold text-primary-700 font-sans">${defaultPassword}</span></div>
+              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">NIS / No. Induk:</span><span class="font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">${nis}</span></div>
+              <div class="flex justify-between items-center"><span class="text-slate-500 font-sans">Kelompok / Kelas:</span><span class="font-bold text-slate-800 font-sans">${className}</span></div>
+              <div class="flex justify-between items-center border-t border-slate-200 pt-2"><span class="text-slate-500 font-sans">Sandi Portal Siswa:</span><span class="font-bold text-primary-700 font-mono text-sm">${defaultPassword}</span></div>
             </div>
-
-            <p class="text-slate-600 text-xs leading-relaxed">
-              Saat pertama kali login di Portal Siswa, siswa/wali murid diwajibkan untuk membuat kata sandi baru demi keamanan akun.
-            </p>
 
             <div class="space-y-2 pt-2">
               <button id="btn-copy-creds" type="button" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                 <span id="copy-btn-text">Salin Rincian Akun (1-Klik)</span>
               </button>
               <button id="btn-close-succ" type="button" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">
@@ -849,11 +961,7 @@
             const txt = succModal.querySelector('#copy-btn-text');
             if (txt) txt.textContent = '✓ Berhasil Disalin ke Clipboard!';
             setTimeout(() => { if (txt) txt.textContent = 'Salin Rincian Akun (1-Klik)'; }, 2500);
-          }).catch(() => {
-            showToast('Gagal menyalin info akun', 'error');
           });
-        } else {
-          showToast('Fitur clipboard tidak didukung di browser ini', 'warning');
         }
       };
     }

@@ -2310,7 +2310,7 @@
             if (!reg.nis && reg.form_metadata.nis) reg.nis = reg.form_metadata.nis;
             if (!reg.class_name && reg.form_metadata.class_name) reg.class_name = reg.form_metadata.class_name;
           }
-          return { success: true, data: { registration: reg }, registration: reg };
+          let parsedNotes = {}; if (reg.notes && typeof reg.notes === 'string' && reg.notes.trim().startsWith('{')) { try { parsedNotes = JSON.parse(reg.notes); } catch (_) {} } const meta = { ...parsedNotes, ...(reg.form_metadata && typeof reg.form_metadata === 'object' ? reg.form_metadata : {}) }; if (!reg.converted_nis && (meta.converted_nis || meta.local_nis || meta.nis)) reg.converted_nis = meta.converted_nis || meta.local_nis || meta.nis; if (!reg.class_name && meta.class_name) reg.class_name = meta.class_name; if (!reg.entry_date && meta.entry_date) reg.entry_date = meta.entry_date; if (!reg.portal_password && meta.portal_password) reg.portal_password = meta.portal_password; reg.form_metadata = meta; return { success: true, data: { ...reg, registration: reg }, registration: reg };
         }
         if (action === 'period') {
           let p = null;
@@ -2475,7 +2475,7 @@
           try {
             res = await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(targetId)},registration_number.eq.${encodeURIComponent(targetId)})`, 'PATCH', {
               status: 'accepted',
-              notes: params.notes || ''
+              status: 'accepted'
             });
           } catch (_) {}
 
@@ -2561,7 +2561,7 @@
             if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
           }
           const customPpdbPass = String(reg.password || reg.account_password || (reg.form_metadata && (reg.form_metadata.password || reg.form_metadata.account_password)) || '').trim();
-          const initialPassword = customPpdbPass || birthDatePassword;
+          const adminSetPass = params.portal_password ? String(params.portal_password).trim() : ''; const initialPassword = adminSetPass || customPpdbPass || birthDatePassword;
 
           const regNo = reg.registration_number || reg.registration_no || '';
           const pendaftarEmail = `${regNo.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
@@ -2681,7 +2681,7 @@
             ...(reg.form_metadata || {}),
             converted_nis: studentNis,
             local_nis: studentNis,
-            entry_date: params.entry_date || new Date().toISOString().slice(0, 10),
+            entry_date: params.entry_date || new Date().toISOString().slice(0, 10), portal_password: initialPassword,
             nis: studentNis,
             class_name: targetClassName,
             student_id: stuId,
@@ -2690,13 +2690,13 @@
           try {
             await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
               status: 'converted',
-              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`,
+              notes: JSON.stringify({ ...(reg.notes && typeof reg.notes === 'string' && reg.notes.trim().startsWith('{') ? (() => { try { return JSON.parse(reg.notes); } catch (_) { return {}; } })() : {}), ...metaWithNis }),
               form_metadata: metaWithNis
             });
           } catch (_) {
             await supabaseRest(`ppdb_registrations?id=eq.${reg.id}`, 'PATCH', {
               status: 'converted',
-              notes: `Diterima sebagai Siswa Aktif (NIS: ${studentNis}, Kelas: ${targetClassName})`
+              notes: JSON.stringify({ ...(reg.notes && typeof reg.notes === 'string' && reg.notes.trim().startsWith('{') ? (() => { try { return JSON.parse(reg.notes); } catch (_) { return {}; } })() : {}), ...metaWithNis })
             }).catch(() => {});
           }
           await recordActivityLog('CONVERT_SISWA', 'students', 'Aktivasi calon siswa PPDB ' + studentName + ' ke siswa aktif (NIS: ' + studentNis + ', Kelas: ' + targetClassName + ')', stuId);
@@ -2750,7 +2750,7 @@
           // 9. Ringkasan Kredensial Siswa Baru
           const origin = typeof window !== 'undefined' && window.location ? window.location.origin : '';
           const loginUrl = (origin || 'https://siyayasan-portal.vercel.app') + '/login.html';
-          const activeInitialPass = customPpdbPass || birthDatePassword;
+          const activeInitialPass = initialPassword;
           const passNotes = customPpdbPass ? `${customPpdbPass} (Password Pendaftaran PPDB)` : `${birthDatePassword} (Tanggal Lahir: DDMMYYYY)`;
           const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${passNotes}\nLink Portal: ${loginUrl}`;
 

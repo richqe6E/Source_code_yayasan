@@ -1,519 +1,527 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lacak status verifikasi pendaftaran calon santri dan siswa baru Yayasan At Tarbiyyah Samarinda secara online menggunakan nomor pendaftaran.">
-  <title>Cek Status Pendaftaran PPDB - Yayasan At Tarbiyyah Wijaya Kusuma Samarinda</title>
-  <!-- Favicon / Brand Logo -->
-  <link rel="icon" type="image/png" href="/images/logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-
-  <!-- Canonical & Social Meta -->
-  <link rel="canonical" href="https://siyayasan.vercel.app/ppdb/status.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Yayasan At Tarbiyyah Wijaya Kusuma Samarinda">
-  <meta property="og:title" content="Cek Status Registrasi PPDB - Yayasan At Tarbiyyah Samarinda">
-  <meta property="og:description" content="Lacak status verifikasi pendaftaran calon santri dan siswa baru Yayasan At Tarbiyyah Samarinda secara online menggunakan nomor pendaftaran.">
-  <meta property="og:image" content="https://siyayasan.vercel.app/images/school-campus.jpg">
-  <meta property="og:url" content="https://siyayasan.vercel.app/ppdb/status.html">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Cek Status Registrasi PPDB - Yayasan At Tarbiyyah Samarinda">
-  <meta name="twitter:description" content="Lacak status verifikasi pendaftaran calon santri dan siswa baru Yayasan At Tarbiyyah Samarinda secara online menggunakan nomor pendaftaran.">
-  <meta name="twitter:image" content="https://siyayasan.vercel.app/images/school-campus.jpg">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cek Status Pendaftaran PPDB — Yayasan At Tarbiyyah Wijaya Kusuma</title>
+  <link rel="icon" type="image/svg+xml" href="../../shared/img/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace']
-          },
-          colors: {
-            primary: { 50:'#F0F9FF',100:'#E0F2FE',200:'#BAE6FD',500:'#0EA5E9',600:'#0284C7',700:'#0369A1',800:'#075985',900:'#0C4A6E' }
-          }
-        }
-      }
-    };
-  </script>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../../shared/css/globals.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="font-sans bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen selection:bg-primary-600 selection:text-white">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
 
-  <div id="site-header"></div>
-
-  <section class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 text-white py-10 sm:py-14 relative overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.15),transparent_50%)]"></div>
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">Cek Status Penerimaan PPDB</h1>
-      <p class="text-primary-100 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-        Pantau proses verifikasi berkas pendaftaran dan pengumuman penerimaan calon santri TPQ Ulinnuha (TPQ Pagi &amp; Jenjang Tahfidz Pra PTPT / PTPT) serta KB Ulinnuha (PAUD) secara transparan dan real-time.
-      </p>
-    </div>
-  </section>
-
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex-1 w-full">
-    <!-- Form Pencarian -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm mb-6">
-      <form id="check-form" class="flex flex-col sm:flex-row gap-3">
-        <div class="relative flex-1">
-          <input id="reg-number" type="text" required placeholder="Contoh: REG-2026-001" class="w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl text-sm font-mono uppercase focus:ring-2 focus:ring-primary-500 focus:border-transparent tracking-wider">
-          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="../index.html" class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-white border border-slate-200 p-1 shadow-sm flex items-center justify-center">
+          <img src="../../shared/img/logo.svg" alt="Logo" class="w-full h-full object-contain" />
         </div>
-        <button type="submit" id="check-btn" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-primary-600/20 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-          <i class="fi fi-rr-search text-xs"></i>
-          <span>Periksa Status</span>
-        </button>
-      </form>
-      <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500">
-        <span>Masukkan Nomor Registrasi yang Anda peroleh saat pendaftaran.</span>
-        <a href="../ppdb.html#formulir-pendaftaran" class="text-primary-600 hover:text-primary-800 font-semibold">Belum mendaftar? Klik di sini &rarr;</a>
+        <div>
+          <span class="block font-display font-extrabold text-sm sm:text-base text-slate-900 leading-tight">AT TARBIYYAH</span>
+          <span class="block text-[11px] font-medium text-slate-500">TPQ &bull; Tahfidz &bull; PAUD &bull; PKBM Samarinda</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="../ppdb.html" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors flex items-center gap-1.5">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Formulir PPDB
+        </a>
+        <a href="../login.html" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors">
+          Login Portal
+        </a>
       </div>
     </div>
+  </header>
 
-    <div id="result" class="hidden"></div>
-  </main>
+  <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
 
-  <div id="site-footer"></div>
-
-  <script src="/shared/js/supabase-config.js" onerror="this.onerror=null;this.src='../../shared/js/supabase-config.js'"></script>
-  <script src="/shared/js/api.js" onerror="this.onerror=null;this.src='../../shared/js/api.js'"></script>
-  <script src="../js/public-shell.js?v=20261024_wa"></script>
-  <script src="../js/app.js"></script>
-  <script>
-    injectSiteChrome({ activeKey: 'ppdb', basePath: '../' });
-
-    let currentResultData = null;
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
-    }
-
-    function sanitizeOfficialNotes(notes) {
-      if (!notes || typeof notes !== 'string') return '';
-      const trimmed = notes.trim();
-      // Cegah kebocoran string JSON mentah dari form metadata/password/NIK ke publik
-      if (trimmed.startsWith('{') || trimmed.includes('"nik":') || trimmed.includes('"password":') || trimmed.includes('"full_address":')) {
-        return '';
-      }
-      return trimmed;
-    }
-
-    async function checkStatus(regNumber) {
-      const reg = (regNumber || '').trim().toUpperCase();
-      if (!reg) return;
-
-      const result = document.getElementById('result');
-      const btn = document.getElementById('check-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="inline-block animate-spin mr-1">⏳</span> Mengecek...';
-
-      result.classList.remove('hidden');
-      result.innerHTML = `
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm animate-pulse space-y-4">
-          <div class="flex justify-between items-center">
-            <div class="space-y-2"><div class="h-3 bg-slate-200 rounded w-28"></div><div class="h-6 bg-slate-200 rounded w-44"></div></div>
-            <div class="h-6 bg-slate-200 rounded w-24"></div>
+      <!-- SEARCH BOX -->
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 p-6 sm:p-10 mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center">
+            <i data-lucide="file-search" class="w-5 h-5"></i>
           </div>
-          <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-            <div class="h-4 bg-slate-200 rounded w-3/4"></div>
-            <div class="h-4 bg-slate-200 rounded w-1/2"></div>
-            <div class="h-4 bg-slate-200 rounded w-2/3"></div>
-            <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+          <div>
+            <h1 class="font-display text-xl sm:text-2xl font-extrabold text-slate-900">Cek Status &amp; Lembar Data PPDB</h1>
+            <p class="text-xs text-slate-500">Masukkan Nomor Registrasi Anda untuk melihat lembar hasil pendaftaran, status penerimaan, Nomor Induk / NIS Lokal, dan Sandi Portal Siswa</p>
           </div>
         </div>
-      `;
 
-      try {
-        const res = await apiCall('ppdb', 'check_status', { registration_number: reg });
-        if (!res.success) {
-          result.innerHTML = `
-            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center text-rose-800">
-              <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl font-bold">!</div>
-              <p class="font-bold text-rose-900 mb-1">Nomor Registrasi Tidak Ditemukan</p>
-              <p class="text-xs text-rose-700 max-w-md mx-auto leading-relaxed mb-4">${escapeHtml(res.message || 'Pastikan nomor pendaftaran yang Anda masukkan sesuai dengan bukti pendaftaran Anda (contoh: REG-2026-001).')}</p>
-              <a href="../ppdb.html#formulir-pendaftaran" class="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 text-white rounded-lg text-xs font-bold hover:bg-rose-700 transition">
-                <span>Daftar Siswa Baru Sekarang</span>
-                &rarr;
-              </a>
-            </div>
-          `;
-          return;
-        }
-
-        const r = (res.data && res.data.registration) ? res.data.registration : (res.data || {});
-        currentResultData = r;
-
-        const regNo = r.registration_number || r.registration_no || r.id || reg;
-        const childName = r.student_name || r.child_name || r.full_name || '-';
-        const birthDate = r.student_birth_date || r.birth_date || r.child_birth_date || '';
-        const createdAt = r.created_at || r.registration_date || '';
-        const rawStatus = (r.status || 'pending').toLowerCase();
-        const jenjang = (r.level || r.form_type || 'TPQ Pagi').toUpperCase();
-        let metaObj = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
-        if (typeof r.notes === 'string' && r.notes.trim().startsWith('{')) { try { metaObj = { ...JSON.parse(r.notes), ...metaObj }; } catch (_) {} }
-        const ageCat = metaObj.age_category || '';
-        const pkbmTrack = metaObj.pkbm_track || '';
-        const subTahfidz = metaObj.pra_ptpt_level || metaObj.ptpt_class || metaObj.paud_origin || '';
-        const entryDate = metaObj.entry_date || '';
-        const parentName = r.parent_name || r.father_name || r.mother_name || '-';
-        const parentPhone = r.parent_phone || r.phone || r.father_phone || '-';
-        let nis = r.converted_nis || r.nis || r.student_nis || (r.form_metadata && (r.form_metadata.converted_nis || r.form_metadata.nis)) || '';
-        let className = r.class_name || (r.form_metadata && r.form_metadata.class_name) || '';
-
-        // Ekstraksi fallback dari r.notes jika field eksplisit belum terisi
-        if (!nis && typeof r.notes === 'string') {
-          const matchNis = r.notes.match(/NIS:\s*([A-Za-z0-9_-]+)/i);
-          if (matchNis && matchNis[1]) nis = matchNis[1].trim();
-        }
-        if (!className && typeof r.notes === 'string') {
-          const matchClass = r.notes.match(/Kelas:\s*([^),]+)/i);
-          if (matchClass && matchClass[1]) className = matchClass[1].trim();
-        }
-
-        const isConverted = rawStatus === 'converted' || Boolean(nis && (rawStatus === 'accepted' || rawStatus === 'approved'));
-        const isApproved = !isConverted && (rawStatus === 'approved' || rawStatus === 'accepted');
-        const isPending = rawStatus === 'pending' || rawStatus === 'submitted' || rawStatus === 'waiting_verification';
-        const isRejected = rawStatus === 'rejected';
-
-        // Fallback pencarian NIS jika pendaftar sudah berstatus converted tapi field nis masih kosong di objek registrasi
-        if (!nis && isConverted) {
-          try {
-            const stuRes = await apiCall('students', 'list', { search: regNo, per_page: 5 });
-            const sList = Array.isArray(stuRes.data) ? stuRes.data : ((stuRes.data && (stuRes.data.students || stuRes.data.items)) || []);
-            const matchStu = sList.find(s => s.reg_number === regNo || s.registration_number === regNo || (s.full_name && childName && s.full_name.toLowerCase() === childName.toLowerCase()));
-            if (matchStu) {
-              if (matchStu.nis) nis = String(matchStu.nis);
-              if (!className && (matchStu.class_name || matchStu.kelas_sekarang)) className = matchStu.class_name || matchStu.kelas_sekarang;
-            }
-          } catch (_) {}
-        }
-        if (currentResultData) {
-          if (nis) currentResultData.converted_nis = nis;
-          if (className) currentResultData.class_name = className;
-        }
-
-        // Teks WhatsApp
-        const waPhone = '6281347142829';
-
-        let statusBannerHtml = '';
-
-        if (isConverted) {
-          statusBannerHtml = `
-            <div class="bg-gradient-to-br from-primary-800 via-primary-900 to-slate-950 rounded-2xl p-6 text-white shadow-lg mb-6">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">🎉</div>
-                <div>
-                  <span class="text-[10px] font-bold tracking-wider uppercase bg-white/20 px-2.5 py-0.5 rounded-full inline-block">Resmi Terdaftar &amp; Aktif</span>
-                  <h3 class="text-base sm:text-lg font-bold leading-tight mt-1">Selamat! Ananda Resmi Terdaftar sebagai Siswa Baru</h3>
-                </div>
-              </div>
-              <p class="text-xs text-primary-100 leading-relaxed mb-4">
-                Pendaftaran telah disetujui penuh oleh pihak yayasan dan rombongan belajar telah ditetapkan. Akun resmi Portal Siswa telah aktif.
-              </p>
-              
-              <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 grid sm:grid-cols-2 gap-3 text-xs mb-4">
-                <div>
-                  <span class="text-primary-200 block text-[11px] font-medium">Nomor Induk Siswa (NIS):</span>
-                  <div class="flex items-center gap-2 mt-0.5">
-                    <span class="text-lg font-bold font-mono tracking-wider tabular-nums">${escapeHtml(nis || 'Telah Diterbitkan')}</span>
-                    ${nis ? `<button type="button" onclick="copyNis('${escapeHtml(nis)}')" class="px-2 py-0.5 bg-white/20 hover:bg-white/30 rounded text-[11px] font-sans">Salin NIS</button>` : ''}
-                  </div>
-                </div>
-                <div>
-                  <span class="text-primary-200 block text-[11px] font-medium">Kelas / Rombel Masuk:</span>
-                  <span class="text-sm font-bold block mt-1">${escapeHtml(className || jenjang)}</span>
-                </div>
-                <div class="border-t border-white/20 pt-2.5 sm:col-span-2">
-                  <span class="text-primary-200 block text-[11px] font-medium mb-1">Panduan Login ke Portal Siswa:</span>
-                  <p class="text-xs text-white leading-relaxed">
-                    <strong>Username:</strong> NIS Anda (${escapeHtml(nis || 'Gunakan NIS Anda')})<br>
-                    <strong>Password Awal:</strong> Tanggal Lahir Siswa format DDMMYYYY (cth: 12052020) atau password yang Anda buat saat pendaftaran<br>
-                    <span class="text-[11px] text-primary-100 italic">*Anda dapat melihat status &amp; jadwal pembayaran SPP bulanan di Portal Siswa.</span>
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="../login.html" class="flex-1 py-3 px-4 bg-primary-500 hover:bg-primary-400 text-white font-bold text-xs rounded-xl shadow-lg shadow-primary-950/40 border border-primary-400/30 transition flex items-center justify-center gap-2">
-                  <span>Masuk ke Portal Siswa Sekarang</span>
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
-                <button type="button" onclick="printOfficialLetter()" class="py-3 px-4 bg-white/15 hover:bg-white/25 text-white font-semibold text-xs rounded-xl border border-white/30 transition flex items-center justify-center gap-2">
-                  <i class="fi fi-rr-print text-xs"></i>
-                  <span>Cetak Surat Penerimaan</span>
-                </button>
-              </div>
-            </div>
-          `;
-        } else if (isApproved) {
-          const waAcceptMsg = `Assalamu'alaikum Panitia PPDB Yayasan At Tarbiyyah Wijaya Kusuma Samarinda,\n\nSaya ingin konfirmasi nomor pendaftaran ${regNo} atas nama ${childName} yang telah dinyatakan DITERIMA (Lolos Seleksi).\nMohon info tahapan penerbitan NIS & jadwal daftar ulang fisik. Terima kasih.`;
-          statusBannerHtml = `
-            <div class="bg-primary-50 border border-primary-200 rounded-2xl p-6 text-slate-900 mb-6">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-primary-100 text-primary-800 flex items-center justify-center text-xl font-bold">✓</div>
-                <div>
-                  <span class="text-[10px] font-bold text-primary-800 uppercase tracking-wide bg-primary-100 px-2 py-0.5 rounded-full inline-block">Hasil Seleksi: DITERIMA</span>
-                  <h3 class="text-base sm:text-lg font-bold text-primary-900 mt-0.5">🎉 Selamat! Calon Siswa Dinyatakan Lolos Seleksi</h3>
-                </div>
-              </div>
-              <p class="text-xs text-primary-800 leading-relaxed mb-4">
-                Berkas pendaftaran telah diverifikasi oleh Panitia PPDB dan dinyatakan <strong>DITERIMA</strong>. Tim Tata Usaha sedang menyiapkan penetapan rombongan belajar dan penerbitan Nomor Induk Siswa (NIS).
-              </p>
-              <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="https://wa.me/${waPhone}?text=${encodeURIComponent(waAcceptMsg)}" target="_blank" class="flex-1 py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-                  <i class="fi fi-brands-whatsapp text-xs"></i>
-                  <span>Konfirmasi ke WhatsApp Panitia TU</span>
-                </a>
-                <button type="button" onclick="printOfficialLetter()" class="py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
-                  <i class="fi fi-rr-print text-xs"></i>
-                  <span>Cetak Surat Pengumuman</span>
-                </button>
-              </div>
-            </div>
-          `;
-        } else if (isPending) {
-          const waPendingMsg = `Assalamu'alaikum Panitia PPDB Yayasan At Tarbiyyah Wijaya Kusuma Samarinda,\n\nSaya ingin menanyakan progres verifikasi pendaftaran online atas nama ${childName} dengan No. Registrasi: ${regNo}. Terima kasih.`;
-          statusBannerHtml = `
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-amber-950 mb-6">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold">⏳</div>
-                <div>
-                  <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wide bg-amber-100 px-2 py-0.5 rounded-full inline-block">Proses: Menunggu Verifikasi</span>
-                  <h3 class="text-base sm:text-lg font-bold text-amber-900 mt-0.5">Berkas Sedang Diverifikasi oleh Panitia TU</h3>
-                </div>
-              </div>
-              <p class="text-xs text-amber-800 leading-relaxed mb-4">
-                Formulir pendaftaran dan kelengkapan dokumen telah masuk ke sistem. Panitia PPDB memerlukan waktu 1–2 hari kerja untuk memvalidasi berkas administrasi. Pastikan nomor kontak WhatsApp Anda aktif.
-              </p>
-              <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="https://wa.me/${waPhone}?text=${encodeURIComponent(waPendingMsg)}" target="_blank" class="flex-1 py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-                  <i class="fi fi-brands-whatsapp text-xs"></i>
-                  <span>Tanya Panitia via WhatsApp</span>
-                </a>
-                <button type="button" onclick="printOfficialLetter()" class="py-2.5 px-4 bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
-                  <i class="fi fi-rr-print text-xs"></i>
-                  <span>Cetak Bukti Pendaftaran</span>
-                </button>
-              </div>
-            </div>
-          `;
-        } else if (isRejected) {
-          const waRejectMsg = `Assalamu'alaikum Panitia PPDB,\n\nSaya ingin konsultasi mengenai status pendaftaran ${regNo} atas nama ${childName}. Terima kasih.`;
-          statusBannerHtml = `
-            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-rose-950 mb-6">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl font-bold">✕</div>
-                <div>
-                  <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wide bg-rose-100 px-2 py-0.5 rounded-full inline-block">Hasil Seleksi</span>
-                  <h3 class="text-base sm:text-lg font-bold text-rose-900 mt-0.5">Mohon Maaf, Pendaftaran Belum Dapat Diterima</h3>
-                </div>
-              </div>
-              <p class="text-xs text-rose-800 leading-relaxed mb-4">
-                Kuota kelas untuk unit yang dipilih telah terpenuhi atau kelengkapan berkas belum memenuhi kualifikasi tahun ajaran ini.
-              </p>
-              <div class="flex flex-col sm:flex-row gap-2.5">
-                <a href="https://wa.me/${waPhone}?text=${encodeURIComponent(waRejectMsg)}" target="_blank" class="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-                  <i class="fi fi-brands-whatsapp text-xs"></i>
-                  <span>Konsultasi ke Sekretariat Yayasan</span>
-                </a>
-              </div>
-            </div>
-          `;
-        }
-
-        const statusBadges = {
-          converted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 border border-primary-200">Siswa Aktif Terdaftar</span>',
-          approved: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 border border-primary-200">Diterima (Lolos Seleksi)</span>',
-          accepted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 border border-primary-200">Diterima (Lolos Seleksi)</span>',
-          pending: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Menunggu Verifikasi TU</span>',
-          submitted: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Menunggu Verifikasi TU</span>',
-          waiting_verification: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Menunggu Verifikasi TU</span>',
-          rejected: '<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">Belum Diterima</span>'
-        };
-
-        result.innerHTML = `
-          ${statusBannerHtml}
-
-          <!-- Rincian Formulir Pendaftar -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-slate-100 gap-3">
-              <div>
-                <span class="text-xs text-slate-500 font-medium">Nomor Registrasi PPDB</span>
-                <div class="text-xl font-bold text-slate-900 font-mono tracking-wider tabular-nums">${escapeHtml(regNo)}</div>
-              </div>
-              <div>
-                ${statusBadges[rawStatus] || `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800">${escapeHtml(r.status)}</span>`}
-              </div>
-            </div>
-
-            <dl class="grid sm:grid-cols-2 gap-4 text-xs mb-5">
-              <div><dt class="text-slate-500 mb-0.5">Nama Lengkap Calon Siswa</dt><dd class="font-bold text-slate-900 text-sm">${escapeHtml(childName)}</dd></div>
-              <div><dt class="text-slate-500 mb-0.5">Jenjang / Program Tujuan</dt><dd class="font-bold text-primary-700 uppercase">${escapeHtml(jenjang)}</dd></div>
-              ${ageCat ? `<div><dt class="text-slate-500 mb-0.5">Kategori Usia</dt><dd class="font-semibold text-slate-800">${escapeHtml(ageCat)}</dd></div>` : ''}
-              ${subTahfidz ? `<div><dt class="text-slate-500 mb-0.5">Rincian Level / Kelas</dt><dd class="font-semibold text-slate-800">${escapeHtml(subTahfidz)}</dd></div>` : ''}
-              ${pkbmTrack ? `<div><dt class="text-slate-500 mb-0.5">Jalur Pendidikan Kesetaraan (PKBM)</dt><dd class="font-semibold text-slate-800">${escapeHtml(pkbmTrack)}</dd></div>` : ''}
-              ${entryDate ? `<div><dt class="text-slate-500 mb-0.5">Tanggal Masuk Resmi</dt><dd class="font-bold text-emerald-700">${escapeHtml(entryDate)}</dd></div>` : ''}
-              ${!nis ? `<div><dt class="text-slate-500 mb-0.5">Status NIS Lokal</dt><dd class="font-semibold text-amber-700">Diterbitkan Admin TU setelah Diterima (Login Portal gunakan ${escapeHtml(regNo)})</dd></div>` : ''}
-              ${nis ? `<div><dt class="text-slate-500 mb-0.5">Nomor Induk Siswa (NIS Resmi)</dt><dd class="font-bold text-primary-800 font-mono text-sm">${escapeHtml(nis)}</dd></div>` : ''}
-              ${className ? `<div><dt class="text-slate-500 mb-0.5">Kelas / Rombongan Belajar</dt><dd class="font-bold text-slate-800">${escapeHtml(className)}</dd></div>` : ''}
-              <div><dt class="text-slate-500 mb-0.5">Tanggal Lahir</dt><dd class="font-medium text-slate-800">${birthDate || '-'}</dd></div>
-              <div><dt class="text-slate-500 mb-0.5">Tanggal Mendaftar</dt><dd class="font-medium text-slate-800">${createdAt ? createdAt.split('T')[0] : '-'}</dd></div>
-              <div><dt class="text-slate-500 mb-0.5">Nama Orang Tua / Wali</dt><dd class="font-semibold text-slate-800">${escapeHtml(parentName)}</dd></div>
-              <div><dt class="text-slate-500 mb-0.5">Kontak WhatsApp Terdaftar</dt><dd class="font-mono text-slate-800">${escapeHtml(parentPhone)}</dd></div>
-            </dl>
-
-            ${(() => {
-              const safeNotes = sanitizeOfficialNotes(r.notes);
-              return safeNotes ? `
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs mb-4">
-                  <span class="font-bold text-slate-700 block mb-1">Catatan Resmi Panitia PPDB:</span>
-                  <p class="text-slate-600 leading-relaxed">${escapeHtml(safeNotes)}</p>
-                </div>` : '';
-            })()}
-
-            <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-              <span>Yayasan At Tarbiyyah Wijaya Kusuma &bull; Sekretariat PPDB Terpadu</span>
-              <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-primary-600 hover:text-primary-800 font-semibold">Cari Nomor Lain &uarr;</button>
-            </div>
+        <form onsubmit="handleCheckStatus(event)" class="mt-6 flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <i data-lucide="hash" class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="reg-input" required placeholder="Contoh: REG-2026-001"
+              class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-300 text-sm font-mono font-bold uppercase focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-600" />
           </div>
-        `;
-      } catch (err) {
-        result.innerHTML = `
-          <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center text-xs text-rose-800">
-            Terjadi gangguan koneksi saat memeriksa data. Silakan coba kembali beberapa saat lagi.
-          </div>
-        `;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fi fi-rr-search text-xs"></i><span>Periksa Status</span>';
+          <button type="submit" id="btn-search" class="px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-lg shadow-sky-600/20 transition-all flex items-center justify-center gap-2">
+            <i data-lucide="search" class="w-4 h-4"></i> Cek Status
+          </button>
+        </form>
+
+        <!-- Quick Demo Pills -->
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <span>Contoh Nomor:</span>
+          <button type="button" onclick="fillAndSearch('REG-2026-001')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold transition-colors">REG-2026-001</button>
+          <button type="button" onclick="fillAndSearch('REG-2026-002')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold transition-colors">REG-2026-002</button>
+          <button type="button" onclick="fillAndSearch('REG-2026-003')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 font-mono font-semibold transition-colors">REG-2026-003</button>
+        </div>
+      </div>
+
+      <!-- RESULT CONTAINER -->
+      <div id="result-container" class="hidden"></div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../shared/js/config.js"></script>
+  <script src="../../shared/js/auth.js"></script>
+  <script src="../../shared/js/api.js"></script>
+  <script>
+    lucide.createIcons();
+
+    let currentRegistrationRecord = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const reg = params.get('reg');
+      if (reg) {
+        fillAndSearch(reg);
       }
+    });
+
+    function fillAndSearch(regNo) {
+      document.getElementById('reg-input').value = regNo;
+      lookupRegistration(regNo);
     }
 
-    function copyNis(nis) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(nis).then(() => {
-          alert('NIS (' + nis + ') berhasil disalin!');
-        });
-      } else {
-        prompt('Salin NIS Anda:', nis);
-      }
+    function handleCheckStatus(e) {
+      e.preventDefault();
+      const val = document.getElementById('reg-input').value.trim().toUpperCase();
+      if (val) lookupRegistration(val);
     }
 
-    function printOfficialLetter() {
-      if (!currentResultData) return;
-      const r = currentResultData;
-      const regNo = r.registration_number || r.registration_no || r.id;
-      const childName = r.child_name || r.full_name || '-';
-      const jenjang = (r.level || r.form_type || 'PAUD/TK').toUpperCase();
-      const parentName = r.father_name || r.mother_name || r.parent_name || '-';
-      const nis = r.converted_nis || r.nis || '-';
-      const className = r.class_name || jenjang;
-      const rawStatus = (r.status || 'pending').toLowerCase();
-      const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    function parseRegistrationMeta(r) {
+      let metaObj = {};
+      if (r.form_metadata && typeof r.form_metadata === 'object') {
+        metaObj = { ...r.form_metadata };
+      }
+      if (r.notes) {
+        try {
+          const parsed = typeof r.notes === 'string' && r.notes.trim().startsWith('{') ? JSON.parse(r.notes) : {};
+          metaObj = { ...parsed, ...metaObj };
+        } catch (_) {}
+      }
+      return metaObj;
+    }
 
-      let statusDesc = 'DALAM PROSES VERIFIKASI ADMINISTRASI';
-      if (rawStatus === 'converted') statusDesc = 'RESMI DITERIMA & TERDAFTAR SEBAGAI SISWA';
-      else if (rawStatus === 'approved' || rawStatus === 'accepted') statusDesc = 'DINYATAKAN DITERIMA (LOLOS SELEKSI)';
-      else if (rawStatus === 'rejected') statusDesc = 'BELUM DAPAT DITERIMA';
+    async function lookupRegistration(regNo) {
+      const container = document.getElementById('result-container');
+      container.classList.remove('hidden');
+      container.innerHTML = `
+        <div class="bg-white rounded-3xl border border-slate-200 p-10 text-center text-slate-500 text-sm">
+          Mencari data pendaftaran <strong>${regNo}</strong>...
+        </div>`;
 
-      const printWindow = window.open('', '_blank', 'width=750,height=850');
-      if (!printWindow) {
-        alert('Mohon izinkan pop-up peramban untuk mencetak surat.');
+      const res = await apiCall('ppdb', 'check_status', { registration_number: regNo });
+      if (!res.success || !res.data) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl border border-rose-200 p-8 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="alert-circle" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-display font-bold text-slate-900 mb-1">Data Tidak Ditemukan</h3>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">${res.error || 'Nomor registrasi tidak ditemukan. Pastikan format nomor sudah benar (contoh: REG-2026-001).'}</p>
+          </div>`;
+        lucide.createIcons();
         return;
       }
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-          <meta charset="UTF-8">
-          <title>Surat Keterangan Status PPDB - ${regNo}</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 32px; color: #0f172a; line-height: 1.6; }
-            .kop { text-align: center; border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 24px; }
-            .kop h1 { margin: 0; color: #0369a1; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
-            .kop p { margin: 3px 0 0; font-size: 12px; color: #64748b; }
-            .title { text-align: center; margin-bottom: 20px; }
-            .title h2 { margin: 0; font-size: 16px; font-weight: 700; text-transform: uppercase; color: #1e293b; }
-            .badge { display: inline-block; background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; padding: 6px 14px; font-weight: 700; font-size: 15px; border-radius: 6px; font-family: monospace; margin-top: 6px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
-            td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
-            td.lbl { width: 34%; font-weight: 600; color: #64748b; }
-            td.val { font-weight: 600; color: #0f172a; }
-            .box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; font-size: 12px; color: #334155; }
-            .ttd-wrap { display: flex; justify-content: space-between; margin-top: 36px; font-size: 12px; }
-            .ttd { text-align: center; width: 220px; }
-            @media print { .no-print { display: none !important; } }
-          </style>
-        </head>
-        <body>
-          <div class="kop">
-            <h1>YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</h1>
-            <p>Program Resmi: TPQ Ulinnuha (TPQ Pagi &amp; Jenjang Tahfidz Pra PTPT / PTPT) &bull; KB Ulinnuha (PAUD NPSN 69840840)</p>
-            <p>Jl. Wijaya Kusuma V-A No. 38, Samarinda Ulu | WhatsApp Resmi: 0813-4714-2829</p>
-          </div>
-          <div class="title">
-            <h2>Surat Keterangan Hasil Seleksi PPDB</h2>
-            <div class="badge">${regNo}</div>
-          </div>
-          <table>
-            <tr><td class="lbl">Nama Lengkap Siswa</td><td class="val">${childName}</td></tr>
-            <tr><td class="lbl">Jenjang / Unit</td><td class="val">${jenjang}</td></tr>
-            <tr><td class="lbl">Nama Orang Tua / Wali</td><td class="val">${parentName}</td></tr>
-            <tr><td class="lbl">Status Hasil Seleksi</td><td class="val" style="color: #0369a1;">${statusDesc}</td></tr>
-            ${nis !== '-' ? `<tr><td class="lbl">Nomor Induk Siswa (NIS)</td><td class="val font-mono">${nis}</td></tr>` : ''}
-            ${className ? `<tr><td class="lbl">Kelas / Rombel</td><td class="val">${className}</td></tr>` : ''}
-          </table>
-          <div class="box">
-            <strong>Keterangan Resmi Yayasan:</strong>
-            <p style="margin: 6px 0 0;">
-              Dokumen ini diterbitkan secara otomatis oleh sistem administrasi Yayasan At Tarbiyyah Wijaya Kusuma Samarinda sebagai bukti sah status penerimaan calon siswa baru. Untuk pengaktifan akun Portal Siswa, gunakan username berupa NIS dan password awal berupa Tanggal Lahir siswa.
-            </p>
-          </div>
-          <div class="ttd-wrap">
-            <div class="ttd">
-              <p>Orang Tua / Wali,</p>
-              <br><br><br>
-              <p><strong>(${parentName})</strong></p>
+      const r = res.data;
+      currentRegistrationRecord = r;
+      const metaObj = parseRegistrationMeta(r);
+      const isPaud = r.level === 'KB Ulinnuha (PAUD)' || metaObj.form_type === 'paud';
+      const photoUrl = r.photo_url || metaObj.photo_url || '';
+      const academicYear = metaObj.academic_year || '2026/2027';
+      const assignedNis = r.converted_nis || metaObj.converted_nis || '';
+      const assignedClass = r.class_name || metaObj.class_name || '';
+      const assignedEntryDate = metaObj.entry_date || r.entry_date || '';
+      const assignedPassword = metaObj.portal_password || r.portal_password || '';
+
+      const statusConfig = {
+        pending: {
+          badge: 'bg-amber-50 text-amber-700 border-amber-200',
+          icon: 'clock',
+          label: 'Menunggu Verifikasi Admin TU',
+          desc: 'Formulir pendaftaran & berkas Anda telah masuk ke sistem. Admin Yayasan sedang memvalidasi data untuk menerbitkan Nomor Induk / NIS Lokal, Kelompok/Kelas, dan Sandi Portal Siswa.'
+        },
+        accepted: {
+          badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          icon: 'check-circle-2',
+          label: 'Diterima / Lulus Verifikasi',
+          desc: 'Selamat! Pendaftaran santri/anak didik telah disetujui oleh Admin Yayasan.'
+        },
+        converted: {
+          badge: 'bg-sky-50 text-sky-700 border-sky-200',
+          icon: 'award',
+          label: 'Resmi Terdaftar & Aktif di Portal Siswa',
+          desc: 'Selamat! Pendaftaran telah divalidasi oleh Admin Yayasan. Nomor Induk / NIS Lokal, Kelompok/Kelas, dan Sandi Login Portal Siswa telah diterbitkan di bawah ini.'
+        },
+        rejected: {
+          badge: 'bg-rose-50 text-rose-700 border-rose-200',
+          icon: 'x-circle',
+          label: 'Belum Dapat Diterima / Perlu Perbaikan',
+          desc: 'Mohon hubungi sekretariat yayasan untuk informasi lebih lanjut terkait berkas pendaftaran.'
+        }
+      };
+
+      const st = statusConfig[r.status] || statusConfig.pending;
+
+      const fatherName = metaObj.father_name || r.parent_name || '-';
+      const fatherJob = metaObj.father_job || r.parent_occupation || '-';
+      const fatherEdu = metaObj.father_education || '-';
+      const motherName = metaObj.mother_name || '-';
+      const motherJob = metaObj.mother_job || '-';
+      const motherEdu = metaObj.mother_education || '-';
+
+      let officialAccountBox = '';
+      if (r.status === 'converted' || r.status === 'accepted') {
+        officialAccountBox = `
+          <div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-bold uppercase tracking-wider mb-1">Diterbitkan Oleh Admin Sekolah</span>
+                <p class="text-xs font-bold uppercase tracking-wider text-emerald-100">${isPaud ? 'Nomor Induk Siswa (PAUD)' : 'NIS Lokal Santri (TPQ)'}</p>
+                <p class="font-mono text-2xl sm:text-3xl font-extrabold tracking-tight mt-0.5">${assignedNis || 'Sedang Diterbitkan'}</p>
+                <p class="text-xs text-emerald-100 mt-1">${isPaud ? 'Kelompok' : 'Kelas / Jenjang'}: <strong>${assignedClass || r.level || '-'}</strong> ${assignedEntryDate ? '&bull; Tgl Masuk: <strong>' + assignedEntryDate + '</strong>' : ''}</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="printOfficialLetter()"
+                  class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs transition-colors flex items-center gap-1.5">
+                  <i data-lucide="printer" class="w-4 h-4"></i> Cetak Lembar Resmi
+                </button>
+                <a href="../login.html" class="px-5 py-2.5 rounded-xl bg-white text-emerald-900 font-bold text-xs hover:bg-emerald-50 transition-colors flex items-center gap-1.5 shadow-sm">
+                  <i data-lucide="log-in" class="w-4 h-4"></i> Login Portal Siswa
+                </a>
+              </div>
             </div>
-            <div class="ttd">
-              <p>Samarinda, ${today}<br>Panitia PPDB Yayasan At Tarbiyyah Wijaya Kusuma,</p>
-              <br><br>
-              <p><strong>( Bagian Administrasi &amp; TU )</strong></p>
+            <div class="mt-4 pt-3 border-t border-white/15 grid sm:grid-cols-2 gap-3 text-xs text-emerald-50">
+              <div class="p-3 rounded-xl bg-white/10 border border-white/15">
+                <span class="block text-[10px] uppercase tracking-wider text-emerald-200 font-bold">Username Login Portal Siswa</span>
+                <span class="font-mono font-extrabold text-sm text-white">${assignedNis || '-'}</span>
+              </div>
+              <div class="p-3 rounded-xl bg-white/10 border border-white/15">
+                <span class="block text-[10px] uppercase tracking-wider text-emerald-200 font-bold">Sandi / Password Portal Siswa (Dari Admin)</span>
+                <span class="font-mono font-extrabold text-sm text-amber-200">${assignedPassword || 'Hubungi Admin TU / Gunakan Tgl Lahir (DDMMYYYY)'}</span>
+              </div>
             </div>
+          </div>`;
+      } else {
+        officialAccountBox = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 mb-6">
+            <div class="text-xs text-amber-900">
+              <p class="font-bold">Menunggu Penerbitan Nomor Induk / NIS &amp; Sandi Portal oleh Admin</p>
+              <p class="text-amber-700 mt-0.5">Setelah Admin Sekolah memvalidasi pendaftaran Anda, Nomor Induk / NIS Lokal, Kelompok/Kelas, dan Sandi Login Portal Siswa akan tampil di halaman ini.</p>
+            </div>
+            <button type="button" onclick="printOfficialLetter()"
+              class="shrink-0 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm">
+              <i data-lucide="printer" class="w-4 h-4 text-sky-600"></i> Cetak Lembar Data PPDB
+            </button>
+          </div>`;
+      }
+
+      let formattedSheetHtml = '';
+      if (isPaud) {
+        formattedSheetHtml = `
+          <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
+            <!-- Header PAUD + Pasfoto -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+              <div>
+                <span class="inline-block px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200 mb-1.5">Formulir Buku Induk Anak Didik PAUD</span>
+                <h4 class="font-display font-extrabold text-lg text-slate-900">${r.student_name || '-'}</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Tahun Pelajaran: <strong>${academicYear}</strong></p>
+                <div class="flex flex-wrap gap-2 mt-2 text-[11px]">
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">No. Induk: <strong>${assignedNis || 'Diisi oleh Admin Yayasan'}</strong></span>
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Kelompok: <strong>${assignedClass || 'Diisi oleh Admin Yayasan'}</strong></span>
+                </div>
+              </div>
+              <div class="shrink-0 flex flex-col items-center">
+                ${photoUrl
+                  ? `<img src="${photoUrl}" alt="Pasfoto Anak" class="w-24 h-32 object-cover rounded-xl border-2 border-slate-300 shadow-sm bg-slate-50" />`
+                  : `<div class="w-24 h-32 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center text-[10px] text-slate-400 text-center p-2">Pasfoto 3x4</div>`
+                }
+                <span class="text-[10px] font-bold text-slate-500 mt-1">Pasfoto Anak</span>
+              </div>
+            </div>
+
+            <!-- A. Identitas Anak Didik -->
+            <div>
+              <h5 class="text-xs font-extrabold uppercase tracking-wider text-sky-800 mb-2.5">A. Identitas Anak Didik</h5>
+              <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">1.a. Nama Lengkap</span><span class="font-bold text-slate-900 text-right">${r.student_name || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">1.b. Nama Panggilan</span><span class="font-semibold text-slate-800 text-right">${r.nickname || metaObj.nickname || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">2. Jenis Kelamin</span><span class="font-semibold text-slate-800 text-right">${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">3. Tempat, Tgl Lahir</span><span class="font-semibold text-slate-800 text-right">${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">4. Alamat Rumah (Jalan, Desa, Kec., Kab/Kota, Prov.)</span><span class="font-semibold text-slate-800 text-right">${r.address || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">5. Agama</span><span class="font-semibold text-slate-800 text-right">${metaObj.religion || 'Islam'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">6. Kewarganegaraan</span><span class="font-semibold text-slate-800 text-right">${metaObj.citizenship || 'WNI'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">7. Anak ke</span><span class="font-semibold text-slate-800 text-right">${r.child_order || metaObj.child_order || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">8. Jml Saudara (Kandung / Tiri / Angkat)</span><span class="font-semibold text-slate-800 text-right">${r.siblings_count ?? metaObj.siblings_count ?? '-'} / ${metaObj.siblings_step || '0'} / ${metaObj.siblings_adopted || '0'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">9. Status Anak</span><span class="font-semibold text-slate-800 text-right">${metaObj.child_status || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">10. Bahasa Sehari-hari</span><span class="font-semibold text-slate-800 text-right">${metaObj.daily_language || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">11. Ciri-ciri Khusus</span><span class="font-semibold text-slate-800 text-right">${metaObj.special_traits || '-'}</span></div>
+              </div>
+            </div>
+
+            <!-- B. Identifikasi Orang Tua / Wali -->
+            <div>
+              <h5 class="text-xs font-extrabold uppercase tracking-wider text-sky-800 mb-2.5">B. Identifikasi Orang Tua / Wali</h5>
+              <div class="grid sm:grid-cols-2 gap-4 text-xs">
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                  <p class="font-bold text-slate-800 border-b border-slate-200 pb-1">1. Data Ayah (${metaObj.father_relation || 'Ayah Kandung'})</p>
+                  <p><span class="text-slate-500">a. Nama:</span> <strong>${fatherName}</strong></p>
+                  <p><span class="text-slate-500">b. TTL:</span> ${metaObj.father_ttl || '-'}</p>
+                  <p><span class="text-slate-500">c. Agama:</span> ${metaObj.father_religion || 'Islam'}</p>
+                  <p><span class="text-slate-500">d. Pendidikan:</span> ${fatherEdu}</p>
+                  <p><span class="text-slate-500">e. Pekerjaan:</span> ${fatherJob}</p>
+                  <p><span class="text-slate-500">f. Telp Rumah/HP &amp; Kantor:</span> ${metaObj.father_phone_home || r.parent_phone || '-'} / ${metaObj.father_phone_office || '-'}</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                  <p class="font-bold text-slate-800 border-b border-slate-200 pb-1">2. Data Ibu (${metaObj.mother_relation || 'Ibu Kandung'})</p>
+                  <p><span class="text-slate-500">a. Nama:</span> <strong>${motherName}</strong></p>
+                  <p><span class="text-slate-500">b. TTL:</span> ${metaObj.mother_ttl || '-'}</p>
+                  <p><span class="text-slate-500">c. Agama:</span> ${metaObj.mother_religion || 'Islam'}</p>
+                  <p><span class="text-slate-500">d. Pendidikan:</span> ${motherEdu}</p>
+                  <p><span class="text-slate-500">e. Pekerjaan:</span> ${motherJob}</p>
+                  <p><span class="text-slate-500">f. Telp Rumah/HP &amp; Kantor:</span> ${metaObj.mother_phone_home || '-'} / ${metaObj.mother_phone_office || '-'}</p>
+                </div>
+              </div>
+              ${metaObj.guardian_name ? `
+                <div class="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                  <span class="font-bold text-slate-700">Data Wali:</span> ${metaObj.guardian_name} &bull; Pekerjaan: ${metaObj.guardian_job || '-'} &bull; Pendidikan: ${metaObj.guardian_education || '-'} &bull; Hubungan: ${metaObj.guardian_relation || '-'}
+                </div>` : ''}
+            </div>
+
+            <!-- C. Mutasi & D. Keterangan Lain-lain -->
+            <div class="grid sm:grid-cols-2 gap-4 text-xs pt-1">
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <p class="font-bold text-slate-800">C. Data Mutasi</p>
+                <p><span class="text-slate-500">1. Diterima Tanggal:</span> ${metaObj.mutasi_date || '-'}</p>
+                <p><span class="text-slate-500">2. Di Kelompok:</span> ${metaObj.mutasi_group || assignedClass || '-'}</p>
+                <p><span class="text-slate-500">3. Berasal / Pindah:</span> ${metaObj.mutasi_origin || '-'}</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <p class="font-bold text-slate-800">D. Keterangan Lain-lain</p>
+                <p><span class="text-slate-500">1. Jarak ke Sekolah:</span> ${metaObj.distance_km ? metaObj.distance_km + ' KM' : '-'}</p>
+                <p><span class="text-slate-500">2. Pergi ke Sekolah Dengan:</span> ${metaObj.transport_mode || '-'}</p>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        formattedSheetHtml = `
+          <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-5">
+            <!-- Header TPQ + Pasfoto -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+              <div>
+                <span class="inline-block px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 text-[10px] font-bold uppercase tracking-wider border border-sky-200 mb-1.5">Formulir Pendaftaran Santri TPQ (${r.level || 'TPQ'})</span>
+                <h4 class="font-display font-extrabold text-lg text-slate-900">${r.student_name || '-'}</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Tahun Pelajaran: <strong>${academicYear}</strong></p>
+                <div class="flex flex-wrap gap-2 mt-2 text-[11px]">
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">13.a. Tgl Daftar: <strong>${r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-'}</strong></span>
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">13.b. Tgl Masuk: <strong>${assignedEntryDate || 'Diisi Admin Yayasan'}</strong></span>
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">13.c. NIS Lokal: <strong>${assignedNis || 'Diisi Admin Yayasan'}</strong></span>
+                </div>
+              </div>
+              <div class="shrink-0 flex flex-col items-center">
+                ${photoUrl
+                  ? `<img src="${photoUrl}" alt="Pasfoto Santri" class="w-24 h-32 object-cover rounded-xl border-2 border-slate-300 shadow-sm bg-slate-50" />`
+                  : `<div class="w-24 h-32 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center text-[10px] text-slate-400 text-center p-2">Pasfoto 3x4</div>`
+                }
+                <span class="text-[10px] font-bold text-slate-500 mt-1">Pasfoto Santri</span>
+              </div>
+            </div>
+
+            <!-- A. Identitas Santri -->
+            <div>
+              <h5 class="text-xs font-extrabold uppercase tracking-wider text-sky-800 mb-2.5">A. Identitas Santri</h5>
+              <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">1. Nama Lengkap</span><span class="font-bold text-slate-900 text-right">${r.student_name || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">2. Nama Panggilan</span><span class="font-semibold text-slate-800 text-right">${r.nickname || metaObj.nickname || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">3. Jenis Kelamin</span><span class="font-semibold text-slate-800 text-right">${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">4. Tempat / Tanggal Lahir</span><span class="font-semibold text-slate-800 text-right">${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">5. Anak ke</span><span class="font-semibold text-slate-800 text-right">${r.child_order || metaObj.child_order || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100"><span class="text-slate-500">6. Jumlah Saudara</span><span class="font-semibold text-slate-800 text-right">${r.siblings_count ?? metaObj.siblings_count ?? '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">7. Nomor NIK Santri</span><span class="font-mono font-bold text-slate-900 text-right">${r.nik || metaObj.nik || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">8. Alamat Rumah (Prov., Kab/Kota, Kec., Desa, Alamat)</span><span class="font-semibold text-slate-800 text-right">${r.address || '-'}</span></div>
+                <div class="flex justify-between py-1.5 border-b border-slate-100 sm:col-span-2"><span class="text-slate-500">9. Kontak Telpon (1)</span><span class="font-semibold text-slate-800 text-right">${r.parent_phone || '-'}</span></div>
+              </div>
+            </div>
+
+            <!-- 10. Ayah, 11. Ibu, 12. Wali -->
+            <div class="grid sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <p class="font-bold text-slate-800 border-b border-slate-200 pb-1">10. Data Ayah</p>
+                <p><span class="text-slate-500">a. Nama Ayah:</span> <strong>${fatherName}</strong></p>
+                <p><span class="text-slate-500">b. Pekerjaan Ayah:</span> ${fatherJob}</p>
+                <p><span class="text-slate-500">c. Pendidikan Ayah:</span> ${fatherEdu}</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <p class="font-bold text-slate-800 border-b border-slate-200 pb-1">11. Data Ibu</p>
+                <p><span class="text-slate-500">a. Nama Ibu:</span> <strong>${motherName}</strong></p>
+                <p><span class="text-slate-500">b. Pekerjaan Ibu:</span> ${motherJob}</p>
+                <p><span class="text-slate-500">c. Pendidikan Ibu:</span> ${motherEdu}</p>
+              </div>
+            </div>
+            ${metaObj.guardian_name ? `
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                <span class="font-bold text-slate-700">12. Data Wali:</span> ${metaObj.guardian_name} &bull; Pekerjaan: ${metaObj.guardian_job || '-'} &bull; Pendidikan: ${metaObj.guardian_education || '-'} &bull; Hubungan: ${metaObj.guardian_relation || '-'}
+              </div>` : ''}
+          </div>`;
+      }
+
+      container.innerHTML = `
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/40 overflow-hidden">
+          <div class="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nomor Registrasi</span>
+              <h2 class="font-mono text-2xl font-extrabold text-slate-900 mt-0.5">${r.registration_number}</h2>
+            </div>
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold ${st.badge}">
+              <i data-lucide="${st.icon}" class="w-4 h-4"></i> ${st.label}
+            </span>
           </div>
-          <div class="no-print" style="text-align: center; margin-top: 30px;">
-            <button onclick="window.print()" style="padding: 10px 24px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Cetak Sekarang</button>
+
+          <div class="p-6 sm:p-8">
+            <p class="text-sm text-slate-600 leading-relaxed mb-6">${st.desc}</p>
+
+            ${officialAccountBox}
+
+            ${formattedSheetHtml}
           </div>
-          <script>window.onload = function() { window.print(); };<\/script>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
+        </div>`;
+      lucide.createIcons();
     }
 
-    document.getElementById('check-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const reg = document.getElementById('reg-number').value.trim();
-      checkStatus(reg);
-    });
+    function printOfficialLetter() {
+      if (!currentRegistrationRecord) return;
+      const r = currentRegistrationRecord;
+      const metaObj = parseRegistrationMeta(r);
+      const isPaud = r.level === 'KB Ulinnuha (PAUD)' || metaObj.form_type === 'paud';
+      const photoUrl = r.photo_url || metaObj.photo_url || '';
+      const academicYear = metaObj.academic_year || '2026/2027';
+      const assignedNis = r.converted_nis || metaObj.converted_nis || 'Diisi Admin Yayasan';
+      const assignedClass = r.class_name || metaObj.class_name || r.level || '-';
+      const assignedEntryDate = metaObj.entry_date || r.entry_date || '-';
+      const assignedPassword = metaObj.portal_password || r.portal_password || '-';
 
-    // Auto-check if URL has query parameter `?reg=...`
-    const urlParams = new URLSearchParams(window.location.search);
-    const regParam = urlParams.get('reg');
-    if (regParam) {
-      document.getElementById('reg-number').value = regParam;
-      checkStatus(regParam);
+      const fatherName = metaObj.father_name || r.parent_name || '-';
+      const fatherJob = metaObj.father_job || r.parent_occupation || '-';
+      const fatherEdu = metaObj.father_education || '-';
+      const motherName = metaObj.mother_name || '-';
+      const motherJob = metaObj.mother_job || '-';
+      const motherEdu = metaObj.mother_education || '-';
+
+      const printWin = window.open('', '_blank', 'width=850,height=950');
+      if (!printWin) {
+        alert('Mohon izinkan pop-up browser untuk mencetak lembar bukti pendaftaran.');
+        return;
+      }
+
+      const photoHtml = photoUrl
+        ? `<img src="${photoUrl}" alt="Pasfoto" style="width:95px;height:125px;object-fit:cover;border:2px solid #334155;border-radius:8px;" />`
+        : `<div style="width:95px;height:125px;border:1px dashed #64748b;display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b;text-align:center;">Pasfoto<br/>3x4</div>`;
+
+      const rowsHtml = isPaud ? `
+        <tr><td class="lbl">Tahun Pelajaran</td><td><strong>${academicYear}</strong></td></tr>
+        <tr><td class="lbl">Nomor Induk / Kelompok</td><td><strong>${assignedNis}</strong> / <strong>${assignedClass}</strong></td></tr>
+        <tr><td class="lbl">1.a. Nama Lengkap Anak</td><td><strong>${r.student_name || '-'}</strong></td></tr>
+        <tr><td class="lbl">1.b. Nama Panggilan</td><td>${r.nickname || metaObj.nickname || '-'}</td></tr>
+        <tr><td class="lbl">2. Jenis Kelamin</td><td>${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</td></tr>
+        <tr><td class="lbl">3. Tempat, Tanggal Lahir</td><td>${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</td></tr>
+        <tr><td class="lbl">4. Alamat Rumah</td><td>${r.address || '-'}</td></tr>
+        <tr><td class="lbl">5. Agama &amp; 6. Kewarganegaraan</td><td>${metaObj.religion || 'Islam'} / ${metaObj.citizenship || 'WNI'}</td></tr>
+        <tr><td class="lbl">7. Anak ke &amp; 8. Jml Saudara</td><td>Anak ke-${r.child_order || metaObj.child_order || '-'} (Kandung: ${r.siblings_count ?? metaObj.siblings_count ?? '-'}, Tiri: ${metaObj.siblings_step || '0'}, Angkat: ${metaObj.siblings_adopted || '0'})</td></tr>
+        <tr><td class="lbl">9. Status Anak &amp; 10. Bahasa</td><td>${metaObj.child_status || '-'} / ${metaObj.daily_language || '-'}</td></tr>
+        <tr><td class="lbl">11. Ciri-ciri Khusus</td><td>${metaObj.special_traits || '-'}</td></tr>
+        <tr><td class="lbl">B.1. Ayah (${metaObj.father_relation || 'Ayah Kandung'})</td><td><strong>${fatherName}</strong> | TTL: ${metaObj.father_ttl || '-'} | Pend: ${fatherEdu} | Pek: ${fatherJob} | Telp: ${metaObj.father_phone_home || r.parent_phone || '-'}</td></tr>
+        <tr><td class="lbl">B.2. Ibu (${metaObj.mother_relation || 'Ibu Kandung'})</td><td><strong>${motherName}</strong> | TTL: ${metaObj.mother_ttl || '-'} | Pend: ${motherEdu} | Pek: ${motherJob} | Telp: ${metaObj.mother_phone_home || '-'}</td></tr>
+        <tr><td class="lbl">D. Jarak &amp; Transportasi</td><td>${metaObj.distance_km ? metaObj.distance_km + ' KM' : '-'} / ${metaObj.transport_mode || '-'}</td></tr>
+      ` : `
+        <tr><td class="lbl">Jenjang Program / Thn Pelajaran</td><td><strong>${r.level || '-'} (${academicYear})</strong></td></tr>
+        <tr><td class="lbl">13. Pendaftaran (Tgl Masuk &amp; NIS Lokal)</td><td>Tgl Masuk: <strong>${assignedEntryDate}</strong> | NIS Lokal: <strong>${assignedNis}</strong></td></tr>
+        <tr><td class="lbl">1. Nama Lengkap Santri</td><td><strong>${r.student_name || '-'}</strong></td></tr>
+        <tr><td class="lbl">2. Nama Panggilan</td><td>${r.nickname || metaObj.nickname || '-'}</td></tr>
+        <tr><td class="lbl">3. Jenis Kelamin</td><td>${r.gender === 'P' ? 'Perempuan' : 'Laki-laki'}</td></tr>
+        <tr><td class="lbl">4. Tempat / Tanggal Lahir</td><td>${r.birth_place || metaObj.birth_place || '-'}, ${r.birth_date || '-'}</td></tr>
+        <tr><td class="lbl">5. Anak ke &amp; 6. Jumlah Saudara</td><td>Anak ke-${r.child_order || metaObj.child_order || '-'} dari ${r.siblings_count ?? metaObj.siblings_count ?? '-'} bersaudara</td></tr>
+        <tr><td class="lbl">7. Nomor NIK Santri</td><td>${r.nik || metaObj.nik || '-'}</td></tr>
+        <tr><td class="lbl">8. Alamat Rumah</td><td>${r.address || '-'}</td></tr>
+        <tr><td class="lbl">9. Kontak Telpon (1)</td><td>${r.parent_phone || '-'}</td></tr>
+        <tr><td class="lbl">10. Data Ayah</td><td><strong>${fatherName}</strong> | Pekerjaan: ${fatherJob} | Pendidikan: ${fatherEdu}</td></tr>
+        <tr><td class="lbl">11. Data Ibu</td><td><strong>${motherName}</strong> | Pekerjaan: ${motherJob} | Pendidikan: ${motherEdu}</td></tr>
+      `;
+
+      printWin.document.write(`<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lembar Data PPDB - ${r.registration_number}</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #0f172a; margin: 24px 36px; line-height: 1.45; }
+    .kop { border-bottom: 3px double #0f172a; padding-bottom: 10px; margin-bottom: 16px; text-align: center; }
+    .kop h1 { font-size: 16px; margin: 0; text-transform: uppercase; }
+    .kop h2 { font-size: 13px; margin: 3px 0; color: #0369a1; }
+    .kop p { font-size: 11px; margin: 2px 0; color: #475569; }
+    .top-bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 12px; }
+    td { padding: 6px 9px; border: 1px solid #cbd5e1; vertical-align: top; }
+    td.lbl { width: 34%; font-weight: bold; background: #f8fafc; color: #334155; }
+    .sign { margin-top: 24px; display: flex; justify-content: space-between; font-size: 12px; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom:14px;text-align:right;">
+    <button onclick="window.print()" style="padding:8px 16px;background:#0284c7;color:#fff;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">Cetak / Simpan PDF</button>
+  </div>
+  <div class="kop">
+    <h1>YAYASAN AT TARBIYYAH WIJAYA KUSUMA</h1>
+    <h2>TPQ ULINNUHA &bull; TAHFIDZ AL-QUR'AN &bull; KB ULINNUHA (PAUD) &bull; PKBM</h2>
+    <p>Jl. Wijaya Kusuma, Kota Samarinda, Kalimantan Timur | NPSN KB: 69840840 | No. Induk TPQ: 05.01.01.001</p>
+  </div>
+  <div class="top-bar">
+    <div>
+      <h3 style="margin:0 0 4px;font-size:14px;text-transform:uppercase;">${isPaud ? 'LEMBAR DATA BUKU INDUK ANAK DIDIK PAUD' : 'LEMBAR DATA PENDAFTARAN SANTRI TPQ'}</h3>
+      <p style="margin:2px 0;font-size:12px;">No. Registrasi: <strong>${r.registration_number}</strong></p>
+      <p style="margin:2px 0;font-size:12px;">Status Pendaftaran: <strong>${r.status === 'converted' || r.status === 'accepted' ? 'DITERIMA / TERDAFTAR RESMI' : 'MENUNGGU VERIFIKASI ADMIN'}</strong></p>
+      ${(r.status === 'converted' || r.status === 'accepted') ? `<p style="margin:2px 0;font-size:12px;">Sandi Portal Siswa: <strong>${assignedPassword}</strong></p>` : ''}
+    </div>
+    ${photoHtml}
+  </div>
+  <table>
+    ${rowsHtml}
+  </table>
+  <div class="sign">
+    <div>
+      <p>Orang Tua / Wali Pendaftar,</p>
+      <br/><br/>
+      <p><strong>(${fatherName !== '-' ? fatherName : motherName})</strong></p>
+    </div>
+    <div style="text-align:center;">
+      <p>Samarinda, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+      <p>Panitia PPDB / Admin Yayasan,</p>
+      <br/><br/>
+      <p><strong>( Bagian Administrasi / TU )</strong></p>
+    </div>
+  </div>
+</body>
+</html>`);
+      printWin.document.close();
     }
   </script>
 </body>
