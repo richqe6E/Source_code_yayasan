@@ -129,7 +129,17 @@
         console.warn('API error:', err);
       }
 
-      if (!n) {
+      if (!n || (!n.title && !n.id)) {
+        article.innerHTML = `
+          <div class="py-16 px-6 text-center bg-white border border-slate-200/90 rounded-2xl shadow-sm">
+            <h1 class="text-xl font-bold text-slate-800 mb-2">Berita Tidak Ditemukan</h1>
+            <p class="text-sm text-slate-500 mb-6">Artikel berita yang Anda cari tidak tersedia atau telah ditarik dari publikasi.</p>
+            <a href="../berita.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 text-white text-xs font-semibold hover:bg-primary-700 transition">Kembali ke Daftar Berita</a>
+          </div>
+        `;
+        return;
+      }
+      if (false) {
         n = {
           title: 'Keseruan Belajar Berbagi pada Peringatan Bulan Ramadhan 1447 H',
           author_name: 'Humas Yayasan',

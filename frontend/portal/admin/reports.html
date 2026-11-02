@@ -165,7 +165,7 @@
       <div class="bg-white border border-gray-200 rounded-lg p-5 flex flex-col justify-between space-y-3">
         <div>
           <h2 class="text-sm font-semibold text-gray-900 mb-1">Pendaftaran PPDB Baru</h2>
-          <p class="text-xs text-gray-500">Rekap data pendaftar baru PAUD, TK, TPQ per tahun ajaran.</p>
+          <p class="text-xs text-gray-500">Rekap data pendaftar baru TPQ Ulinnuha &amp; KB Ulinnuha (PAUD) per tahun ajaran.</p>
         </div>
         <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
           <input type="text" id="rep-ppdb-year" placeholder="2026/2027" class="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs min-w-0 flex-1 focus:ring-1 focus:ring-primary-500">
@@ -224,7 +224,7 @@
           </div>
           <div class="flex-1 text-center font-serif text-black leading-tight">
             <div class="text-base sm:text-lg font-bold tracking-wider uppercase" id="print-school-name">YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA</div>
-            <div class="text-xs sm:text-sm font-bold tracking-wide uppercase mt-0.5">PENDIDIKAN ANAK USIA DINI (PAUD) &amp; TK TERPADU - TPQ ULINNUHA</div>
+            <div class="text-xs sm:text-sm font-bold tracking-wide uppercase mt-0.5">TPQ ULINNUHA (TPQ PAGI &amp; TAHFIDZ) - KB ULINNUHA (PAUD)</div>
             <div class="text-[10px] sm:text-[11px] text-gray-800 mt-1" id="print-school-address">Alamat: Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124</div>
             <div class="text-[10px] text-gray-700 mt-0.5" id="print-school-contact">Telepon / WhatsApp: 081347142829 | Email: info@yayasan.sch.id</div>
           </div>
@@ -461,7 +461,7 @@
       }
 
       const schoolName = (school?.school_name || school?.name || 'YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA').toUpperCase();
-      const schoolUnits = 'PENDIDIKAN ANAK USIA DINI (PAUD) & TK TERPADU - TPQ ULINNUHA';
+      const schoolUnits = 'TPQ ULINNUHA (TPQ PAGI & TAHFIDZ) - KB ULINNUHA (PAUD)';
       const schoolAddress = school?.address || 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124';
       const schoolPhone = school?.phone || '081347142829';
       const schoolWa = school?.whatsapp || school?.whatsapp_number || '081347142829';

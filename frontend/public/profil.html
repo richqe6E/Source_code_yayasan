@@ -83,6 +83,19 @@
         const raw = localStorage.getItem('siy_school_ext');
         if (!raw) return;
         const d = JSON.parse(raw);
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function() {
+            try {
+              if (d.sejarah) {
+                const el = document.getElementById('profil-sejarah');
+                if (el) {
+                  const paras = d.sejarah.split('\n\n').filter(Boolean);
+                  el.innerHTML = paras.map(p => '<p class="text-justify [text-align-last:left]">' + p.replace(/\n/g, '<br>') + '</p>').join('');
+                }
+              }
+            } catch (_) {}
+          });
+        }
         if (d.sejarah) {
           const el = document.getElementById('profil-sejarah');
           if (el) {
@@ -90,11 +103,11 @@
             el.innerHTML = paras.map(p => '<p class="text-justify [text-align-last:left]">' + p.replace(/\n/g, '<br>') + '</p>').join('');
           }
         }
-        if (d.visi && d.visi.includes('9 Tahun')) {
+        if (d.visi && !String(d.visi).includes('Menjadi lembaga pendidikan anak usia dini')) {
           const el = document.getElementById('profil-visi');
           if (el) el.textContent = d.visi;
         }
-        if (false && d.misi) {
+        if (d.misi && !String(d.misi).includes('Menyelenggarakan pendidikan yang holistik')) {
           const el = document.getElementById('profil-misi');
           if (el) {
             let items = Array.isArray(d.misi) ? d.misi : (typeof d.misi === 'string' ? d.misi.split('\n').map(s=>s.trim()).filter(Boolean) : []);
@@ -501,11 +514,11 @@
               el.innerHTML = paras.map(p => `<p class="text-justify [text-align-last:left]">${p.replace(/\n/g, '<br>')}</p>`).join('');
             }
           }
-          if (d.visi && d.visi.includes('9 Tahun')) {
+          if (d.visi && !String(d.visi).includes('Menjadi lembaga pendidikan anak usia dini')) {
             const el = document.getElementById('profil-visi');
             if (el) el.textContent = d.visi;
           }
-          if (false && d.misi) {
+          if (d.misi && !String(d.misi).includes('Menyelenggarakan pendidikan yang holistik')) {
             const el = document.getElementById('profil-misi');
             if (el) {
               let items = [];
@@ -525,7 +538,7 @@
             const el = document.getElementById('profil-budaya');
             if (el) el.textContent = d.budaya;
           }
-          if (false && d.program_pendidikan) {
+          if (d.program_pendidikan && !String(d.program_pendidikan.paud || '').includes('Usia 2-4 tahun')) {
             if (typeof d.program_pendidikan === 'object') {
               const paudTkEl = document.getElementById('profil-program-paud-tk');
               if (paudTkEl) {
@@ -541,7 +554,7 @@
               if (el) el.textContent = d.program_pendidikan;
             }
           }
-          if (false && d.kurikulum) {
+          if (d.kurikulum && !String(d.kurikulum).includes('Kurikulum Merdeka Ramah Anak')) {
             const el = document.getElementById('profil-kurikulum');
             if (el) el.textContent = d.kurikulum;
           }

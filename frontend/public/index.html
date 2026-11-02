@@ -703,11 +703,11 @@
           const res = await window.apiCall('schools', 'get');
           if (res && res.success && res.data) {
             const d = res.data;
-            if (d.visi && d.visi.includes('9 Tahun')) {
+            if (d.visi && !String(d.visi).includes('Menjadi lembaga pendidikan anak usia dini')) {
               const el = document.getElementById('home-visi');
               if (el) el.textContent = d.visi;
             }
-            if (false && d.misi) {
+            if (d.misi && !String(d.misi).includes('Menyelenggarakan pendidikan yang holistik')) {
               const listEl = document.getElementById('home-misi-list');
               if (listEl) {
                 let items = [];
@@ -723,7 +723,7 @@
                 }
               }
             }
-            if (false && d.program_pendidikan) {
+            if (d.program_pendidikan && !String(d.program_pendidikan.paud || '').includes('Usia 2-4 tahun')) {
               if (typeof d.program_pendidikan === 'object') {
                 if (d.program_pendidikan.paud) {
                   const el = document.getElementById('home-program-paud');
@@ -742,7 +742,7 @@
                 if (progEl) progEl.textContent = d.program_pendidikan;
               }
             }
-            if (false && d.kurikulum) {
+            if (d.kurikulum && !String(d.kurikulum).includes('Kurikulum Merdeka Ramah Anak')) {
               const kurEl = document.getElementById('home-kurikulum');
               if (kurEl) kurEl.textContent = d.kurikulum;
             }
@@ -752,6 +752,12 @@
         }
       }
 
+      document.querySelectorAll('a[href="ppdb.html#formulir-pendaftaran"]').forEach(a => {
+        const txt = (a.textContent || '').toLowerCase();
+        if (txt.includes('tpq pagi')) a.setAttribute('href', 'ppdb.html?jenjang=tpq_pagi#formulir-pendaftaran');
+        else if (txt.includes('tahfidz')) a.setAttribute('href', 'ppdb.html?jenjang=tahfidz#formulir-pendaftaran');
+        else if (txt.includes('paud') || txt.includes('kb ulinnuha')) a.setAttribute('href', 'ppdb.html?jenjang=paud#formulir-pendaftaran');
+      });
       loadInstitutionalProfile();
       syncPpdbStatus();
     });

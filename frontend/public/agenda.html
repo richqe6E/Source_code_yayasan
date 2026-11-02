@@ -122,7 +122,7 @@
       let items = [];
       try {
         if (typeof apiCall === 'function') {
-          const res = await apiCall('events', 'list', { per_page: 30 });
+          const res = await apiCall('events', 'list', { per_page: 30, status: 'published', is_published: 'true' });
           if (res && res.success) {
             items = Array.isArray(res.data) ? res.data : ((res.data && res.data.items) || res.items || []);
           }
@@ -194,7 +194,32 @@
         `;
       }).join('');
 
-      injectEventSchema(items);
+      if (typeof injectEventSchema === 'function') injectEventSchema(items);
+
+    function injectEventSchema(items) {
+      try {
+        if (!Array.isArray(items) || items.length === 0) return;
+        let scriptEl = document.getElementById('jsonld-events');
+        if (!scriptEl) {
+          scriptEl = document.createElement('script');
+          scriptEl.id = 'jsonld-events';
+          scriptEl.type = 'application/ld+json';
+          document.head.appendChild(scriptEl);
+        }
+        const graph = items.slice(0, 10).map(ev => ({
+          '@context': 'https://schema.org',
+          '@type': 'Event',
+          name: ev.title || 'Agenda Yayasan',
+          startDate: ev.event_date || ev.date || new Date().toISOString().slice(0, 10),
+          location: {
+            '@type': 'Place',
+            name: ev.location || 'Kampus Yayasan At Tarbiyyah Wijaya Kusuma Samarinda'
+          },
+          description: ev.description || ev.content || ''
+        }));
+        scriptEl.textContent = JSON.stringify(graph);
+      } catch (_) {}
+    }
     }
 
     loadEvents();

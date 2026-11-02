@@ -118,7 +118,7 @@
       let items = [];
       try {
         if (typeof apiCall === 'function') {
-          const res = await apiCall('announcements', 'list', { per_page: 30 });
+          const res = await apiCall('announcements', 'list', { per_page: 30, status: 'published', is_published: 'true' });
           if (res && res.success) {
             items = Array.isArray(res.data) ? res.data : ((res.data && res.data.items) || res.items || []);
           }

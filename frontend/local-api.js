@@ -728,7 +728,11 @@ function handleApiRequest(apiPath, params, method) {
         const e = params.email || params.parent_email;
         reg.email = e; reg.parent_email = e;
       }
-      if (params.level !== undefined) { reg.level = params.level; reg.form_type = params.level === 'TPQ' ? 'tpq' : 'paud'; }
+      if (params.level !== undefined) {
+        reg.level = params.level;
+        const lvLower = String(params.level).toLowerCase();
+        reg.form_type = (lvLower.includes('paud') || lvLower.includes('kb') || lvLower.includes('tk')) ? 'paud' : (lvLower.includes('tahfidz') ? 'tahfidz' : 'tpq');
+      }
       if (params.notes !== undefined) reg.notes = params.notes;
       reg.updated_at = new Date().toISOString();
 
@@ -946,7 +950,20 @@ function handleApiRequest(apiPath, params, method) {
         const found = DB.students.find(s => (s.parent_email && s.parent_email.toLowerCase() === emailLower) || (s.email && s.email.toLowerCase() === emailLower));
         if (found) return found;
       }
-      return DB.students[0];
+      // Cek di DB.ppdb_registrations untuk akun calon_siswa (REG-...) agar tidak bocor ke STU-001 (CRIT-05)
+      if (DB.ppdb_registrations) {
+        const regLookupId = String(studentId || params._user_id || '').replace(/^USR-/, '');
+        if (regLookupId) {
+          const foundReg = DB.ppdb_registrations.find(r => r.id === regLookupId || r.registration_number === regLookupId || r.registration_no === regLookupId || r.student_id === regLookupId);
+          if (foundReg) return foundReg;
+        }
+        if (params._user_email) {
+          const emLower = params._user_email.toLowerCase();
+          const foundRegByEmail = DB.ppdb_registrations.find(r => (r.parent_email && r.parent_email.toLowerCase() === emLower) || (r.email && r.email.toLowerCase() === emLower) || (`${(r.registration_number || '').toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id` === emLower));
+          if (foundRegByEmail) return foundRegByEmail;
+        }
+      }
+      return null;
     };
 
     const targetStudent = findStudent();

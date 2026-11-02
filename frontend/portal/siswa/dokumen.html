@@ -192,7 +192,7 @@
 
     async function initPage() {
       const user = getCurrentUser() || {};
-      const isSiswaAktif = (user.role && user.role.code === 'siswa_aktif') || user.role === 'siswa_aktif';
+      const isSiswaAktif = (user.role && (user.role.code === 'siswa_aktif' || user.role.code === 'siswa')) || user.role === 'siswa_aktif' || user.role === 'siswa';
 
       const studentMenu = isSiswaAktif ? [
         { href: 'dashboard.html', label: 'Dashboard' },

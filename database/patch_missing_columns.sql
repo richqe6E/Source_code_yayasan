@@ -25,6 +25,9 @@ ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS converted_nis VARCHAR(50
 ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS nis VARCHAR(50);
 ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS class_name VARCHAR(100);
 ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS password VARCHAR(255);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS portal_password VARCHAR(255);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS student_id VARCHAR(50);
+ALTER TABLE ppdb_registrations ADD COLUMN IF NOT EXISTS entry_date DATE;
 
 -- 2. News (Berita)
 ALTER TABLE news ADD COLUMN IF NOT EXISTS author VARCHAR(150) DEFAULT 'Admin Sekolah';
@@ -105,6 +108,8 @@ ALTER TABLE students ADD COLUMN IF NOT EXISTS program VARCHAR(100);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS level VARCHAR(100);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS registration_number VARCHAR(100);
 ALTER TABLE students ADD COLUMN IF NOT EXISTS reg_number VARCHAR(100);
+ALTER TABLE students ADD COLUMN IF NOT EXISTS form_metadata JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS notes TEXT;
 
 -- 8B. Kolom Otentikasi & Sesi Users V2
 ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100);

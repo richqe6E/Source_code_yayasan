@@ -104,7 +104,7 @@
         const errMessage = (data && (data.message || data.error || data.msg)) || `Error ${res.status}`;
         // Self-healing: if PostgREST rejects an unknown column in POST/PATCH/PUT object payload, strip it and retry
         if (
-          _retryCount < 8 &&
+          _retryCount < 25 &&
           body &&
           typeof body === 'object' &&
           !Array.isArray(body) &&
@@ -271,7 +271,7 @@
                     const r = regRows[0];
                     const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
                     const bDate = String(r.birth_date || r.student_birth_date || '').trim();
-                    const customPass = String(meta.password || meta.account_password || '').trim();
+                    const customPass = String(r.portal_password || meta.portal_password || meta.password || meta.account_password || r.password || '').trim();
                     const regNoStr = r.registration_number || r.registration_no || rawIdentifier.toUpperCase();
                     const isConverted = String(r.status || '').toLowerCase() === 'converted';
                     matchedUser = {
@@ -435,6 +435,22 @@
           if (matchedUser.password_hash !== password) {
             // Check if initial login with birthdate or fallback
             let passedBirthdate = false;
+            if (!matchedUser.birth_date && !studentRecord) {
+              try {
+                if (matchedUser.student_id) {
+                  const sRows = await supabaseRest(`students?id=eq.${encodeURIComponent(matchedUser.student_id)}&select=birth_date`).catch(() => []);
+                  if (sRows && sRows[0] && sRows[0].birth_date) matchedUser.birth_date = sRows[0].birth_date;
+                }
+                if (!matchedUser.birth_date && matchedUser.nis) {
+                  const sRows = await supabaseRest(`students?nis=eq.${encodeURIComponent(matchedUser.nis)}&select=birth_date`).catch(() => []);
+                  if (sRows && sRows[0] && sRows[0].birth_date) matchedUser.birth_date = sRows[0].birth_date;
+                }
+                if (!matchedUser.birth_date && matchedUser.username && String(matchedUser.username).toUpperCase().startsWith('REG')) {
+                  const rRows = await supabaseRest(`ppdb_registrations?registration_number=eq.${encodeURIComponent(matchedUser.username)}&select=birth_date,student_birth_date`).catch(() => []);
+                  if (rRows && rRows[0]) matchedUser.birth_date = rRows[0].birth_date || rRows[0].student_birth_date || '';
+                }
+              } catch (_) {}
+            }
             const bDate = String(matchedUser.birth_date || (studentRecord && studentRecord.birth_date) || '').trim();
             const fallbackDob = String(matchedUser.fallback_dob_password || '').trim();
             if (fallbackDob && password === fallbackDob) {
@@ -517,6 +533,8 @@
             phone: phone,
             role: 'calon_siswa',
             role_label: 'Calon Siswa / Pendaftar',
+            birth_date: typeof birthDate !== 'undefined' ? birthDate : (params.birth_date || ''),
+            fallback_dob_password: password,
             status: 'active',
             student_id: studentId,
             is_password_changed: true,
@@ -559,7 +577,7 @@
           const token = 'siy_' + userId + '_' + Date.now();
 
           // Auto-persist active session
-          localStorage.setItem('siy_token', token);
+          if (!['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '')) localStorage.setItem('siy_token', token);
           localStorage.setItem('siy_user', JSON.stringify(userPayload));
 
           return {
@@ -860,7 +878,46 @@
 
         if (action === 'get_profile') {
           let student = await resolveCurrentStudentRecord();
-          if (student && !student.registration_number && currentUser) {
+          if (currentUser) {
+            if (!student) student = {};
+            const regNoHint = student.registration_number || student.reg_number || (currentUser.username && String(currentUser.username).startsWith('REG') ? currentUser.username : '');
+            const nameHint = student.full_name || currentUser.full_name || currentUser.name || '';
+            if (regNoHint || nameHint) {
+              try {
+                let regs = [];
+                if (regNoHint) {
+                  regs = await supabaseRest(`ppdb_registrations?or=(registration_number.eq.${encodeURIComponent(regNoHint)},registration_no.eq.${encodeURIComponent(regNoHint)})&select=*`).catch(() => []);
+                }
+                if ((!regs || regs.length === 0) && nameHint) {
+                  regs = await supabaseRest(`ppdb_registrations?full_name=eq.${encodeURIComponent(nameHint)}&select=*`).catch(() => []);
+                }
+                if (regs && regs[0]) {
+                  const r = regs[0];
+                  student.id = student.id || r.student_id || (r.form_metadata && r.form_metadata.student_id) || r.id;
+                  student.full_name = student.full_name || r.full_name || r.student_name || r.child_name || '';
+                  student.name = student.name || student.full_name;
+                  student.nik = student.nik || r.nik || (r.form_metadata && r.form_metadata.nik) || '';
+                  student.level = student.level || r.level || (r.form_metadata && r.form_metadata.program_level) || '';
+                  student.form_type = student.form_type || r.form_type || '';
+                  student.notes = student.notes || r.notes || '';
+                  student.form_metadata = (student.form_metadata && Object.keys(student.form_metadata).length > 0) ? student.form_metadata : (r.form_metadata || null);
+                  if (!student.nickname && r.nickname) student.nickname = r.nickname;
+                  if (!student.gender && (r.gender || r.student_gender)) student.gender = r.gender || r.student_gender;
+                  if (!student.birth_place && (r.birth_place || r.student_birth_place)) student.birth_place = r.birth_place || r.student_birth_place;
+                  if (!student.birth_date && (r.birth_date || r.student_birth_date)) student.birth_date = r.birth_date || r.student_birth_date;
+                  if (!student.address && r.address) student.address = r.address;
+                  if (!student.father_name && r.father_name) student.father_name = r.father_name;
+                  if (!student.mother_name && r.mother_name) student.mother_name = r.mother_name;
+                  if (!student.parent_phone && (r.parent_phone || r.phone)) student.parent_phone = r.parent_phone || r.phone;
+                  if (!student.parent_email && r.parent_email) student.parent_email = r.parent_email;
+                  student.registration_number = student.registration_number || r.registration_number || r.registration_no;
+                  student.status_pendaftaran = r.status || student.status_pendaftaran;
+                  if (!student.photo_url && r.photo_url) student.photo_url = r.photo_url;
+                }
+              } catch (_) {}
+            }
+          }
+          if (false && student && !student.registration_number && currentUser) {
             try {
               const regQuery = currentUser.username && String(currentUser.username).startsWith('REG')
                 ? `ppdb_registrations?registration_number=eq.${encodeURIComponent(currentUser.username)}&select=*`
@@ -897,6 +954,101 @@
 
           const payload = { ...params };
           delete payload.student_id;
+          // Normalisasi alias field form biodata -> struktur form_metadata PPDB
+          if (payload.daily_language !== undefined && payload.language === undefined) payload.language = payload.daily_language;
+          if (payload.special_traits !== undefined && payload.special_notes === undefined) payload.special_notes = payload.special_traits;
+          if (payload.distance_km !== undefined && payload.distance === undefined) payload.distance = payload.distance_km;
+          if (payload.transport_mode !== undefined && payload.transportation === undefined) payload.transportation = payload.transport_mode;
+          if (payload.father_phone === undefined && payload.parent_phone !== undefined) payload.father_phone = payload.parent_phone;
+          if (payload.father_phone_office !== undefined && payload.father_office === undefined) payload.father_office = payload.father_phone_office;
+          const flatMetaExtras = {};
+          ['daily_language', 'special_traits', 'distance_km', 'transport_mode', 'phone_2', 'father_phone_office',
+           'father_education', 'father_ttl', 'mother_education', 'mother_ttl', 'mother_phone',
+           'guardian_name', 'guardian_relation', 'guardian_job', 'guardian_phone', 'father_job', 'mother_job'].forEach(k => {
+            if (payload[k] !== undefined) flatMetaExtras[k] = payload[k];
+          });
+          const validStuCols = [
+            'nis', 'nisn', 'full_name', 'name', 'child_name', 'nickname', 'nik',
+            'gender', 'birth_place', 'birth_date', 'class_id', 'class_name',
+            'kelas_sekarang', 'semester_sekarang', 'status_kenaikan', 'status_kelulusan',
+            'status_pendaftaran', 'parent_id', 'parent_name', 'father_name', 'mother_name',
+            'parent_email', 'parent_phone', 'phone', 'father_phone', 'mother_phone',
+            'father_occupation', 'mother_occupation', 'previous_school', 'blood_type',
+            'hobbies', 'joined_at', 'address', 'religion', 'entry_year', 'photo_url',
+            'program', 'level', 'registration_number', 'reg_number', 'status', 'is_active',
+            'form_metadata', 'notes'
+          ];
+          const prevMeta = (stuRecord && stuRecord.form_metadata && typeof stuRecord.form_metadata === 'object') ? stuRecord.form_metadata : {};
+          const mergedMeta = {
+            ...prevMeta,
+            nik: payload.nik !== undefined ? payload.nik : prevMeta.nik,
+            nickname: payload.nickname !== undefined ? payload.nickname : prevMeta.nickname,
+            child_order: payload.child_order !== undefined ? payload.child_order : prevMeta.child_order,
+            siblings_count: payload.siblings_count !== undefined ? payload.siblings_count : prevMeta.siblings_count,
+            siblings_step: payload.siblings_step !== undefined ? payload.siblings_step : prevMeta.siblings_step,
+            siblings_adopted: payload.siblings_adopted !== undefined ? payload.siblings_adopted : prevMeta.siblings_adopted,
+            child_status: payload.child_status !== undefined ? payload.child_status : prevMeta.child_status,
+            religion: payload.religion !== undefined ? payload.religion : prevMeta.religion,
+            citizenship: payload.citizenship !== undefined ? payload.citizenship : prevMeta.citizenship,
+            language: payload.language !== undefined ? payload.language : prevMeta.language,
+            special_notes: payload.special_notes !== undefined ? payload.special_notes : prevMeta.special_notes,
+            mutasi: {
+              ...(prevMeta.mutasi || {}),
+              ...(payload.entry_date !== undefined ? { entry_date: payload.entry_date } : {}),
+              ...(payload.group_name !== undefined ? { group_name: payload.group_name } : {}),
+              ...(payload.previous_school !== undefined ? { previous_school: payload.previous_school } : {})
+            },
+            full_address: {
+              ...(prevMeta.full_address || {}),
+              ...(payload.address !== undefined ? { address: payload.address } : {}),
+              ...(payload.distance !== undefined ? { distance: payload.distance } : {}),
+              ...(payload.transportation !== undefined ? { transportation: payload.transportation } : {})
+            },
+            father: {
+              ...(prevMeta.father || {}),
+              ...(payload.father_name !== undefined ? { name: payload.father_name } : {}),
+              ...(payload.father_status !== undefined ? { status: payload.father_status } : {}),
+              ...(payload.father_ttl !== undefined ? { ttl: payload.father_ttl } : {}),
+              ...(payload.father_religion !== undefined ? { religion: payload.father_religion } : {}),
+              ...(payload.father_citizenship !== undefined ? { citizenship: payload.father_citizenship } : {}),
+              ...(payload.father_education !== undefined ? { education: payload.father_education } : {}),
+              ...(payload.father_job !== undefined ? { job: payload.father_job } : {}),
+              ...(payload.father_phone !== undefined ? { phone: payload.father_phone } : {}),
+              ...(payload.father_office !== undefined ? { office_address: payload.father_office } : {})
+            },
+            mother: {
+              ...(prevMeta.mother || {}),
+              ...(payload.mother_name !== undefined ? { name: payload.mother_name } : {}),
+              ...(payload.mother_status !== undefined ? { status: payload.mother_status } : {}),
+              ...(payload.mother_ttl !== undefined ? { ttl: payload.mother_ttl } : {}),
+              ...(payload.mother_religion !== undefined ? { religion: payload.mother_religion } : {}),
+              ...(payload.mother_citizenship !== undefined ? { citizenship: payload.mother_citizenship } : {}),
+              ...(payload.mother_education !== undefined ? { education: payload.mother_education } : {}),
+              ...(payload.mother_job !== undefined ? { job: payload.mother_job } : {}),
+              ...(payload.mother_phone !== undefined ? { phone: payload.mother_phone } : {}),
+              ...(payload.mother_office !== undefined ? { office_address: payload.mother_office } : {})
+            },
+            guardian: {
+              ...(prevMeta.guardian || {}),
+              ...(payload.guardian_name !== undefined ? { name: payload.guardian_name } : {}),
+              ...(payload.guardian_relation !== undefined ? { relation: payload.guardian_relation } : {}),
+              ...(payload.guardian_ttl !== undefined ? { ttl: payload.guardian_ttl } : {}),
+              ...(payload.guardian_religion !== undefined ? { religion: payload.guardian_religion } : {}),
+              ...(payload.guardian_citizenship !== undefined ? { citizenship: payload.guardian_citizenship } : {}),
+              ...(payload.guardian_education !== undefined ? { education: payload.guardian_education } : {}),
+              ...(payload.guardian_job !== undefined ? { job: payload.guardian_job } : {}),
+              ...(payload.guardian_phone !== undefined ? { phone: payload.guardian_phone } : {}),
+              ...(payload.guardian_office !== undefined ? { office_address: payload.guardian_office } : {})
+            }
+          };
+          if (payload.father_job !== undefined && payload.father_occupation === undefined) payload.father_occupation = payload.father_job;
+          if (payload.mother_job !== undefined && payload.mother_occupation === undefined) payload.mother_occupation = payload.mother_job;
+          if (payload.entry_date !== undefined && payload.joined_at === undefined && payload.entry_date) payload.joined_at = payload.entry_date;
+          payload.form_metadata = { ...mergedMeta, ...flatMetaExtras };
+          Object.assign(mergedMeta, flatMetaExtras);
+          for (const k of Object.keys(payload)) {
+            if (!validStuCols.includes(k)) delete payload[k];
+          }
           delete payload.id;
           const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
 
@@ -924,8 +1076,15 @@
             if (payload.parent_email !== undefined) regPatch.parent_email = payload.parent_email;
             if (payload.address !== undefined) regPatch.address = payload.address;
             if (payload.nik !== undefined) regPatch.nik = payload.nik;
-            if (payload.notes !== undefined) regPatch.notes = payload.notes;
-            if (Object.keys(regPatch).length > 0 && currentUser) {
+            regPatch.form_metadata = mergedMeta;
+            regPatch.notes = JSON.stringify(mergedMeta);
+            const regNoMatch = (stuRecord && (stuRecord.registration_number || stuRecord.reg_number)) || (currentUser && currentUser.username && String(currentUser.username).startsWith('REG') ? currentUser.username : '');
+            if (regNoMatch) {
+              await supabaseRest(`ppdb_registrations?or=(registration_number.eq.${encodeURIComponent(regNoMatch)},registration_no.eq.${encodeURIComponent(regNoMatch)})`, 'PATCH', regPatch).catch(() => {});
+            } else if (payload.notes !== undefined) {
+              regPatch.notes = payload.notes;
+            }
+            if (!regNoMatch && Object.keys(regPatch).length > 0 && currentUser) {
               const regFilter = (currentUser.username && String(currentUser.username).startsWith('REG'))
                 ? `registration_number=eq.${encodeURIComponent(currentUser.username)}`
                 : `full_name=eq.${encodeURIComponent((stuRecord && stuRecord.full_name) || currentUser.full_name || '')}`;
@@ -1038,6 +1197,14 @@
           const targetCol = docColMap[canonicalType] || docColMap[rawType];
           if (targetCol) {
             try {
+              const regNoMatch = (stuRecord && (stuRecord.registration_number || stuRecord.reg_number)) || (currentUser && currentUser.username && String(currentUser.username).startsWith('REG') ? currentUser.username : '');
+              if (regNoMatch) {
+                await supabaseRest(
+                  `ppdb_registrations?or=(registration_number.eq.${encodeURIComponent(regNoMatch)},registration_no.eq.${encodeURIComponent(regNoMatch)})`,
+                  'PATCH',
+                  { [targetCol]: fileUrl }
+                ).catch(() => {});
+              }
               const nameMatch = (stuRecord && stuRecord.full_name) || currentUser?.full_name || currentUser?.name || '';
               if (nameMatch) {
                 await supabaseRest(
@@ -1108,7 +1275,7 @@
         const ppdbThisMonth = ppdbList.filter(p => String(p.created_at || '').startsWith(currentMonthPrefix)).length;
 
         const stats = {
-          total_students: (students || []).length || activeStudents,
+          total_students: (students || []).filter(s => s.status !== 'pending' && s.status !== 'calon_siswa').length || activeStudents,
           active_students: activeStudents,
           total_students_active: activeStudents,
           total_teachers: (teachers || []).length || activeTeachers,
@@ -1462,7 +1629,7 @@
           if (params.status) {
             query += `&status=eq.${encodeURIComponent(params.status)}`;
           } else {
-            query += `&status=neq.pending`;
+            query += `&status=not.in.(pending,calon_siswa)`;
           }
           if (params.search || params.q) {
             query += `&full_name.ilike.*${encodeURIComponent(params.search || params.q)}*`;
@@ -1571,6 +1738,22 @@
           payload.updated_at = new Date().toISOString();
 
           const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
+          // Sinkronkan perubahan NIS, Nama, Tanggal Lahir, dan Status ke tabel users (MED-03)
+          try {
+            const uSync = {};
+            if (payload.nis !== undefined) uSync.nis = payload.nis;
+            if (payload.full_name) { uSync.full_name = payload.full_name; uSync.name = payload.full_name; }
+            if (payload.birth_date !== undefined) uSync.birth_date = payload.birth_date;
+            if (payload.parent_phone !== undefined) uSync.phone = payload.parent_phone;
+            if (payload.status !== undefined) uSync.status = payload.status === 'inactive' ? 'inactive' : 'active';
+            if (Object.keys(uSync).length > 0 && id) {
+              const userIdLink = (res && res[0] && res[0].user_id) || params.user_id;
+              const uFilter = userIdLink
+                ? `or=(id.eq.${encodeURIComponent(userIdLink)},student_id.eq.${encodeURIComponent(id)})`
+                : `student_id=eq.${encodeURIComponent(id)}`;
+              await supabaseRest(`users?${uFilter}`, 'PATCH', uSync).catch(() => {});
+            }
+          } catch (_) {}
           return { success: true, data: res[0] || payload, message: 'Data siswa diperbarui' };
         }
         if (action === 'reset_password') {
@@ -1669,6 +1852,13 @@
         }
         if (action === 'delete') {
           await supabaseRest(`students?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
+          try {
+            await supabaseRest(`users?student_id=eq.${encodeURIComponent(params.id)}`, 'DELETE').catch(() => {});
+            const rawStu = localStorage.getItem('siy_local_students');
+            if (rawStu) localStorage.setItem('siy_local_students', JSON.stringify(JSON.parse(rawStu).filter(s => s.id !== params.id)));
+            const rawUsr = localStorage.getItem('siy_local_users');
+            if (rawUsr) localStorage.setItem('siy_local_users', JSON.stringify(JSON.parse(rawUsr).filter(u => u.student_id !== params.id)));
+          } catch (_) {}
           return { success: true, message: 'Siswa berhasil dihapus' };
         }
       }
@@ -1905,6 +2095,7 @@
             method: params.method || 'transfer',
             payment_date: params.payment_date || new Date().toISOString().slice(0, 10),
             proof_image_url: proofUrl || '',
+            notes: params.notes || '',
             status: 'menunggu_verifikasi'
           };
 
@@ -2121,6 +2312,9 @@
               if (parsedNotes.account && parsedNotes.account.password) {
                 delete parsedNotes.account.password;
               }
+              Object.assign(cleanMeta, parsedNotes);
+              if (params.form_metadata && typeof params.form_metadata === 'object') Object.assign(cleanMeta, params.form_metadata);
+              delete cleanMeta.form_metadata;
               safeIncomingNotes = JSON.stringify(parsedNotes);
             } catch (_) {}
           }
@@ -2133,7 +2327,7 @@
             full_name: studentName,
             child_name: studentName,
             nickname: params.nickname || '',
-            nik: params.nik || '',
+            nik: params.nik || cleanMeta.nik || '',
             form_type: params.form_type || (level === 'TPQ' ? 'tpq' : 'paud'),
             student_gender: gender,
             gender: gender,
@@ -2209,6 +2403,8 @@
             phone: parentPhone,
             role: 'calon_siswa',
             role_label: 'Calon Siswa / Pendaftar',
+            birth_date: typeof birthDate !== 'undefined' ? birthDate : (params.birth_date || ''),
+            fallback_dob_password: password,
             status: 'active',
             student_id: studentId,
             is_password_changed: true,
@@ -2230,7 +2426,7 @@
             full_name: studentName,
             name: studentName,
             nickname: params.nickname || '',
-            nik: params.nik || '',
+            nik: params.nik || cleanMeta.nik || '',
             gender: gender,
             birth_place: birthPlace,
             birth_date: birthDate,
@@ -2243,6 +2439,11 @@
             status_pendaftaran: 'pending',
             is_active: false,
             status: 'calon_siswa',
+            registration_number: regNum,
+            reg_number: regNum,
+            level: level,
+            program: level,
+            form_metadata: cleanMeta,
             photo_url: photoUrl || '',
             created_at: new Date().toISOString()
           };
@@ -2285,8 +2486,13 @@
           const userSession = { ...newUser, role: roleObj, student_id: studentId };
           delete userSession.password_hash;
           const token = 'siy_' + userId + '_' + Date.now();
-          localStorage.setItem('siy_token', token);
-          localStorage.setItem('siy_user', JSON.stringify(userSession));
+          if (!['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '')) localStorage.setItem('siy_token', token);
+          const curRole = currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '';
+          const isCurAdmin = ['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(curRole);
+          if (!isCurAdmin) {
+            if (!['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '')) localStorage.setItem('siy_token', token);
+            localStorage.setItem('siy_user', JSON.stringify(userSession));
+          }
 
           return {
             success: true,
@@ -2310,7 +2516,7 @@
             if (!reg.nis && reg.form_metadata.nis) reg.nis = reg.form_metadata.nis;
             if (!reg.class_name && reg.form_metadata.class_name) reg.class_name = reg.form_metadata.class_name;
           }
-          let parsedNotes = {}; if (reg.notes && typeof reg.notes === 'string' && reg.notes.trim().startsWith('{')) { try { parsedNotes = JSON.parse(reg.notes); } catch (_) {} } const meta = { ...parsedNotes, ...(reg.form_metadata && typeof reg.form_metadata === 'object' ? reg.form_metadata : {}) }; if (!reg.converted_nis && (meta.converted_nis || meta.local_nis || meta.nis)) reg.converted_nis = meta.converted_nis || meta.local_nis || meta.nis; if (!reg.class_name && meta.class_name) reg.class_name = meta.class_name; if (!reg.entry_date && meta.entry_date) reg.entry_date = meta.entry_date; if (!reg.portal_password && meta.portal_password) reg.portal_password = meta.portal_password; reg.form_metadata = meta; return { success: true, data: { ...reg, registration: reg }, registration: reg };
+          let parsedNotes = {}; if (reg.notes && typeof reg.notes === 'string' && reg.notes.trim().startsWith('{')) { try { parsedNotes = JSON.parse(reg.notes); } catch (_) {} } const meta = { ...parsedNotes, ...(reg.form_metadata && typeof reg.form_metadata === 'object' ? reg.form_metadata : {}) }; if (!reg.converted_nis && (meta.converted_nis || meta.local_nis || meta.nis)) reg.converted_nis = meta.converted_nis || meta.local_nis || meta.nis; if (!reg.class_name && meta.class_name) reg.class_name = meta.class_name; if (!reg.entry_date && meta.entry_date) reg.entry_date = meta.entry_date; if (!reg.portal_password && meta.portal_password) reg.portal_password = meta.portal_password; reg.form_metadata = meta; if (String(reg.status || '').toLowerCase() === 'rejected' && meta.rejection_reason) reg.notes = meta.rejection_reason; return { success: true, data: { ...reg, registration: reg }, registration: reg };
         }
         if (action === 'period') {
           let p = null;
@@ -2389,6 +2595,8 @@
               res = await supabaseRest('ppdb_periods', 'POST', {
                 id: targetId,
                 name: params.name || 'Gelombang 1',
+                start_date: params.start_date || '2026-01-01',
+                end_date: params.end_date || '2026-08-31',
                 ...payload
               });
             }
@@ -2397,6 +2605,8 @@
             res = await supabaseRest('ppdb_periods', 'POST', {
               id: targetId,
               name: params.name || 'Gelombang 1',
+              start_date: params.start_date || '2026-01-01',
+              end_date: params.end_date || '2026-08-31',
               ...payload
             }).catch(() => null);
           }
@@ -2408,6 +2618,10 @@
           const patchData = { ...params };
           delete patchData.id;
           delete patchData.token;
+          if (patchData.level && !patchData.form_type) {
+            const lvLower = String(patchData.level).toLowerCase();
+            patchData.form_type = (lvLower.includes('paud') || lvLower.includes('kb') || lvLower.includes('tk')) ? 'paud' : (lvLower.includes('tahfidz') ? 'tahfidz' : 'tpq');
+          }
           if (patchData.email !== undefined) {
             if (!patchData.parent_email) patchData.parent_email = patchData.email;
             delete patchData.email;
@@ -2429,6 +2643,24 @@
         if (action === 'delete') {
           const id = params.id;
           if (!id) return { success: false, message: 'ID pendaftar tidak ditentukan' };
+          try {
+            const regRows = await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(id)},registration_number.eq.${encodeURIComponent(id)},registration_no.eq.${encodeURIComponent(id)})&select=*`).catch(() => []);
+            if (regRows && regRows[0]) {
+              const r = regRows[0];
+              const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
+              const stuIdDel = r.student_id || meta.student_id;
+              const usrIdDel = meta.user_id;
+              const regNoDel = r.registration_number || r.registration_no;
+              if (stuIdDel) {
+                await supabaseRest(`students?id=eq.${encodeURIComponent(stuIdDel)}&status=in.(calon_siswa,pending)`, 'DELETE').catch(() => {});
+              }
+              if (usrIdDel) {
+                await supabaseRest(`users?id=eq.${encodeURIComponent(usrIdDel)}&role=eq.calon_siswa`, 'DELETE').catch(() => {});
+              } else if (regNoDel) {
+                await supabaseRest(`users?username=eq.${encodeURIComponent(regNoDel)}&role=eq.calon_siswa`, 'DELETE').catch(() => {});
+              }
+            }
+          } catch (_) {}
 
           // 1. Hapus dari Supabase dengan mencocokkan ID dan registration_number
           try {
@@ -2503,7 +2735,25 @@
           try {
             res = await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(targetId)},registration_number.eq.${encodeURIComponent(targetId)})`, 'PATCH', {
               status: 'rejected',
-              notes: params.reason || params.notes || ''
+              notes: await (async () => {
+                const reasonText = params.reason || params.notes || '';
+                try {
+                  const existing = await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(targetId)},registration_number.eq.${encodeURIComponent(targetId)})&select=notes,form_metadata`).catch(() => []);
+                  if (existing && existing[0]) {
+                    const ex = existing[0];
+                    let baseObj = (ex.form_metadata && typeof ex.form_metadata === 'object') ? { ...ex.form_metadata } : {};
+                    if (ex.notes && typeof ex.notes === 'string' && ex.notes.trim().startsWith('{')) {
+                      try { baseObj = { ...JSON.parse(ex.notes), ...baseObj }; } catch (_) {}
+                    }
+                    if (Object.keys(baseObj).length > 0) {
+                      baseObj.rejection_reason = reasonText;
+                      await supabaseRest(`ppdb_registrations?or=(id.eq.${encodeURIComponent(targetId)},registration_number.eq.${encodeURIComponent(targetId)})`, 'PATCH', { form_metadata: baseObj }).catch(() => {});
+                      return JSON.stringify(baseObj);
+                    }
+                  }
+                } catch (_) {}
+                return reasonText;
+              })()
             });
           } catch (_) {}
 
@@ -2588,7 +2838,9 @@
             nis: studentNis,
             student_id: stuId,
             password_hash: initialPassword,
-            is_password_changed: Boolean(customPpdbPass),
+            birth_date: birthDateStr,
+            fallback_dob_password: birthDatePassword,
+            is_password_changed: Boolean(adminSetPass || customPpdbPass),
             status: 'active'
           };
 
@@ -2624,6 +2876,23 @@
             semester_sekarang: 'Semester 1',
             status_kenaikan: 'Aktif',
             status_pendaftaran: 'accepted',
+            nik: reg.nik || (reg.form_metadata && reg.form_metadata.nik) || null,
+            level: reg.level || (reg.form_metadata && reg.form_metadata.program_level) || null,
+            program: reg.level || (reg.form_metadata && reg.form_metadata.program_level) || null,
+            registration_number: regNo,
+            reg_number: regNo,
+            joined_at: params.entry_date || new Date().toISOString().slice(0, 10),
+            father_occupation: (reg.form_metadata && reg.form_metadata.father && reg.form_metadata.father.job) || reg.father_occupation || null,
+            mother_occupation: (reg.form_metadata && reg.form_metadata.mother && reg.form_metadata.mother.job) || reg.mother_occupation || null,
+            form_metadata: {
+              ...(reg.notes && typeof reg.notes === 'string' && reg.notes.trim().startsWith('{') ? (() => { try { return JSON.parse(reg.notes); } catch (_) { return {}; } })() : {}),
+              ...(reg.form_metadata || {}),
+              converted_nis: studentNis,
+              nis: studentNis,
+              class_name: targetClassName,
+              entry_date: params.entry_date || new Date().toISOString().slice(0, 10),
+              portal_password: initialPassword
+            },
             is_active: true,
             parent_name: reg.parent_name || reg.father_name || reg.mother_name || '',
             father_name: reg.father_name || reg.parent_name || '',
@@ -2751,7 +3020,7 @@
           const origin = typeof window !== 'undefined' && window.location ? window.location.origin : '';
           const loginUrl = (origin || 'https://siyayasan-portal.vercel.app') + '/login.html';
           const activeInitialPass = initialPassword;
-          const passNotes = customPpdbPass ? `${customPpdbPass} (Password Pendaftaran PPDB)` : `${birthDatePassword} (Tanggal Lahir: DDMMYYYY)`;
+          const passNotes = adminSetPass ? `${adminSetPass} (Kata Sandi Portal Siswa)` : (customPpdbPass ? `${customPpdbPass} (Password Pendaftaran PPDB)` : `${birthDatePassword} (Tanggal Lahir: DDMMYYYY)`);
           const summaryText = `Akses Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda\nNama: ${studentName}\nNIS (Username Login): ${studentNis}\nKata Sandi Awal: ${passNotes}\nLink Portal: ${loginUrl}`;
 
           return {
@@ -2786,6 +3055,9 @@
           }
           if (params.exclude_id) {
             list = list.filter(n => String(n.id) !== String(params.exclude_id) && String(n.slug) !== String(params.exclude_id));
+          }
+          if (params.per_page || params.limit) {
+            list = list.slice(0, Number(params.per_page || params.limit));
           }
           return { success: true, data: list, raw: { items: list } };
         }
@@ -2874,7 +3146,7 @@
             content: params.content || params.body || params.excerpt || '',
             target_audience: targetAud,
             target_role: targetAud,
-            category: params.category || targetAud,
+            // category mapped to target_audience/target_role
             is_pinned: !!params.is_pinned,
             status: params.status || (isPubAnn ? 'published' : 'draft'),
             is_published: isPubAnn,
@@ -2890,7 +3162,7 @@
           if (params.target_audience || params.target_role || params.category) {
             payload.target_audience = params.target_audience || params.target_role || params.category;
             payload.target_role = payload.target_audience;
-            payload.category = payload.target_audience;
+            // category omitted (not in announcements schema)
           }
           if (params.status) {
             payload.status = params.status;
@@ -3143,7 +3415,7 @@
           // Kolom asli yang tersedia di tabel schools Supabase:
           // id, name, npsn, address, phone, email, website, logo_url, headmaster_name, pembina, pengawas, ketua_yayasan, sekretaris, bendahara, wa_gateway_token, updated_at
           const validSchoolCols = [
-            'name', 'npsn', 'address', 'phone', 'email', 'website', 'logo_url',
+            'name', 'npsn', 'address', 'phone', 'email',
             'headmaster_name', 'pembina', 'pengawas', 'ketua_yayasan', 'sekretaris', 'bendahara', 'wa_gateway_token', 'updated_at'
           ];
           const dbSchoolPayload = {
@@ -3239,13 +3511,21 @@
             const regs = await supabaseRest('ppdb_registrations?select=*').catch(() => []);
             let list = regs || [];
             if (params.academic_year) {
-              list = list.filter(r => (r.academic_year && r.academic_year.includes(params.academic_year)) || (r.period_name && r.period_name.includes(params.academic_year)));
+              const yrPrefix = String(params.academic_year).split('/')[0].trim();
+              list = list.filter(r => {
+                const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
+                const rYear = r.academic_year || meta.academic_year || r.period_name || '';
+                if (rYear) return String(rYear).includes(params.academic_year) || (yrPrefix && String(rYear).includes(yrPrefix));
+                const regStr = String(r.registration_number || r.registration_no || '');
+                const dtStr = String(r.created_at || r.registration_date || '');
+                return !yrPrefix || regStr.includes(yrPrefix) || dtStr.startsWith(yrPrefix);
+              });
             }
             rows = list.map((r, idx) => [
               idx + 1,
               r.registration_number || r.registration_no || '-',
               r.full_name || r.child_name || '-',
-              (r.form_type || 'PAUD').toUpperCase(),
+              r.level || (r.form_metadata && r.form_metadata.program_level) || (r.form_type || 'PAUD').toUpperCase(),
               r.father_name || r.parent_name || '-',
               r.phone || r.father_phone || '-',
               (r.status || 'pending').toUpperCase(),
@@ -3494,7 +3774,11 @@
               if (raw) {
                 const list = JSON.parse(raw);
                 const found = list.find(b => b.id === params.id);
-                if (found && found.data) snapshot = found.data;
+                if (found && found.data) {
+                  snapshot = found.data;
+                } else {
+                  return { success: false, message: 'Arsip riwayat ini hanya menyimpan metadata ringkas di browser. Silakan gunakan fitur "Pilih File Backup (.json)" untuk memulihkan dari file cadangan yang telah Anda unduh.' };
+                }
               }
             } catch (_) {}
           }

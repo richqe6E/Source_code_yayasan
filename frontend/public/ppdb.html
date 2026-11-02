@@ -1776,9 +1776,9 @@
             ${hasOtherInfo ? `
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex flex-wrap items-center gap-3 text-slate-700">
               <span class="font-bold text-slate-800 flex items-center gap-1.5"><i class="fi fi-rr-info text-primary-600"></i> Keterangan:</span>
-              ${snap.distance ? `<span>Jarak Tempat Tinggal ke TK: <strong>${escapeHtml(snap.distance)} KM</strong></span>` : ''}
+              ${snap.distance ? `<span>Jarak Tempat Tinggal ke Sekolah: <strong>${escapeHtml(snap.distance)} KM</strong></span>` : ''}
               ${snap.distance && snap.transportation ? `<span class="text-slate-300">&bull;</span>` : ''}
-              ${snap.transportation ? `<span>Pergi ke TK dengan: <strong>${escapeHtml(snap.transportation)}</strong></span>` : ''}
+              ${snap.transportation ? `<span>Pergi ke Sekolah dengan: <strong>${escapeHtml(snap.transportation)}</strong></span>` : ''}
             </div>` : ''}
           </div>
         `;
@@ -2074,6 +2074,7 @@
         full_name: snap.studentName,
         child_name: snap.studentName,
         nickname: snap.nickname,
+        nik: snap.nik,
         gender: snap.genderCode,
         birth_place: snap.birthPlace,
         birth_date: snap.birthDate,
@@ -2086,7 +2087,8 @@
         photo_url: uploadedFiles.photo ? uploadedFiles.photo.dataUrl : '',
         birth_certificate_url: uploadedFiles.birth_cert ? uploadedFiles.birth_cert.dataUrl : '',
         family_card_url: uploadedFiles.family_card ? uploadedFiles.family_card.dataUrl : '',
-        notes: JSON.stringify(detailNotes)
+        notes: JSON.stringify(detailNotes),
+        form_metadata: detailNotes
       };
 
       try {

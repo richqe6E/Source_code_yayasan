@@ -320,7 +320,7 @@
           return;
         }
 
-        studentsCache = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.students)) || []);
+        studentsCache = (Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.students)) || [])).filter(s => s.status !== 'pending' && s.status !== 'calon_siswa');
         let filtered = [...studentsCache];
 
         if (search) {
@@ -618,7 +618,7 @@
           const waPhone = phone.startsWith('0') ? '62' + phone.slice(1) : phone;
           const msg = encodeURIComponent(
             `Assalamu'alaikum Wr. Wb.\n\nBerikut informasi akun Portal Siswa Yayasan At Tarbiyyah Wijaya Kusuma Samarinda untuk ananda *${activeResetStudent.full_name}*:\n` +
-            `• Website Login: ${window.location.origin}/login\n` +
+            `• Website Login: ${window.location.origin}/login.html\n` +
             `• NIS (Username): *${activeResetStudent.nis}*\n` +
             `• Password Awal: *${activeResetStudent.birth_date}*\n\n` +
             `Silakan masuk dan ikuti petunjuk untuk membuat password baru ananda. Terima kasih.`
@@ -642,7 +642,7 @@
         `Nama Siswa: ${activeResetStudent.full_name}\n` +
         `NIS: ${activeResetStudent.nis}\n` +
         `Password Awal: ${activeResetStudent.birth_date}\n` +
-        `Halaman Login: ${window.location.origin}/login`;
+        `Halaman Login: ${window.location.origin}/login.html`;
       
       navigator.clipboard.writeText(text).then(() => {
         showToast('Kredensial berhasil disalin ke clipboard!', 'success');

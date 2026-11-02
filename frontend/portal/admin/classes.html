@@ -47,7 +47,6 @@
             <option value="Tahfidz Pra PTPT">B.1. Jenjang Tahfidz — Pra PTPT</option>
             <option value="Tahfidz PTPT">B.2. Jenjang Tahfidz — PTPT (Kelas 1–6)</option>
             <option value="KB Ulinnuha (PAUD)">C. KB Ulinnuha (PAUD)</option>
-            <option value="PKBM">PKBM (SPS / Paket A, B, C)</option>
 
 
 
@@ -168,7 +167,9 @@
         document.getElementById('modal-title').textContent = 'Edit Kelas';
         document.getElementById('class-id').value = cls.id;
         document.getElementById('form-name').value = cls.name;
-        document.getElementById('form-grade').value = cls.grade_level || 'PAUD';
+        const rawGrade = cls.grade_level || cls.level || 'KB Ulinnuha (PAUD)';
+        const gradeMap = { 'PAUD': 'KB Ulinnuha (PAUD)', 'TK': 'KB Ulinnuha (PAUD)', 'TPQ': 'TPQ Pagi' };
+        document.getElementById('form-grade').value = gradeMap[rawGrade] || rawGrade;
         document.getElementById('form-year').value = cls.academic_year;
         document.getElementById('form-teacher').value = cls.homeroom_teacher_id || '';
         document.getElementById('form-capacity').value = cls.capacity || 20;

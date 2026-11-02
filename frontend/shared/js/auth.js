@@ -34,7 +34,7 @@
    */
   function getPortalRedirect(roleCode) {
     const role = (roleCode || '').toLowerCase();
-    if (role === 'super_admin' || role === 'admin_tu' || role === 'admin' || role === 'kepala_sekolah' || role === 'staff') {
+    if (role === 'super_admin' || role === 'admin_tu' || role === 'admin' || role === 'kepala_sekolah' || role === 'staff' || role === 'guru') {
       return '/admin/dashboard.html';
     }
     if (role === 'siswa_aktif' || role === 'siswa' || role === 'calon_siswa' || role === 'pendaftar') {
@@ -61,20 +61,28 @@
       }
       const allowed = allowedRoles.split(',').map(r => r.trim().toLowerCase());
       const rawRole = (user.role && user.role.code ? user.role.code : (user.role || '')).toLowerCase();
-      
-      // Normalized matching: 'admin' covers super_admin & admin_tu, 'siswa' covers siswa_aktif & calon_siswa
+
+      const adminRoles = ['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'];
+      const siswaRoles = ['siswa', 'siswa_aktif', 'calon_siswa', 'pendaftar'];
+
       let isAllowed = allowed.includes(rawRole);
       if (!isAllowed) {
-        if (allowed.includes('admin') && (rawRole === 'super_admin' || rawRole === 'admin_tu')) {
+        if (allowed.some(a => adminRoles.includes(a)) && adminRoles.includes(rawRole)) {
           isAllowed = true;
         }
-        if (allowed.includes('siswa') && (rawRole === 'siswa_aktif' || rawRole === 'calon_siswa')) {
+        if (allowed.some(a => siswaRoles.includes(a)) && siswaRoles.includes(rawRole)) {
           isAllowed = true;
         }
       }
 
       if (!isAllowed) {
-        window.location.href = getPortalRedirect(rawRole);
+        const targetUrl = getPortalRedirect(rawRole);
+        if (window.location.pathname === targetUrl || targetUrl === '/login.html') {
+          clearSession();
+          window.location.href = '/login.html';
+        } else {
+          window.location.href = targetUrl;
+        }
         return false;
       }
     }

@@ -134,6 +134,14 @@
     }
 
     function actionColor(a) {
+      const s = String(a || '').toLowerCase();
+      if (s.includes('login')) return 'bg-primary-100 text-primary-700';
+      if (s.includes('logout')) return 'bg-gray-100 text-gray-700';
+      if (s.includes('create') || s.includes('submit') || s.includes('convert')) return 'bg-blue-100 text-blue-700';
+      if (s.includes('update') || s.includes('edit')) return 'bg-yellow-100 text-yellow-700';
+      if (s.includes('delete') || s.includes('remove')) return 'bg-red-100 text-red-700';
+      if (s.includes('approve') || s.includes('verify') || s.includes('restore')) return 'bg-emerald-100 text-emerald-700';
+      if (s.includes('reject')) return 'bg-red-100 text-red-700';
       if (a === 'login') return 'bg-primary-100 text-primary-700';
       if (a === 'logout') return 'bg-gray-100 text-gray-700';
       if (a === 'create') return 'bg-blue-100 text-blue-700';

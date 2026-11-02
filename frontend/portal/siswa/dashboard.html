@@ -371,6 +371,13 @@
       try {
         const res = await apiCall('siswa', 'get_profile');
         const student = (res.success && res.data) ? res.data : {};
+        if (!isSiswaAktif && student && (student.status === 'active' || student.status_pendaftaran === 'converted') && student.nis) {
+          isSiswaAktif = true;
+          try {
+            const updatedUser = { ...user, role: { code: 'siswa_aktif', name: 'Siswa Aktif' }, nis: student.nis, student_id: student.id || user.student_id };
+            localStorage.setItem('siy_user', JSON.stringify(updatedUser));
+          } catch (_) {}
+        }
 
         // Render Welcome Info
         const studentName = student.full_name || student.name || user.full_name || 'Santri';

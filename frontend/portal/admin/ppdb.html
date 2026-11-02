@@ -710,6 +710,10 @@
         birth_place: document.getElementById('edit-birth-place').value.trim(),
         birth_date: document.getElementById('edit-birth-date').value,
         level: document.getElementById('edit-level').value,
+        form_type: (() => {
+          const lv = String(document.getElementById('edit-level').value || '').toLowerCase();
+          return (lv.includes('paud') || lv.includes('kb') || lv.includes('tk')) ? 'paud' : (lv.includes('tahfidz') ? 'tahfidz' : 'tpq');
+        })(),
         parent_name: document.getElementById('edit-parent-name').value.trim(),
         parent_phone: document.getElementById('edit-parent-phone').value.trim(),
         phone: document.getElementById('edit-parent-phone').value.trim(),
