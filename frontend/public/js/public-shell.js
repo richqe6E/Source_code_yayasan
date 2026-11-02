@@ -329,9 +329,9 @@
     const email = school.email || 'info@attarbiyyah-samarinda.sch.id';
     const address = school.address || 'Jl. Wijaya Kusuma V-A No. 38, Kel. Air Putih, Kec. Samarinda Ulu Kota Samarinda, Kalimantan Timur, Kode Pos: 75124';
     const wa = school.whatsapp_number ? `https://wa.me/${school.whatsapp_number.replace(/\D/g, '')}` : 'https://wa.me/6281347142829';
-    const ig = school.instagram_url || 'https://instagram.com/yayasansamarinda';
-    const yt = school.youtube_url || 'https://youtube.com/@yayasansamarinda';
-    const fb = school.facebook_url || 'https://facebook.com/yayasansamarinda';
+    const ig = (school.instagram_url && school.instagram_url !== '#' && school.instagram_url !== 'null') ? school.instagram_url : 'https://instagram.com/attarbiyyah.smd';
+    const yt = (school.youtube_url && school.youtube_url !== '#' && school.youtube_url !== 'null') ? school.youtube_url : 'https://youtu.be/TwMZEbDbi3c?si=9WasYWL8r7eheKXh';
+    const fb = (school.facebook_url && school.facebook_url !== '#' && school.facebook_url !== 'null') ? school.facebook_url : 'https://facebook.com/attarbiyyah.samarinda';
 
     // Footer background image update (from CMS admin)
     if (school.footer_bg_url) {

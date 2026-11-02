@@ -179,9 +179,9 @@
   <!-- ============ HERO CAROUSEL SECTION ============ -->
   <section class="relative overflow-hidden bg-primary-950 text-white min-h-[520px] lg:min-h-[600px] flex items-center">
     <!-- Slider Images Container (Controlled via JS & Instant Local Cache) -->
-    <div id="hero-slider-container" class="absolute inset-0">
+    <div id="hero-slider-container" class="absolute inset-0 bg-primary-950">
       <!-- Foto latar beranda sekolah resmi (dikelola penuh melalui CMS Banner) -->
-      <div class="hero-slide active bg-cover bg-center" style="background-image: url('/images/school-campus.jpg');"></div>
+      <div class="hero-slide active bg-cover bg-center bg-primary-950"></div>
     </div>
     <script>
       (function() {
@@ -192,9 +192,12 @@
             if (Array.isArray(imgs) && imgs.length > 0) {
               var container = document.getElementById('hero-slider-container');
               if (container) {
-                container.innerHTML = imgs.map(function(img, i) {
-                  return '<div class="hero-slide ' + (i === 0 ? 'active' : '') + ' bg-cover bg-center" style="background-image: url(\'' + (img.url || '') + '\'), url(\'/images/school-campus.jpg\');"></div>';
-                }).join('');
+                var validImgs = imgs.filter(function(img) { return img && img.url; });
+                if (validImgs.length > 0) {
+                  container.innerHTML = validImgs.map(function(img, i) {
+                    return '<div class="hero-slide ' + (i === 0 ? 'active' : '') + ' bg-cover bg-center" style="background-image: url(\'' + (img.url || '') + '\');"></div>';
+                  }).join('');
+                }
               }
             }
           }
@@ -592,12 +595,13 @@
         if (!sliderContainer) return;
 
         function renderSlides(images) {
-          if (!Array.isArray(images) || images.length === 0) {
-            sliderContainer.innerHTML = '<div class="hero-slide active bg-cover bg-center" style="background-image: url(\'/images/school-campus.jpg\');"></div>';
+          const validImages = Array.isArray(images) ? images.filter(img => img && img.url) : [];
+          if (validImages.length === 0) {
+            sliderContainer.innerHTML = '<div class="hero-slide active bg-cover bg-center bg-primary-950"></div>';
             return;
           }
-          sliderContainer.innerHTML = images.map((img, i) => `
-            <div class="hero-slide ${i === 0 ? 'active' : ''} bg-cover bg-center" style="background-image: url('${img.url}'), url('/images/school-campus.jpg');"></div>
+          sliderContainer.innerHTML = validImages.map((img, i) => `
+            <div class="hero-slide ${i === 0 ? 'active' : ''} bg-cover bg-center" style="background-image: url('${img.url}');"></div>
           `).join('');
 
           if (heroCarouselTimer) {

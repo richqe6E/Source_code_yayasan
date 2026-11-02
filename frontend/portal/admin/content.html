@@ -633,7 +633,22 @@
           const dataUrl = ev.target.result;
           previewImg.src = dataUrl;
           previewWrap.classList.remove('hidden');
-          hiddenUrl.value = dataUrl;
+          // Unggah ke Supabase Cloud Storage dan dapatkan URL HTTPS
+          hiddenUrl.value = '';
+          if (typeof window.uploadToSupabaseStorage === 'function') {
+            showToast('Mengunggah foto ke Cloud Storage...', 'info');
+            window.uploadToSupabaseStorage(f, currentTab === 'gallery' ? 'galeri' : 'berita').then(cloudUrl => {
+              if (cloudUrl && cloudUrl.startsWith('http')) {
+                hiddenUrl.value = cloudUrl;
+                showToast('Foto berhasil diunggah ke Cloud Storage!', 'success');
+              } else {
+                showToast('Gagal mengunggah foto ke Cloud Storage', 'error');
+              }
+            }).catch(err => {
+              console.error('Storage upload error:', err);
+              showToast('Gagal upload gambar: ' + (err.message || err), 'error');
+            });
+          }
           clearBtn.classList.remove('hidden');
         };
         reader.readAsDataURL(f);
@@ -1395,7 +1410,8 @@
           img.classList.remove('hidden');
         }
         if (mono) mono.classList.add('hidden');
-        if (hidden) hidden.value = compressedDataUrl;
+        // Jangan set hidden.value dengan raw data URL Base64
+        if (hidden) hidden.value = '';
         if (delBtn) delBtn.classList.remove('hidden');
         if (statusEl) statusEl.textContent = 'Foto terkompresi siap disimpan';
 
@@ -1408,7 +1424,8 @@
             if (hidden) hidden.value = cloudUrl;
             if (statusEl) statusEl.textContent = 'Foto tersimpan di Cloud Storage';
           } else {
-            if (statusEl) statusEl.textContent = 'Foto siap disimpan';
+            showToast('Gagal mengunggah foto ke Cloud Storage', 'error');
+            if (statusEl) statusEl.textContent = 'Gagal unggah storage';
           }
         }
       } catch (err) {

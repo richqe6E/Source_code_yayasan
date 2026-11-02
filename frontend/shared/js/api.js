@@ -243,9 +243,9 @@
 
     try {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = controller ? setTimeout(() => controller.abort(), 15000) : null;
-      const token = getToken();
-      const authHeader = token ? `Bearer ${token}` : `Bearer ${API_KEY}`;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 25000) : null;
+      // Selalu gunakan API_KEY Supabase yang terbukti memiliki hak akses RLS upload ke bucket siyayasan-uploads
+      const authHeader = `Bearer ${API_KEY}`;
       const res = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
@@ -262,18 +262,13 @@
       if (res.ok) {
         return `${API_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
       }
-      console.warn('Storage upload HTTP non-ok, falling back to base64 Data URL:', await res.text());
+      const errBody = await res.text().catch(() => '');
+      throw new Error(`Storage upload HTTP ${res.status}: ${errBody}`);
     } catch (uploadErr) {
-      console.warn('Storage upload network unreachable, using base64 Data URL fallback:', uploadErr.message);
+      console.error('Supabase Storage upload error:', uploadErr);
+      // DILARANG silent fallback ke Base64 data URL agar database tidak membengkak
+      throw uploadErr;
     }
-
-    // Fallback offline / local: convert blob to base64 data URL
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
   }
 
   // Activity Log helper (Non-blocking / Fire-and-forget for instant CRUD performance)
@@ -921,6 +916,15 @@
             mergedExt.whatsapp = params.whatsapp_number;
           }
 
+          // Sanitasi ketat: Cegah string Base64 gambar agar tidak pernah masuk ke JSON metadata
+          const sanitizedExt = {};
+          for (const [k, v] of Object.entries(mergedExt)) {
+            if (k === 'hero_images' || k === 'backup_history') continue; // Hindari duplikasi dump besar
+            if (typeof v === 'string' && (v.startsWith('data:image/') || v.length > 10000)) continue;
+            sanitizedExt[k] = v;
+          }
+          mergedExt = sanitizedExt;
+
           try {
             localStorage.setItem('siy_school_ext', JSON.stringify(mergedExt));
           } catch (_) {}
@@ -934,6 +938,12 @@
           });
           if (params.name && !safeWsPayload.school_name) safeWsPayload.school_name = params.name;
           if (params.whatsapp_number && !safeWsPayload.whatsapp) safeWsPayload.whatsapp = params.whatsapp_number;
+          
+          // Pastikan hero_images hanya menyimpan URL HTTPS valid
+          if (Array.isArray(safeWsPayload.hero_images)) {
+            safeWsPayload.hero_images = safeWsPayload.hero_images.filter(s => s && s.url && !s.url.startsWith('data:image/'));
+          }
+          
           safeWsPayload.announcement_banner = JSON.stringify(mergedExt);
 
           let res = null;
@@ -3662,6 +3672,13 @@
             bendahara_jabatan: params.bendahara_jabatan !== undefined ? params.bendahara_jabatan : existingExt.bendahara_jabatan
           };
           delete extPayload.hero_images;
+          delete extPayload.backup_history;
+          // Sanitasi ketat: pastikan foto hanya URL storage bukan raw Base64
+          for (const [k, v] of Object.entries(extPayload)) {
+            if (typeof v === 'string' && (v.startsWith('data:image/') || v.length > 10000)) {
+              extPayload[k] = '';
+            }
+          }
           try {
             localStorage.setItem('siy_school_ext', JSON.stringify(extPayload));
             sessionStorage.setItem('siyayasan_school_profile', JSON.stringify({ ...fullPayload, ...extPayload }));

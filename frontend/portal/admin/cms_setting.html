@@ -667,19 +667,15 @@
           return;
         }
         saveBtn.disabled = true;
-        saveBtn.textContent = 'Mengunggah Foto...';
+        saveBtn.textContent = 'Mengompres & Mengunggah...';
         try {
           finalImageUrl = await uploadToSupabaseStorage(selectedSlideFile, 'hero_slide');
         } catch (uploadErr) {
-          finalImageUrl = selectedSlideDataUrl;
-        }
-        if (!finalImageUrl && selectedSlideFile) {
-          finalImageUrl = await new Promise(resolve => {
-            const r = new FileReader();
-            r.onload = ev => resolve(ev.target.result);
-            r.onerror = () => resolve('');
-            r.readAsDataURL(selectedSlideFile);
-          });
+          console.error('Upload hero slide error:', uploadErr);
+          alert('Gagal mengunggah foto slide ke Cloud Storage: ' + (uploadErr.message || uploadErr));
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Tambahkan Slide';
+          return;
         }
       } else {
         const urlInput = document.getElementById('slide-url').value.trim();
@@ -690,8 +686,8 @@
         finalImageUrl = urlInput;
       }
 
-      if (!finalImageUrl) {
-        alert('Gagal memproses gambar. Pastikan file atau link gambar valid.');
+      if (!finalImageUrl || (!finalImageUrl.startsWith('http://') && !finalImageUrl.startsWith('https://') && !finalImageUrl.startsWith('/'))) {
+        alert('Gagal memproses gambar. Pastikan URL gambar valid (HTTP/HTTPS) dan bukan data mentah.');
         saveBtn.disabled = false;
         saveBtn.textContent = 'Tambahkan Slide';
         return;

@@ -371,14 +371,25 @@
     // Jika artikel hanya 1: Tampilkan Bento Split (Warta Utama di kiri + Dokumentasi Galeri Kegiatan di kanan)
     if (items.length === 1) {
       const n = items[0];
-      const imgUrl = n.image || n.featured_image_url || 'images/school-campus.jpg';
+      const hasImg = !!(n.image || n.featured_image_url);
+      const imgUrl = n.image || n.featured_image_url || '';
       container.className = 'grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch';
       container.innerHTML = `
         <!-- Kartu Berita Utama (Featured News) -->
         <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
           <div>
             <div class="aspect-video w-full rounded-xl overflow-hidden bg-slate-100 mb-5 relative">
-              <img src="${imgUrl}" alt="${n.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+              ${hasImg ? `
+                <img src="${imgUrl}" alt="${n.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+              ` : `
+                <div class="w-full h-full bg-gradient-to-br from-primary-900 to-slate-900 flex flex-col items-center justify-center p-6 text-center text-white">
+                  <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                  </div>
+                  <span class="text-xs font-bold tracking-wide uppercase text-primary-200">Warta Yayasan At Tarbiyyah</span>
+                  <span class="text-[11px] text-white/70 mt-1">${escapeHtml(n.category || 'Informasi Publik')}</span>
+                </div>
+              `}
               <span class="absolute top-3 left-3 bg-slate-900/75 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-1 rounded-md">Warta Yayasan</span>
             </div>
             <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
