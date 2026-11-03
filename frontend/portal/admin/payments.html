@@ -278,9 +278,36 @@
       Shell.hideError();
       const stopSpin = Shell.startRefresh();
       try {
-        await Promise.all([loadKpis(), loadInvoices(), loadVerifications(), loadClasses(), loadStudentsList()]);
-      } catch (e) {
-        Shell.showError('Tidak dapat terhubung ke server database.');
+        const results = await Promise.allSettled([
+          loadKpis(),
+          loadInvoices(),
+          loadVerifications(),
+          loadClasses(),
+          loadStudentsList()
+        ]);
+
+        const componentNames = ['Ringkasan KPI', 'Daftar Tagihan', 'Verifikasi Bukti Transfer', 'Daftar Kelas', 'Data Siswa'];
+        const failures = [];
+
+        results.forEach((r, idx) => {
+          if (r.status === 'rejected') {
+            console.error(`[Payments] Gagal memuat ${componentNames[idx]}:`, r.reason);
+            failures.push(componentNames[idx]);
+          }
+        });
+
+        // Error Isolation: Hanya tampilkan peringatan jika komponen data utama gagal
+        if (failures.length > 0) {
+          const isCritical = results[0].status === 'rejected' || results[1].status === 'rejected';
+          if (isCritical) {
+            Shell.showError(`Sebagian data (${failures.join(', ')}) gagal dimuat dari server. Silakan klik Coba lagi.`);
+          } else {
+            console.warn(`[Payments] Komponen sekunder (${failures.join(', ')}) mengalami kendala, namun data utama berhasil disajikan.`);
+          }
+        }
+      } catch (unexpectedErr) {
+        console.error('[Payments] Terjadi kesalahan fatal tak terduga pada refreshAll:', unexpectedErr);
+        Shell.showError('Terjadi kendala saat memuat halaman: ' + (unexpectedErr.message || 'Silakan muat ulang.'));
       } finally {
         stopSpin();
       }
@@ -311,9 +338,6 @@
       const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.classes)) || []);
       if (res.success && items.length > 0) {
         classesCache = items;
-        const selBulk = document.getElementById('bulk-class');
-        if (selBulk) selBulk.innerHTML = '<option value="">Semua Siswa Aktif Seluruh Kelas</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-
         const selFilter = document.getElementById('filter-inv-class');
         if (selFilter) selFilter.innerHTML = '<option value="">Semua Rombongan Belajar (Kelas)</option>' + classesCache.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
       }
@@ -324,8 +348,6 @@
       const items = Array.isArray(res.data) ? res.data : ((res.data && (res.data.items || res.data.students)) || []);
       if (res.success && items.length > 0) {
         studentsCache = items;
-        const sel = document.getElementById('single-student');
-        sel.innerHTML = studentsCache.map(s => `<option value="${s.id}">${s.full_name} (${s.nis || 'NIS -'}) - ${s.kelas_sekarang || s.class_name || '-'}</option>`).join('');
       }
     }
 
