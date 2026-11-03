@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -177,15 +177,7 @@
             </div>
           </div>
 
-          <div>
-            <label for="daily_language" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Bahasa Sehari-hari</label>
-            <input type="text" id="daily_language" name="daily_language" placeholder="Bahasa Indonesia, Banjar, Bugis, Jawa, dll." class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
-          </div>
 
-          <div>
-            <label for="special_traits" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Ciri-ciri Khusus / Kesehatan</label>
-            <input type="text" id="special_traits" name="special_traits" placeholder="Tanda lahir, alergi, atau catatan fisik anak" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
-          </div>
 
           <div class="sm:col-span-2">
             <label for="address" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -294,13 +286,13 @@
         </div>
       </div>
 
-      <!-- Section 3: Data Wali & Keterangan Tambahan -->
+      <!-- Section 3: Data Wali Santri (Bagian 3 Mandiri) -->
       <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-5">
         <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
           <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-sm">3</div>
           <div>
-            <h2 class="text-base font-bold text-slate-900">Data Wali &amp; Keterangan Tambahan</h2>
-            <p class="text-xs text-slate-500">Informasi wali (bila siswa diasuh/tinggal bersama wali) serta sarana transportasi sekolah.</p>
+            <h2 class="text-base font-bold text-slate-900">Data Wali Santri</h2>
+            <p class="text-xs text-slate-500">Informasi wali murid (khusus santri yang diasuh, dibiayai, atau tinggal bersama wali).</p>
           </div>
         </div>
 
@@ -312,17 +304,45 @@
 
           <div>
             <label for="guardian_relation" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Hubungan Keluarga Wali</label>
-            <input type="text" id="guardian_relation" name="guardian_relation" placeholder="Paman, Kakek, Nenek, dll." class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+            <input type="text" id="guardian_relation" name="guardian_relation" placeholder="Contoh: Kakek, Nenek, Paman, Tante" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
           </div>
 
           <div>
             <label for="guardian_job" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pekerjaan Wali</label>
-            <input type="text" id="guardian_job" name="guardian_job" placeholder="Pekerjaan wali" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+            <input type="text" id="guardian_job" name="guardian_job" placeholder="Pekerjaan / profesi wali" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
           </div>
 
           <div>
             <label for="guardian_phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">No. Telepon / WhatsApp Wali</label>
             <input type="tel" id="guardian_phone" name="guardian_phone" placeholder="08xxxxxxxxxx" class="block w-full px-3.5 py-2.5 text-sm font-mono bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="guardian_office" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Alamat Lengkap / Kantor Wali</label>
+            <input type="text" id="guardian_office" name="guardian_office" placeholder="Alamat domisili atau instansi tempat wali bekerja (bila ada)" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Keterangan Tambahan & Informasi Penunjang (Bagian 4 Mandiri) -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-5">
+        <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-sm">4</div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Keterangan Tambahan &amp; Informasi Penunjang</h2>
+            <p class="text-xs text-slate-500">Sarana transportasi, jarak tempat tinggal, bahasa sehari-hari, serta catatan khusus santri.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="daily_language" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Bahasa Sehari-hari di Rumah</label>
+            <input type="text" id="daily_language" name="daily_language" placeholder="Bahasa Indonesia, Banjar, Bugis, Jawa, dll." class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
+          </div>
+
+          <div>
+            <label for="special_traits" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Ciri Khusus / Catatan Kesehatan</label>
+            <input type="text" id="special_traits" name="special_traits" placeholder="Tanda lahir, alergi, atau catatan kesehatan santri" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
           </div>
 
           <div>
@@ -331,11 +351,11 @@
           </div>
 
           <div>
-            <label for="transport_mode" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pergi ke Sekolah Menggunakan</label>
+            <label for="transport_mode" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Moda Transportasi ke Sekolah</label>
             <select id="transport_mode" name="transport_mode" class="block w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-all">
-              <option value="Berkendara" selected>Berkendara (Sepeda Motor / Mobil)</option>
-              <option value="Jalan kaki">Jalan kaki</option>
-              <option value="Antar jemput">Antar jemput sekolah</option>
+              <option value="Berkendara" selected>Berkendara (Sepeda Motor / Mobil Pribadi)</option>
+              <option value="Jalan kaki">Jalan Kaki</option>
+              <option value="Antar jemput">Antar Jemput Sekolah / Rombongan</option>
             </select>
           </div>
         </div>
@@ -373,7 +393,7 @@
   <script src="../../shared/js/shell.js"></script>
 
   <script>
-    if (!requireAuth('siswa,siswa_aktif,calon_siswa')) {}
+    if (!requireAuth('siswa,siswa_aktif')) {}
 
     async function initPage() {
       const user = getCurrentUser() || {};
@@ -450,6 +470,7 @@
           setVal('guardian_relation', s.guardian_relation || (meta.guardian && meta.guardian.relation) || '');
           setVal('guardian_job', s.guardian_job || (meta.guardian && meta.guardian.job) || '');
           setVal('guardian_phone', s.guardian_phone || (meta.guardian && meta.guardian.phone) || '');
+          setVal('guardian_office', s.guardian_office || (meta.guardian && (meta.guardian.office_address || meta.guardian.address)) || '');
 
           // Data Sekolah
           setVal('distance_km', s.distance_km || meta.distance_km || '');
@@ -513,6 +534,7 @@
         guardian_relation: val('guardian_relation'),
         guardian_job: val('guardian_job'),
         guardian_phone: val('guardian_phone'),
+        guardian_office: val('guardian_office'),
 
         distance_km: val('distance_km'),
         transport_mode: val('transport_mode')

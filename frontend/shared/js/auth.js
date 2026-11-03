@@ -37,7 +37,7 @@
     if (role === 'super_admin' || role === 'admin_tu' || role === 'admin' || role === 'kepala_sekolah' || role === 'staff' || role === 'guru') {
       return '/admin/dashboard.html';
     }
-    if (role === 'siswa_aktif' || role === 'siswa' || role === 'calon_siswa' || role === 'pendaftar') {
+    if (role === 'siswa_aktif' || role === 'siswa') {
       return '/siswa/dashboard.html';
     }
     return '/login.html';
@@ -63,7 +63,7 @@
       const rawRole = (user.role && user.role.code ? user.role.code : (user.role || '')).toLowerCase();
 
       const adminRoles = ['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'];
-      const siswaRoles = ['siswa', 'siswa_aktif', 'calon_siswa', 'pendaftar'];
+      const siswaRoles = ['siswa', 'siswa_aktif'];
 
       let isAllowed = allowed.includes(rawRole);
       if (!isAllowed) {

@@ -188,7 +188,7 @@
   <script src="../../shared/js/shell.js"></script>
 
   <script>
-    if (!requireAuth('siswa,siswa_aktif,calon_siswa')) {}
+    if (!requireAuth('siswa,siswa_aktif')) {}
 
     async function initPage() {
       const user = getCurrentUser() || {};

@@ -218,7 +218,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
                 <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                   <span class="text-[11px] font-semibold text-slate-500 block mb-1">Besaran SPP</span>
-                  <span class="text-base font-bold text-slate-900">Rp 150.000</span>
+                  <span class="text-base font-bold text-slate-900" id="dash-monthly-spp">-</span>
                   <span class="text-[10px] text-slate-400 block mt-0.5">Per bulan</span>
                 </div>
                 <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
@@ -325,7 +325,7 @@
 
   <script>
     // Guard Halaman: Wajib Login sebagai Siswa
-    if (!requireAuth('siswa,siswa_aktif,calon_siswa')) {
+    if (!requireAuth('siswa,siswa_aktif')) {
       // Handled inside requireAuth
     }
 
@@ -506,6 +506,16 @@
       document.getElementById('info-ttl').textContent = ttl || '-';
       document.getElementById('info-kontak').textContent = student.parent_phone || student.phone || '-';
 
+      // Besaran SPP Bulanan Dinamis Sesuai Profil Santri
+      let monthlySpp = Number(student.monthly_spp_amount) || 0;
+      if (!monthlySpp && student.form_metadata && student.form_metadata.monthly_spp_amount) {
+        monthlySpp = Number(student.form_metadata.monthly_spp_amount);
+      }
+      const monthlySppEl = document.getElementById('dash-monthly-spp');
+      if (monthlySppEl && monthlySpp > 0) {
+        monthlySppEl.textContent = formatIDR(monthlySpp);
+      }
+
       // Load Pengumuman Akademik Dinamis
       try {
         const annRes = await apiCall('announcements', 'list', { published_only: true });
@@ -538,6 +548,11 @@
           const invoices = sppRes.data.invoices || [];
           const unpaid = invoices.filter(i => i.status === 'unpaid');
           const totalUnpaid = unpaid.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+
+          if (!monthlySpp && invoices.length > 0 && invoices[0].amount) {
+            monthlySpp = Number(invoices[0].amount);
+            if (monthlySppEl) monthlySppEl.textContent = formatIDR(monthlySpp);
+          }
 
           if (totalUnpaid > 0) {
             document.getElementById('card-spp').textContent = formatIDR(totalUnpaid);

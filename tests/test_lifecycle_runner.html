@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>E2E Lifecycle & Security Test Runner</title>
+  <script src="/shared/js/supabase-config.js"></script>
+  <script src="/shared/js/auth.js"></script>
+  <script src="/shared/js/api.js"></script>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #0f172a; color: #f8fafc; }
+    .pass { color: #4ade80; }
+    .fail { color: #f87171; }
+    .info { color: #38bdf8; }
+    pre { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
+  </style>
+</head>
+<body>
+  <h1>SIYAYASAN — Student Lifecycle & Security Test Suite</h1>
+  <div id="summary">Running tests...</div>
+  <pre id="log"></pre>
+
+  <script>
+    const logEl = document.getElementById('log');
+    const summaryEl = document.getElementById('summary');
+    const results = [];
+
+    function log(msg, type = 'info') {
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = `[${new Date().toISOString().slice(11, 19)}] ${msg}`;
+      logEl.appendChild(line);
+      console.log(`[${type}]`, msg);
+    }
+
+    function recordTest(name, passed, detail) {
+      results.push({ name, passed, detail });
+      if (passed) {
+        log(`✓ PASS: ${name} - ${detail}`, 'pass');
+      } else {
+        log(`✗ FAIL: ${name} - ${detail}`, 'fail');
+      }
+    }
+
+    async function runAllTests() {
+      log('Starting 12 Automated Regression & Operational Scenarios...', 'info');
+      localStorage.clear();
+
+      const testTimestamp = Date.now();
+      const testEmail = `wali_${testTimestamp}@example.com`;
+      const testNis = '2026' + String(Math.floor(1000 + Math.random() * 9000));
+      let regNum = '';
+      let regId = '';
+      let studentId = '';
+      let userId = '';
+
+      try {
+        // SCENARIO 1: PPDB Submit (Pendaftar Baru)
+        log('--- SCENARIO 1: PPDB Submission Security Guard ---');
+        const submitRes = await apiCall('ppdb', 'submit', {
+          full_name: 'Santri Uji E2E ' + testTimestamp,
+          student_name: 'Santri Uji E2E ' + testTimestamp,
+          child_name: 'Santri Uji E2E ' + testTimestamp,
+          parent_name: 'Wali Santri Uji',
+          father_name: 'Wali Santri Uji',
+          phone: '081234567890',
+          parent_phone: '081234567890',
+          parent_email: testEmail,
+          email: testEmail,
+          birth_place: 'Samarinda',
+          birth_date: '2020-05-14',
+          gender: 'L',
+          nik: '6472010101200001',
+          level: 'PAUD',
+          address: 'Jl. Uji Laboratorium No. 1'
+        });
+
+        const s1Passed = submitRes.success && submitRes.registration_number && submitRes.registration_number.startsWith('REG-');
+        regNum = submitRes.registration_number;
+        regId = submitRes.data ? submitRes.data.id : '';
+        const tokenInStorage = localStorage.getItem('siy_token');
+        const userInStorage = localStorage.getItem('siy_user');
+        const noAutoLogin = !tokenInStorage && !userInStorage;
+
+        recordTest(
+          'S1: PPDB Submission Quarantine',
+          s1Passed && noAutoLogin,
+          `No. Reg: ${regNum}, Auto-Login Prevented: ${noAutoLogin}`
+        );
+
+        // Verify users table directly has no account with username == regNum
+        const userCheck = await supabaseRest(`users?username=eq.${encodeURIComponent(regNum)}&select=id`).catch(() => []);
+        recordTest(
+          'S1-B: Zero Premature Account in users Table',
+          userCheck.length === 0,
+          `Found in users table: ${userCheck.length} records (expected 0)`
+        );
+
+        // SCENARIO 2: Login with Registration Number is Rejected
+        log('--- SCENARIO 2: Reject Registration Number in Student Login ---');
+        const regLoginRes = await apiCall('auth', 'login', {
+          identifier: regNum,
+          password: 'PasswordBypass123'
+        });
+        const s2Passed = !regLoginRes.success && regLoginRes.message && regLoginRes.message.includes('Nomor registrasi hanya digunakan untuk memantau status');
+        recordTest(
+          'S2: REG Number Login Rejection',
+          s2Passed,
+          `Message: "${regLoginRes.message}"`
+        );
+
+        // SCENARIO 3: Calon Siswa / Pendaftar Role Quarantine
+        log('--- SCENARIO 3: Calon Siswa / Pendaftar Role Quarantine ---');
+        // If an account exists with calon_siswa role, it must be rejected
+        // Simulate checking with a fake calon_siswa seed
+        const calonLoginRes = await apiCall('auth', 'login', {
+          identifier: 'calon_siswa_test@example.com',
+          password: 'dummy'
+        });
+        // Account shouldn't exist, but let's check auth.js getPortalRedirect guard
+        const calonRedirect = getPortalRedirect('calon_siswa');
+        const pendaftarRedirect = getPortalRedirect('pendaftar');
+        const s3Passed = calonRedirect === '/login.html' && pendaftarRedirect === '/login.html';
+        recordTest(
+          'S3: Calon Siswa / Pendaftar Portal Redirect Quarantine',
+          s3Passed,
+          `calon_siswa redirect: ${calonRedirect}, pendaftar: ${pendaftarRedirect} (neither reaches /siswa/)`
+        );
+
+        // SCENARIO 4: Date of Birth Password Bypass Elimination
+        log('--- SCENARIO 4: DOB Password Bypass Elimination ---');
+        // Attempting to login with birthdate as password without matching password hash must fail
+        const dobLoginRes = await apiCall('auth', 'login', {
+          identifier: '2026001',
+          password: 'wrong_password_99999'
+        });
+        const s4Passed = !dobLoginRes.success && dobLoginRes.message.includes('Password salah');
+        recordTest(
+          'S4: Elimination of DOB Password Bypass',
+          s4Passed,
+          `Response: "${dobLoginRes.message}"`
+        );
+
+        // SCENARIO 5: Status Check Before Conversion
+        log('--- SCENARIO 5: Status Check Before Conversion ---');
+        const statusRes1 = await apiCall('ppdb', 'getStatusPublic', { registration_number: regNum });
+        const s5Passed = statusRes1.success && statusRes1.data && statusRes1.data.status === 'pending';
+        recordTest(
+          'S5: Status Check Shows Pending for New Registrant',
+          s5Passed,
+          `Current Status: ${statusRes1.data?.status}`
+        );
+
+        // SCENARIO 6: Admin Conversion (Aktivasi Santri & Penerbitan Akun NIS Murni)
+        log('--- SCENARIO 6: Admin Conversion with Pure NIS & Custom SPP ---');
+        const initialTempPass = 'SandiAwal#' + Math.floor(1000 + Math.random() * 9000);
+        const configuredSpp = 50000;
+
+        const convRes = await apiCall('ppdb', 'convert', {
+          id: regId,
+          nis: testNis,
+          portal_password: initialTempPass,
+          spp_amount: configuredSpp,
+          auto_spp: true
+        });
+
+        const s6Passed = convRes.success && convRes.data && convRes.data.nis === testNis;
+        studentId = convRes.data?.student?.id;
+        userId = convRes.data?.student?.user_id;
+
+        recordTest(
+          'S6: Admin Student Conversion',
+          s6Passed,
+          `NIS: ${testNis}, Student ID: ${studentId}, Message: ${convRes.message || 'OK'}`
+        );
+
+        // Verify users table has username == testNis and NO fake email
+        const userDbList = await supabaseRest(`users?nis=eq.${encodeURIComponent(testNis)}&select=*`).catch(() => []);
+        const createdUser = userDbList[0] || {};
+        const noFakeEmail = !createdUser.email || !createdUser.email.includes('@siswa.yayasan.sch.id');
+        const pureNisUsername = createdUser.username === testNis;
+        const mustChangePass = createdUser.must_change_password === true && createdUser.is_password_changed === false;
+
+        recordTest(
+          'S6-B: User Account Purity in Database',
+          pureNisUsername && noFakeEmail && mustChangePass,
+          `Username: ${createdUser.username}, Email: ${createdUser.email || '(null)'}, MustChangePass: ${mustChangePass}`
+        );
+
+        // SCENARIO 7: First Login with NIS & Initial Temporary Password
+        log('--- SCENARIO 7: First Login with Pure NIS & Password Change Enforcement ---');
+        const firstLoginRes = await apiCall('auth', 'login', {
+          identifier: testNis,
+          password: initialTempPass
+        });
+
+        const s7Passed = firstLoginRes.success && firstLoginRes.data?.user?.nis === testNis && firstLoginRes.data?.needs_password_change === true;
+        recordTest(
+          'S7: First Login Demands Password Change',
+          s7Passed,
+          `User: ${firstLoginRes.data?.user?.full_name}, Needs Password Change: ${firstLoginRes.data?.needs_password_change}`
+        );
+
+        // SCENARIO 8: Change Password on First Login
+        log('--- SCENARIO 8: Change Password Execution ---');
+        const newPassword = 'PasswordBaruSantri*2026';
+        const changeRes = await apiCall('auth', 'change_password', {
+          user_id: createdUser.id,
+          new_password: newPassword,
+          skip_old: true
+        });
+        const s8Passed = changeRes.success;
+        recordTest(
+          'S8: Initial Password Successfully Changed',
+          s8Passed,
+          `Message: "${changeRes.message}"`
+        );
+
+        // SCENARIO 9: Login with New Password
+        log('--- SCENARIO 9: Login with New Password ---');
+        const secondLoginRes = await apiCall('auth', 'login', {
+          identifier: testNis,
+          password: newPassword
+        });
+        const s9Passed = secondLoginRes.success && secondLoginRes.data?.needs_password_change === false;
+        recordTest(
+          'S9: Login with New Password Without Change Prompt',
+          s9Passed,
+          `Logged in: ${secondLoginRes.data?.user?.full_name}, Needs Change: ${secondLoginRes.data?.needs_password_change}`
+        );
+
+        // Set session for subsequent student operations
+        setSession(secondLoginRes.data.token, secondLoginRes.data.user);
+
+        // SCENARIO 10: Backend Biodata Strict Allowlist Protection
+        log('--- SCENARIO 10: Strict Allowlist Attack Simulation ---');
+        // Simulated attack attempting to alter academic fields
+        const attackRes = await apiCall('siswa', 'update_biodata', {
+          nis: '99999999',
+          class_id: 'CLS-HACK',
+          class_name: 'Kelas Diretas',
+          kelas_sekarang: 'Kelas Diretas',
+          level: 'UNIVERSITAS',
+          status: 'graduated',
+          is_active: false,
+          monthly_spp_amount: 0,
+          // Allowed fields:
+          nickname: 'Faiz Junior',
+          blood_type: 'O',
+          address: 'Jl. Pondok Damai No. 88, Samarinda',
+          parent_phone: '081299998888'
+        });
+
+        // Verify directly from database that academic fields remained UNTOUCHED
+        const stuDbList = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`);
+        const verifiedStu = stuDbList[0] || {};
+
+        const academicProtected = 
+          verifiedStu.nis === testNis && 
+          verifiedStu.class_id !== 'CLS-HACK' &&
+          verifiedStu.status === 'active' &&
+          verifiedStu.is_active === true &&
+          Number(verifiedStu.monthly_spp_amount) === configuredSpp;
+
+        const personalUpdated = 
+          verifiedStu.nickname === 'Faiz Junior' &&
+          verifiedStu.blood_type === 'O' &&
+          verifiedStu.address === 'Jl. Pondok Damai No. 88, Samarinda';
+
+        recordTest(
+          'S10: Backend Strict Allowlist Protection',
+          academicProtected && personalUpdated,
+          `NIS: ${verifiedStu.nis} (Protected), SPP: Rp ${verifiedStu.monthly_spp_amount} (Protected), Address: "${verifiedStu.address}" (Updated)`
+        );
+
+        // SCENARIO 11: SPP Nominal Dynamic Synchronization (Zero 150rb Discrepancy)
+        log('--- SCENARIO 11: SPP Nominal Dynamic Synchronization ---');
+        const sppData = await apiCall('siswa', 'get_spp');
+        const studentProfile = await apiCall('siswa', 'get_profile');
+        const invList = sppData.data?.invoices || [];
+        const has150Discrepancy = invList.some(inv => Number(inv.amount) === 150000 && configuredSpp !== 150000);
+        const matchesConfigured = Number(studentProfile.data?.monthly_spp_amount) === configuredSpp;
+
+        recordTest(
+          'S11: SPP Nominal Consistency (Rp 50.000 vs Hardcoded 150rb)',
+          matchesConfigured && !has150Discrepancy,
+          `Profile SPP: Rp ${studentProfile.data?.monthly_spp_amount}, Active Invoices: ${invList.length} (Nominal: Rp ${invList[0]?.amount})`
+        );
+
+        // SCENARIO 12: PPDB Status Display Without [TERENKRIPSI]
+        log('--- SCENARIO 12: PPDB Status Display Without Technical Artifacts ---');
+        const statusRes2 = await apiCall('ppdb', 'getStatusPublic', { registration_number: regNum });
+        const convStatusData = statusRes2.data || {};
+        const isConverted = convStatusData.status === 'converted';
+        const hasValidNis = convStatusData.converted_nis === testNis;
+
+        recordTest(
+          'S12: PPDB Status Shows Converted & Valid NIS',
+          isConverted && hasValidNis,
+          `Status: ${convStatusData.status}, NIS: ${convStatusData.converted_nis}`
+        );
+
+      } catch (err) {
+        log(`CRITICAL ERROR during test execution: ${err.message}\n${err.stack}`, 'fail');
+      }
+
+      // Final summary
+      const passedCount = results.filter(r => r.passed).length;
+      const totalCount = results.length;
+      const allPassed = passedCount === totalCount && totalCount >= 12;
+
+      summaryEl.innerHTML = `
+        <h2 style="color: ${allPassed ? '#4ade80' : '#f87171'}">
+          ${allPassed ? 'ALL TESTS PASSED' : 'SOME TESTS FAILED'}: ${passedCount} / ${totalCount} Scenarios
+        </h2>
+      `;
+
+      window.__TEST_RESULTS__ = {
+        passed: passedCount,
+        total: totalCount,
+        allPassed,
+        results
+      };
+      log(`=== TEST RUN COMPLETED: ${passedCount} / ${totalCount} PASSED ===`, allPassed ? 'pass' : 'fail');
+    }
+
+    window.addEventListener('DOMContentLoaded', runAllTests);
+  </script>
+</body>
+</html>

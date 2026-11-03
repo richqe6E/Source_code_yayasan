@@ -189,7 +189,7 @@
         <div>
           <div class="mb-1.5">
             <label for="identifier" id="identifier-label" class="block text-xs font-bold text-slate-700">
-              NIS Lokal / Nomor Registrasi PPDB *
+              Nomor Induk Siswa (NIS) *
             </label>
           </div>
 
@@ -203,7 +203,7 @@
               name="identifier" 
               required
               autocomplete="username"
-              placeholder="Contoh: 2026001 atau REG-2026-0001" 
+              placeholder="Contoh: 2026001" 
               class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 text-sm font-medium text-slate-800 placeholder-slate-400 outline-none transition"
             >
           </div>
@@ -383,8 +383,8 @@
       } else {
         tabSiswa.className = 'flex-1 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition flex items-center justify-center gap-1.5 font-semibold';
         tabAdmin.className = 'flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5 font-semibold';
-        label.textContent = 'NIS Lokal / Nomor Registrasi PPDB *';
-        input.placeholder = 'Contoh: 2026001 atau REG-2026-0001';
+        label.textContent = 'Nomor Induk Siswa (NIS) *';
+        input.placeholder = 'Contoh: 2026001';
         input.type = 'text';
         icon.className = 'fi fi-rr-graduation-cap text-base';
       }
@@ -444,15 +444,15 @@
         if (body) {
           body.innerHTML = `
             <div class="p-3.5">
-              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">NIS Lokal atau Nomor Registrasi PPDB (Anak Usia &lt; 3 Tahun)</div>
+              <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Nomor Induk Siswa (NIS)</div>
               <div class="text-slate-700 mt-1 leading-relaxed">
-                Bagi santri aktif yang telah diterima, masukkan <strong>NIS Lokal</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">2026001</code>). Bagi pendaftar baru PPDB (termasuk anak usia dini &lt; 3 tahun yang belum memiliki NIS), gunakan <strong>Nomor Registrasi PPDB</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">REG-2026-0001</code>) atau Email pendaftaran.
+                Portal Siswa diperuntukkan bagi <strong>santri aktif</strong> yang telah resmi diterima dan memiliki <strong>NIS</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800 font-bold">2026001</code>). Bagi pendaftar baru PPDB yang memegang <strong>Nomor Registrasi (REG-...)</strong>, silakan pantau pengumuman di menu <a href="ppdb/status.html" class="text-brand-600 font-bold underline">Cek Status PPDB</a>.
               </div>
             </div>
             <div class="p-3.5">
               <div class="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Kata Sandi Awal</div>
               <div class="text-slate-700 mt-1 leading-relaxed">
-                Gunakan format <strong>Tanggal Lahir</strong> (contoh: <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800">2018-05-14</code> atau <code class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-800">14052018</code>) atau kata sandi yang Anda tentukan saat pendaftaran PPDB.
+                Gunakan kata sandi sementara yang diberikan oleh Tata Usaha sekolah saat konversi pendaftaran. Demi keamanan akun, Anda wajib membuat kata sandi baru pribadi saat pertama kali masuk ke Portal Siswa.
               </div>
             </div>
             <div class="p-3.5">
@@ -495,6 +495,12 @@
       }
 
       btn.disabled = true;
+      if (currentLoginMode === 'siswa' && identifier.toUpperCase().startsWith('REG')) {
+        showToast('Nomor registrasi hanya untuk memantau status PPDB di halaman Status. Login Siswa menggunakan NIS.', 'warning');
+        btn.disabled = false;
+        btnText.textContent = 'Masuk ke SIAKAD';
+        return;
+      }
       btnText.textContent = 'Memverifikasi...';
 
       try {
@@ -506,13 +512,20 @@
 
           // Role Guard berdasarkan tab aktif
           const rawRole = (user.role && user.role.code) ? user.role.code : (user.role || '');
-          const isStudentRole = (rawRole === 'siswa_aktif' || rawRole === 'calon_siswa' || rawRole === 'student' || rawRole === 'siswa');
+          const isStudentRole = (rawRole === 'siswa_aktif' || rawRole === 'siswa');
           const isAdminRole = (rawRole === 'super_admin' || rawRole === 'admin' || rawRole === 'admin_tu' || rawRole === 'kepala_sekolah' || rawRole === 'staff');
 
           if (currentLoginMode === 'admin' && isStudentRole) {
             showToast('Akun ini terdaftar sebagai Siswa. Silakan gunakan tab "Siswa" untuk masuk.', 'warning');
             btn.disabled = false;
             btnText.textContent = 'Login';
+            return;
+          }
+
+          if (rawRole === 'calon_siswa' || rawRole === 'pendaftar') {
+            showToast('Akun Anda masih berstatus Calon Siswa. Akses Portal Siswa baru akan aktif setelah resmi diterima dan memiliki NIS.', 'warning');
+            btn.disabled = false;
+            btnText.textContent = 'Masuk ke SIAKAD';
             return;
           }
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SIYAYASAN V2 - Supabase Shared API Helper
  * Single apiCall() entry point connected directly to Supabase PostgreSQL & Storage.
  * Retains 100% contract compatibility with the portal frontend:
@@ -331,6 +331,13 @@
             return { success: false, message: 'Harap masukkan Email / NIS dan Password' };
           }
 
+          if (String(rawIdentifier).toUpperCase().startsWith('REG-') || String(rawIdentifier).toUpperCase().startsWith('REG')) {
+            return {
+              success: false,
+              message: 'Nomor registrasi hanya digunakan untuk memantau status pendaftaran PPDB di halaman Status PPDB. Akses Portal Siswa hanya menggunakan Nomor Induk Siswa (NIS) setelah calon santri resmi diterima dan diaktivasi.'
+            };
+          }
+
           let matchedUser = null;
           let studentRecord = null;
           let needsPasswordChange = false;
@@ -349,84 +356,18 @@
           } else {
             try {
               // Identifier is a NIS or username
-              const users = await supabaseRest(`users?or=(nis.eq.${encodeURIComponent(rawIdentifier)},username.eq.${encodeURIComponent(rawIdentifier)},email.eq.${encodeURIComponent(rawIdentifier)})&status=eq.active&select=*`);
+              const users = await supabaseRest(`users?or=(nis.eq.${encodeURIComponent(rawIdentifier)},username.eq.${encodeURIComponent(rawIdentifier)})&status=eq.active&select=*`);
               if (users && users.length > 0) {
                 matchedUser = users[0];
               } else {
-                // Look up student by NIS
-                if (!matchedUser && String(rawIdentifier).toUpperCase().startsWith('REG')) {
-                  const regRows = await supabaseRest(`ppdb_registrations?or=(registration_number.eq.${encodeURIComponent(rawIdentifier.toUpperCase())},registration_no.eq.${encodeURIComponent(rawIdentifier.toUpperCase())},id.eq.${encodeURIComponent(rawIdentifier.toUpperCase())})&select=*`).catch(() => []);
-                  if (regRows && regRows.length > 0) {
-                    const r = regRows[0];
-                    const meta = (r.form_metadata && typeof r.form_metadata === 'object') ? r.form_metadata : {};
-                    const bDate = String(r.birth_date || r.student_birth_date || '').trim();
-                    const customPass = String(r.portal_password || meta.portal_password || meta.password || meta.account_password || r.password || '').trim();
-                    const regNoStr = r.registration_number || r.registration_no || rawIdentifier.toUpperCase();
-                    const isConverted = String(r.status || '').toLowerCase() === 'converted';
-                    matchedUser = {
-                      id: meta.user_id || ('USR-' + regNoStr),
-                      email: r.parent_email || `${regNoStr.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`,
-                      username: regNoStr,
-                      nis: r.converted_nis || meta.converted_nis || meta.nis || '',
-                      password_hash: customPass || bDate,
-                      birth_date: bDate,
-                      full_name: r.full_name || r.student_name || r.child_name || 'Calon Santri',
-                      name: r.full_name || r.student_name || r.child_name || 'Calon Santri',
-                      phone: r.parent_phone || r.phone || '',
-                      role: isConverted ? 'siswa_aktif' : 'calon_siswa',
-                      role_label: isConverted ? 'Siswa Aktif' : 'Calon Siswa / Pendaftar',
-                      status: 'active',
-                      student_id: meta.student_id || r.student_id || null,
-                      is_password_changed: true
-                    };
-                  }
-                }
-                const students = !matchedUser ? await supabaseRest(`students?nis=eq.${encodeURIComponent(rawIdentifier)}&select=*`) : [];
+                // Look up student by NIS in students table
+                const students = !matchedUser ? await supabaseRest(`students?nis=eq.${encodeURIComponent(rawIdentifier)}&status=eq.active&select=*`).catch(() => []) : [];
                 if (students && students.length > 0) {
                   studentRecord = students[0];
                   if (studentRecord.user_id) {
-                    const uList = await supabaseRest(`users?id=eq.${studentRecord.user_id}&select=*`);
+                    const uList = await supabaseRest(`users?id=eq.${encodeURIComponent(studentRecord.user_id)}&status=eq.active&select=*`).catch(() => []);
                     if (uList && uList.length > 0) {
                       matchedUser = uList[0];
-                    }
-                  }
-
-                  // If user account not linked yet, check birthdate as initial password
-                  if (!matchedUser) {
-                    const bDate = studentRecord.birth_date ? String(studentRecord.birth_date).trim() : '';
-                    const bDateClean = bDate.replace(/[^0-9]/g, '');
-                    const passClean = password.replace(/[^0-9]/g, '');
-                    let ddmmyyyy = '';
-                    if (bDate && bDate.includes('-')) {
-                      const parts = bDate.split('-');
-                      if (parts.length === 3) ddmmyyyy = parts[2] + parts[1] + parts[0];
-                    }
-
-                    const matchesBirthdate = password === bDate || 
-                                             password === ddmmyyyy || 
-                                             (passClean.length >= 6 && passClean === bDateClean) || 
-                                             (passClean.length >= 6 && passClean === ddmmyyyy);
-
-                    if (matchesBirthdate) {
-                      const newUserId = 'USR-' + (studentRecord.nis || Date.now());
-                      const newUserEmail = studentRecord.parent_email || `${studentRecord.nis}@siswa.yayasan.sch.id`;
-                      const newU = {
-                        id: newUserId,
-                        email: newUserEmail,
-                        password_hash: password,
-                        full_name: studentRecord.full_name || studentRecord.name || 'Siswa',
-                        phone: studentRecord.parent_phone || '',
-                        role: 'siswa_aktif',
-                        role_label: 'Siswa Aktif',
-                        status: 'active',
-                        nis: studentRecord.nis,
-                        student_id: studentRecord.id,
-                        is_password_changed: false
-                      };
-                      await supabaseRest('users', 'POST', newU).catch(() => {});
-                      await supabaseRest(`students?id=eq.${studentRecord.id}`, 'PATCH', { user_id: newUserId }).catch(() => {});
-                      matchedUser = newU;
-                      needsPasswordChange = true;
                     }
                   }
                 }
@@ -520,6 +461,15 @@
             return { success: false, message: 'Akun tidak ditemukan. Periksa Email atau NIS Anda.' };
           }
 
+          // Karantina Hak Akses Portal Siswa (Calon Siswa / Pendaftar dilarang login ke Portal Siswa)
+          const rawRoleCode = String((matchedUser.role && matchedUser.role.code) ? matchedUser.role.code : (matchedUser.role || '')).toLowerCase();
+          if (rawRoleCode === 'calon_siswa' || rawRoleCode === 'pendaftar') {
+            return {
+              success: false,
+              message: 'Status pendaftaran Anda belum dikonversi menjadi siswa aktif. Akses Portal Siswa baru akan aktif setelah Anda dinyatakan diterima dan mendapatkan NIS resmi dari Tata Usaha.'
+            };
+          }
+
           // Check password (Dual-Mode: Salted Hash with lazy migration for legacy plaintext)
           let passwordMatched = false;
           if (matchedUser.password_salt) {
@@ -545,45 +495,8 @@
           }
 
           if (!passwordMatched) {
-            // Check if initial login with birthdate or fallback
-            let passedBirthdate = false;
-            if (!matchedUser.birth_date && !studentRecord) {
-              try {
-                if (matchedUser.student_id) {
-                  const sRows = await supabaseRest(`students?id=eq.${encodeURIComponent(matchedUser.student_id)}&select=birth_date`).catch(() => []);
-                  if (sRows && sRows[0] && sRows[0].birth_date) matchedUser.birth_date = sRows[0].birth_date;
-                }
-                if (!matchedUser.birth_date && matchedUser.nis) {
-                  const sRows = await supabaseRest(`students?nis=eq.${encodeURIComponent(matchedUser.nis)}&select=birth_date`).catch(() => []);
-                  if (sRows && sRows[0] && sRows[0].birth_date) matchedUser.birth_date = sRows[0].birth_date;
-                }
-                if (!matchedUser.birth_date && matchedUser.username && String(matchedUser.username).toUpperCase().startsWith('REG')) {
-                  const rRows = await supabaseRest(`ppdb_registrations?registration_number=eq.${encodeURIComponent(matchedUser.username)}&select=birth_date,student_birth_date`).catch(() => []);
-                  if (rRows && rRows[0]) matchedUser.birth_date = rRows[0].birth_date || rRows[0].student_birth_date || '';
-                }
-              } catch (_) {}
-            }
-            const bDate = String(matchedUser.birth_date || (studentRecord && studentRecord.birth_date) || '').trim();
-            const fallbackDob = String(matchedUser.fallback_dob_password || '').trim();
-            if (fallbackDob && password === fallbackDob) {
-              passedBirthdate = true;
-            }
-            if (bDate) {
-              const passClean = password.replace(/[^0-9]/g, '');
-              const bClean = bDate.replace(/[^0-9]/g, '');
-              let ddmmyyyy = '';
-              if (bDate.includes('-')) {
-                const parts = bDate.split('-');
-                if (parts.length === 3) ddmmyyyy = parts[2] + parts[1] + parts[0];
-              }
-              if (passClean === bClean || password === bDate || password === ddmmyyyy || passClean === ddmmyyyy) {
-                passedBirthdate = true;
-                needsPasswordChange = true;
-              }
-            }
-            if (!passedBirthdate) {
-              return { success: false, message: 'Password salah. Gunakan password saat pendaftaran PPDB atau gunakan Tanggal Lahir format DDMMYYYY (contoh: 14052020).' };
-            }
+            return { success: false, message: 'Password salah. Masukkan kata sandi yang sesuai atau hubungi Tata Usaha jika lupa kata sandi.' };
+          }
           }
 
           if (matchedUser.is_password_changed === false || matchedUser.must_change_password === true) {
@@ -622,90 +535,11 @@
         }
 
         if (action === 'register') {
-          // Fase 1 PPDB: Pembuatan Akun Calon Siswa Baru
-          const email = (params.email || '').trim().toLowerCase();
-          const password = (params.password || '').trim();
-          const fullName = (params.full_name || params.nama || '').trim();
-          const phone = (params.phone || params.whatsapp || '').trim();
-
-          if (!email || !password || !fullName) {
-            return { success: false, message: 'Nama lengkap, email, dan password wajib diisi.' };
-          }
-
-          const existing = await supabaseRest(`users?email=eq.${encodeURIComponent(email)}&select=id`);
-          if (existing && existing.length > 0) {
-            return { success: false, message: 'Email sudah terdaftar. Silakan login langsung.' };
-          }
-
-          const userId = 'USR-' + Date.now();
-          const studentId = 'STU-' + Date.now();
-
-          const newUser = {
-            id: userId,
-            email: email,
-            password_hash: password,
-            full_name: fullName,
-            phone: phone,
-            role: 'calon_siswa',
-            role_label: 'Calon Siswa / Pendaftar',
-            birth_date: typeof birthDate !== 'undefined' ? birthDate : (params.birth_date || ''),
-            fallback_dob_password: password,
-            status: 'active',
-            student_id: studentId,
-            is_password_changed: true,
-            created_at: new Date().toISOString()
-          };
-
-          // Safe local persistence fallback
-          try {
-            const localUsers = JSON.parse(localStorage.getItem('siy_local_users') || '[]');
-            localUsers.push(newUser);
-            localStorage.setItem('siy_local_users', JSON.stringify(localUsers));
-          } catch (_) {}
-
-          await supabaseRest('users', 'POST', newUser).catch(err => console.warn('Supabase users insert warning:', err));
-
-          const newStudent = {
-            id: studentId,
-            user_id: userId,
-            full_name: fullName,
-            name: fullName,
-            parent_email: email,
-            parent_phone: phone,
-            status_pendaftaran: 'pending',
-            is_active: false,
-            status: 'pending',
-            created_at: new Date().toISOString()
-          };
-
-          try {
-            const localStudents = JSON.parse(localStorage.getItem('siy_local_students') || '[]');
-            localStudents.push(newStudent);
-            localStorage.setItem('siy_local_students', JSON.stringify(localStudents));
-          } catch (_) {}
-
-          await supabaseRest('students', 'POST', newStudent).catch(err => console.warn('Student init warning:', err));
-
-          const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
-          const userPayload = { ...newUser, role: roleObj, student_id: studentId };
-          delete userPayload.password_hash;
-          const token = 'siy_' + userId + '_' + Date.now();
-
-          // Auto-persist active session
-          if (!['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '')) localStorage.setItem('siy_token', token);
-          localStorage.setItem('siy_user', JSON.stringify(userPayload));
-
           return {
-            success: true,
-            data: {
-              token,
-              user: userPayload,
-              redirect: '/siswa/dashboard.html',
-              message: 'Akun pendaftar berhasil dibuat! Silakan melengkapi formulir biodata.'
-            }
+            success: false,
+            message: 'Pendaftaran calon santri baru dilakukan secara online melalui formulir PPDB Online.'
           };
         }
-
         if (action === 'change_password') {
           const targetUserId = params.user_id || (currentUser ? currentUser.id : null);
           if (!targetUserId) return { success: false, message: 'Harus login atau menyertakan identitas akun' };
@@ -1098,36 +932,49 @@
           let id = (stuRecord && stuRecord.id) || studentId;
           if (!id) return { success: false, message: 'Data siswa tidak ditemukan' };
 
+          // 1. Validasi Kepemilikan Sesi (Session Authorization Guard)
+          if (currentUser) {
+            const curRole = String((currentUser.role && currentUser.role.code) ? currentUser.role.code : (currentUser.role || '')).toLowerCase();
+            const isAdmin = ['super_admin', 'admin', 'admin_tu', 'kepala_sekolah', 'staff'].includes(curRole);
+            if (!isAdmin) {
+              const curStuId = currentUser.student_id;
+              const curUserId = currentUser.id;
+              if (stuRecord && ((stuRecord.user_id && stuRecord.user_id !== curUserId) || (curStuId && stuRecord.id !== curStuId))) {
+                return { success: false, message: 'Akses ditolak: Anda tidak memiliki wewenang mengubah data siswa ini.' };
+              }
+            }
+          }
+
           const payload = { ...params };
           delete payload.student_id;
-          // Normalisasi alias field form biodata -> struktur form_metadata PPDB
+
+          // 2. Strict Blacklist: Kolom Akademik & Finansial Mutlak Ditolak
+          const BANNED_ACADEMIC_COLS = [
+            'nis', 'nisn', 'class_id', 'class_name', 'kelas_sekarang', 'semester_sekarang',
+            'status_kenaikan', 'status_kelulusan', 'status_pendaftaran', 'level', 'program',
+            'registration_number', 'reg_number', 'status', 'is_active', 'monthly_spp_amount',
+            'user_id', 'id', 'created_at', 'joined_at', 'entry_year', 'entry_date'
+          ];
+          BANNED_ACADEMIC_COLS.forEach(c => delete payload[c]);
+
+          // 3. Normalisasi field pelengkap biodata
           if (payload.daily_language !== undefined && payload.language === undefined) payload.language = payload.daily_language;
           if (payload.special_traits !== undefined && payload.special_notes === undefined) payload.special_notes = payload.special_traits;
           if (payload.distance_km !== undefined && payload.distance === undefined) payload.distance = payload.distance_km;
           if (payload.transport_mode !== undefined && payload.transportation === undefined) payload.transportation = payload.transport_mode;
           if (payload.father_phone === undefined && payload.parent_phone !== undefined) payload.father_phone = payload.parent_phone;
           if (payload.father_phone_office !== undefined && payload.father_office === undefined) payload.father_office = payload.father_phone_office;
+
           const flatMetaExtras = {};
           ['daily_language', 'special_traits', 'distance_km', 'transport_mode', 'phone_2', 'father_phone_office',
            'father_education', 'father_ttl', 'mother_education', 'mother_ttl', 'mother_phone',
            'guardian_name', 'guardian_relation', 'guardian_job', 'guardian_phone', 'father_job', 'mother_job'].forEach(k => {
             if (payload[k] !== undefined) flatMetaExtras[k] = payload[k];
           });
-          const validStuCols = [
-            'nis', 'nisn', 'full_name', 'name', 'child_name', 'nickname', 'nik',
-            'gender', 'birth_place', 'birth_date', 'class_id', 'class_name',
-            'kelas_sekarang', 'semester_sekarang', 'status_kenaikan', 'status_kelulusan',
-            'status_pendaftaran', 'parent_id', 'parent_name', 'father_name', 'mother_name',
-            'parent_email', 'parent_phone', 'phone', 'father_phone', 'mother_phone',
-            'father_occupation', 'mother_occupation', 'previous_school', 'blood_type',
-            'hobbies', 'joined_at', 'address', 'religion', 'entry_year', 'photo_url',
-            'program', 'level', 'registration_number', 'reg_number', 'status', 'is_active',
-            'form_metadata', 'notes'
-          ];
+
           const prevMeta = (stuRecord && stuRecord.form_metadata && typeof stuRecord.form_metadata === 'object') ? stuRecord.form_metadata : {};
           const mergedMeta = {
             ...prevMeta,
-            nik: payload.nik !== undefined ? payload.nik : prevMeta.nik,
             nickname: payload.nickname !== undefined ? payload.nickname : prevMeta.nickname,
             child_order: payload.child_order !== undefined ? payload.child_order : prevMeta.child_order,
             siblings_count: payload.siblings_count !== undefined ? payload.siblings_count : prevMeta.siblings_count,
@@ -1138,12 +985,6 @@
             citizenship: payload.citizenship !== undefined ? payload.citizenship : prevMeta.citizenship,
             language: payload.language !== undefined ? payload.language : prevMeta.language,
             special_notes: payload.special_notes !== undefined ? payload.special_notes : prevMeta.special_notes,
-            mutasi: {
-              ...(prevMeta.mutasi || {}),
-              ...(payload.entry_date !== undefined ? { entry_date: payload.entry_date } : {}),
-              ...(payload.group_name !== undefined ? { group_name: payload.group_name } : {}),
-              ...(payload.previous_school !== undefined ? { previous_school: payload.previous_school } : {})
-            },
             full_address: {
               ...(prevMeta.full_address || {}),
               ...(payload.address !== undefined ? { address: payload.address } : {}),
@@ -1187,13 +1028,23 @@
               ...(payload.guardian_office !== undefined ? { office_address: payload.guardian_office } : {})
             }
           };
+
           if (payload.father_job !== undefined && payload.father_occupation === undefined) payload.father_occupation = payload.father_job;
           if (payload.mother_job !== undefined && payload.mother_occupation === undefined) payload.mother_occupation = payload.mother_job;
-          if (payload.entry_date !== undefined && payload.joined_at === undefined && payload.entry_date) payload.joined_at = payload.entry_date;
           payload.form_metadata = { ...mergedMeta, ...flatMetaExtras };
           Object.assign(mergedMeta, flatMetaExtras);
+
+          // 4. Strict Whitelist: Hanya kolom profil pribadi santri yang diizinkan diperbarui
+          const ALLOWED_BIODATA_COLS = [
+            'nickname', 'blood_type', 'hobbies', 'aspirations', 'religion',
+            'address', 'parent_phone', 'phone', 'father_phone', 'mother_phone',
+            'father_occupation', 'mother_occupation', 'father_name', 'mother_name',
+            'parent_name', 'guardian_name', 'guardian_relation', 'guardian_job',
+            'guardian_phone', 'guardian_office', 'daily_language', 'special_traits',
+            'distance_km', 'transport_mode', 'form_metadata'
+          ];
           for (const k of Object.keys(payload)) {
-            if (!validStuCols.includes(k)) delete payload[k];
+            if (!ALLOWED_BIODATA_COLS.includes(k)) delete payload[k];
           }
           delete payload.id;
           const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
@@ -2621,125 +2472,12 @@
             localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(localRegs));
           } catch (_) {}
 
-          // 2. Buat akun login Portal Siswa untuk Calon Siswa (dengan Salted SHA-256 Hashing - BUG-005 Fix)
-          const userSalt = generateSalt(16);
-          const userHashedPassword = await hashPassword(password, userSalt);
-          let birthDatePassword = (typeof birthDate === 'string' ? birthDate.replace(/[^0-9]/g, '') : '');
-          if (birthDate.includes('-')) {
-            const p = birthDate.split('-');
-            if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
-          }
-
-          const newUser = {
-            id: userId,
-            email: emailForLogin,
-            username: regNum,
-            password_hash: userHashedPassword,
-            password_salt: userSalt,
-            full_name: studentName,
-            name: studentName,
-            phone: parentPhone,
-            role: 'calon_siswa',
-            role_label: 'Calon Siswa / Pendaftar',
-            birth_date: typeof birthDate !== 'undefined' ? birthDate : (params.birth_date || ''),
-            fallback_dob_password: birthDatePassword,
-            status: 'active',
-            student_id: studentId,
-            is_password_changed: true,
-            created_at: new Date().toISOString()
-          };
-
-          try {
-            const localUsers = JSON.parse(localStorage.getItem('siy_local_users') || '[]');
-            localUsers.push(newUser);
-            localStorage.setItem('siy_local_users', JSON.stringify(localUsers));
-          } catch (_) {}
-
-          await supabaseRest('users', 'POST', newUser).catch(err => console.warn('User account warning:', err));
-
-          // 3. Buat record di students
-          const newStudent = {
-            id: studentId,
-            user_id: userId,
-            full_name: studentName,
-            name: studentName,
-            nickname: params.nickname || '',
-            nik: params.nik || cleanMeta.nik || '',
-            gender: gender,
-            birth_place: birthPlace,
-            birth_date: birthDate,
-            address: address,
-            father_name: params.father_name || parentName,
-            mother_name: params.mother_name || '',
-            parent_name: parentName,
-            parent_phone: parentPhone,
-            parent_email: emailForLogin,
-            status_pendaftaran: 'pending',
-            is_active: false,
-            status: 'calon_siswa',
-            registration_number: regNum,
-            reg_number: regNum,
-            level: level,
-            program: level,
-            form_metadata: cleanMeta,
-            photo_url: photoUrl || '',
-            created_at: new Date().toISOString()
-          };
-
-          try {
-            const localStudents = JSON.parse(localStorage.getItem('siy_local_students') || '[]');
-            localStudents.push(newStudent);
-            localStorage.setItem('siy_local_students', JSON.stringify(localStudents));
-          } catch (_) {}
-
-          await supabaseRest('students', 'POST', newStudent).catch(e => console.warn('Student profile insert warning:', e));
-
-          // Sinkronkan berkas yang diunggah saat PPDB ke tabel student_documents
-          const initialDocs = [
-            { type: 'pas_foto', name: 'Pas Foto 3x4', url: photoUrl },
-            { type: 'akta_kelahiran', name: 'Akta Kelahiran', url: certUrl },
-            { type: 'kartu_keluarga', name: 'Kartu Keluarga', url: kkUrl }
-          ].filter(d => d.url);
-          for (const doc of initialDocs) {
-              await supabaseRest('student_documents', 'POST', {
-                id: 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                student_id: studentId,
-                document_type: doc.type,
-                file_name: doc.name,
-                file_url: doc.url,
-                is_verified: false
-              }).catch(async () => {
-                await supabaseRest('student_documents', 'POST', {
-                  id: 'DOC-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-                  student_id: studentId,
-                  document_type: doc.type,
-                  file_name: doc.name,
-                  file_url: doc.url
-                }).catch(() => {});
-              });
-          }
-
-          // 4. Simpan sesi login otomatis ke localStorage
-          const roleObj = { code: 'calon_siswa', name: 'Calon Siswa / Pendaftar' };
-          const userSession = { ...newUser, role: roleObj, student_id: studentId };
-          delete userSession.password_hash;
-          const token = 'siy_' + userId + '_' + Date.now();
-          if (!['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '')) localStorage.setItem('siy_token', token);
-          const curRole = currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '';
-          const isCurAdmin = ['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(curRole);
-          if (!isCurAdmin) {
-            if (!['super_admin', 'admin_tu', 'admin', 'kepala_sekolah', 'staff', 'guru'].includes(currentUser ? String(currentUser.role?.code || currentUser.role || '').toLowerCase() : '')) localStorage.setItem('siy_token', token);
-            localStorage.setItem('siy_user', JSON.stringify(userSession));
-          }
-
           return {
             success: true,
             data: (res && res[0]) || regPayload,
             registration_number: regNum,
             registration_no: regNum,
-            login_email: emailForLogin,
-            login_password: password,
-            message: 'Pendaftaran PPDB berhasil diajukan! Akun portal calon siswa Anda telah aktif.'
+            message: "Pendaftaran PPDB berhasil diajukan! Simpan Nomor Registrasi Anda (" + regNum + ") untuk memantau status seleksi di halaman Cek Status PPDB."
           };
         }
         if (action === 'getStatusPublic' || action === 'check_status' || action === 'status') {
@@ -3077,34 +2815,32 @@
           const targetSppAmount = Number(params.spp_amount || params.monthly_spp_amount || params.amount) || defaultProgramFee(reg.level || reg.form_type) || 150000;
 
           const regNo = reg.registration_number || reg.registration_no || '';
-          const pendaftarEmail = `${regNo.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
-          const cleanPhone = (reg.phone || reg.parent_phone || '').replace(/[^0-9]/g, '');
-          const studentEmail = reg.email || reg.parent_email || (cleanPhone ? `${studentNis}@siswa.yayasan.sch.id` : `siswa_${studentNis}@yayasan.sch.id`);
+          const studentEmail = reg.email || reg.parent_email || null;
           const studentName = reg.student_name || reg.full_name || reg.child_name || 'Santri Baru';
 
-          // 5. Cek apakah user akun pendaftar sudah ada (cari via email, username regNo, atau email pendaftar)
-          let existingUsers = await supabaseRest(
-            `users?or=(email.eq.${encodeURIComponent(studentEmail)},username.eq.${encodeURIComponent(regNo)},email.eq.${encodeURIComponent(pendaftarEmail)})&select=*`
-          ).catch(() => []);
+          // 5. Cek apakah akun user untuk NIS ini sudah ada (Idempotensi Akun)
+          const userLookupQuery = studentEmail 
+            ? `users?or=(nis.eq.${encodeURIComponent(studentNis)},username.eq.${encodeURIComponent(studentNis)},email.eq.${encodeURIComponent(studentEmail)})&select=*`
+            : `users?or=(nis.eq.${encodeURIComponent(studentNis)},username.eq.${encodeURIComponent(studentNis)})&select=*`;
+          let existingUsers = await supabaseRest(userLookupQuery).catch(() => []);
 
           let userId = (existingUsers && existingUsers[0])
             ? existingUsers[0].id
             : ((reg.form_metadata && reg.form_metadata.user_id) || ('USR-' + studentNis));
           let stuId = (existingUsers && existingUsers[0] && existingUsers[0].student_id)
             ? existingUsers[0].student_id
-            : ((reg.form_metadata && reg.form_metadata.student_id) || ('STU-' + String(Date.now()).slice(-5)));
+            : ((reg.form_metadata && reg.form_metadata.student_id) || ('STU-' + studentNis));
 
           const userPayloadToSave = {
+            username: studentNis,
+            nis: studentNis,
             email: studentEmail,
             role: 'siswa_aktif',
             role_label: 'Siswa Aktif',
-            nis: studentNis,
             student_id: stuId,
             password_hash: initialHashedPassword,
             password_salt: initialSalt,
             must_change_password: true,
-            birth_date: birthDateStr,
-            fallback_dob_password: birthDatePassword,
             is_password_changed: false,
             status: 'active'
           };
@@ -3118,7 +2854,8 @@
               full_name: studentName,
               name: studentName,
               phone: reg.phone || reg.parent_phone || '',
-              avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'
+              avatar: reg.photo_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+              created_at: new Date().toISOString()
             };
             await supabaseRest('users', 'POST', newUserRecord).catch(() => {});
           }

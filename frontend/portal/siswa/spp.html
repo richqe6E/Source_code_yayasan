@@ -74,7 +74,7 @@
 
       <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Biaya SPP Bulanan</span>
-        <div class="text-2xl font-extrabold text-slate-900 tabular-nums">Rp 150.000</div>
+        <div class="text-2xl font-extrabold text-slate-900 tabular-nums" id="stat-monthly-fee">-</div>
         <span class="text-xs text-slate-500 mt-1 block">Jatuh tempo tgl 10 tiap bulan</span>
       </div>
     </div>
@@ -279,6 +279,24 @@
         const invoices = (res.success && res.data && res.data.invoices) ? res.data.invoices : [];
         const payments = (res.success && res.data && res.data.payments) ? res.data.payments : [];
         invoicesCache = invoices;
+
+        // Tampilkan tarif SPP bulanan dinamis
+        let monthlyAmount = (res.data && res.data.monthly_spp_amount) ? Number(res.data.monthly_spp_amount) : 0;
+        if (!monthlyAmount && invoices.length > 0 && invoices[0].amount) {
+          monthlyAmount = Number(invoices[0].amount);
+        }
+        if (!monthlyAmount) {
+          try {
+            const pRes = await apiCall('siswa', 'get_profile');
+            if (pRes && pRes.success && pRes.data && pRes.data.monthly_spp_amount) {
+              monthlyAmount = Number(pRes.data.monthly_spp_amount);
+            }
+          } catch (_) {}
+        }
+        const statMonthlyEl = document.getElementById('stat-monthly-fee');
+        if (statMonthlyEl) {
+          statMonthlyEl.textContent = monthlyAmount > 0 ? formatIDR(monthlyAmount) : 'Rp 0';
+        }
         const tbody = document.getElementById('invoices-table-body');
 
         if (invoices.length === 0) {
@@ -351,7 +369,7 @@
             `;
           } else {
             statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Belum Bayar</span>';
-            const waPayMsg = `Assalamu'alaikum Bendahara Yayasan At Tarbiyyah Wijaya Kusuma Samarinda, saya ingin konfirmasi pembayaran SPP:\n- Nama Siswa: ${user.full_name || user.name || '-'}\n- NIS: ${user.nis || '-'}\n- Tagihan: ${inv.month || inv.description || 'SPP'}\n- Nominal: ${formatIDR(inv.amount || 150000)}\nMohon info nomor rekening / konfirmasi pembayaran. Terima kasih.`;
+            const waPayMsg = `Assalamu'alaikum Bendahara Yayasan At Tarbiyyah Wijaya Kusuma Samarinda, saya ingin konfirmasi pembayaran SPP:\n- Nama Siswa: ${user.full_name || user.name || '-'}\n- NIS: ${user.nis || '-'}\n- Tagihan: ${inv.month || inv.description || 'SPP'}\n- Nominal: ${formatIDR(inv.amount || monthlyAmount || 0)}\nMohon info nomor rekening / konfirmasi pembayaran. Terima kasih.`;
             actionBtn = `
               <div class="flex items-center justify-end gap-1.5">
                 <button onclick="openPayModal('${inv.id}', '${inv.month || inv.description}', ${inv.amount})" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs transition shadow-sm">
@@ -411,7 +429,7 @@
       const className = user.class_name || 'PAUD / TK Terpadu';
       const invNum = inv.invoice_number || ('INV/' + new Date().getFullYear() + '/SPP');
       const month = inv.month || inv.item_name || inv.description || 'SPP Bulanan';
-      const amount = inv.amount || 150000;
+      const amount = Number(inv.amount) || 0;
       const paidAt = inv.paid_at ? (window.formatDate ? formatDate(inv.paid_at) : inv.paid_at) : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       const paidBy = inv.payment_method || inv.paid_by || 'Transfer Bank Yayasan';
 
