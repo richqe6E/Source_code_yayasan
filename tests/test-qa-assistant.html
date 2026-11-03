@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Suite - SIYAYASAN Smart Q/A Engine</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; background: #0f172a; color: #f8fafc; line-height: 1.5; }
+    h1 { color: #38bdf8; font-size: 20px; margin-bottom: 8px; }
+    p.sub { color: #94a3b8; font-size: 13px; margin-bottom: 24px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+    .pass { background: #064e3b; color: #34d399; border: 1px solid #059669; }
+    .fail { background: #881337; color: #f43f5e; border: 1px solid #e11d48; }
+    .query { color: #e2e8f0; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .expected { color: #94a3b8; font-size: 12px; }
+    .actual { color: #cbd5e1; font-size: 12px; margin-top: 4px; }
+    .summary-box { background: #0369a1; color: white; padding: 12px 16px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Test Suite — SIYAYASAN Smart Q/A Assistant & NLP Engine</h1>
+  <p class="sub">Validasi 10 Skenario Pengujian Intent, Scope Guardrails, dan Integrasi Navigasi.</p>
+
+  <div id="summary" class="summary-box">Menjalankan pengujian...</div>
+  <div id="results"></div>
+
+  <script src="../frontend/public/js/qa-knowledge-base.js"></script>
+  <script>
+    const testCases = [
+      {
+        id: 'T1_PPDB_VARIATIONS',
+        desc: 'Pertanyaan pendaftaran dengan variasi kalimat slang & informal',
+        queries: ['bagaimana cara daftar?', 'gimana cara daftar', 'saya mau masuk sekolah ini', 'bgmn registrasinya', 'mau daftar ppdb'],
+        validator: (res) => res.type === 'answer' && (res.intent === 'ppdb_register' || res.intent === 'ppdb_info') && res.actions.length > 0
+      },
+      {
+        id: 'T2_REQUIREMENTS',
+        desc: 'Pertanyaan persyaratan berkas PPDB',
+        queries: ['apa saja berkas yang dibutuhkan?', 'syarat pendaftaran', 'perlu pasfoto kah?', 'dokumen akta dan kk'],
+        validator: (res) => res.type === 'answer' && res.intent === 'ppdb_requirements' && res.answer.includes('Pasfoto') && res.answer.includes('Akta Kelahiran')
+      },
+      {
+        id: 'T3_LOCATION_CONTACT',
+        desc: 'Pertanyaan lokasi yayasan & kontak resmi',
+        queries: ['di mana alamat sekolah?', 'lokasi yayasan', 'nomor whatsapp admin', 'kontak resmi yayasan'],
+        validator: (res) => res.type === 'answer' && (res.intent === 'school_location' || res.intent === 'school_contacts') && (res.answer.includes('Wijaya Kusuma') || res.answer.includes('081347142829'))
+      },
+      {
+        id: 'T4_HOLIDAYS_HOURS',
+        desc: 'Pertanyaan hari libur dan jam operasional sekolah',
+        queries: ['sekolah libur kapan?', 'kapan sekolah libur?', 'hari apa saja masuk sekolah?', 'jam berapa jam belajar?'],
+        validator: (res) => res.type === 'answer' && (res.intent === 'school_holidays' || res.intent === 'school_schedule') && (res.answer.includes('Ahad') || res.answer.includes('Senin'))
+      },
+      {
+        id: 'T5_OUT_OF_SCOPE_POLITICS',
+        desc: 'Pertanyaan politik di luar ruang lingkup (Strict exact response)',
+        queries: ['siapa presiden indonesia?', 'pemilu tahun berapa?', 'pilpres capres'],
+        validator: (res) => res.type === 'out_of_scope' && res.answer === 'Saya tidak bisa menjawab pertanyaan Anda.'
+      },
+      {
+        id: 'T6_OUT_OF_SCOPE_TECH_RECIPE',
+        desc: 'Pertanyaan coding / teknologi / resep di luar ruang lingkup',
+        queries: ['bagaimana cara coding python?', 'resep nasi goreng enak', 'cara main mobile legends', '1+1 berapa'],
+        validator: (res) => res.type === 'out_of_scope' && res.answer === 'Saya tidak bisa menjawab pertanyaan Anda.'
+      },
+      {
+        id: 'T7_IN_SCOPE_UNHANDLED',
+        desc: 'Pertanyaan seputar sekolah tapi informasinya belum terdaftar di KB',
+        queries: ['apakah ada beasiswa kuliah s2 luar negeri untuk siswa yayasan?', 'apakah ada ekskul renang olimpiade di sekolah?'],
+        validator: (res) => res.type === 'unhandled_in_scope' && res.answer.includes('Maaf, informasi tersebut belum tersedia dalam sistem') && res.actions.some(a => a.label.includes('WhatsApp'))
+      },
+      {
+        id: 'T8_EMPTY_AMBIGUOUS',
+        desc: 'Pertanyaan kosong atau tanda baca saja',
+        queries: ['', '   ', '???', '...'],
+        validator: (res) => res.type === 'empty' || (res.type === 'out_of_scope' && res.answer === 'Saya tidak bisa menjawab pertanyaan Anda.')
+      },
+      {
+        id: 'T9_PPDB_11_STEPS',
+        desc: 'Panduan lengkap alur PPDB 11 langkah',
+        queries: ['bagaimana alur pendaftaran dari awal sampai akhir?', 'panduan lengkap ppdb', 'proses pendaftaran step by step'],
+        validator: (res) => res.type === 'answer' && (res.intent === 'ppdb_11_steps' || res.actions.some(a => a.action === 'open_ppdb_guide'))
+      },
+      {
+        id: 'T10_SPP_AND_PAYMENTS',
+        desc: 'Informasi administrasi SPP & pembayaran bulanan',
+        queries: ['bagaimana cara membayar spp?', 'info tagihan spp', 'berapa biaya spp'],
+        validator: (res) => res.type === 'answer' && res.intent === 'tuition_spp' && res.answer.includes('Portal Siswa')
+      }
+    ];
+
+    let totalTests = 0;
+    let passedTests = 0;
+    const container = document.getElementById('results');
+
+    testCases.forEach(tc => {
+      tc.queries.forEach(q => {
+        totalTests++;
+        const res = window.SiyQaEngine.findAnswer(q);
+        const isPass = tc.validator(res);
+        if (isPass) passedTests++;
+
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-weight:bold; color:#7dd3fc; font-size:12px;">${tc.id}: ${tc.desc}</span>
+            <span class="badge ${isPass ? 'pass' : 'fail'}">${isPass ? 'PASS' : 'FAIL'}</span>
+          </div>
+          <div class="query">Q: "${q || '(string kosong)'}"</div>
+          <div class="actual">Type: <strong>${res.type}</strong> | Intent: <strong>${res.intent || '-'}</strong></div>
+          <div class="actual" style="max-height:80px; overflow-y:auto; background:#0f172a; padding:6px 10px; border-radius:6px; margin-top:4px; font-family:monospace; font-size:11px;">
+            ${res.answer.substring(0, 180)}...
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    });
+
+    const summaryBox = document.getElementById('summary');
+    summaryBox.textContent = `Hasil Pengujian: ${passedTests} / ${totalTests} Tes Berhasil Lolos (${Math.round(passedTests/totalTests*100)}%)`;
+    document.title = 'TEST_RESULT: ' + passedTests + '/' + totalTests + ' PASS';
+    if (passedTests === totalTests) {
+      summaryBox.style.background = '#065f46';
+    } else {
+      summaryBox.style.background = '#991b1b';
+    }
+  </script>
+</body>
+</html>
