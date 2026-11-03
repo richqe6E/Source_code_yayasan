@@ -1,5 +1,5 @@
 # SIYAYASAN Smart QA Engine Verification Script (PowerShell Native)
-$jsPath = "frontend\public\js\qa-knowledge-base.js"
+$jsPath = "frontend/public/js/qa-knowledge-base.js"
 $content = [System.IO.File]::ReadAllText($jsPath)
 
 Write-Host "==================================================" -ForegroundColor Cyan
@@ -11,6 +11,7 @@ $outOfScopeRegex = [regex]'\b(politik|pemilu|pilpres|pilkada|capres|cawapres|cal
 
 $oosQueries = @(
     "siapa presiden indonesia?",
+    "siapa presiden amerika?",
     "pemilu tahun berapa?",
     "bagaimana cara coding python?",
     "resep nasi goreng enak",
@@ -29,9 +30,13 @@ foreach ($q in $oosQueries) {
 }
 
 # 2. Verify In-scope Anchors
-$inScopeAnchor = [regex]'\b(yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b'
+$inScopeAnchor = [regex]'\b(halo|hallop|hallo|hai|assalam|assalamu|assalamualaikum|salam|kabar|permisi|pagi|siang|sore|malam|yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b'
 
 $inScopeQueries = @(
+    "halo",
+    "hallop",
+    "hai admin",
+    "assalamu alaikum",
     "bagaimana cara daftar?",
     "apa saja berkas ppdb?",
     "dimana alamat yayasan?",
@@ -51,7 +56,7 @@ foreach ($q in $inScopeQueries) {
 }
 
 # 3. Verify Slang Mapping & Normalization coverage
-$slangCheck = @("gimana", "bgmn", "sy", "mo", "brapa", "daptar", "skolah", "biaya", "syarat", "lulus", "kontak", "libur")
+$slangCheck = @("hallop", "hallo", "assalamu", "assalamualaikum", "gimana", "bgmn", "sy", "mo", "brapa", "daptar", "skolah", "biaya", "syarat", "lulus", "kontak", "libur")
 $slangPassed = $true
 foreach ($s in $slangCheck) {
     if ($content.Contains("'$s':")) {
@@ -87,8 +92,33 @@ foreach ($st in $stepsCheck) {
     }
 }
 
-if ($oosPassed -and $inScopePassed -and $slangPassed -and $stepsPassed) {
-    Write-Host "`nALL 27 CORE LOGIC CHECKS PASSED 100%!" -ForegroundColor Green
+# 5. Verify No Unscoped ctx in Static Actions
+$noCtxLeak = $true
+if ($content -match 'url:\s*ctx\.') {
+    Write-Host " [FAIL] Found static 'url: ctx.' leak in code!" -ForegroundColor Red
+    $noCtxLeak = $false
+} else {
+    Write-Host " [PASS] No static 'url: ctx.' leaks in KNOWLEDGE_BASE!" -ForegroundColor Green
+}
+
+# 6. Verify Greeting & PPDB Schedule Intents
+$intentsPassed = $true
+if ($content.Contains("intent: 'greeting'")) {
+    Write-Host " [PASS] Found 'greeting' intent" -ForegroundColor Green
+} else {
+    Write-Host " [FAIL] Missing 'greeting' intent" -ForegroundColor Red
+    $intentsPassed = $false
+}
+
+if ($content.Contains("intent: 'ppdb_schedule'")) {
+    Write-Host " [PASS] Found 'ppdb_schedule' intent" -ForegroundColor Green
+} else {
+    Write-Host " [FAIL] Missing 'ppdb_schedule' intent" -ForegroundColor Red
+    $intentsPassed = $false
+}
+
+if ($oosPassed -and $inScopePassed -and $slangPassed -and $stepsPassed -and $noCtxLeak -and $intentsPassed) {
+    Write-Host "`nALL QA ENGINE VERIFICATION CHECKS PASSED 100%!" -ForegroundColor Green
     exit 0
 } else {
     Write-Host "`nSOME CHECKS FAILED!" -ForegroundColor Red

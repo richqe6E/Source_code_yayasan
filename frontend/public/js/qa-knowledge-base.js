@@ -98,6 +98,15 @@
   ]);
 
   const SLANG_MAP = {
+    'hallop': 'halo',
+    'hallo': 'halo',
+    'haloo': 'halo',
+    'helo': 'halo',
+    'hello': 'halo',
+    'haii': 'hai',
+    'assalamu': 'assalam',
+    'assalamualaikum': 'assalam',
+    'asalamualaikum': 'assalam',
     'gimana': 'bagaimana',
     'bgmn': 'bagaimana',
     'bgaimana': 'bagaimana',
@@ -158,11 +167,16 @@
     'telepon': 'hubungi',
     'nomer': 'hubungi',
     'nomor': 'hubungi',
-    'libur': 'jadwal',
-    'masuk': 'jadwal',
-    'waktu': 'jadwal',
-    'jam': 'jadwal',
-    'hari': 'jadwal',
+    'registrasinya': 'daftar',
+    'pendaftarannya': 'daftar',
+    'daftarnya': 'daftar',
+    'caranya': 'cara',
+    'syaratnya': 'berkas',
+    'persyaratannya': 'berkas',
+    'biayanya': 'spp',
+    'jadwalnya': 'jadwal',
+    'lokasinya': 'alamat',
+    'kontaknya': 'hubungi',
     'kalender': 'agenda',
     'kegiatan': 'agenda',
     'acara': 'agenda',
@@ -180,7 +194,7 @@
   const OUT_OF_SCOPE_REGEX = /\b(politik|pemilu|pilpres|pilkada|capres|cawapres|caleg|partai|dpr|mpr|presiden|menteri|pemerintah\s+daerah|perang|militer|senjata|rusia|ukraina|israel|palestina|coding|programmer|programming|python|javascript|typescript|react|vue|angular|html|css|php|laravel|java|c\+\+|sql|database\s+admin|hack|cheat|game|gaming|dota|mobile\s+legends|free\s+fire|pubg|roblox|genshin|gta|steam|film|movie|bioskop|cinema|aktor|aktris|artis|selebriti|sinetron|netflix|anime|manga|zodiak|horoskop|ramalan|tarot|cuaca|prakiraan\s+cuaca|hujan\s+hari\s+ini|gempa|tsunami|resep|bumbu|memasak|goreng|rebus|masakan|kuliner|restoran|kafe|cafe|kopi|coffee|crypto|bitcoin|ethereum|forex|saham|investasi\s+bodong|pinjol|pinjaman\s+online|judi|slot|casino|togel|pacaran|selingkuh|curhat|jodoh|kalkulus|integral|turunan|sin\s+cos\s+tan|aljabar\s+vektor)\b/i;
 
   // Keyword umum yang menandakan konteks sekolah/yayasan
-  const IN_SCOPE_ANCHOR_REGEX = /\b(yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b/i;
+  const IN_SCOPE_ANCHOR_REGEX = /\b(halo|hallop|hallo|hai|assalam|assalamu|assalamualaikum|salam|kabar|permisi|pagi|siang|sore|malam|yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b/i;
 
   // =========================================================================
   // 4. DATA PANDUAN PPDB INTERAKTIF 11 TAHAPAN
@@ -281,6 +295,38 @@
   // =========================================================================
   const KNOWLEDGE_BASE = [
     // -----------------------------------------------------------------------
+    // GREETING / SALAM PEMBUKA & SAPAAN
+    // -----------------------------------------------------------------------
+    {
+      id: 'system_greeting',
+      category: 'umum',
+      intent: 'greeting',
+      title: 'Salam & Bantuan Asisten Informasi',
+      patterns: [
+        'halo', 'hallop', 'hallo', 'haloo', 'hai', 'hi', 'helo', 'hello',
+        'assalamu alaikum', 'assalamualaikum', 'asalamualaikum',
+        'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam',
+        'apa kabar', 'salam', 'permisi', 'halo admin', 'hai admin', 'bantuan'
+      ],
+      keywords: ['halo', 'hai', 'assalam', 'salam', 'pagi', 'siang', 'sore', 'malam', 'permisi', 'kabar', 'bantuan'],
+      priority: 25,
+      buildAnswer: function (ctx) {
+        return `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\n` +
+          `Selamat datang di Layanan Asisten Informasi Resmi *${ctx.schoolName}*! 😊\n\n` +
+          `Saya siap membantu Anda dengan informasi seputar:\n` +
+          `• *Penerimaan Peserta Didik Baru (PPDB)* Tahun Ajaran ${ctx.activeYear}\n` +
+          `• Persyaratan berkas, biaya SPP, dan alur pendaftaran\n` +
+          `• Program pendidikan TPQ Ulinnuha & KB Ulinnuha (PAUD)\n` +
+          `• Lokasi, kontak resmi, dan jadwal kegiatan yayasan\n\n` +
+          `Silakan ketik pertanyaan Anda atau pilih topik rekomendasi di bawah ini.`;
+      },
+      actions: [
+        { label: 'Buka Halaman PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+        { label: 'Panduan Alur 11 Langkah', action: 'open_ppdb_guide', icon: 'fi fi-rr-workflow' }
+      ]
+    },
+
+    // -----------------------------------------------------------------------
     // A. KATEGORI PPDB & PENDAFTARAN ONLINE
     // -----------------------------------------------------------------------
     {
@@ -303,6 +349,31 @@
       ]
     },
     {
+      id: 'ppdb_schedule_timeline',
+      category: 'ppdb',
+      intent: 'ppdb_schedule',
+      title: 'Jadwal & Periode Pembukaan PPDB',
+      patterns: [
+        'kapan ppdb buka', 'kapan ppdb dibuka', 'kapan pendaftaran dibuka', 'kapan mulai daftar',
+        'jadwal buka ppdb', 'tanggal berapa buka', 'apakah ppdb sudah buka', 'kapan buka ppdb',
+        'kapan pendaftaran murid baru dibuka', 'jadwal ppdb', 'periode pendaftaran',
+        'kapan mulai pendaftaran', 'kapan terakhir pendaftaran', 'kapan pendaftaran ditutup'
+      ],
+      keywords: ['ppdb', 'daftar', 'pendaftaran', 'kapan', 'buka', 'dibuka', 'jadwal', 'mulai', 'tanggal', 'periode', 'gelombang', 'ditutup', 'terakhir'],
+      priority: 18,
+      buildAnswer: function (ctx) {
+        return `📅 *Jadwal & Periode PPDB ${ctx.schoolName}*:\n\n` +
+          `• *Tahun Ajaran:* ${ctx.activeYear}\n` +
+          `• *Periode:* ${ctx.ppdbPeriodName}\n` +
+          `• *Status Pendaftaran:* ${ctx.regDates}\n\n` +
+          `Pendaftaran peserta didik baru dibuka secara mandiri 24 jam melalui formulir online di website resmi yayasan. Anda dapat langsung melengkapi biodata calon siswa dan mengunggah dokumen persyaratan secara daring.`;
+      },
+      actions: [
+        { label: 'Lihat Linimasa Lengkap PPDB', url: 'ppdb.html#jadwal-linimasa', icon: 'fi fi-rr-calendar' },
+        { label: 'Buka Formulir Pendaftaran', url: 'ppdb.html#formulir-pendaftaran', icon: 'fi fi-rr-edit' }
+      ]
+    },
+    {
       id: 'ppdb_registration_howto',
       category: 'ppdb',
       intent: 'ppdb_register',
@@ -310,7 +381,8 @@
       patterns: [
         'bagaimana cara daftar', 'gimana cara daftar', 'cara mendaftar', 'saya mau masuk',
         'saya mau daftar', 'bagaimana alur pendaftaran', 'tata cara daftar', 'langkah pendaftaran',
-        'cara registrasi', 'mau daftar sekolah', 'cara ikut ppdb', 'prosedur daftar'
+        'cara registrasi', 'mau daftar sekolah', 'cara ikut ppdb', 'prosedur daftar',
+        'bagaimana cara mendaftar', 'bagaimana registrasinya', 'bagaimana pendaftarannya', 'bgmn registrasinya', 'registrasi'
       ],
       keywords: ['cara', 'daftar', 'alur', 'pendaftaran', 'masuk', 'langkah', 'prosedur', 'tata'],
       priority: 15,
@@ -330,9 +402,11 @@
       patterns: [
         'apa saja persyaratan berkas', 'syarat berkas', 'persyaratan dokumen', 'apa saja dokumen yang dibutuhkan',
         'syarat pendaftaran', 'berkas apa saja', 'dokumen yang disiapkan', 'syarat masuk',
-        'perlu foto kah', 'perlu akta', 'perlu kartu keluarga'
+        'perlu foto kah', 'perlu akta', 'perlu kartu keluarga',
+        'apa saja persyaratan ppdb', 'persyaratan ppdb', 'syarat ppdb', 'berkas ppdb',
+        'apa saja syarat ppdb', 'syarat pendaftaran ppdb', 'apa saja persyaratan masuk', 'syarat masuk ppdb'
       ],
-      keywords: ['persyaratan', 'syarat', 'berkas', 'dokumen', 'pasfoto', 'akta', 'kk', 'kartu', 'keluarga', 'upload'],
+      keywords: ['persyaratan', 'syarat', 'berkas', 'dokumen', 'pasfoto', 'akta', 'kk', 'kartu', 'keluarga', 'upload', 'ppdb'],
       priority: 14,
       buildAnswer: function (ctx) {
         return `Berikut adalah *dokumen persyaratan pendaftaran calon santri/siswa* di ${ctx.schoolName}:\n\n` +
@@ -457,7 +531,7 @@
       },
       actions: [
         { label: 'Lihat Lokasi Sekretariat Yayasan', url: 'kontak.html', icon: 'fi fi-rr-marker' },
-        { label: 'Hubungi Panitia via WhatsApp', url: ctx.waHelpUrl, icon: 'fi fi-brands-whatsapp', isExternal: true }
+        { label: 'Hubungi Panitia via WhatsApp', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true }
       ]
     },
     {
@@ -593,7 +667,7 @@
           `Anda juga dapat mengklik tombol WhatsApp hijau di pojok kanan bawah layar untuk langsung terhubung dengan admin kami.`;
       },
       actions: [
-        { label: 'Chat WhatsApp Sekarang', url: ctx.waHelpUrl, icon: 'fi fi-brands-whatsapp', isExternal: true },
+        { label: 'Chat WhatsApp Sekarang', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true },
         { label: 'Buka Formulir Kontak', url: 'kontak.html', icon: 'fi fi-rr-envelope' }
       ]
     },
@@ -650,7 +724,8 @@
       title: 'Hari Masuk & Jam Operasional Sekolah',
       patterns: [
         'hari masuk sekolah', 'jam operasional sekolah', 'jam berapa buka', 'hari apa saja sekolah',
-        'kapan jam belajar', 'jadwal masuk sekolah', 'jam belajar tpq', 'jam belajar paud'
+        'kapan jam belajar', 'jadwal masuk sekolah', 'jam belajar tpq', 'jam belajar paud',
+        'hari apa saja masuk sekolah', 'hari apa saja masuk'
       ],
       keywords: ['hari', 'jam', 'masuk', 'operasional', 'buka', 'belajar', 'jadwal', 'senin', 'sabtu'],
       priority: 13,
@@ -673,7 +748,7 @@
       title: 'Informasi Hari Libur Sekolah',
       patterns: [
         'hari libur', 'sekolah libur kapan', 'kapan libur sekolah', 'apakah hari minggu libur',
-        'jadwal libur', 'libur nasional sekolah'
+        'jadwal libur', 'libur nasional sekolah', 'kapan sekolah libur', 'hari libur sekolah'
       ],
       keywords: ['libur', 'minggu', 'ahad', 'kapan', 'nasional', 'jadwal'],
       priority: 13,
@@ -729,7 +804,7 @@
       },
       actions: [
         { label: 'Login Portal Siswa (SIAKAD)', url: 'login.html', icon: 'fi fi-rr-graduation-cap' },
-        { label: 'Tanya Biaya via WhatsApp', url: ctx.waHelpUrl, icon: 'fi fi-brands-whatsapp', isExternal: true }
+        { label: 'Tanya Biaya via WhatsApp', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true }
       ]
     },
     {
@@ -789,7 +864,26 @@
 
     const trimmed = rawQuery.trim();
     const normalized = normalizeText(trimmed);
+    if (!normalized || !normalized.trim()) {
+      return {
+        type: 'empty',
+        answer: 'Silakan ketik pertanyaan Anda seputar PPDB, persyaratan, program pendidikan, atau informasi yayasan.',
+        actions: []
+      };
+    }
     const ctx = getDynamicContext();
+
+    function resolveActions(actionsList) {
+      if (!actionsList || !Array.isArray(actionsList)) return [];
+      return actionsList.map(function (act) {
+        const item = Object.assign({}, act);
+        if (item.isWhatsApp || (!item.url && !item.action)) {
+          item.url = ctx.waHelpUrl;
+          item.isExternal = true;
+        }
+        return item;
+      });
+    }
 
     // -----------------------------------------------------------------------
     // FILTER 1: DETEKSI STRICT OUT-OF-SCOPE
@@ -877,8 +971,10 @@
         }
       }
 
-      // 3. Tambahan prioritas bawaan
-      score += (entry.priority || 0) * 0.2;
+      // 3. Tambahan prioritas bawaan jika ada kecocokan
+      if (score > 0) {
+        score += (entry.priority || 0) * 0.1;
+      }
 
       if (score > highestScore) {
         highestScore = score;
@@ -887,7 +983,7 @@
     }
 
     // Ambang batas kecocokan minimum (threshold)
-    const MATCH_THRESHOLD = 5.0;
+    const MATCH_THRESHOLD = 7.0;
 
     if (bestMatch && highestScore >= MATCH_THRESHOLD) {
       return {
@@ -895,7 +991,7 @@
         intent: bestMatch.intent,
         title: bestMatch.title,
         answer: bestMatch.buildAnswer(ctx),
-        actions: bestMatch.actions || []
+        actions: resolveActions(bestMatch.actions)
       };
     }
 
@@ -907,10 +1003,10 @@
       return {
         type: 'unhandled_in_scope',
         answer: 'Maaf, informasi tersebut belum tersedia dalam sistem. Silakan hubungi pihak yayasan melalui WhatsApp untuk mendapatkan informasi lebih lanjut.',
-        actions: [
-          { label: 'Hubungi WhatsApp Resmi', url: ctx.waHelpUrl, icon: 'fi fi-brands-whatsapp', isExternal: true },
+        actions: resolveActions([
+          { label: 'Hubungi WhatsApp Resmi', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true },
           { label: 'Lihat Menu Kontak & Alamat', url: 'kontak.html', icon: 'fi fi-rr-marker' }
-        ]
+        ])
       };
     }
 

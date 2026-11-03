@@ -30,13 +30,13 @@
       {
         id: 'T1_PPDB_VARIATIONS',
         desc: 'Pertanyaan pendaftaran dengan variasi kalimat slang & informal',
-        queries: ['bagaimana cara daftar?', 'gimana cara daftar', 'saya mau masuk sekolah ini', 'bgmn registrasinya', 'mau daftar ppdb'],
+        queries: ['Bagaimana cara mendaftar?', 'bagaimana cara daftar?', 'gimana cara daftar', 'saya mau masuk sekolah ini', 'bgmn registrasinya', 'mau daftar ppdb'],
         validator: (res) => res.type === 'answer' && (res.intent === 'ppdb_register' || res.intent === 'ppdb_info') && res.actions.length > 0
       },
       {
         id: 'T2_REQUIREMENTS',
         desc: 'Pertanyaan persyaratan berkas PPDB',
-        queries: ['apa saja berkas yang dibutuhkan?', 'syarat pendaftaran', 'perlu pasfoto kah?', 'dokumen akta dan kk'],
+        queries: ['Apa saja persyaratan PPDB?', 'apa saja berkas yang dibutuhkan?', 'syarat pendaftaran', 'perlu pasfoto kah?', 'dokumen akta dan kk'],
         validator: (res) => res.type === 'answer' && res.intent === 'ppdb_requirements' && res.answer.includes('Pasfoto') && res.answer.includes('Akta Kelahiran')
       },
       {
@@ -54,7 +54,7 @@
       {
         id: 'T5_OUT_OF_SCOPE_POLITICS',
         desc: 'Pertanyaan politik di luar ruang lingkup (Strict exact response)',
-        queries: ['siapa presiden indonesia?', 'pemilu tahun berapa?', 'pilpres capres'],
+        queries: ['siapa presiden indonesia?', 'siapa presiden amerika?', 'pemilu tahun berapa?', 'pilpres capres'],
         validator: (res) => res.type === 'out_of_scope' && res.answer === 'Saya tidak bisa menjawab pertanyaan Anda.'
       },
       {
@@ -86,6 +86,18 @@
         desc: 'Informasi administrasi SPP & pembayaran bulanan',
         queries: ['bagaimana cara membayar spp?', 'info tagihan spp', 'berapa biaya spp'],
         validator: (res) => res.type === 'answer' && res.intent === 'tuition_spp' && res.answer.includes('Portal Siswa')
+      },
+      {
+        id: 'T11_GREETINGS',
+        desc: 'Sapaan dan salam pembuka pengunjung website',
+        queries: ['hallop', 'halo', 'hai', 'assalamu alaikum', 'selamat pagi'],
+        validator: (res) => res.type === 'answer' && res.intent === 'greeting' && res.answer.includes('Selamat datang')
+      },
+      {
+        id: 'T12_PPDB_SCHEDULE',
+        desc: 'Informasi jadwal dan periode pembukaan PPDB',
+        queries: ['kapan PPDB buka?', 'kapan pendaftaran dibuka', 'jadwal buka ppdb', 'apakah ppdb sudah buka'],
+        validator: (res) => res.type === 'answer' && res.intent === 'ppdb_schedule' && res.answer.includes('Jadwal & Periode')
       }
     ];
 

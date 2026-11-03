@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>E2E Test - SIYAYASAN QA Assistant UI</title>
+  <link rel="stylesheet" href="../frontend/public/css/public-styles.css">
+  <style>
+    body { padding: 40px; background: #f8fafc; font-family: sans-serif; }
+    #log { background: #0f172a; color: #38bdf8; padding: 20px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>UI Integration Verification - Asisten Informasi</h1>
+  <div id="log">Running tests...</div>
+
+  <script src="../frontend/public/js/qa-knowledge-base.js"></script>
+  <script src="../frontend/public/js/qa-assistant.js"></script>
+  <script>
+    const logEl = document.getElementById('log');
+    function log(msg) {
+      logEl.textContent += msg + '\n';
+    }
+
+    try {
+      log('1. Checking SiyQaEngine existence...');
+      if (!window.SiyQaEngine) throw new Error('SiyQaEngine is not defined!');
+      log('   [PASS] SiyQaEngine exists.');
+
+      log('2. Initializing UI with initSiyQaAssistant()...');
+      window.initSiyQaAssistant('../frontend/public/');
+      log('   [PASS] initSiyQaAssistant executed without throwing.');
+
+      const triggerBtn = document.getElementById('site-floating-qa');
+      const modal = document.getElementById('siy-qa-modal');
+      const chatBody = document.getElementById('qa-chat-messages');
+      const chipsList = document.getElementById('qa-chips-list');
+      const input = document.getElementById('qa-input-text');
+
+      if (!triggerBtn) throw new Error('site-floating-qa trigger button not found!');
+      if (!modal) throw new Error('siy-qa-modal modal container not found!');
+      if (!chatBody) throw new Error('qa-chat-messages body not found!');
+      log('   [PASS] All UI elements successfully inserted into DOM.');
+
+      log('3. Checking Quick Chips population...');
+      const chips = chipsList ? chipsList.children : [];
+      log('   [PASS] Quick Chips rendered: ' + chips.length + ' chips.');
+      if (chips.length === 0) throw new Error('Quick chips list is empty!');
+
+      log('4. Testing Modal Toggle...');
+      triggerBtn.click();
+      if (!modal.classList.contains('is-open')) throw new Error('Modal did not open on trigger click!');
+      log('   [PASS] Modal is open.');
+
+      log('5. Testing Chat Submission simulation...');
+      const form = document.getElementById('qa-chat-form');
+      input.value = 'hallop';
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+
+      setTimeout(() => {
+        const messages = chatBody.querySelectorAll('.qa-message-row');
+        log('   [PASS] Total message rows in chat: ' + messages.length);
+        const lastMsg = messages[messages.length - 1];
+        log('   Last message text:\n' + lastMsg.textContent.trim().substring(0, 150) + '...');
+
+        if (!lastMsg.textContent.includes('Assalamu\'alaikum')) {
+          log('   [FAIL] Last message did not contain greeting!');
+          document.title = 'E2E_FAIL';
+        } else {
+          log('   [PASS] Greeting successfully received from SiyQaEngine!');
+          document.title = 'E2E_PASS_ALL';
+        }
+      }, 500);
+
+    } catch (err) {
+      log('FATAL ERROR: ' + err.message);
+      document.title = 'E2E_ERROR';
+    }
+  </script>
+</body>
+</html>

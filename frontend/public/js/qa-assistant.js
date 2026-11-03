@@ -315,7 +315,11 @@
 
     // Render Quick Chips
     function renderQuickChips() {
-      if (!chipsList || !window.SiyQaEngine) return;
+      if (!chipsList) return;
+      if (!window.SiyQaEngine) {
+        setTimeout(renderQuickChips, 200);
+        return;
+      }
       chipsList.innerHTML = '';
       const chips = window.SiyQaEngine.getSuggestedQuestions();
       chips.forEach(q => {
@@ -336,6 +340,9 @@
       if (isOpen) {
         modal.classList.add('is-open');
         btnTrigger.setAttribute('aria-expanded', 'true');
+        if (chipsList && chipsList.children.length === 0) {
+          renderQuickChips();
+        }
         setTimeout(() => {
           if (inputText) inputText.focus();
         }, 150);
