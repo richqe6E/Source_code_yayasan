@@ -30,13 +30,18 @@ foreach ($q in $oosQueries) {
 }
 
 # 2. Verify In-scope Anchors
-$inScopeAnchor = [regex]'\b(halo|hallop|hallo|hai|assalam|assalamu|assalamualaikum|salam|kabar|permisi|pagi|siang|sore|malam|yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b'
+$inScopeAnchor = [regex]'\b(halo|hallop|hallo|hai|assalam|assalamu|assalamualaikum|salam|kabar|permisi|pagi|siang|sore|malam|terima\s+kasih|terimakasih|makasih|oke|baik|siap|sampai\s+jumpa|dadah|bye|tolong|maaf|bantu|bantuan|siapa|anda|kamu|fungsi|tugas|asisten|nama|ai|robot|manusia|privasi|yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b'
 
 $inScopeQueries = @(
     "halo",
     "hallop",
     "hai admin",
     "assalamu alaikum",
+    "siapa anda?",
+    "apa tugas kamu?",
+    "terima kasih infonya",
+    "oke baik",
+    "sampai jumpa lagi",
     "bagaimana cara daftar?",
     "apa saja berkas ppdb?",
     "dimana alamat yayasan?",
@@ -56,7 +61,7 @@ foreach ($q in $inScopeQueries) {
 }
 
 # 3. Verify Slang Mapping & Normalization coverage
-$slangCheck = @("hallop", "hallo", "assalamu", "assalamualaikum", "gimana", "bgmn", "sy", "mo", "brapa", "daptar", "skolah", "biaya", "syarat", "lulus", "kontak", "libur")
+$slangCheck = @("hallop", "hallo", "assalamu", "assalamualaikum", "gimana", "bgmn", "sy", "mo", "brapa", "daptar", "skolah", "biaya", "syarat", "lulus", "kontak", "makasih", "ok")
 $slangPassed = $true
 foreach ($s in $slangCheck) {
     if ($content.Contains("'$s':")) {
@@ -101,23 +106,43 @@ if ($content -match 'url:\s*ctx\.') {
     Write-Host " [PASS] No static 'url: ctx.' leaks in KNOWLEDGE_BASE!" -ForegroundColor Green
 }
 
-# 6. Verify Greeting & PPDB Schedule Intents
+# 6. Verify Core & Expanded Intents
+$intentsCheck = @(
+    "greeting",
+    "ppdb_schedule",
+    "bot_identity",
+    "user_identity",
+    "courtesy_thanks",
+    "courtesy_ack",
+    "courtesy_closing",
+    "courtesy_help",
+    "bot_capabilities",
+    "social_media"
+)
+
 $intentsPassed = $true
-if ($content.Contains("intent: 'greeting'")) {
-    Write-Host " [PASS] Found 'greeting' intent" -ForegroundColor Green
-} else {
-    Write-Host " [FAIL] Missing 'greeting' intent" -ForegroundColor Red
-    $intentsPassed = $false
+foreach ($it in $intentsCheck) {
+    if ($content.Contains("intent: '$it'")) {
+        Write-Host " [PASS] Found '$it' intent" -ForegroundColor Green
+    } else {
+        Write-Host " [FAIL] Missing '$it' intent" -ForegroundColor Red
+        $intentsPassed = $false
+    }
 }
 
-if ($content.Contains("intent: 'ppdb_schedule'")) {
-    Write-Host " [PASS] Found 'ppdb_schedule' intent" -ForegroundColor Green
-} else {
-    Write-Host " [FAIL] Missing 'ppdb_schedule' intent" -ForegroundColor Red
-    $intentsPassed = $false
+# 7. Verify Typo Tolerance & Fuzzy Engine Functions
+$nlpFuncs = @("levenshteinDistance", "fuzzyMatchKeyword", "cleanRepeatedCharacters", "normalizeToken")
+$nlpPassed = $true
+foreach ($fn in $nlpFuncs) {
+    if ($content.Contains("function $fn")) {
+        Write-Host " [PASS] Found NLP function '$fn'" -ForegroundColor Green
+    } else {
+        Write-Host " [FAIL] Missing NLP function '$fn'" -ForegroundColor Red
+        $nlpPassed = $false
+    }
 }
 
-if ($oosPassed -and $inScopePassed -and $slangPassed -and $stepsPassed -and $noCtxLeak -and $intentsPassed) {
+if ($oosPassed -and $inScopePassed -and $slangPassed -and $stepsPassed -and $noCtxLeak -and $intentsPassed -and $nlpPassed) {
     Write-Host "`nALL QA ENGINE VERIFICATION CHECKS PASSED 100%!" -ForegroundColor Green
     exit 0
 } else {

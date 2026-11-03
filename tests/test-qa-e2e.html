@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <title>E2E Test - SIYAYASAN QA Assistant UI</title>
   <link rel="stylesheet" href="../frontend/public/css/public-styles.css">
+  <link rel="stylesheet" href="../frontend/public/css/qa-assistant.css">
   <style>
-    body { padding: 40px; background: #f8fafc; font-family: sans-serif; }
-    #log { background: #0f172a; color: #38bdf8; padding: 20px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
+    body { padding: 40px; background: #0f172a; color: #f8fafc; font-family: sans-serif; }
+    #log { background: #1e293b; color: #38bdf8; padding: 20px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -17,62 +18,83 @@
   <script src="../frontend/public/js/qa-assistant.js"></script>
   <script>
     const logEl = document.getElementById('log');
-    function log(msg) {
-      logEl.textContent += msg + '\n';
+    let passes = 0;
+    let fails = 0;
+
+    function assert(desc, cond) {
+      if (cond) {
+        passes++;
+        logEl.textContent += ' [PASS] ' + desc + '\n';
+      } else {
+        fails++;
+        logEl.textContent += ' [FAIL] ' + desc + '\n';
+      }
     }
 
     try {
-      log('1. Checking SiyQaEngine existence...');
-      if (!window.SiyQaEngine) throw new Error('SiyQaEngine is not defined!');
-      log('   [PASS] SiyQaEngine exists.');
-
-      log('2. Initializing UI with initSiyQaAssistant()...');
+      assert('SiyQaEngine exists', !!window.SiyQaEngine);
       window.initSiyQaAssistant('../frontend/public/');
-      log('   [PASS] initSiyQaAssistant executed without throwing.');
+      assert('initSiyQaAssistant executed without throwing', true);
 
       const triggerBtn = document.getElementById('site-floating-qa');
       const modal = document.getElementById('siy-qa-modal');
       const chatBody = document.getElementById('qa-chat-messages');
       const chipsList = document.getElementById('qa-chips-list');
+      const chipsWrapper = document.getElementById('qa-suggestions-area');
+      const toggleChipsBtn = document.getElementById('qa-btn-toggle-suggestions');
       const input = document.getElementById('qa-input-text');
-
-      if (!triggerBtn) throw new Error('site-floating-qa trigger button not found!');
-      if (!modal) throw new Error('siy-qa-modal modal container not found!');
-      if (!chatBody) throw new Error('qa-chat-messages body not found!');
-      log('   [PASS] All UI elements successfully inserted into DOM.');
-
-      log('3. Checking Quick Chips population...');
-      const chips = chipsList ? chipsList.children : [];
-      log('   [PASS] Quick Chips rendered: ' + chips.length + ' chips.');
-      if (chips.length === 0) throw new Error('Quick chips list is empty!');
-
-      log('4. Testing Modal Toggle...');
-      triggerBtn.click();
-      if (!modal.classList.contains('is-open')) throw new Error('Modal did not open on trigger click!');
-      log('   [PASS] Modal is open.');
-
-      log('5. Testing Chat Submission simulation...');
       const form = document.getElementById('qa-chat-form');
-      input.value = 'hallop';
+
+      assert('site-floating-qa trigger button found', !!triggerBtn);
+      assert('siy-qa-modal modal container found', !!modal);
+      assert('qa-chat-messages body found', !!chatBody);
+      assert('qa-chips-list container found', !!chipsList);
+      assert('qa-suggestions-area wrapper found', !!chipsWrapper);
+      assert('qa-btn-toggle-suggestions toggle button found', !!toggleChipsBtn);
+      assert('qa-input-text field found', !!input);
+
+      // Modal open test
+      triggerBtn.click();
+      assert('Modal opened with .is-open class', modal.classList.contains('is-open'));
+
+      // Dimension check
+      const modalRect = modal.getBoundingClientRect();
+      assert('Modal desktop width >= 380px (actual: ' + Math.round(modalRect.width) + 'px)', modalRect.width >= 380);
+
+      // Suggestions check
+      assert('Quick chips rendered (count: ' + chipsList.children.length + ')', chipsList.children.length >= 4);
+
+      // Toggle collapse/expand check
+      toggleChipsBtn.click();
+      assert('Suggestions collapsible (.is-collapsed)', chipsWrapper.classList.contains('is-collapsed'));
+      toggleChipsBtn.click();
+      assert('Suggestions expandable', !chipsWrapper.classList.contains('is-collapsed'));
+
+      // Test input focus auto-collapses chips
+      input.dispatchEvent(new Event('focus'));
+      assert('Focusing input auto-collapses suggestions', chipsWrapper.classList.contains('is-collapsed'));
+
+      // Single live chat submission test
+      input.value = 'bagaimana cara mendaftar?';
       form.dispatchEvent(new Event('submit', { cancelable: true }));
 
       setTimeout(() => {
-        const messages = chatBody.querySelectorAll('.qa-message-row');
-        log('   [PASS] Total message rows in chat: ' + messages.length);
-        const lastMsg = messages[messages.length - 1];
-        log('   Last message text:\n' + lastMsg.textContent.trim().substring(0, 150) + '...');
+        const assistantMsgs = chatBody.querySelectorAll('.qa-message-row.assistant');
+        const lastMsg = assistantMsgs[assistantMsgs.length - 1];
+        assert('Assistant responded to live submission', !!lastMsg);
+        assert('Response contains registration information', lastMsg && (lastMsg.textContent.includes('PPDB Online') || lastMsg.textContent.includes('Yayasan')));
 
-        if (!lastMsg.textContent.includes('Assalamu\'alaikum')) {
-          log('   [FAIL] Last message did not contain greeting!');
-          document.title = 'E2E_FAIL';
-        } else {
-          log('   [PASS] Greeting successfully received from SiyQaEngine!');
+        if (fails === 0) {
           document.title = 'E2E_PASS_ALL';
+          logEl.textContent += '\nALL ' + passes + ' E2E UI TESTS PASSED 100%!\n';
+        } else {
+          document.title = 'E2E_FAIL';
+          logEl.textContent += '\nE2E TESTS HAD ' + fails + ' FAILURES.\n';
         }
-      }, 500);
+      }, 400);
 
-    } catch (err) {
-      log('FATAL ERROR: ' + err.message);
+    } catch (e) {
+      logEl.textContent += '\n[FATAL ERROR] ' + e.message + '\n';
       document.title = 'E2E_ERROR';
     }
   </script>

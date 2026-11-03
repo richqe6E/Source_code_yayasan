@@ -98,6 +98,48 @@
         desc: 'Informasi jadwal dan periode pembukaan PPDB',
         queries: ['kapan PPDB buka?', 'kapan pendaftaran dibuka', 'jadwal buka ppdb', 'apakah ppdb sudah buka'],
         validator: (res) => res.type === 'answer' && res.intent === 'ppdb_schedule' && res.answer.includes('Jadwal & Periode')
+      },
+      {
+        id: 'T13_BOT_IDENTITY',
+        desc: 'Identitas, peran, dan transparansi asisten informasi',
+        queries: ['siapa anda?', 'anda siapa', 'apa tugas anda?', 'apa fungsi kamu', 'apakah anda AI?', 'apa yang bisa anda bantu?'],
+        validator: (res) => res.type === 'answer' && res.intent === 'bot_identity' && res.answer.includes('Asisten Informasi Resmi') && res.answer.includes('bukan manusia')
+      },
+      {
+        id: 'T14_USER_IDENTITY',
+        desc: 'Identitas pengguna, privasi, dan konteks lokasi',
+        queries: ['siapa saya?', 'apakah anda mengenal saya?', 'saya sedang berada di mana?'],
+        validator: (res) => res.type === 'answer' && res.intent === 'user_identity' && res.answer.includes('pengunjung website resmi') && res.answer.includes('Privasi')
+      },
+      {
+        id: 'T15_SOCIAL_COURTESIES',
+        desc: 'Etika percakapan, terima kasih, konfirmasi, dan penutup',
+        queries: ['terima kasih', 'makasih banyak', 'oke baik', 'siap', 'sampai jumpa', 'dadah'],
+        validator: (res) => res.type === 'answer' && (res.intent === 'courtesy_thanks' || res.intent === 'courtesy_ack' || res.intent === 'courtesy_closing')
+      },
+      {
+        id: 'T16_ELONGATED_TYPOS',
+        desc: 'Toleransi pengetikan huruf berulang (elongated letters) dan slang shorthand',
+        queries: ['Halloooo', 'bagaimanaa cara daftarr?', 'Ppdb kapan dibukaa?', 'Sekolaaah', 'Persyaratann', 'Lokasii sekolah dmna?', 'Sy mau daftar sekolah.', 'Apa aj persyaratannya?'],
+        validator: (res) => res.type === 'answer' && ['greeting', 'ppdb_register', 'ppdb_schedule', 'yayasan_profile', 'ppdb_requirements', 'school_location'].includes(res.intent)
+      },
+      {
+        id: 'T17_VARIATIONS',
+        desc: 'Variasi susunan kalimat pendaftaran siswa baru',
+        queries: ['Saya ingin mendaftar.', 'Bagaimana cara masuk sekolah ini?', 'Saya mau menjadi siswa baru.', 'Bagaimana proses penerimaannya?'],
+        validator: (res) => res.type === 'answer' && ['ppdb_register', 'ppdb_info'].includes(res.intent)
+      },
+      {
+        id: 'T18_CONTEXT_TRACKING',
+        desc: 'Pelacakan konteks percakapan multi-turn (follow-up questions)',
+        queries: [
+          { q: 'Bagaimana cara daftar?', ctx: null, expectedIntent: 'ppdb_register' },
+          { q: 'Apa saja berkasnya?', ctx: { lastIntent: 'ppdb_register', lastTopic: 'ppdb' }, expectedIntent: 'ppdb_requirements' },
+          { q: 'Kalau sudah diterima bagaimana?', ctx: { lastIntent: 'ppdb_requirements', lastTopic: 'ppdb' }, expectedIntent: 'ppdb_after_accepted' },
+          { q: 'Di mana halamannya?', ctx: { lastIntent: 'ppdb_after_accepted', lastTopic: 'ppdb' }, expectedIntent: 'page_link' },
+          { q: 'Berapa biayanya?', ctx: { lastIntent: 'ppdb_register', lastTopic: 'ppdb' }, expectedIntent: 'tuition_spp' }
+        ],
+        isContextSuite: true
       }
     ];
 
@@ -106,27 +148,51 @@
     const container = document.getElementById('results');
 
     testCases.forEach(tc => {
-      tc.queries.forEach(q => {
-        totalTests++;
-        const res = window.SiyQaEngine.findAnswer(q);
-        const isPass = tc.validator(res);
-        if (isPass) passedTests++;
+      if (tc.isContextSuite) {
+        tc.queries.forEach(item => {
+          totalTests++;
+          const res = window.SiyQaEngine.findAnswer(item.q, item.ctx);
+          const isPass = res.intent === item.expectedIntent;
+          if (isPass) passedTests++;
 
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="font-weight:bold; color:#7dd3fc; font-size:12px;">${tc.id}: ${tc.desc}</span>
-            <span class="badge ${isPass ? 'pass' : 'fail'}">${isPass ? 'PASS' : 'FAIL'}</span>
-          </div>
-          <div class="query">Q: "${q || '(string kosong)'}"</div>
-          <div class="actual">Type: <strong>${res.type}</strong> | Intent: <strong>${res.intent || '-'}</strong></div>
-          <div class="actual" style="max-height:80px; overflow-y:auto; background:#0f172a; padding:6px 10px; border-radius:6px; margin-top:4px; font-family:monospace; font-size:11px;">
-            ${res.answer.substring(0, 180)}...
-          </div>
-        `;
-        container.appendChild(div);
-      });
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-weight:bold; color:#7dd3fc; font-size:12px;">${tc.id}: ${tc.desc}</span>
+              <span class="badge ${isPass ? 'pass' : 'fail'}">${isPass ? 'PASS' : 'FAIL'}</span>
+            </div>
+            <div class="query">Q: "${item.q}" [Context: ${item.ctx ? item.ctx.lastIntent : 'none'}]</div>
+            <div class="actual">Type: <strong>${res.type}</strong> | Expected: <strong>${item.expectedIntent}</strong> | Actual: <strong>${res.intent || '-'}</strong></div>
+            <div class="actual" style="max-height:80px; overflow-y:auto; background:#0f172a; padding:6px 10px; border-radius:6px; margin-top:4px; font-family:monospace; font-size:11px;">
+              ${res.answer.substring(0, 180)}...
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } else {
+        tc.queries.forEach(q => {
+          totalTests++;
+          const res = window.SiyQaEngine.findAnswer(q);
+          const isPass = tc.validator(res);
+          if (isPass) passedTests++;
+
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-weight:bold; color:#7dd3fc; font-size:12px;">${tc.id}: ${tc.desc}</span>
+              <span class="badge ${isPass ? 'pass' : 'fail'}">${isPass ? 'PASS' : 'FAIL'}</span>
+            </div>
+            <div class="query">Q: "${q || '(string kosong)'}"</div>
+            <div class="actual">Type: <strong>${res.type}</strong> | Intent: <strong>${res.intent || '-'}</strong></div>
+            <div class="actual" style="max-height:80px; overflow-y:auto; background:#0f172a; padding:6px 10px; border-radius:6px; margin-top:4px; font-family:monospace; font-size:11px;">
+              ${res.answer.substring(0, 180)}...
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
     });
 
     const summaryBox = document.getElementById('summary');

@@ -89,15 +89,16 @@
   // =========================================================================
   const STOPWORDS = new Set([
     'apakah', 'bagaimanakah', 'bagaimana', 'apa', 'apaan', 'dimanakah', 'dimana', 'kemanakah',
-    'kemana', 'kapan', 'kapankah', 'kenapakah', 'kenapa', 'mengapa', 'mengapakah', 'siapakah',
-    'siapa', 'berapa', 'berapakah', 'dan', 'atau', 'yang', 'ini', 'itu', 'adalah', 'yaitu',
+    'kemana', 'kapan', 'kapankah', 'kenapakah', 'kenapa', 'mengapa', 'mengapakah',
+    'berapa', 'berapakah', 'dan', 'atau', 'yang', 'ini', 'itu', 'adalah', 'yaitu',
     'dari', 'pada', 'ke', 'di', 'untuk', 'dengan', 'secara', 'atas', 'oleh', 'bagi', 'terhadap',
-    'saya', 'kami', 'kita', 'anda', 'kamu', 'ingin', 'mau', 'pengen', 'bisa', 'dapat', 'tolong',
-    'mohon', 'tanya', 'info', 'informasi', 'ada', 'tidak', 'nggak', 'gak', 'bukan', 'pun',
-    'lagi', 'saja', 'hanya', 'tentang', 'mengenai', 'seputar', 'dong', 'sih', 'deh', 'ya', 'kah'
+    'ingin', 'mau', 'pengen', 'bisa', 'dapat', 'mohon', 'tanya', 'info', 'informasi',
+    'ada', 'tidak', 'nggak', 'gak', 'bukan', 'pun', 'lagi', 'saja', 'hanya',
+    'tentang', 'mengenai', 'seputar', 'dong', 'sih', 'deh', 'ya', 'kah'
   ]);
 
   const SLANG_MAP = {
+    // Sapaan & Salam
     'hallop': 'halo',
     'hallo': 'halo',
     'haloo': 'halo',
@@ -107,23 +108,38 @@
     'assalamu': 'assalam',
     'assalamualaikum': 'assalam',
     'asalamualaikum': 'assalam',
+    'kbr': 'kabar',
+
+    // Kata Tanya & Perintah
     'gimana': 'bagaimana',
     'bgmn': 'bagaimana',
     'bgaimana': 'bagaimana',
     'gmn': 'bagaimana',
     'kmn': 'kemana',
     'dmn': 'dimana',
+    'dmna': 'dimana',
     'kpn': 'kapan',
     'knp': 'kenapa',
     'brapa': 'berapa',
     'brp': 'berapa',
+
+    // Kata Ganti & Mau
     'sy': 'saya',
     'aq': 'saya',
     'aku': 'saya',
     'gw': 'saya',
     'gua': 'saya',
+    'lu': 'anda',
+    'kamu': 'anda',
     'mo': 'mau',
+    'mw': 'mau',
     'pngen': 'mau',
+    'pengen': 'mau',
+    'ingin': 'mau',
+    'aj': 'saja',
+    'aja': 'saja',
+
+    // Pendaftaran & Sekolah
     'daptar': 'daftar',
     'dftr': 'daftar',
     'regis': 'daftar',
@@ -138,6 +154,8 @@
     'lokasi': 'alamat',
     'tmpat': 'alamat',
     'posisi': 'alamat',
+
+    // Biaya & SPP
     'biaya': 'spp',
     'bayar': 'spp',
     'tarif': 'spp',
@@ -145,6 +163,8 @@
     'uang': 'spp',
     'iuran': 'spp',
     'pembayaran': 'spp',
+
+    // Dokumen & Berkas
     'dokumen': 'berkas',
     'persyaratan': 'berkas',
     'syarat': 'berkas',
@@ -153,6 +173,8 @@
     'foto': 'pasfoto',
     'pasfoto': 'pasfoto',
     'poto': 'pasfoto',
+
+    // Penerimaan & Hasil
     'lulus': 'diterima',
     'lolos': 'diterima',
     'keterima': 'diterima',
@@ -160,6 +182,8 @@
     'seleksi': 'diterima',
     'pengumuman': 'diterima',
     'status': 'diterima',
+
+    // Kontak & Admin
     'kontak': 'hubungi',
     'wa': 'hubungi',
     'whatsapp': 'hubungi',
@@ -167,6 +191,22 @@
     'telepon': 'hubungi',
     'nomer': 'hubungi',
     'nomor': 'hubungi',
+
+    // Kesantunan & Konfirmasi
+    'makasih': 'terimakasih',
+    'terimakasih': 'terimakasih',
+    'makasi': 'terimakasih',
+    'thx': 'terimakasih',
+    'thanks': 'terimakasih',
+    'suwun': 'terimakasih',
+    'ok': 'oke',
+    'sip': 'oke',
+    'siap': 'oke',
+    'yup': 'oke',
+    'bye': 'dadah',
+    'goodbye': 'dadah',
+
+    // Suffix -nya mapping
     'registrasinya': 'daftar',
     'pendaftarannya': 'daftar',
     'daftarnya': 'daftar',
@@ -177,6 +217,14 @@
     'jadwalnya': 'jadwal',
     'lokasinya': 'alamat',
     'kontaknya': 'hubungi',
+    'fungsinya': 'fungsi',
+    'tugasnya': 'tugas',
+    'penerimaannya': 'diterima',
+    'halamannya': 'halaman',
+    'linknya': 'halaman',
+    'tautannya': 'halaman',
+
+    // Akademik & Program
     'kalender': 'agenda',
     'kegiatan': 'agenda',
     'acara': 'agenda',
@@ -193,8 +241,8 @@
   // "Saya tidak bisa menjawab pertanyaan Anda."
   const OUT_OF_SCOPE_REGEX = /\b(politik|pemilu|pilpres|pilkada|capres|cawapres|caleg|partai|dpr|mpr|presiden|menteri|pemerintah\s+daerah|perang|militer|senjata|rusia|ukraina|israel|palestina|coding|programmer|programming|python|javascript|typescript|react|vue|angular|html|css|php|laravel|java|c\+\+|sql|database\s+admin|hack|cheat|game|gaming|dota|mobile\s+legends|free\s+fire|pubg|roblox|genshin|gta|steam|film|movie|bioskop|cinema|aktor|aktris|artis|selebriti|sinetron|netflix|anime|manga|zodiak|horoskop|ramalan|tarot|cuaca|prakiraan\s+cuaca|hujan\s+hari\s+ini|gempa|tsunami|resep|bumbu|memasak|goreng|rebus|masakan|kuliner|restoran|kafe|cafe|kopi|coffee|crypto|bitcoin|ethereum|forex|saham|investasi\s+bodong|pinjol|pinjaman\s+online|judi|slot|casino|togel|pacaran|selingkuh|curhat|jodoh|kalkulus|integral|turunan|sin\s+cos\s+tan|aljabar\s+vektor)\b/i;
 
-  // Keyword umum yang menandakan konteks sekolah/yayasan
-  const IN_SCOPE_ANCHOR_REGEX = /\b(halo|hallop|hallo|hai|assalam|assalamu|assalamualaikum|salam|kabar|permisi|pagi|siang|sore|malam|yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b/i;
+  // Keyword umum yang menandakan konteks sekolah/yayasan atau interaksi asisten resmi
+  const IN_SCOPE_ANCHOR_REGEX = /\b(halo|hallop|hallo|hai|assalam|assalamu|assalamualaikum|salam|kabar|permisi|pagi|siang|sore|malam|terima\s+kasih|terimakasih|makasih|oke|baik|siap|sampai\s+jumpa|dadah|bye|tolong|maaf|bantu|bantuan|asisten|ai|robot|manusia|privasi|yayasan|sekolah|paud|tpq|santri|siswa|ananda|ppdb|daftar|pendaftaran|guru|ustadz|ustadzah|tu|tata\s+usaha|spp|ijazah|rapor|juanda|wijaya\s+kusuma|air\s+putih|samarinda|ulinnuha|qiraati|tahfidz|ptpt|pra\s+ptpt|surah|nis|nomor\s+induk|portal\s+siswa)\b|siapa\s+(anda|kamu|bot|asisten|admin|pengurus|kepala|ketua|saya|kita)|(anda|kamu)\s+siapa|(tugas|fungsi)\s+(anda|kamu|bot|asisten)/i;
 
   // =========================================================================
   // 4. DATA PANDUAN PPDB INTERAKTIF 11 TAHAPAN
@@ -327,6 +375,188 @@
     },
 
     // -----------------------------------------------------------------------
+    // IDENTITAS ASISTEN, PENGGUNA, KESANTUNAN & PANDUAN FUNGSI
+    // -----------------------------------------------------------------------
+    {
+      id: 'bot_identity_info',
+      category: 'asisten',
+      intent: 'bot_identity',
+      title: 'Identitas & Peran Asisten Informasi',
+      patterns: [
+        'siapa anda', 'anda siapa', 'siapa kamu', 'kamu siapa', 'siapa ini', 'ini siapa',
+        'apa nama anda', 'siapa nama anda', 'siapa nama kamu', 'anda ini siapa', 'kamu ini siapa',
+        'apa tugas anda', 'apa fungsi anda', 'apa tugas kamu', 'apa fungsi kamu', 'fungsi anda', 'tugas anda',
+        'anda dibuat untuk apa', 'kamu dibuat untuk apa', 'dibuat untuk apa', 'tujuan anda dibuat',
+        'apa yang bisa anda bantu', 'apa yang bisa kamu bantu', 'bisa bantu apa saja', 'bisa bantu apa',
+        'apakah anda ai', 'apakah anda robot', 'apakah anda manusia', 'apakah kamu ai', 'apakah kamu manusia',
+        'kamu robot ya', 'anda robot ya', 'bagaimana cara menggunakan anda', 'bagaimana cara pakai asisten',
+        'cara menggunakan asisten', 'tentang asisten'
+      ],
+      keywords: ['siapa', 'anda', 'nama', 'tugas', 'fungsi', 'bantu', 'bantuan', 'asisten', 'ai', 'robot', 'manusia'],
+      priority: 22,
+      buildAnswer: function (ctx) {
+        return `Saya adalah *Asisten Informasi Resmi ${ctx.schoolName}*! 🤖\n\n` +
+          `• *Tugas & Fungsi Saya:* Membantu calon santri, orang tua/wali murid, dan pengunjung memperoleh informasi resmi seputar:\n` +
+          `  1. *PPDB Online* (Jadwal pendaftaran, alur 11 langkah, formulir, dan verifikasi).\n` +
+          `  2. *Persyaratan Berkas* (Pasfoto formal, scan Akta Kelahiran, dan KK).\n` +
+          `  3. *Program Pendidikan* (TPQ Ulinnuha Metode Qiraati & KB Ulinnuha PAUD/PKBM).\n` +
+          `  4. *Administrasi Pendidikan* (SPP bulanan di SIAKAD, aktivasi NIS, dan daftar ulang).\n` +
+          `  5. *Informasi Umum Yayasan* (Alamat kantor, kontak WhatsApp panitia, dan fasilitas).\n\n` +
+          `• *Status Sistem:* Saya merupakan sistem asisten informasi cerdas berbasis aturan (*rule-based*) internal SIYAYASAN. Saya bukan manusia dan tidak menggunakan layanan AI eksternal.\n\n` +
+          `Silakan ketik pertanyaan Anda seputar PPDB atau yayasan, atau pilih topik rekomendasi di bawah!`;
+      },
+      actions: [
+        { label: 'Buka Halaman PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+        { label: 'Panduan Alur 11 Langkah', action: 'open_ppdb_guide', icon: 'fi fi-rr-workflow' },
+        { label: 'Profil Yayasan', url: 'profil.html', icon: 'fi fi-rr-info' }
+      ]
+    },
+    {
+      id: 'user_identity_privacy',
+      category: 'asisten',
+      intent: 'user_identity',
+      title: 'Identitas Pengguna & Privasi Data',
+      patterns: [
+        'siapa saya', 'siapa aku', 'aku siapa', 'saya siapa', 'anda kenal saya',
+        'apakah anda mengenal saya', 'apakah kamu kenal saya', 'apakah anda tahu nama saya',
+        'apakah kamu tahu nama saya', 'tahu nama saya', 'kenal saya tidak',
+        'apa yang anda ketahui tentang saya', 'apa yang kamu tahu tentang saya', 'anda tahu apa tentang saya',
+        'saya sedang berada di mana', 'dimana saya sekarang', 'lokasi saya dimana', 'posisi saya dimana',
+        'dimana saya'
+      ],
+      keywords: ['siapa', 'saya', 'aku', 'kenal', 'mengenal', 'privasi', 'posisi', 'tahu'],
+      priority: 20,
+      buildAnswer: function (ctx) {
+        return `Anda adalah *pengunjung website resmi ${ctx.schoolName}* yang sedang menggunakan layanan Asisten Informasi.\n\n` +
+          `• *Privasi & Keamanan Data:* Saya tidak memiliki akses ke nama, identitas pribadi, kontak, maupun data perangkat Anda. Seluruh sesi tanya jawab ini bersifat aman dan anonim.\n` +
+          `• *Informasi Lokasi:* Saya tidak melacak posisi fisik Anda. Namun jika Anda mencari lokasi resmi sekolah kami, *Sekretariat Yayasan At Tarbiyyah* beralamat di:\n` +
+          `  📍 *${ctx.address}*\n\n` +
+          `Ada informasi pendaftaran atau informasi yayasan yang dapat saya bantu?`;
+      },
+      actions: [
+        { label: 'Lihat Alamat & Peta Kontak', url: 'kontak.html', icon: 'fi fi-rr-marker' },
+        { label: 'Buka Menu PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' }
+      ]
+    },
+    {
+      id: 'courtesy_thanks_info',
+      category: 'umum',
+      intent: 'courtesy_thanks',
+      title: 'Ucapan Terima Kasih',
+      patterns: [
+        'terima kasih', 'makasih', 'terimakasih', 'makasi', 'makasih banyak', 'terima kasih banyak',
+        'thanks', 'thank you', 'suwun', 'hatur nuhun', 'matur suwun', 'terima kasih infonya',
+        'makasih infonya', 'makasih admin', 'terima kasih admin'
+      ],
+      keywords: ['terima', 'kasih', 'makasih', 'thanks', 'suwun'],
+      priority: 22,
+      buildAnswer: function (ctx) {
+        return `Sama-sama! Senang dapat membantu Anda. 😊\n\n` +
+          `Jangan ragu untuk bertanya kembali jika ada hal lain seputar pendaftaran PPDB, persyaratan berkas, atau informasi ${ctx.schoolName} yang Anda butuhkan.\n\n` +
+          `Semoga sukses dan berkah untuk ananda dan keluarga!`;
+      },
+      actions: [
+        { label: 'Buka Formulir PPDB Online', url: 'ppdb.html#formulir-pendaftaran', icon: 'fi fi-rr-edit' },
+        { label: 'Hubungi Panitia via WhatsApp', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true }
+      ]
+    },
+    {
+      id: 'courtesy_ack_info',
+      category: 'umum',
+      intent: 'courtesy_ack',
+      title: 'Konfirmasi Percakapan',
+      patterns: [
+        'oke', 'ok', 'baik', 'baiklah', 'siap', 'paham', 'mengerti', 'sip',
+        'oke baik', 'oke paham', 'oke mengerti', 'oke siap', 'oke sip'
+      ],
+      keywords: ['oke', 'baik', 'siap', 'paham', 'mengerti', 'sip'],
+      priority: 18,
+      buildAnswer: function () {
+        return `Baik! Senang informasi yang disampaikan dapat dipahami dengan baik. 👍\n\n` +
+          `Apakah masih ada hal lain seputar PPDB, biaya SPP, jadwal kegiatan, atau profil yayasan yang ingin Anda ketahui? Silakan ketik pertanyaan Anda.`;
+      },
+      actions: [
+        { label: 'Buka Halaman PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+        { label: 'Panduan Alur 11 Langkah', action: 'open_ppdb_guide', icon: 'fi fi-rr-workflow' }
+      ]
+    },
+    {
+      id: 'courtesy_closing_info',
+      category: 'umum',
+      intent: 'courtesy_closing',
+      title: 'Salam Perpisahan & Penutup',
+      patterns: [
+        'sampai jumpa', 'dadah', 'bye', 'selamat tinggal', 'goodbye', 'sampai ketemu',
+        'wassalam', 'wassalamualaikum', 'wassalamu alaikum'
+      ],
+      keywords: ['sampai', 'jumpa', 'dadah', 'bye', 'tinggal', 'wassalam'],
+      priority: 20,
+      buildAnswer: function (ctx) {
+        return `Sampai jumpa kembali! Terima kasih banyak telah berkunjung ke website resmi ${ctx.schoolName}.\n\n` +
+          `Semoga hari Anda menyenangkan dan senantiasa dalam lindungan Allah SWT. Wassalamu'alaikum Warahmatullahi Wabarakatuh. 🙏`;
+      },
+      actions: [
+        { label: 'Buka Halaman Utama', url: 'index.html', icon: 'fi fi-rr-home' }
+      ]
+    },
+    {
+      id: 'courtesy_help_request_info',
+      category: 'umum',
+      intent: 'courtesy_help',
+      title: 'Permintaan Bantuan',
+      patterns: [
+        'bisa bantu saya', 'bantu saya', 'tolong saya', 'minta tolong', 'tolong',
+        'saya butuh bantuan', 'butuh bantuan', 'tolong bantu', 'mau tanya dong',
+        'saya mau tanya', 'boleh tanya', 'apakah boleh tanya'
+      ],
+      keywords: ['bisa', 'bantu', 'tolong', 'bantuan', 'tanya'],
+      priority: 20,
+      buildAnswer: function () {
+        return `Tentu! Saya siap membantu Anda dengan senang hati. 😊\n\n` +
+          `Silakan tanyakan informasi yang Anda perlukan seputar:\n` +
+          `• *PPDB Online:* Syarat berkas, tata cara pendaftaran, jadwal, dan status pengumuman.\n` +
+          `• *Program Pendidikan:* TPQ Ulinnuha (Metode Qiraati & Tahfidz) serta KB Ulinnuha (PAUD).\n` +
+          `• *Keuangan & Administrasi:* SPP bulanan, aktivasi NIS, seragam, dan daftar ulang.\n` +
+          `• *Sekolah & Yayasan:* Alamat lokasi kantor, hari operasional, dan nomor WhatsApp panitia.\n\n` +
+          `Apa yang ingin Anda ketahui?`;
+      },
+      actions: [
+        { label: 'Buka Halaman PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+        { label: 'Lihat Persyaratan Berkas', url: 'ppdb.html#jadwal-linimasa', icon: 'fi fi-rr-clip' }
+      ]
+    },
+    {
+      id: 'bot_capabilities_info',
+      category: 'asisten',
+      intent: 'bot_capabilities',
+      title: 'Panduan Informasi & Cara Bertanya',
+      patterns: [
+        'apa saja informasi yang tersedia', 'bisa tanya apa saja', 'menu apa saja',
+        'informasi apa saja yang ada', 'bisa bantu apa', 'bagaimana cara bertanya',
+        'cara bertanya bagaimana', 'bagaimana mencari informasi ppdb', 'cara cari info ppdb',
+        'bagaimana membuka halaman tertentu', 'bagaimana mendapatkan bantuan',
+        'bagaimana menghubungi admin'
+      ],
+      keywords: ['informasi', 'tersedia', 'tanya', 'menu', 'bantuan', 'admin', 'cara'],
+      priority: 19,
+      buildAnswer: function (ctx) {
+        return `ℹ️ *Panduan Informasi Asisten SIYAYASAN*:\n\n` +
+          `Anda dapat bertanya seputar:\n` +
+          `• *1. Pendaftaran PPDB:* Cara mendaftar online, jadwal linimasa, panduan pengisian formulir, dan alur 11 tahapan.\n` +
+          `• *2. Dokumen Persyaratan:* Pasfoto formal anak, scan Akta Kelahiran, dan KK.\n` +
+          `• *3. Status Penerimaan & Daftar Ulang:* Cara memantau pengumuman mandiri, verifikasi berkas fisik, dan penerbitan NIS.\n` +
+          `• *4. SPP & Pembayaran:* Mekanisme kuitansi resmi dan tagihan via Portal Siswa (SIAKAD).\n` +
+          `• *5. Profil Yayasan:* Fasilitas pendidikan, kurikulum metode Qiraati & tahfidz, lokasi alamat, dan kontak resmi.\n\n` +
+          `Jika pertanyaan membutuhkan layanan tatap muka, Anda dapat langsung menghubungi panitia melalui WhatsApp.`;
+      },
+      actions: [
+        { label: 'Buka Halaman PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+        { label: 'Hubungi WhatsApp Panitia', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true },
+        { label: 'Buka Halaman Kontak', url: 'kontak.html', icon: 'fi fi-rr-envelope' }
+      ]
+    },
+
+    // -----------------------------------------------------------------------
     // A. KATEGORI PPDB & PENDAFTARAN ONLINE
     // -----------------------------------------------------------------------
     {
@@ -382,10 +612,13 @@
         'bagaimana cara daftar', 'gimana cara daftar', 'cara mendaftar', 'saya mau masuk',
         'saya mau daftar', 'bagaimana alur pendaftaran', 'tata cara daftar', 'langkah pendaftaran',
         'cara registrasi', 'mau daftar sekolah', 'cara ikut ppdb', 'prosedur daftar',
-        'bagaimana cara mendaftar', 'bagaimana registrasinya', 'bagaimana pendaftarannya', 'bgmn registrasinya', 'registrasi'
+        'bagaimana cara mendaftar', 'bagaimana registrasinya', 'bagaimana pendaftarannya', 'bgmn registrasinya', 'registrasi',
+        'saya ingin mendaftar', 'saya ingin masuk', 'saya mau masuk sekolah ini', 'bagaimana cara masuk sekolah ini',
+        'saya mau menjadi siswa baru', 'mau jadi siswa baru', 'bagaimana proses penerimaannya', 'proses penerimaan',
+        'mau daftar ppdb', 'daftar ppdb', 'pendaftaran ppdb', 'ikut ppdb', 'mau daftar'
       ],
-      keywords: ['cara', 'daftar', 'alur', 'pendaftaran', 'masuk', 'langkah', 'prosedur', 'tata'],
-      priority: 15,
+      keywords: ['cara', 'daftar', 'alur', 'pendaftaran', 'masuk', 'langkah', 'prosedur', 'tata', 'ppdb', 'registrasi'],
+      priority: 19,
       buildAnswer: function (ctx) {
         return `Untuk mendaftar di *${ctx.schoolName}*, ikuti langkah ringkas berikut:\n\n1. Buka menu *PPDB Online* pada website ini.\n2. Lengkapi formulir pendaftaran (Data Santri, Orang Tua, dan Riwayat Pendidikan).\n3. Unggah Pasfoto formal ananda (wajib) serta foto/scan Akta Kelahiran & KK.\n4. Periksa ringkasan formulir dan klik *Kirim Pendaftaran*.\n5. Simpan/cetak Lembar Bukti Registrasi dengan Nomor Registrasi unik Anda.\n\nSetelah itu, panitia Tata Usaha akan memverifikasi berkas Anda.`;
       },
@@ -404,7 +637,8 @@
         'syarat pendaftaran', 'berkas apa saja', 'dokumen yang disiapkan', 'syarat masuk',
         'perlu foto kah', 'perlu akta', 'perlu kartu keluarga',
         'apa saja persyaratan ppdb', 'persyaratan ppdb', 'syarat ppdb', 'berkas ppdb',
-        'apa saja syarat ppdb', 'syarat pendaftaran ppdb', 'apa saja persyaratan masuk', 'syarat masuk ppdb'
+        'apa saja syarat ppdb', 'syarat pendaftaran ppdb', 'apa saja persyaratan masuk', 'syarat masuk ppdb',
+        'apa saja berkasnya', 'apa saja persyaratannya', 'berkasnya apa saja', 'syaratnya apa saja'
       ],
       keywords: ['persyaratan', 'syarat', 'berkas', 'dokumen', 'pasfoto', 'akta', 'kk', 'kartu', 'keluarga', 'upload', 'ppdb'],
       priority: 14,
@@ -518,7 +752,9 @@
       title: 'Langkah Setelah Dinyatakan Diterima (Daftar Ulang)',
       patterns: [
         'apa yang harus dilakukan setelah diterima', 'langkah setelah diterima', 'setelah lolos seleksi harus apa',
-        'tahapan setelah diterima', 'cara daftar ulang', 'kapan daftar ulang', 'konfirmasi penerimaan'
+        'tahapan setelah diterima', 'cara daftar ulang', 'kapan daftar ulang', 'konfirmasi penerimaan',
+        'kalau sudah diterima bagaimana', 'setelah diterima bagaimana', 'kalau sudah diterima',
+        'setelah lolos bagaimana', 'langkah setelah diterima bagaimana'
       ],
       keywords: ['setelah', 'diterima', 'lolos', 'lulus', 'daftar', 'ulang', 'konfirmasi', 'sekretariat'],
       priority: 13,
@@ -567,7 +803,7 @@
       title: 'Profil Yayasan At Tarbiyyah Wijaya Kusuma',
       patterns: [
         'profil yayasan', 'tentang yayasan', 'sejarah yayasan', 'apa itu yayasan at tarbiyyah',
-        'siapa yayasan at tarbiyyah', 'profil sekolah', 'profil singkat'
+        'siapa yayasan at tarbiyyah', 'profil sekolah', 'profil singkat', 'sekolah', 'tentang sekolah', 'info sekolah'
       ],
       keywords: ['profil', 'yayasan', 'sejarah', 'tentang', 'tarbiyyah', 'wijaya', 'kusuma'],
       priority: 12,
@@ -634,9 +870,11 @@
       title: 'Lokasi & Alamat Resmi Yayasan',
       patterns: [
         'di mana lokasi sekolah', 'dimana alamat sekolah', 'alamat yayasan', 'lokasi yayasan',
-        'kantor yayasan dimana', 'rute ke sekolah', 'di mana posisi yayasan', 'tempat sekolah'
+        'kantor yayasan dimana', 'rute ke sekolah', 'di mana posisi yayasan', 'tempat sekolah',
+        'lokasi sekolah', 'alamat sekolah', 'lokasi sekolah dimana', 'alamat sekolah dimana',
+        'dimana lokasi sekolah', 'dimana alamat sekolah', 'posisi sekolah', 'sekolah dimana'
       ],
-      keywords: ['lokasi', 'alamat', 'dimana', 'jalan', 'juanda', 'wijaya', 'kusuma', 'samarinda', 'maps', 'posisi'],
+      keywords: ['lokasi', 'alamat', 'dimana', 'jalan', 'juanda', 'wijaya', 'kusuma', 'samarinda', 'maps', 'posisi', 'sekolah'],
       priority: 14,
       buildAnswer: function (ctx) {
         return `📍 *Alamat Resmi ${ctx.schoolName}*:\n\n` +
@@ -669,6 +907,30 @@
       actions: [
         { label: 'Chat WhatsApp Sekarang', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true },
         { label: 'Buka Formulir Kontak', url: 'kontak.html', icon: 'fi fi-rr-envelope' }
+      ]
+    },
+    {
+      id: 'yayasan_social_media_info',
+      category: 'yayasan',
+      intent: 'social_media',
+      title: 'Media Sosial & Saluran Informasi Resmi',
+      patterns: [
+        'media sosial yayasan', 'akun instagram', 'facebook yayasan', 'youtube sekolah',
+        'medsos yayasan', 'akun medsos', 'sosial media', 'instagram sekolah', 'facebook sekolah',
+        'medsos sekolah', 'sosmed yayasan', 'sosmed sekolah'
+      ],
+      keywords: ['media', 'sosial', 'medsos', 'sosmed', 'instagram', 'facebook', 'youtube', 'saluran'],
+      priority: 15,
+      buildAnswer: function (ctx) {
+        return `🌐 *Saluran Informasi Resmi ${ctx.schoolName}*:\n\n` +
+          `• *Website Resmi:* Akses berita terkini, pengumuman, dan kalender kegiatan langsung di portal website ini.\n` +
+          `• *Layanan WhatsApp Panitia:* ${ctx.phone} (layanan pesan cepat untuk konsultasi PPDB & pertanyaan umum).\n` +
+          `• *Email Resmi:* ${ctx.email}\n\n` +
+          `Dokumentasi kegiatan santri, agenda wisuda tahfidz, dan pengumuman resmi yayasan dipublikasikan secara berkala melalui menu Berita dan Galeri di website ini.`;
+      },
+      actions: [
+        { label: 'Lihat Berita Terbaru', url: 'berita.html', icon: 'fi fi-rr-newspaper' },
+        { label: 'Hubungi WhatsApp Resmi', isWhatsApp: true, icon: 'fi fi-brands-whatsapp', isExternal: true }
       ]
     },
     {
@@ -834,8 +1096,106 @@
   ];
 
   // =========================================================================
-  // 6. HELPER: NORMALISASI TEKS QUERY PENGGUNA
+  // 6. HELPER: NORMALISASI TEKS & FUZZY MATCHING (TYPO TOLERANCE)
   // =========================================================================
+  const CANONICAL_KEYWORDS = [
+    'daftar', 'pendaftaran', 'mendaftar', 'masuk', 'formulir', 'registrasi',
+    'syarat', 'persyaratan', 'berkas', 'dokumen', 'pasfoto', 'foto', 'akta', 'keluarga',
+    'sekolah', 'yayasan', 'profil', 'alamat', 'lokasi', 'kontak', 'telepon', 'whatsapp',
+    'jadwal', 'libur', 'kalender', 'agenda', 'kegiatan', 'biaya', 'spp', 'bayar', 'tagihan',
+    'diterima', 'lulus', 'hasil', 'pengumuman', 'seleksi', 'aktivasi', 'nis', 'portal',
+    'siapa', 'tugas', 'fungsi', 'bantu', 'bantuan', 'asisten', 'terimakasih', 'terima', 'kasih',
+    'halo', 'pagi', 'siang', 'sore', 'malam', 'kabar', 'sampai', 'jumpa', 'informasi', 'dibuka'
+  ];
+
+  // Algoritma Levenshtein Distance untuk toleransi kesalahan ketik (typo)
+  function levenshteinDistance(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+
+    const row = [];
+    for (let i = 0; i <= b.length; i++) {
+      row[i] = i;
+    }
+
+    for (let i = 1; i <= a.length; i++) {
+      let prev = i;
+      for (let j = 1; j <= b.length; j++) {
+        let val;
+        if (a[i - 1] === b[j - 1]) {
+          val = row[j - 1];
+        } else {
+          val = Math.min(row[j - 1] + 1, prev + 1, row[j] + 1);
+        }
+        row[j - 1] = prev;
+        prev = val;
+      }
+      row[b.length] = prev;
+    }
+    return row[b.length];
+  }
+
+  // Pencocokan fuzzy ke kosakata kanonikal
+  function fuzzyMatchKeyword(token) {
+    if (!token || token.length < 4) return token;
+    let closestWord = token;
+    let minDistance = 99;
+
+    for (let i = 0; i < CANONICAL_KEYWORDS.length; i++) {
+      const canonical = CANONICAL_KEYWORDS[i];
+      if (Math.abs(token.length - canonical.length) > 2) continue;
+      const dist = levenshteinDistance(token, canonical);
+      const maxAllowed = canonical.length >= 7 ? 2 : 1;
+      if (dist <= maxAllowed && dist < minDistance) {
+        minDistance = dist;
+        closestWord = canonical;
+      }
+    }
+
+    return closestWord;
+  }
+
+  // Pemangkasan huruf berulang (elongated letters: "halloooo" -> "hallo", "bagaimanaa" -> "bagaimana")
+  function cleanRepeatedCharacters(word) {
+    if (!word || typeof word !== 'string') return '';
+    // 1. Pangkas pengulangan 3+ karakter berturut-turut menjadi 1 karakter
+    let clean = word.replace(/([a-z])\1{2,}/gi, '$1');
+
+    // 2. Pangkas pengulangan 2 karakter di akhir kata untuk konsonan/vokal berlebih
+    clean = clean.replace(/([a-z])\1$/i, '$1');
+
+    return clean;
+  }
+
+  function normalizeToken(rawToken) {
+    if (!rawToken) return '';
+    let token = cleanRepeatedCharacters(rawToken);
+
+    if (SLANG_MAP[token]) {
+      return SLANG_MAP[token];
+    }
+
+    // Penanganan sufiks '-nya' (contoh: "persyaratannya" -> "persyaratan" -> "berkas")
+    if (token.endsWith('nya') && token.length > 5) {
+      const root = token.slice(0, -3);
+      if (SLANG_MAP[root]) {
+        return SLANG_MAP[root];
+      }
+      if (CANONICAL_KEYWORDS.includes(root)) {
+        return root;
+      }
+    }
+
+    // Fuzzy matching ke kamus kanonikal
+    const fuzzy = fuzzyMatchKeyword(token);
+    if (fuzzy !== token) {
+      return SLANG_MAP[fuzzy] || fuzzy;
+    }
+
+    return token;
+  }
+
   function normalizeText(text) {
     if (!text || typeof text !== 'string') return '';
     let clean = text.toLowerCase();
@@ -843,9 +1203,8 @@
     // Hapus karakter non-alfanumerik kecuali spasi
     clean = clean.replace(/[^a-z0-9\s]/g, ' ');
 
-    // Ganti slang / singkatan
     const tokens = clean.split(/\s+/).filter(Boolean);
-    const normalizedTokens = tokens.map(t => SLANG_MAP[t] || t);
+    const normalizedTokens = tokens.map(t => normalizeToken(t));
 
     return normalizedTokens.join(' ').trim();
   }
@@ -853,7 +1212,7 @@
   // =========================================================================
   // 7. MESIN PENCOCOK INTENT (RULE-BASED WEIGHTED MATCHING)
   // =========================================================================
-  function findAnswer(rawQuery) {
+  function findAnswer(rawQuery, conversationContext) {
     if (!rawQuery || typeof rawQuery !== 'string' || !rawQuery.trim()) {
       return {
         type: 'empty',
@@ -886,6 +1245,107 @@
     }
 
     // -----------------------------------------------------------------------
+    // FILTER 0: CONTEXT-AWARE FOLLOW-UP RESOLVER (Pertanyaan Berangkai)
+    // -----------------------------------------------------------------------
+    if (conversationContext && conversationContext.lastIntent) {
+      const lastIntent = conversationContext.lastIntent;
+      const lastTopic = conversationContext.lastTopic || '';
+
+      // A. "Bagaimana selanjutnya?", "Kalau sudah?", "Terus?", "Langkah berikutnya?"
+      const isNextStep = /^(bagaimana\s+selanjutnya|kalau\s+sudah|setelah\s+itu|terus\s+bagaimana|terus\s+gimana|terus|selanjutnya\s+apa|langkah\s+berikutnya)/i.test(trimmed) ||
+                         /^(bagaimana\s+selanjutnya|kalau\s+sudah|setelah\s+itu|terus\s+bagaimana|terus\s+gimana|terus|selanjutnya\s+apa|langkah\s+berikutnya)/i.test(normalized);
+
+      if (isNextStep) {
+        if (lastIntent === 'ppdb_register' || lastIntent === 'ppdb_form_help' || lastIntent === 'ppdb_info') {
+          return findAnswer('bagaimana cara verifikasi dan pengumuman ppdb', null);
+        } else if (lastIntent === 'ppdb_requirements') {
+          return findAnswer('bagaimana cara mendaftar ppdb online', null);
+        } else if (lastIntent === 'ppdb_acceptance_check' || lastIntent === 'ppdb_after_accepted') {
+          return findAnswer('bagaimana proses aktivasi menjadi siswa dan dapat nis', null);
+        }
+      }
+
+      // B. "Apa saja berkasnya?", "Syaratnya apa saja?", "Apa saja?"
+      const isRequirementsFollowup = /^(apa\s+saja\s+berkas|apa\s+saja\s+syarat|syaratnya\s+apa|berkasnya\s+apa|apa\s+saja)/i.test(normalized) ||
+                                     /^(apa\s+saja\s+berkasnya|apa\s+saja\s+syaratnya)/i.test(trimmed);
+      if (isRequirementsFollowup && (lastTopic === 'ppdb' || lastIntent.startsWith('ppdb'))) {
+        return findAnswer('apa saja persyaratan berkas dokumen ppdb', null);
+      }
+
+      // C. "Kalau sudah diterima bagaimana?", "Setelah diterima bagaimana?"
+      const isAfterAcceptance = /^(kalau\s+sudah\s+diterima|setelah\s+diterima|setelah\s+lolos)/i.test(normalized);
+      if (isAfterAcceptance) {
+        return findAnswer('apa yang harus dilakukan setelah diterima', null);
+      }
+
+      // D. "Di mana halamannya?", "Mana linknya?", "Mana tautannya?"
+      const isPageLink = /^(di\s+mana\s+halaman|dimana\s+halaman|mana\s+link|mana\s+tautan|linknya\s+mana|buka\s+halaman)/i.test(normalized);
+      if (isPageLink) {
+        if (lastTopic === 'ppdb' || lastIntent.startsWith('ppdb')) {
+          return {
+            type: 'answer',
+            category: 'ppdb',
+            intent: 'page_link',
+            title: 'Tautan Halaman PPDB Online',
+            answer: `Berikut tautan langsung menuju halaman resmi *PPDB Online ${ctx.schoolName}*:\n\nSilakan klik tombol di bawah untuk membuka halaman pendaftaran atau formulir online:`,
+            actions: [
+              { label: 'Buka Halaman PPDB', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+              { label: 'Isi Formulir Pendaftaran', url: 'ppdb.html#formulir-pendaftaran', icon: 'fi fi-rr-edit' }
+            ]
+          };
+        } else if (lastIntent === 'tuition_spp' || lastTopic === 'administrasi') {
+          return {
+            type: 'answer',
+            category: 'administrasi',
+            intent: 'page_link',
+            title: 'Tautan Portal Siswa (SIAKAD)',
+            answer: `Berikut tautan resmi menuju *Portal Siswa (SIAKAD) ${ctx.schoolName}* untuk pengecekan tagihan SPP dan administrasi keuangan santri:`,
+            actions: [
+              { label: 'Login Portal Siswa (SIAKAD)', url: 'login.html', icon: 'fi fi-rr-graduation-cap' }
+            ]
+          };
+        } else if (lastIntent === 'school_location' || lastIntent === 'school_contacts') {
+          return {
+            type: 'answer',
+            category: 'yayasan',
+            intent: 'page_link',
+            title: 'Tautan Kontak & Lokasi Yayasan',
+            answer: `Berikut tautan resmi menuju halaman *Kontak & Peta Lokasi Yayasan*:`,
+            actions: [
+              { label: 'Lihat Kontak & Lokasi', url: 'kontak.html', icon: 'fi fi-rr-marker' }
+            ]
+          };
+        }
+      }
+
+      // E. "Berapa biayanya?", "Biayanya berapa?"
+      const isCostFollowup = /^(berapa\s+spp|spp\s+berapa|biayanya\s+berapa|berapa\s+biaya)/i.test(normalized);
+      if (isCostFollowup) {
+        return findAnswer('berapa biaya spp dan tagihan pendidikan', conversationContext);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // FILTER 0B: AMBIGUOUS SHORT QUERY CLARIFICATION
+    // Jika pertanyaan hanya 1 kata ambigu ("info", "tanya", "menu", "bantuan")
+    // -----------------------------------------------------------------------
+    if (['info', 'tanya', 'menu', 'bantuan', 'informasi'].includes(normalized)) {
+      return {
+        type: 'clarification',
+        category: 'umum',
+        intent: 'bot_capabilities',
+        title: 'Bantuan Asisten Informasi SIYAYASAN',
+        answer: `Halo! Saya siap membantu Anda. Silakan pilih topik informasi yang ingin Anda ketahui di bawah ini, atau ketik pertanyaan lengkap Anda:`,
+        actions: [
+          { label: 'Pendaftaran PPDB Online', url: 'ppdb.html', icon: 'fi fi-rr-document-signed' },
+          { label: 'Syarat Berkas Pendaftaran', url: 'ppdb.html#jadwal-linimasa', icon: 'fi fi-rr-clip' },
+          { label: 'Biaya SPP & Pendidikan', url: 'login.html', icon: 'fi fi-rr-coins' },
+          { label: 'Lokasi & Kontak Yayasan', url: 'kontak.html', icon: 'fi fi-rr-marker' }
+        ]
+      };
+    }
+
+    // -----------------------------------------------------------------------
     // FILTER 1: DETEKSI STRICT OUT-OF-SCOPE
     // Pertanyaan politik, pemilu, coding, film, game, kalkulus, resep, dll
     // WAJIB dijawab persis: "Saya tidak bisa menjawab pertanyaan Anda."
@@ -893,7 +1353,7 @@
     const hasForbiddenWord = OUT_OF_SCOPE_REGEX.test(trimmed) || OUT_OF_SCOPE_REGEX.test(normalized);
     const hasSchoolAnchor = IN_SCOPE_ANCHOR_REGEX.test(trimmed) || IN_SCOPE_ANCHOR_REGEX.test(normalized);
 
-    if (hasForbiddenWord && !hasSchoolAnchor) {
+    if (hasForbiddenWord) {
       return {
         type: 'out_of_scope',
         answer: 'Saya tidak bisa menjawab pertanyaan Anda.',
@@ -908,6 +1368,7 @@
         /(panduan lengkap|11 tahap|step by step)/i.test(normalized)) {
       return {
         type: 'answer',
+        category: 'ppdb',
         intent: 'ppdb_11_steps',
         title: 'Panduan Lengkap Alur Pendaftaran PPDB',
         answer: `Berikut adalah *11 Tahapan Resmi Pendaftaran Santri Baru* di ${ctx.schoolName}:\n\n` +
@@ -947,7 +1408,7 @@
         if (normalized === pattern) {
           score += 25;
           break;
-        } else if (normalized.includes(pattern)) {
+        } else if (pattern.includes(' ') && normalized.includes(pattern)) {
           score += 18;
           break;
         } else if (pattern.includes(normalized) && normalized.length > 5) {
@@ -988,6 +1449,7 @@
     if (bestMatch && highestScore >= MATCH_THRESHOLD) {
       return {
         type: 'answer',
+        category: bestMatch.category || 'umum',
         intent: bestMatch.intent,
         title: bestMatch.title,
         answer: bestMatch.buildAnswer(ctx),
@@ -1019,18 +1481,76 @@
   }
 
   // =========================================================================
-  // 8. DAFTAR PERTANYAAN REKOMENDASI CEPAT (QUICK CHIPS)
+  // 8. DAFTAR PERTANYAAN REKOMENDASI CEPAT & ADAPTIF (QUICK CHIPS)
   // =========================================================================
   const SUGGESTED_QUESTIONS = [
     'Bagaimana cara mendaftar?',
     'Apa saja persyaratan PPDB?',
     'Panduan alur pendaftaran PPDB',
-    'Di mana lokasi sekolah?',
+    'Berapa biaya SPP pendidikan?',
+    'Di mana lokasi yayasan & sekolah?',
     'Apa saja program pendidikannya?',
-    'Bagaimana informasi biaya / SPP?',
     'Bagaimana cara cek status PPDB?',
     'Kapan hari & jam operasional sekolah?'
   ];
+
+  // Rekomendasi kontekstual adaptif berdasarkan topik percakapan terakhir
+  function getContextualSuggestions(lastIntent) {
+    if (!lastIntent) return SUGGESTED_QUESTIONS.slice(0, 3);
+
+    switch (lastIntent) {
+      case 'ppdb_register':
+      case 'ppdb_form_help':
+        return [
+          'Apa saja persyaratan PPDB?',
+          'Kapan PPDB buka?',
+          'Bagaimana cara cek status PPDB?'
+        ];
+      case 'ppdb_requirements':
+        return [
+          'Bagaimana cara mendaftar?',
+          'Berapa biaya SPP pendidikan?',
+          'Di mana lokasi yayasan & sekolah?'
+        ];
+      case 'ppdb_schedule':
+        return [
+          'Bagaimana cara mendaftar?',
+          'Apa saja persyaratan PPDB?',
+          'Panduan alur pendaftaran PPDB'
+        ];
+      case 'ppdb_after_accepted':
+      case 'ppdb_activation':
+        return [
+          'Bagaimana login Portal Siswa?',
+          'Berapa biaya SPP pendidikan?',
+          'Di mana lokasi yayasan & sekolah?'
+        ];
+      case 'tuition_spp':
+        return [
+          'Bagaimana cara mendaftar?',
+          'Bagaimana login Portal Siswa?',
+          'Hubungi panitia via WhatsApp'
+        ];
+      case 'school_location':
+      case 'school_contacts':
+        return [
+          'Kapan hari & jam operasional sekolah?',
+          'Bagaimana cara mendaftar?',
+          'Apa saja program pendidikannya?'
+        ];
+      case 'bot_identity':
+      case 'user_identity':
+      case 'greeting':
+      case 'courtesy_help':
+        return [
+          'Bagaimana cara mendaftar?',
+          'Apa saja persyaratan PPDB?',
+          'Di mana lokasi yayasan & sekolah?'
+        ];
+      default:
+        return SUGGESTED_QUESTIONS.slice(0, 3);
+    }
+  }
 
   return {
     findAnswer: findAnswer,
@@ -1041,6 +1561,7 @@
     getSuggestedQuestions: function () {
       return SUGGESTED_QUESTIONS;
     },
+    getContextualSuggestions: getContextualSuggestions,
     getDynamicContext: getDynamicContext,
     isOutOfScope: function (query) {
       const res = findAnswer(query);

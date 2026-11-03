@@ -98,9 +98,14 @@
 
         <!-- Quick Chips (Rekomendasi Pertanyaan Cepat) -->
         <div class="qa-suggestions-wrapper" id="qa-suggestions-area">
-          <div class="qa-suggestions-title">
-            <i class="fi fi-rr-bulb text-[10px] text-amber-500"></i>
-            <span>Rekomendasi Pertanyaan</span>
+          <div class="qa-suggestions-header">
+            <div class="qa-suggestions-title">
+              <i class="fi fi-rr-bulb text-[10px] text-amber-500"></i>
+              <span>Rekomendasi Cepat</span>
+            </div>
+            <button type="button" class="qa-suggestions-toggle" id="qa-btn-toggle-suggestions" title="Tutup Rekomendasi" aria-label="Tutup Rekomendasi">
+              Tutup &times;
+            </button>
           </div>
           <div class="qa-chips-container" id="qa-chips-list">
             <!-- Chips dirender dinamis -->
@@ -279,6 +284,8 @@
     const btnClear = document.getElementById('qa-btn-clear');
     const chatBody = document.getElementById('qa-chat-messages');
     const chipsList = document.getElementById('qa-chips-list');
+    const suggestionsArea = document.getElementById('qa-suggestions-area');
+    const btnToggleSuggestions = document.getElementById('qa-btn-toggle-suggestions');
     const inputForm = document.getElementById('qa-chat-form');
     const inputText = document.getElementById('qa-input-text');
     const btnSend = document.getElementById('qa-btn-send');
@@ -286,10 +293,12 @@
     if (!btnTrigger || !modal) return;
 
     let messages = loadHistory();
+    let conversationContext = { lastIntent: null, lastTopic: null };
 
     // Salam Pembuka Default
     function resetToDefaultGreeting() {
       const ctx = window.SiyQaEngine ? window.SiyQaEngine.getDynamicContext() : { schoolName: 'Yayasan At Tarbiyyah' };
+      conversationContext = { lastIntent: null, lastTopic: null };
       messages = [
         {
           sender: 'assistant',
@@ -302,6 +311,7 @@
       ];
       saveHistory(messages);
       renderAllMessages();
+      renderQuickChips();
     }
 
     function renderAllMessages() {
@@ -313,15 +323,21 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // Render Quick Chips
-    function renderQuickChips() {
+    // Render Quick Chips Secara Adaptif
+    function renderQuickChips(lastIntent) {
       if (!chipsList) return;
       if (!window.SiyQaEngine) {
-        setTimeout(renderQuickChips, 200);
+        setTimeout(() => renderQuickChips(lastIntent), 200);
         return;
       }
       chipsList.innerHTML = '';
-      const chips = window.SiyQaEngine.getSuggestedQuestions();
+      let chips;
+      if (lastIntent && typeof window.SiyQaEngine.getContextualSuggestions === 'function') {
+        chips = window.SiyQaEngine.getContextualSuggestions(lastIntent);
+      } else {
+        chips = window.SiyQaEngine.getSuggestedQuestions().slice(0, 4);
+      }
+
       chips.forEach(q => {
         const chip = document.createElement('button');
         chip.type = 'button';
@@ -331,6 +347,31 @@
           handleUserSubmit(q);
         };
         chipsList.appendChild(chip);
+      });
+
+      if (suggestionsArea) {
+        suggestionsArea.classList.remove('is-collapsed');
+        if (btnToggleSuggestions) btnToggleSuggestions.innerHTML = 'Tutup &times;';
+      }
+    }
+
+    // Toggle Tombol Buka/Tutup Saran
+    if (btnToggleSuggestions && suggestionsArea) {
+      btnToggleSuggestions.onclick = function () {
+        suggestionsArea.classList.toggle('is-collapsed');
+        if (suggestionsArea.classList.contains('is-collapsed')) {
+          btnToggleSuggestions.innerHTML = 'Buka Saran &plus;';
+        } else {
+          btnToggleSuggestions.innerHTML = 'Tutup &times;';
+        }
+      };
+    }
+
+    // Auto-collapse saran saat pengguna mengetik agar ruang chat & keyboard leluasa
+    if (inputText && suggestionsArea) {
+      inputText.addEventListener('focus', function () {
+        suggestionsArea.classList.add('is-collapsed');
+        if (btnToggleSuggestions) btnToggleSuggestions.innerHTML = 'Buka Saran &plus;';
       });
     }
 
@@ -394,7 +435,7 @@
       if (btnSend) btnSend.disabled = true;
       showTypingIndicator(chatBody);
 
-      // 3. Proses jawaban via NLP Engine
+      // 3. Proses jawaban via NLP Engine dengan Context Tracking
       setTimeout(() => {
         hideTypingIndicator();
         isTyping = false;
@@ -407,18 +448,27 @@
             actions: []
           });
         } else {
-          const res = window.SiyQaEngine.findAnswer(q);
+          const res = window.SiyQaEngine.findAnswer(q, conversationContext);
+          if (res && res.intent) {
+            conversationContext.lastIntent = res.intent;
+            conversationContext.lastTopic = res.category || '';
+          }
+
           messages.push({
             sender: 'assistant',
             text: res.answer,
             actions: res.actions || [],
             isGuideCard: res.intent === 'ppdb_11_steps'
           });
+
+          // Perbarui saran adaptif kontekstual
+          renderQuickChips(res.intent);
         }
 
         saveHistory(messages);
         renderAllMessages();
-      }, 350);
+        chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: 'smooth' });
+      }, 300);
     }
 
     if (inputForm) {

@@ -1,4 +1,4 @@
-﻿// Shared public site header & footer injector.
+// Shared public site header & footer injector.
 // Pages opt in by including <div id="site-header"></div> and <div id="site-footer"></div>
 // in their markup, then call injectSiteChrome({ activeKey, basePath }).
 

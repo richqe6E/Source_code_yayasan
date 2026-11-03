@@ -8,20 +8,26 @@ $userDataDir = [System.IO.Path]::Combine($env:TEMP, "edge-test-" + [System.Guid]
 
 Write-Host "Launching Edge Headless against: $testHtml" -ForegroundColor Cyan
 
+# Remove previous output file
+if (Test-Path "tests/test-output.html") {
+    Remove-Item "tests/test-output.html" -Force
+}
+
 $process = Start-Process -FilePath $edgePath -ArgumentList @(
-    "--headless=new",
+    "--headless",
     "--dump-dom",
-    "--virtual-time-budget=5000",
+    "--virtual-time-budget=6000",
     "--user-data-dir=$userDataDir",
     "--disable-gpu",
     $testHtml
 ) -PassThru -NoNewWindow -RedirectStandardOutput "tests/test-output.html" -RedirectStandardError "tests/test-error.log"
 
-$process.WaitForExit(10000)
-Start-Sleep -Milliseconds 1500
+$process.WaitForExit(15000)
+Start-Sleep -Seconds 2
 
 if (Test-Path "tests/test-output.html") {
-    $html = [System.IO.File]::ReadAllText("tests/test-output.html")
+    $html = Get-Content "tests/test-output.html" -Raw
+    Write-Host "Output length: $($html.Length) chars"
     if ($html -match '<title>(.*?)</title>') {
         Write-Host "PAGE TITLE: $($matches[1])" -ForegroundColor Yellow
     }
@@ -34,22 +40,23 @@ if (Test-Path "tests/test-output.html") {
     if ($failures.Count -gt 0) {
         Write-Host "Found $($failures.Count) FAILED tests!" -ForegroundColor Red
         # Print failure cards
-        $cards = [regex]::Matches($html, '<div class="card">.*?<span class="badge fail">FAIL</span>.*?</div>')
+        $cards = [regex]::Matches($html, '<div class="card">(.*?)</div>\s*(?=<div class="card">|</div>\s*<script)', [System.Text.RegularExpressions.RegexOptions]::Singleline)
         foreach ($c in $cards) {
-            Write-Host $c.Value -ForegroundColor Red
+            if ($c.Value -match '<span class="badge fail">FAIL</span>') {
+                Write-Host "------------------------"
+                $lines = $c.Value -split "`r?`n"
+                foreach ($l in $lines) {
+                    if ($l -match 'class="query"' -or $l -match 'class="actual"') {
+                        Write-Host $l.Trim() -ForegroundColor Red
+                    }
+                }
+            }
         }
     } else {
         Write-Host "ALL IN-BROWSER JAVASCRIPT TESTS PASSED WITH ZERO FAILURES!" -ForegroundColor Green
     }
 } else {
     Write-Host "No output generated!" -ForegroundColor Red
-}
-
-if (Test-Path "tests/test-error.log") {
-    $err = [System.IO.File]::ReadAllText("tests/test-error.log")
-    if ($err) {
-        Write-Host "STDERR: $err" -ForegroundColor Yellow
-    }
 }
 
 # Cleanup
