@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SIYAYASAN V2 - Supabase Shared API Helper
  * Single apiCall() entry point connected directly to Supabase PostgreSQL & Storage.
  * Retains 100% contract compatibility with the portal frontend:
@@ -346,7 +346,7 @@
 
           if (isEmail) {
             try {
-              const users = await supabaseRest(`users?email=eq.${encodeURIComponent(rawIdentifier)}&status=eq.active&select=*`);
+              const users = await supabaseRest(`users?email=eq.${encodeURIComponent(rawIdentifier)}&select=*`);
               if (users && users.length > 0) {
                 matchedUser = users[0];
               }
@@ -356,16 +356,16 @@
           } else {
             try {
               // Identifier is a NIS or username
-              const users = await supabaseRest(`users?or=(nis.eq.${encodeURIComponent(rawIdentifier)},username.eq.${encodeURIComponent(rawIdentifier)})&status=eq.active&select=*`);
+              const users = await supabaseRest(`users?or=(nis.eq.${encodeURIComponent(rawIdentifier)},username.eq.${encodeURIComponent(rawIdentifier)})&select=*`);
               if (users && users.length > 0) {
                 matchedUser = users[0];
               } else {
                 // Look up student by NIS in students table
-                const students = !matchedUser ? await supabaseRest(`students?nis=eq.${encodeURIComponent(rawIdentifier)}&status=eq.active&select=*`).catch(() => []) : [];
+                const students = !matchedUser ? await supabaseRest(`students?nis=eq.${encodeURIComponent(rawIdentifier)}&select=*`).catch(() => []) : [];
                 if (students && students.length > 0) {
                   studentRecord = students[0];
                   if (studentRecord.user_id) {
-                    const uList = await supabaseRest(`users?id=eq.${encodeURIComponent(studentRecord.user_id)}&status=eq.active&select=*`).catch(() => []);
+                    const uList = await supabaseRest(`users?id=eq.${encodeURIComponent(studentRecord.user_id)}&select=*`).catch(() => []);
                     if (uList && uList.length > 0) {
                       matchedUser = uList[0];
                     }
@@ -375,6 +375,23 @@
             } catch (err) {
               console.warn('Supabase auth NIS query warning:', err);
             }
+          }
+
+          if (matchedUser) {
+            if (matchedUser.is_active === false || matchedUser.status === 'inactive') {
+              return {
+                success: false,
+                message: 'Akun santri telah dinonaktifkan oleh pihak yayasan. Akses ke Portal Siswa ditutup. Silakan hubungi Tata Usaha untuk informasi lebih lanjut.'
+              };
+            }
+          }
+
+          if (studentRecord && (studentRecord.status === 'inactive' || studentRecord.status === 'transferred' || studentRecord.status === 'graduated' || studentRecord.is_active === false)) {
+            const stLabel = studentRecord.status === 'transferred' ? 'Mutasi Keluar' : (studentRecord.status === 'graduated' ? 'Alumni / Lulus' : 'Nonaktif');
+            return {
+              success: false,
+              message: `Akun santri tidak aktif (${stLabel}). Akses Portal Siswa ditutup. Silakan hubungi Tata Usaha yayasan.`
+            };
           }
 
           if (!matchedUser) {
@@ -647,6 +664,30 @@
         if (action === 'logout') {
           return { success: true, data: { message: 'Logout berhasil' } };
         }
+
+        if (action === 'verify_session') {
+          const uId = params.user_id || (currentUser ? currentUser.id : null);
+          const uNis = params.nis || (currentUser ? currentUser.nis : null);
+          if (!uId && !uNis) return { success: true, valid: true };
+          try {
+            const filter = uId ? `id=eq.${encodeURIComponent(uId)}` : `nis=eq.${encodeURIComponent(uNis)}`;
+            const users = await supabaseRest(`users?${filter}&select=id,status,role,student_id`).catch(() => []);
+            if (users && users[0]) {
+              const u = users[0];
+              if (u.status === 'inactive') {
+                return { success: false, session_revoked: true, message: 'Akun Anda telah dinonaktifkan oleh pihak yayasan.' };
+              }
+              if (u.student_id) {
+                const stu = await supabaseRest(`students?id=eq.${encodeURIComponent(u.student_id)}&select=status,is_active`).catch(() => []);
+                if (stu && stu[0] && (stu[0].status !== 'active' || stu[0].is_active === false)) {
+                  const stLabel = stu[0].status === 'transferred' ? 'Mutasi Keluar' : (stu[0].status === 'graduated' ? 'Alumni' : 'Nonaktif');
+                  return { success: false, session_revoked: true, message: `Status santri tidak aktif (${stLabel}). Akses Portal Siswa ditutup.` };
+                }
+              }
+            }
+          } catch (_) {}
+          return { success: true, valid: true };
+        }
       }
 
       // -------------------------------------------------------------
@@ -864,6 +905,21 @@
 
         if (action === 'get_profile') {
           let student = await resolveCurrentStudentRecord();
+          if (currentUser && (currentUser.is_active === false || currentUser.status === 'inactive')) {
+            return {
+              success: false,
+              session_revoked: true,
+              message: 'Akun santri telah dinonaktifkan oleh administrator yayasan. Akses ke Portal Siswa ditutup.'
+            };
+          }
+          if (student && (student.status === 'inactive' || student.status === 'transferred' || student.status === 'graduated' || student.is_active === false)) {
+            const stLabel = student.status === 'transferred' ? 'Mutasi Keluar' : (student.status === 'graduated' ? 'Alumni / Lulus' : 'Nonaktif');
+            return {
+              success: false,
+              session_revoked: true,
+              message: `Status santri tidak aktif (${stLabel}). Akses ke Portal Siswa ditutup.`
+            };
+          }
           if (currentUser) {
             if (!student) student = {};
             const regNoHint = student.registration_number || student.reg_number || (currentUser.username && String(currentUser.username).startsWith('REG') ? currentUser.username : '');
@@ -1224,6 +1280,13 @@
 
         if (action === 'get_spp') {
           const stuRecord = await resolveCurrentStudentRecord();
+          if (currentUser && (currentUser.is_active === false || currentUser.status === 'inactive')) {
+            return { success: false, session_revoked: true, message: 'Akun santri telah dinonaktifkan oleh administrator yayasan. Akses ke riwayat tagihan ditutup.' };
+          }
+          if (stuRecord && (stuRecord.status === 'inactive' || stuRecord.status === 'transferred' || stuRecord.status === 'graduated' || stuRecord.is_active === false)) {
+            const stLabel = stuRecord.status === 'transferred' ? 'Mutasi Keluar' : (stuRecord.status === 'graduated' ? 'Alumni / Lulus' : 'Nonaktif');
+            return { success: false, session_revoked: true, message: `Status santri tidak aktif (${stLabel}). Akses tagihan ditutup.` };
+          }
           let id = (stuRecord && stuRecord.id) || studentId;
           const [invoices, payments] = await Promise.all([
             id ? supabaseRest(`invoices?student_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.desc`).catch(() => []) : [],
@@ -1562,7 +1625,7 @@
             ...c,
             grade_level: c.grade_level || c.level || '-',
             canonical_level: getCanonicalJenjang(c.level || c.grade_level || c.name),
-            student_count: countMap[c.id] !== undefined ? countMap[c.id] : (Number(c.student_count) || 0)
+            student_count: countMap[c.id] || 0
           }));
           return { success: true, data: mappedClasses };
         }
@@ -1747,6 +1810,20 @@
           payload.updated_at = new Date().toISOString();
 
           const res = await supabaseRest(`students?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
+          // Sinkronkan jumlah siswa pada rombel jika class_id diperbarui
+          if (classId !== undefined) {
+            try {
+              if (classId) {
+                const actNew = await supabaseRest(`students?class_id=eq.${encodeURIComponent(classId)}&status=eq.active&select=id`).catch(() => []);
+                await supabaseRest(`classes?id=eq.${encodeURIComponent(classId)}`, 'PATCH', { student_count: (actNew || []).length }).catch(() => {});
+              }
+              const oldClassId = params.old_class_id || (params.student && params.student.class_id);
+              if (oldClassId && oldClassId !== classId) {
+                const actOld = await supabaseRest(`students?class_id=eq.${encodeURIComponent(oldClassId)}&status=eq.active&select=id`).catch(() => []);
+                await supabaseRest(`classes?id=eq.${encodeURIComponent(oldClassId)}`, 'PATCH', { student_count: (actOld || []).length }).catch(() => {});
+              }
+            } catch (_) {}
+          }
           // Sinkronkan perubahan NIS, Nama, Tanggal Lahir, dan Status ke tabel users (MED-03)
           try {
             const uSync = {};
@@ -1859,16 +1936,343 @@
           } catch (_) { docs = []; }
           return { success: true, data: docs };
         }
-        if (action === 'delete') {
-          await supabaseRest(`students?id=eq.${encodeURIComponent(params.id)}`, 'DELETE');
+        if (action === 'deactivate') {
+          const studentId = params.id || params.student_id;
+          if (!studentId) return { success: false, message: 'ID Siswa wajib disertakan' };
+
+          const students = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`);
+          if (!students || students.length === 0) return { success: false, message: 'Siswa tidak ditemukan' };
+          const student = students[0];
+
+          // Idempotency: Jika siswa sudah tidak aktif dengan status yang sama, kembalikan respons sukses aman
+          const rawReason = String(params.reason || 'nonaktif').toLowerCase();
+          let targetStatus = 'inactive';
+          if (rawReason.includes('mutasi') || rawReason === 'transferred') targetStatus = 'transferred';
+          else if (rawReason.includes('lulus') || rawReason === 'graduated') targetStatus = 'graduated';
+
+          const currentClassId = student.class_id;
+          const currentClassName = student.class_name || student.kelas_sekarang || '';
+
+          // 1. Simpan riwayat penempatan rombel & riwayat mutasi ke form_metadata
+          const meta = student.form_metadata || {};
+          const classHistory = Array.isArray(meta.class_history) ? [...meta.class_history] : [];
+          if (currentClassId || currentClassName) {
+            classHistory.push({
+              class_id: currentClassId,
+              class_name: currentClassName,
+              academic_year: student.entry_year ? `${student.entry_year}/${Number(student.entry_year) + 1}` : '2026/2027',
+              left_at: params.effective_date || new Date().toISOString().slice(0, 10),
+              departure_reason: params.reason || 'Nonaktif / Mutasi',
+              departure_notes: params.notes || '',
+              recorded_at: new Date().toISOString()
+            });
+          }
+
+          const updatedMeta = {
+            ...meta,
+            class_history: classHistory,
+            previous_class_id: currentClassId || meta.previous_class_id || null,
+            previous_class_name: currentClassName || meta.previous_class_name || null,
+            operational_status: targetStatus,
+            deactivated_at: new Date().toISOString(),
+            deactivation_reason: params.reason || 'nonaktif',
+            deactivation_notes: params.notes || ''
+          };
+
+          // 2. Update status siswa & keluarkan dari rombel aktif
+          const updatePayload = {
+            status: targetStatus,
+            is_active: false,
+            class_id: null,
+            class_name: null,
+            kelas_sekarang: null,
+            form_metadata: updatedMeta,
+            updated_at: new Date().toISOString()
+          };
+          await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}`, 'PATCH', updatePayload);
+
+          // 3. Sinkronkan Rombel & Kelas: Hitung ulang siswa aktif di kelas asal
+          if (currentClassId) {
+            try {
+              const actList = await supabaseRest(`students?class_id=eq.${encodeURIComponent(currentClassId)}&status=eq.active&select=id`).catch(() => []);
+              await supabaseRest(`classes?id=eq.${encodeURIComponent(currentClassId)}`, 'PATCH', { student_count: (actList || []).length }).catch(() => {});
+            } catch (_) {}
+          }
+
+          // 4. Sinkronkan status di PPDB Registrations (tetap simpan converted, tapi tandai operational_status)
           try {
-            await supabaseRest(`users?student_id=eq.${encodeURIComponent(params.id)}`, 'DELETE').catch(() => {});
-            const rawStu = localStorage.getItem('siy_local_students');
-            if (rawStu) localStorage.setItem('siy_local_students', JSON.stringify(JSON.parse(rawStu).filter(s => s.id !== params.id)));
-            const rawUsr = localStorage.getItem('siy_local_users');
-            if (rawUsr) localStorage.setItem('siy_local_users', JSON.stringify(JSON.parse(rawUsr).filter(u => u.student_id !== params.id)));
+            const regFilter = student.nis
+              ? `or=(student_id.eq.${encodeURIComponent(studentId)},converted_nis.eq.${encodeURIComponent(student.nis)})`
+              : `student_id=eq.${encodeURIComponent(studentId)}`;
+            const regs = await supabaseRest(`ppdb_registrations?${regFilter}&select=*`).catch(() => []);
+            if (regs && regs.length > 0) {
+              for (const r of regs) {
+                const rMeta = {
+                  ...(r.form_metadata || {}),
+                  operational_status: targetStatus,
+                  deactivation_date: new Date().toISOString().slice(0, 10),
+                  deactivation_reason: params.reason || 'nonaktif'
+                };
+                await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(r.id)}`, 'PATCH', {
+                  form_metadata: rMeta,
+                  notes: (r.notes || '') + `\n[Status Santri: ${targetStatus.toUpperCase()} - ${new Date().toISOString().slice(0, 10)} - ${params.reason || 'Nonaktif'}]`
+                }).catch(() => {});
+              }
+            }
           } catch (_) {}
-          return { success: true, message: 'Siswa berhasil dihapus' };
+
+          // 5. Nonaktifkan Akun Pengguna (Revoke Portal Access Langsung)
+          try {
+            const uFilter = student.user_id
+              ? `or=(id.eq.${encodeURIComponent(student.user_id)},student_id.eq.${encodeURIComponent(studentId)},nis.eq.${encodeURIComponent(student.nis || 'NONE')})`
+              : `or=(student_id.eq.${encodeURIComponent(studentId)},nis.eq.${encodeURIComponent(student.nis || 'NONE')})`;
+            await supabaseRest(`users?${uFilter}`, 'PATCH', {
+              status: 'inactive'
+            }).catch(() => {});
+          } catch (_) {}
+
+          // 6. Sinkronkan ke localStorage
+          try {
+            const rawStu = localStorage.getItem('siy_local_students');
+            if (rawStu) {
+              const localStu = JSON.parse(rawStu);
+              const idx = localStu.findIndex(s => s.id === studentId);
+              if (idx !== -1) {
+                localStu[idx] = { ...localStu[idx], ...updatePayload };
+                localStorage.setItem('siy_local_students', JSON.stringify(localStu));
+              }
+            }
+            const rawUsr = localStorage.getItem('siy_local_users');
+            if (rawUsr) {
+              const localUsr = JSON.parse(rawUsr);
+              localUsr.forEach(u => {
+                if (u.student_id === studentId || (student.nis && u.nis === student.nis)) {
+                  u.is_active = false;
+                  u.status = 'inactive';
+                }
+              });
+              localStorage.setItem('siy_local_users', JSON.stringify(localUsr));
+            }
+          } catch (_) {}
+
+          // 7. Catat ke Activity Log
+          const logMsg = `Siswa ${student.full_name} (${student.nis || studentId}) dinonaktifkan: ${params.reason || 'Nonaktif'}. Dikeluarkan dari rombel ${currentClassName || '-'}.`;
+          await recordActivityLog('STUDENT_DEACTIVATED', 'students', logMsg, studentId).catch(() => {});
+
+          return {
+            success: true,
+            message: `Siswa ${student.full_name} berhasil dinonaktifkan (${targetStatus === 'transferred' ? 'Mutasi' : (targetStatus === 'graduated' ? 'Lulus' : 'Nonaktif')}) dan dikeluarkan dari rombel aktif.`,
+            data: { id: studentId, status: targetStatus, previous_class: currentClassName }
+          };
+        }
+
+        if (action === 'reactivate') {
+          const studentId = params.id || params.student_id;
+          if (!studentId) return { success: false, message: 'ID Siswa wajib disertakan' };
+
+          const students = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`);
+          if (!students || students.length === 0) return { success: false, message: 'Siswa tidak ditemukan' };
+          const student = students[0];
+
+          const meta = student.form_metadata || {};
+          const targetClassId = params.class_id || meta.previous_class_id || null;
+          if (!targetClassId) {
+            return { success: false, message: 'Harap pilih rombel / kelas penempatan untuk mengaktifkan kembali santri.' };
+          }
+
+          // Ambil detail kelas tujuan
+          const classes = await supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}&select=id,name,level`).catch(() => []);
+          const targetClass = classes && classes[0];
+          const targetClassName = targetClass ? targetClass.name : (meta.previous_class_name || 'Kelas');
+          const sppAmount = params.monthly_spp_amount !== undefined ? Number(params.monthly_spp_amount) : (student.monthly_spp_amount || 150000);
+
+          // 1. Simpan riwayat rombel baru ke form_metadata
+          const classHistory = Array.isArray(meta.class_history) ? [...meta.class_history] : [];
+          classHistory.push({
+            class_id: targetClassId,
+            class_name: targetClassName,
+            joined_at: params.effective_date || new Date().toISOString().slice(0, 10),
+            action: 'reactivated',
+            notes: params.notes || 'Diaktifkan kembali oleh admin yayasan',
+            recorded_at: new Date().toISOString()
+          });
+
+          const updatedMeta = {
+            ...meta,
+            class_history: classHistory,
+            operational_status: 'active',
+            reactivated_at: new Date().toISOString(),
+            reactivation_notes: params.notes || ''
+          };
+
+          // 2. Update status siswa & tetapkan ke rombel aktif
+          const updatePayload = {
+            status: 'active',
+            is_active: true,
+            class_id: targetClassId,
+            class_name: targetClassName,
+            kelas_sekarang: targetClassName,
+            monthly_spp_amount: sppAmount,
+            form_metadata: updatedMeta,
+            updated_at: new Date().toISOString()
+          };
+          await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}`, 'PATCH', updatePayload);
+
+          // 3. Sinkronkan Rombel & Kelas: Hitung ulang siswa aktif di kelas tujuan
+          try {
+            const actList = await supabaseRest(`students?class_id=eq.${encodeURIComponent(targetClassId)}&status=eq.active&select=id`).catch(() => []);
+            await supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}`, 'PATCH', { student_count: (actList || []).length }).catch(() => {});
+          } catch (_) {}
+
+          // 4. Sinkronkan PPDB Registrations
+          try {
+            const regFilter = student.nis
+              ? `or=(student_id.eq.${encodeURIComponent(studentId)},converted_nis.eq.${encodeURIComponent(student.nis)})`
+              : `student_id=eq.${encodeURIComponent(studentId)}`;
+            const regs = await supabaseRest(`ppdb_registrations?${regFilter}&select=*`).catch(() => []);
+            if (regs && regs.length > 0) {
+              for (const r of regs) {
+                const rMeta = { ...(r.form_metadata || {}), operational_status: 'active', class_name: targetClassName };
+                await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(r.id)}`, 'PATCH', {
+                  form_metadata: rMeta,
+                  class_name: targetClassName,
+                  notes: (r.notes || '') + `\n[Diaktifkan Kembali: ${new Date().toISOString().slice(0, 10)} ke ${targetClassName}]`
+                }).catch(() => {});
+              }
+            }
+          } catch (_) {}
+
+          // 5. Pulihkan Akun Pengguna Siswa (Restore Portal Access TANPA membuat akun/NIS baru)
+          try {
+            const uFilter = student.user_id
+              ? `or=(id.eq.${encodeURIComponent(student.user_id)},student_id.eq.${encodeURIComponent(studentId)},nis.eq.${encodeURIComponent(student.nis || 'NONE')})`
+              : `or=(student_id.eq.${encodeURIComponent(studentId)},nis.eq.${encodeURIComponent(student.nis || 'NONE')})`;
+            await supabaseRest(`users?${uFilter}`, 'PATCH', {
+              status: 'active'
+            }).catch(() => {});
+          } catch (_) {}
+
+          // 6. Sinkronkan ke localStorage
+          try {
+            const rawStu = localStorage.getItem('siy_local_students');
+            if (rawStu) {
+              const localStu = JSON.parse(rawStu);
+              const idx = localStu.findIndex(s => s.id === studentId);
+              if (idx !== -1) {
+                localStu[idx] = { ...localStu[idx], ...updatePayload };
+                localStorage.setItem('siy_local_students', JSON.stringify(localStu));
+              }
+            }
+            const rawUsr = localStorage.getItem('siy_local_users');
+            if (rawUsr) {
+              const localUsr = JSON.parse(rawUsr);
+              localUsr.forEach(u => {
+                if (u.student_id === studentId || (student.nis && u.nis === student.nis)) {
+                  u.is_active = true;
+                  u.status = 'active';
+                }
+              });
+              localStorage.setItem('siy_local_users', JSON.stringify(localUsr));
+            }
+          } catch (_) {}
+
+          // 7. Catat ke Activity Log
+          const logMsg = `Siswa ${student.full_name} (${student.nis || studentId}) diaktifkan kembali ke rombel ${targetClassName}. Tarif SPP: Rp ${Number(sppAmount).toLocaleString('id-ID')}.`;
+          await recordActivityLog('STUDENT_REACTIVATED', 'students', logMsg, studentId).catch(() => {});
+
+          return {
+            success: true,
+            message: `Siswa ${student.full_name} berhasil diaktifkan kembali ke rombel ${targetClassName}.`,
+            data: { id: studentId, status: 'active', class_name: targetClassName }
+          };
+        }
+
+        if (action === 'delete') {
+          const studentId = params.id || params.student_id;
+          if (!studentId) return { success: false, message: 'ID Siswa wajib disertakan' };
+
+          const students = await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}&select=*`);
+          if (!students || students.length === 0) return { success: false, message: 'Siswa tidak ditemukan' };
+          const student = students[0];
+
+          // 1. VALIDASI KEUANGAN KETAT: Periksa apakah ada invoice lunas atau menunggu verifikasi
+          const existingInvoices = await supabaseRest(`invoices?student_id=eq.${encodeURIComponent(studentId)}&select=id,invoice_number,status,amount`).catch(() => []);
+          const paidInvoices = (existingInvoices || []).filter(inv => inv.status === 'paid' || inv.status === 'menunggu_verifikasi');
+          if (paidInvoices.length > 0) {
+            return {
+              success: false,
+              code: 'FINANCIAL_INTEGRITY_VIOLATION',
+              message: `Penghapusan permanen ditolak: Siswa ${student.full_name} memiliki ${paidInvoices.length} tagihan SPP lunas/menunggu verifikasi (${paidInvoices.map(i => i.invoice_number).slice(0, 3).join(', ')}). Seluruh data transaksi keuangan wajib dipertahankan untuk audit kas yayasan. Gunakan fitur "Nonaktifkan / Mutasi Siswa" agar riwayat pembukuan tetap terjaga.`
+            };
+          }
+
+          // 2. VALIDASI PEMBAYARAN KETAT: Periksa tabel payments
+          const existingPayments = await supabaseRest(`payments?student_id=eq.${encodeURIComponent(studentId)}&select=id,status,amount`).catch(() => []);
+          const verifiedPayments = (existingPayments || []).filter(p => p.status === 'verified' || p.status === 'menunggu_verifikasi');
+          if (verifiedPayments.length > 0) {
+            return {
+              success: false,
+              code: 'FINANCIAL_INTEGRITY_VIOLATION',
+              message: `Penghapusan permanen ditolak: Siswa ${student.full_name} memiliki catatan bukti pembayaran kas yayasan. Gunakan opsi "Nonaktifkan / Mutasi" sebagai gantinya.`
+            };
+          }
+
+          // 3. JIKA 0 TRANSAKSI KEUANGAN RESMI: Lakukan pembersihan atomik menyeluruh
+          // A. Hapus tagihan draft/unpaid (jika ada)
+          await supabaseRest(`invoices?student_id=eq.${encodeURIComponent(studentId)}`, 'DELETE').catch(() => {});
+          await supabaseRest(`payments?student_id=eq.${encodeURIComponent(studentId)}`, 'DELETE').catch(() => {});
+
+          // B. Hapus berkas dokumen siswa
+          await supabaseRest(`student_documents?student_id=eq.${encodeURIComponent(studentId)}`, 'DELETE').catch(() => {});
+
+          // C. Putuskan relasi PPDB (jangan hapus registrasi asli agar arsip seleksi tersimpan, reset student_id)
+          try {
+            const regFilter = student.nis
+              ? `or=(student_id.eq.${encodeURIComponent(studentId)},converted_nis.eq.${encodeURIComponent(student.nis)})`
+              : `student_id=eq.${encodeURIComponent(studentId)}`;
+            const regs = await supabaseRest(`ppdb_registrations?${regFilter}&select=id,form_metadata`).catch(() => []);
+            if (regs && regs.length > 0) {
+              for (const r of regs) {
+                const rMeta = { ...(r.form_metadata || {}), operational_status: 'deleted', student_deleted_at: new Date().toISOString() };
+                await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(r.id)}`, 'PATCH', {
+                  student_id: null,
+                  form_metadata: rMeta
+                }).catch(() => {});
+              }
+            }
+          } catch (_) {}
+
+          // D. Hapus akun pengguna (users)
+          try {
+            const uFilter = student.user_id
+              ? `or=(id.eq.${encodeURIComponent(student.user_id)},student_id.eq.${encodeURIComponent(studentId)},nis.eq.${encodeURIComponent(student.nis || 'NONE')})`
+              : `or=(student_id.eq.${encodeURIComponent(studentId)},nis.eq.${encodeURIComponent(student.nis || 'NONE')})`;
+            await supabaseRest(`users?${uFilter}`, 'DELETE').catch(() => {});
+          } catch (_) {}
+
+          // E. Hapus baris siswa dari tabel students
+          await supabaseRest(`students?id=eq.${encodeURIComponent(studentId)}`, 'DELETE');
+
+          // F. Perbarui jumlah siswa di kelas asal
+          if (student.class_id) {
+            try {
+              const actList = await supabaseRest(`students?class_id=eq.${encodeURIComponent(student.class_id)}&status=eq.active&select=id`).catch(() => []);
+              await supabaseRest(`classes?id=eq.${encodeURIComponent(student.class_id)}`, 'PATCH', { student_count: (actList || []).length }).catch(() => {});
+            } catch (_) {}
+          }
+
+          // G. Bersihkan localStorage
+          try {
+            const rawStu = localStorage.getItem('siy_local_students');
+            if (rawStu) localStorage.setItem('siy_local_students', JSON.stringify(JSON.parse(rawStu).filter(s => s.id !== studentId)));
+            const rawUsr = localStorage.getItem('siy_local_users');
+            if (rawUsr) localStorage.setItem('siy_local_users', JSON.stringify(JSON.parse(rawUsr).filter(u => u.student_id !== studentId && (!student.nis || u.nis !== student.nis))));
+          } catch (_) {}
+
+          // H. Audit Log
+          await recordActivityLog('STUDENT_PERMANENT_DELETED', 'students', `Siswa ${student.full_name} (${student.nis || studentId}) dihapus permanen dari sistem (0 riwayat pembayaran).`, studentId).catch(() => {});
+
+          return { success: true, message: `Data siswa ${student.full_name} berhasil dihapus permanen.` };
         }
       }
 

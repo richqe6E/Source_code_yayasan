@@ -384,6 +384,14 @@ function handleApiRequest(apiPath, params, method) {
       );
 
       if (student) {
+        if (student.status === 'inactive' || student.status === 'transferred' || student.status === 'graduated' || student.is_active === false) {
+          const stLabel = student.status === 'transferred' ? 'Mutasi Keluar' : (student.status === 'graduated' ? 'Alumni / Lulus' : 'Nonaktif');
+          return {
+            success: false,
+            message: `Akun santri tidak aktif (${stLabel}). Akses Portal Siswa ditutup. Silakan hubungi pihak yayasan / Tata Usaha.`,
+            error: { code: 'FORBIDDEN' }
+          };
+        }
         const bDate = student.birth_date ? String(student.birth_date).trim() : '';
         const bDateClean = bDate.replace(/[^0-9]/g, '');
         const passClean = password.replace(/[^0-9]/g, '');
@@ -523,6 +531,22 @@ function handleApiRequest(apiPath, params, method) {
     if (action === 'logout') {
       if (params.token) SESSIONS.delete(params.token);
       return { success: true, data: { message: 'Berhasil logout' } };
+    }
+
+    if (action === 'verify_session') {
+      const uId = params.user_id || (params._user && params._user.id);
+      const uNis = params.nis || (params._user && params._user.nis);
+      if (!uId && !uNis) return { success: true, valid: true };
+      const u = DB.users.find(x => (uId && x.id === uId) || (uNis && (x.nis === uNis || x.username === uNis)));
+      if (u && (u.is_active === false || u.status === 'inactive')) {
+        return { success: false, session_revoked: true, message: 'Akun santri telah dinonaktifkan oleh pihak yayasan.' };
+      }
+      const s = DB.students.find(x => (u && x.id === u.student_id) || (uNis && x.nis === uNis) || (uId && ('USR-' + x.nis) === uId));
+      if (s && (s.status !== 'active' || s.is_active === false)) {
+        const stLabel = s.status === 'transferred' ? 'Mutasi Keluar' : (s.status === 'graduated' ? 'Alumni' : 'Nonaktif');
+        return { success: false, session_revoked: true, message: `Status santri tidak aktif (${stLabel}). Akses Portal Siswa ditutup.` };
+      }
+      return { success: true, valid: true };
     }
   }
 
@@ -1237,13 +1261,138 @@ function handleApiRequest(apiPath, params, method) {
       if (params.status != null) stu.status = params.status;
       return { success: true, message: 'Data siswa diperbarui', data: { message: 'Data siswa diperbarui', student: stu } };
     }
+    if (action === 'deactivate') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const stu = DB.students.find(s => s.id === params.id || s.id === params.student_id);
+      if (!stu) return { success: false, message: 'Siswa tidak ditemukan', error: { code: 'NOT_FOUND' } };
+
+      const rawReason = String(params.reason || 'nonaktif').toLowerCase();
+      let targetStatus = 'inactive';
+      if (rawReason.includes('mutasi') || rawReason === 'transferred') targetStatus = 'transferred';
+      else if (rawReason.includes('lulus') || rawReason === 'graduated') targetStatus = 'graduated';
+
+      const prevClassId = stu.class_id;
+      const prevClassName = stu.class_name;
+
+      stu.form_metadata = stu.form_metadata || {};
+      stu.form_metadata.class_history = stu.form_metadata.class_history || [];
+      if (prevClassId) {
+        stu.form_metadata.class_history.push({
+          class_id: prevClassId,
+          class_name: prevClassName,
+          left_at: params.effective_date || new Date().toISOString().slice(0, 10),
+          reason: params.reason || 'Nonaktif / Mutasi',
+          notes: params.notes || ''
+        });
+      }
+      stu.form_metadata.previous_class_id = prevClassId;
+      stu.form_metadata.previous_class_name = prevClassName;
+      stu.form_metadata.operational_status = targetStatus;
+
+      stu.status = targetStatus;
+      stu.is_active = false;
+      stu.class_id = null;
+      stu.class_name = null;
+
+      // Update linked user
+      const linkedUser = DB.users.find(u => u.student_id === stu.id || u.nis === stu.nis || u.id === ('USR-' + stu.nis));
+      if (linkedUser) {
+        linkedUser.is_active = false;
+        linkedUser.status = 'inactive';
+      }
+
+      // Update linked PPDB registration
+      const linkedReg = DB.ppdb_registrations.find(r => r.student_id === stu.id || r.converted_nis === stu.nis);
+      if (linkedReg) {
+        linkedReg.form_metadata = linkedReg.form_metadata || {};
+        linkedReg.form_metadata.operational_status = targetStatus;
+      }
+
+      return { success: true, message: `Siswa ${stu.full_name} berhasil dinonaktifkan (${targetStatus}).`, data: { id: stu.id, status: targetStatus, previous_class: prevClassName } };
+    }
+
+    if (action === 'reactivate') {
+      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
+      if (deny) return deny;
+      const stu = DB.students.find(s => s.id === params.id || s.id === params.student_id);
+      if (!stu) return { success: false, message: 'Siswa tidak ditemukan', error: { code: 'NOT_FOUND' } };
+
+      const targetClassId = params.class_id || (stu.form_metadata && stu.form_metadata.previous_class_id);
+      if (!targetClassId) return { success: false, message: 'Harap pilih rombel / kelas penempatan untuk aktivasi kembali santri.' };
+      const cls = DB.classes.find(c => c.id === targetClassId);
+      const targetClassName = cls ? cls.name : 'Kelas';
+
+      stu.status = 'active';
+      stu.is_active = true;
+      stu.class_id = targetClassId;
+      stu.class_name = targetClassName;
+      if (params.monthly_spp_amount != null) stu.monthly_spp_amount = Number(params.monthly_spp_amount);
+
+      stu.form_metadata = stu.form_metadata || {};
+      stu.form_metadata.class_history = stu.form_metadata.class_history || [];
+      stu.form_metadata.class_history.push({
+        class_id: targetClassId,
+        class_name: targetClassName,
+        joined_at: new Date().toISOString().slice(0, 10),
+        action: 'reactivated'
+      });
+      stu.form_metadata.operational_status = 'active';
+
+      // Restore linked user
+      const linkedUser = DB.users.find(u => u.student_id === stu.id || u.nis === stu.nis || u.id === ('USR-' + stu.nis));
+      if (linkedUser) {
+        linkedUser.is_active = true;
+        linkedUser.status = 'active';
+      }
+
+      // Update linked PPDB registration
+      const linkedReg = DB.ppdb_registrations.find(r => r.student_id === stu.id || r.converted_nis === stu.nis);
+      if (linkedReg) {
+        linkedReg.form_metadata = linkedReg.form_metadata || {};
+        linkedReg.form_metadata.operational_status = 'active';
+        linkedReg.form_metadata.class_name = targetClassName;
+      }
+
+      return { success: true, message: `Siswa ${stu.full_name} berhasil diaktifkan kembali ke rombel ${targetClassName}.`, data: { id: stu.id, status: 'active', class_name: targetClassName } };
+    }
+
     if (action === 'delete') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
-      const idx = DB.students.findIndex(s => s.id === params.id);
-      if (idx === -1) return { success: false, message: 'Siswa tidak ditemukan', error: { code: 'NOT_FOUND' } };
-      const removed = DB.students.splice(idx, 1)[0];
-      return { success: true, message: 'Siswa berhasil dihapus', data: { message: 'Siswa berhasil dihapus', student: removed } };
+      const stu = DB.students.find(s => s.id === params.id || s.id === params.student_id);
+      if (!stu) return { success: false, message: 'Siswa tidak ditemukan', error: { code: 'NOT_FOUND' } };
+
+      // Validasi keuangan ketat: tolak jika ada invoice lunas / verifikasi
+      const hasPaidInvoices = (DB.invoices || []).some(i => i.student_id === stu.id && (i.status === 'paid' || i.status === 'menunggu_verifikasi'));
+      const hasPayments = (DB.payments || []).some(p => p.student_id === stu.id && (p.status === 'verified' || p.status === 'menunggu_verifikasi'));
+      if (hasPaidInvoices || hasPayments) {
+        return {
+          success: false,
+          code: 'FINANCIAL_INTEGRITY_VIOLATION',
+          message: `Penghapusan permanen ditolak: Siswa ${stu.full_name} memiliki riwayat transaksi SPP / pembayaran resmi yang wajib dipertahankan untuk audit kas yayasan. Gunakan fitur "Nonaktifkan / Mutasi Siswa".`
+        };
+      }
+
+      // Hapus draft/unpaid invoices
+      DB.invoices = (DB.invoices || []).filter(i => i.student_id !== stu.id);
+      DB.payments = (DB.payments || []).filter(p => p.student_id !== stu.id);
+
+      // Detach PPDB
+      const linkedReg = DB.ppdb_registrations.find(r => r.student_id === stu.id || r.converted_nis === stu.nis);
+      if (linkedReg) {
+        linkedReg.student_id = null;
+        if (linkedReg.form_metadata) linkedReg.form_metadata.operational_status = 'deleted';
+      }
+
+      // Delete linked user
+      DB.users = (DB.users || []).filter(u => u.student_id !== stu.id && u.nis !== stu.nis && u.id !== ('USR-' + stu.nis));
+
+      // Remove student
+      const idx = DB.students.findIndex(s => s.id === stu.id);
+      if (idx !== -1) DB.students.splice(idx, 1);
+
+      return { success: true, message: `Siswa ${stu.full_name} berhasil dihapus permanen.` };
     }
   }
 
@@ -1259,7 +1408,7 @@ function handleApiRequest(apiPath, params, method) {
         level: c.level,
         teacher_id: c.teacher_id || null,
         teacher_name: c.teacher_name || '',
-        student_count: c.student_count || DB.students.filter(s => s.class_id === c.id).length,
+        student_count: DB.students.filter(s => s.class_id === c.id && s.status === 'active').length,
         capacity: c.capacity || 20,
         academic_year: c.academic_year || '2026/2027',
         grade_level: c.grade_level || c.level,

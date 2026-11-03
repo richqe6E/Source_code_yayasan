@@ -85,7 +85,40 @@
         }
         return false;
       }
+
+      // Validasi status akun siswa secara real-time terhadap server
+      if (siswaRoles.includes(rawRole)) {
+        setTimeout(async () => {
+          try {
+            if (typeof window.apiCall === 'function') {
+              const chk = await window.apiCall('auth', 'verify_session', { user_id: user.id, nis: user.nis });
+              if (chk && chk.session_revoked) {
+                clearSession();
+                alert(chk.message || 'Sesi akun santri telah dinonaktifkan oleh pihak yayasan. Akses ke Portal Siswa ditutup.');
+                window.location.href = '/login.html?revoked=1';
+              }
+            }
+          } catch (_) {}
+        }, 50);
+      }
     }
+    return true;
+  }
+
+  async function validateSession() {
+    const user = getUser();
+    if (!user) return true;
+    try {
+      if (typeof window.apiCall === 'function') {
+        const chk = await window.apiCall('auth', 'verify_session', { user_id: user.id, nis: user.nis });
+        if (chk && chk.session_revoked) {
+          clearSession();
+          alert(chk.message || 'Sesi akun santri telah dinonaktifkan oleh pihak yayasan.');
+          window.location.href = '/login.html?revoked=1';
+          return false;
+        }
+      }
+    } catch (_) {}
     return true;
   }
 
@@ -99,4 +132,5 @@
   window.logout = logout;
   window.getPortalRedirect = getPortalRedirect;
   window.requireAuth = requireAuth;
+  window.validateSession = validateSession;
 })();

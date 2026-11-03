@@ -1,0 +1,211 @@
+﻿{
+    "invoices":  {
+                     "value":  [
+
+                               ],
+                     "Count":  0
+                 },
+    "classes":  {
+                    "value":  [
+
+                              ],
+                    "Count":  0
+                },
+    "web_settings":  {
+                         "value":  [
+                                       {
+                                           "id":  "default",
+                                           "school_name":  "YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA",
+                                           "tagline":  "Membentuk Generasi Qurani, Cerdas, Ceria \u0026 Berakhlakul Karimah",
+                                           "hero_title":  "Membangun Generasi Cerdas \u0026 Berkarakter",
+                                           "hero_subtitle":  "Lembaga Pendidikan Islam Terpadu: PAUD, TK, dan TPQ dengan kurikulum holistik dan berbasis nilai islami.",
+                                           "hero_images":  [
+                                                               {
+                                                                   "url":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1793633334008_0636v.webp",
+                                                                   "caption":  "suasana"
+                                                               },
+                                                               {
+                                                                   "url":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1793633351699_f3hlt.webp",
+                                                                   "caption":  "mushola"
+                                                               },
+                                                               {
+                                                                   "url":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1793633376343_ut3rw.webp",
+                                                                   "caption":  "suasana"
+                                                               },
+                                                               {
+                                                                   "url":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1793663774626_aoof2.webp",
+                                                                   "caption":  "suasana"
+                                                               },
+                                                               {
+                                                                   "url":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/hero_slide_1793663799658_w0gj2.webp",
+                                                                   "caption":  "suasana"
+                                                               }
+                                                           ],
+                                           "facebook_url":  "https://facebook.com/attarbiyyah.samarinda",
+                                           "instagram_url":  "https://instagram.com/attarbiyyah.smd",
+                                           "youtube_url":  "https://youtu.be/TwMZEbDbi3c?si=9WasYWL8r7eheKXh",
+                                           "phone":  "0813-4714-2829",
+                                           "whatsapp":  "6281347142829",
+                                           "email":  "info@attarbiyyah-samarinda.sch.id",
+                                           "address":  "Jl. Wijaya Kusuma V-A No. 38, RT. 14, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124",
+                                           "ppdb_active_note":  "Pendaftaran Gelombang 1 Dibuka! Kuota Terbatas.",
+                                           "updated_at":  "2026-11-03T04:13:27.994+00:00",
+                                           "header_title":  null,
+                                           "announcement_banner":  "{\"id\":\"SCH-001\",\"school_name\":\"YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\",\"tagline\":\"Membentuk Generasi Qurani, Cerdas, Ceria \u0026 Berakhlakul Karimah\",\"hero_title\":\"Membangun Generasi Cerdas \u0026 Berkarakter\",\"hero_subtitle\":\"Lembaga Pendidikan Islam Terpadu: PAUD, TK, dan TPQ dengan kurikulum holistik dan berbasis nilai islami.\",\"facebook_url\":\"https://facebook.com/attarbiyyah.samarinda\",\"instagram_url\":\"https://instagram.com/attarbiyyah.smd\",\"youtube_url\":\"https://youtu.be/TwMZEbDbi3c?si=9WasYWL8r7eheKXh\",\"phone\":\"0813-4714-2829\",\"whatsapp\":\"6281347142829\",\"email\":\"info@attarbiyyah-samarinda.sch.id\",\"address\":\"Jl. Wijaya Kusuma V-A No. 38, RT. 14, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124\",\"ppdb_active_note\":\"Pendaftaran Gelombang 1 Dibuka! Kuota Terbatas.\",\"updated_at\":\"2026-10-21T11:33:29.911+00:00\",\"header_title\":null,\"announcement_banner\":\"{\\\"campus_note\\\":\\\"\\\",\\\"maps_url\\\":\\\"https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda\\\",\\\"maps_embed_url\\\":\\\"https://maps.google.com/maps?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124\u0026t=\u0026z=16\u0026ie=UTF8\u0026iwloc=\u0026output=embed\\\",\\\"whatsapp_number\\\":\\\"6281347142829\\\",\\\"instagram_url\\\":\\\"https://instagram.com/attarbiyyah.smd\\\",\\\"youtube_url\\\":\\\"https://youtu.be/TwMZEbDbi3c?si=9WasYWL8r7eheKXh\\\",\\\"facebook_url\\\":\\\"https://facebook.com/attarbiyyah.samarinda\\\",\\\"visi\\\":\\\"Mewujudkan generasi anak usia dini yang berakhlak mulia, cerdas, mandiri, ceria, dan cinta Al-Quran.\\\",\\\"misi\\\":[\\\"Menyelenggarakan pembelajaran PAUD \u0026 TK yang aktif, kreatif, dan menyenangkan.\\\",\\\"Menanamkan adab Islami dan hafalan doa sehari-hari sejak usia dini.\\\",\\\"Membimbing santri membaca Al-Quran dengan tartil melalui metode tilawati di TPQ Ulinnuha.\\\"],\\\"budaya\\\":\\\"Menerapkan 5S (Senyum, Salam, Sapa, Sopan, Santun), membiasakan doa harian, adab makan minum, kepedulian sosial, serta cinta kebersihan lingkungan.\\\",\\\"sejarah\\\":\\\"Yayasan At Tarbiyyah Wijaya Kusuma Samarinda berdiri sebagai wujud kepedulian masyarakat di lingkungan Air Putih Samarinda Ulu terhadap pendidikan dasar Islam dan anak usia dini yang berkualitas.Yayasan ini dibangun di lingkungan yang sangat menjamin tumbuh kembang siswa agar lebih konsisten dan berfokus dengan lingkungan yang tenang dan adem.\\\",\\\"program_pendidikan\\\":{\\\"paud\\\":\\\"Usia 2-4 tahun. Stimulasi tumbuh kembang optimal melalui bermain sambil belajar dengan pendekatan sentra dan kasih sayang. riki\\\",\\\"tk\\\":\\\"Usia 4-6 tahun. Persiapan masuk SD dengan penguatan kemandirian, adab Islami, dan calistung dasar yang menyenangkan. riki\\\",\\\"tpq\\\":\\\"Santri usia 5-12 tahun. Pembelajaran membaca Al-Qur\u0027an metode tartil, hafalan Juz 30, hafalan doa harian, dan praktik ibadah. riki\\\"},\\\"kurikulum\\\":\\\"Kurikulum Merdeka Ramah Anak, Integrasi Karakter Qurani \u0026 Adab Harian, Pembiasaan Sholat Dhuha \u0026 Doa Ceria. Riki\\\",\\\"struktur_organisasi\\\":{\\\"pembina\\\":\\\"DJOKO IRIANDONO\\\",\\\"pengawas\\\":\\\"Suhardi\\\",\\\"ketua_yayasan\\\":\\\"Makhrus\\\",\\\"sekretaris\\\":\\\"Candra Gunawan\\\",\\\"bendahara\\\":\\\"Sri Pragawati\\\",\\\"kepala_paud_tk\\\":\\\"-\\\",\\\"kepala_tpq\\\":\\\"-\\\"},\\\"pembina\\\":\\\"DJOKO IRIANDONO\\\",\\\"pengawas\\\":\\\"Suhardi\\\",\\\"ketua_yayasan\\\":\\\"Makhrus\\\",\\\"sekretaris\\\":\\\"Candra Gunawan\\\",\\\"bendahara\\\":\\\"Sri Pragawati\\\",\\\"headmaster_name\\\":\\\"Makhrus\\\",\\\"operational_hours\\\":{\\\"weekday\\\":\\\"07.30 - 12.30 WITA\\\",\\\"friday\\\":\\\"07.30 - 11.00 WITA\\\",\\\"saturday\\\":\\\"08.00 - 12.00 WITA\\\",\\\"sunday\\\":\\\"Libur Akhir Pekan / Nasional\\\"},\\\"footer_bg_url\\\":\\\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/footer_bg_1792582371686_5auo9.jpg\\\",\\\"tagline\\\":\\\"Membentuk Generasi Qurani, Cerdas, Ceria \u0026 Berakhlakul Karimah\\\",\\\"name\\\":\\\"YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\\\",\\\"school_name\\\":\\\"YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\\\",\\\"address\\\":\\\"Jl. Wijaya Kusuma V-A No. 38, RT. 14, Kel. Air Putih, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75124\\\",\\\"phone\\\":\\\"0813-4714-2829\\\",\\\"email\\\":\\\"info@attarbiyyah-samarinda.sch.id\\\",\\\"whatsapp\\\":\\\"6281347142829\\\",\\\"backup_history\\\":[],\\\"wa_gateway_token\\\":\\\"\\\"}\",\"whatsapp_official\":null,\"contact_email\":null,\"campus_note\":\"Lokasi Yayasan Terpadu PAUD, TK \u0026 TPQ Ulinnuha (Dekat Masjid Al-ukhuwah Wijaya Kusuma)\",\"maps_url\":\"https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda\",\"maps_embed_url\":\"https://maps.google.com/maps?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124\u0026t=\u0026z=16\u0026ie=UTF8\u0026iwloc=\u0026output=embed\",\"academic_year\":\"2026/2027\",\"footer_bg_url\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/footer_bg_1793678894020_q5t9y.webp\",\"login_bg_url\":\"/images/school-campus.jpg\",\"whatsapp_number\":\"6281347142829\",\"visi\":\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"misi\":[\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\"],\"budaya\":\"Menerapkan 5S (Senyum, Salam, Sapa, Sopan, Santun), membiasakan doa harian, adab makan minum, kepedulian sosial, serta cinta kebersihan lingkungan. tes\",\"sejarah\":\"Yayasan At Tarbiyyah Wijaya Kusuma Samarinda berdiri sebagai wujud kepedulian masyarakat di lingkungan Air Putih Samarinda Ulu terhadap pendidikan dasar Islam dan anak usia dini yang berkualitas.Yayasan ini dibangun di lingkungan yang sangat menjamin tumbuh kembang siswa agar lebih konsisten dan berfokus dengan lingkungan yang tenang dan adem.\",\"program_pendidikan\":{\"paud\":\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"tk\":\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"tpq\":\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\"},\"kurikulum\":\"Mewujudkan Anak Hafal Al Quran di bawah Usia 9 Tahun, Hafal Tanpa Menghafal\",\"struktur_organisasi\":{\"pembina\":\"DJOKO IRIANDONO\",\"pengawas\":\"Suhardi\",\"ketua_yayasan\":\"Makhrus\",\"sekretaris\":\"Candra Gunawan\",\"bendahara\":\"Sri Pragawati\",\"pembina_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_pembina_1793679026091.jpg_1793679026095_13wav.jpeg\",\"pengawas_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_pengawas_1793679029888.jpg_1793679029889_1tozk.jpeg\",\"ketua_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_ketua_1793679033379.jpg_1793679033381_b894i.jpeg\",\"ketua_yayasan_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_ketua_1793679033379.jpg_1793679033381_b894i.jpeg\",\"sekretaris_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_sekretaris_1793679037736.jpg_1793679037740_3uy7y.jpeg\",\"bendahara_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_bendahara_1793679041979.jpg_1793679041982_uy2ym.jpeg\",\"pembina_jabatan\":\"Pembina\",\"pengawas_jabatan\":\"Pengawas\",\"ketua_jabatan\":\"Ketua Yayasan\",\"sekretaris_jabatan\":\"Sekretaris\",\"bendahara_jabatan\":\"Bendahara\"},\"pembina\":\"DJOKO IRIANDONO\",\"pengawas\":\"Suhardi\",\"ketua_yayasan\":\"Makhrus\",\"sekretaris\":\"Candra Gunawan\",\"bendahara\":\"Sri Pragawati\",\"headmaster_name\":\"Makhrus\",\"operational_hours\":{\"weekday\":\"-\",\"friday\":\"-\",\"saturday\":\"-\",\"sunday\":\"-\"},\"name\":\"YAYASAN AT TARBIYYAH WIJAYA KUSUMA SAMARINDA\",\"wa_gateway_token\":\"\",\"npsn\":\"69912345\",\"level\":\"PAUD, TK, dan TPQ\",\"created_at\":\"2026-10-14T04:39:29.82613+00:00\",\"pembina_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_pembina_1793679026091.jpg_1793679026095_13wav.jpeg\",\"pengawas_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_pengawas_1793679029888.jpg_1793679029889_1tozk.jpeg\",\"ketua_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_ketua_1793679033379.jpg_1793679033381_b894i.jpeg\",\"ketua_yayasan_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_ketua_1793679033379.jpg_1793679033381_b894i.jpeg\",\"sekretaris_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_sekretaris_1793679037736.jpg_1793679037740_3uy7y.jpeg\",\"bendahara_photo\":\"https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/pengurus_bendahara_1793679041979.jpg_1793679041982_uy2ym.jpeg\",\"pembina_jabatan\":\"Pembina\",\"pengawas_jabatan\":\"Pengawas\",\"ketua_jabatan\":\"Ketua Yayasan\",\"sekretaris_jabatan\":\"Sekretaris\",\"bendahara_jabatan\":\"Bendahara\"}",
+                                           "whatsapp_official":  null,
+                                           "contact_email":  null,
+                                           "campus_note":  "Lokasi Yayasan Terpadu PAUD, TK \u0026 TPQ Ulinnuha (Dekat Masjid Al-ukhuwah Wijaya Kusuma)",
+                                           "maps_url":  "https://maps.google.com/?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda",
+                                           "maps_embed_url":  "https://maps.google.com/maps?q=Jl.+Wijaya+Kusuma+V-A+No.+38,+Air+Putih,+Samarinda+Ulu,+Kota+Samarinda,+Kalimantan+Timur+75124\u0026t=\u0026z=16\u0026ie=UTF8\u0026iwloc=\u0026output=embed",
+                                           "academic_year":  "2026/2027",
+                                           "footer_bg_url":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/footer_bg_1793678894020_q5t9y.webp",
+                                           "login_bg_url":  "/images/school-campus.jpg"
+                                       }
+                                   ],
+                         "Count":  1
+                     },
+    "students":  {
+                     "value":  [
+
+                               ],
+                     "Count":  0
+                 },
+    "ppdb_registrations":  {
+                               "value":  [
+
+                                         ],
+                               "Count":  0
+                           },
+    "users":  {
+                  "value":  [
+                                {
+                                    "id":  "USR-ADMIN01",
+                                    "email":  "admin@yayasan.sch.id",
+                                    "username":  null,
+                                    "nis":  null,
+                                    "password_hash":  "d5d4be31c0cfe977a7ec08ae7039ed2edad150cd24419981bb1c3d226d9188df",
+                                    "full_name":  "Administrator Yayasan",
+                                    "name":  "Administrator Yayasan",
+                                    "phone":  "081234567890",
+                                    "role":  "super_admin",
+                                    "role_label":  "Super Admin",
+                                    "status":  "active",
+                                    "avatar":  "https://hnkxrbmngmveoxipohtk.supabase.co/storage/v1/object/public/siyayasan-uploads/avatar_1792414296750_zrs11.jpeg",
+                                    "is_password_changed":  true,
+                                    "student_id":  null,
+                                    "teacher_id":  null,
+                                    "parent_id":  null,
+                                    "created_at":  "2026-10-14T04:39:29.82613+00:00",
+                                    "updated_at":  "2026-11-03T04:17:21.659+00:00",
+                                    "last_login":  "2026-11-03T08:15:55.549+00:00",
+                                    "fallback_dob_password":  null,
+                                    "birth_date":  null,
+                                    "must_change_password":  false,
+                                    "password_salt":  "aa839ed4f53b3ee1f6e7e5e096f62607"
+                                }
+                            ],
+                  "Count":  1
+              },
+    "teachers":  {
+                     "value":  [
+                                   {
+                                       "id":  "TEA-57947",
+                                       "user_id":  null,
+                                       "nip":  "123456789",
+                                       "full_name":  "Riky Rivaldi",
+                                       "name":  "Riky Rivaldi",
+                                       "gender":  "L",
+                                       "phone":  "081234567890",
+                                       "email":  "rikyrivaldi369@gmail.com",
+                                       "education":  "S1 Pendidikan",
+                                       "position":  "Pendididkan Paud",
+                                       "specialization":  "Pendididkan Paud",
+                                       "start_date":  "2026-11-03",
+                                       "joined_at":  "2026-11-03",
+                                       "avatar":  null,
+                                       "status":  "active",
+                                       "created_at":  "2026-11-03T04:31:00.218398+00:00",
+                                       "updated_at":  "2026-11-03T04:31:00.218398+00:00",
+                                       "subject_specialty":  null
+                                   }
+                               ],
+                     "Count":  1
+                 },
+    "activity_logs":  {
+                          "value":  [
+                                        {
+                                            "id":  "LOG-1793679147265-rafw",
+                                            "user_id":  "USR-ADMIN01",
+                                            "user_name":  "Administrator Yayasan",
+                                            "action":  "CLEAR_LOGS",
+                                            "module":  "logs",
+                                            "details":  "Pembersihan seluruh log aktivitas secara permanen oleh Administrator Yayasan dengan otorisasi kata sandi terverifikasi",
+                                            "ip_address":  null,
+                                            "created_at":  "2026-11-03T04:12:27.265+00:00"
+                                        },
+                                        {
+                                            "id":  "LOG-1793680019073-61c6",
+                                            "user_id":  "USR-ADMIN01",
+                                            "user_name":  "Administrator Yayasan",
+                                            "action":  "APPROVE_PPDB",
+                                            "module":  "ppdb",
+                                            "details":  "Menyetujui berkas pendaftaran calon siswa ID: REG-1793679696844 [ID: REG-1793679696844]",
+                                            "ip_address":  null,
+                                            "created_at":  "2026-11-03T04:26:59.073+00:00"
+                                        },
+                                        {
+                                            "id":  "LOG-1793679442035-qbjb",
+                                            "user_id":  "USR-ADMIN01",
+                                            "user_name":  "Administrator Yayasan",
+                                            "action":  "UPDATE_USER",
+                                            "module":  "users",
+                                            "details":  "Memperbarui akun user ID: USR-ADMIN01 [ID: USR-ADMIN01]",
+                                            "ip_address":  null,
+                                            "created_at":  "2026-11-03T04:17:22.035+00:00"
+                                        },
+                                        {
+                                            "id":  "LOG-1793680564888-pggo",
+                                            "user_id":  "USR-ADMIN01",
+                                            "user_name":  "Administrator Yayasan",
+                                            "action":  "CONVERT_SISWA",
+                                            "module":  "students",
+                                            "details":  "Aktivasi calon siswa PPDB Riky Rivaldi ke siswa aktif (NIS: 20266051, Kelas: simulasi ruangan) [ID: STU-1793679696844]",
+                                            "ip_address":  null,
+                                            "created_at":  "2026-11-03T04:36:04.888+00:00"
+                                        },
+                                        {
+                                            "id":  "LOG-1793679557151-cz1l",
+                                            "user_id":  "USR-ADMIN01",
+                                            "user_name":  "Administrator Yayasan",
+                                            "action":  "UPDATE_PERIOD",
+                                            "module":  "ppdb",
+                                            "details":  "Mengubah pengaturan jadwal \u0026 status PPDB: open [ID: PER-2026-1]",
+                                            "ip_address":  null,
+                                            "created_at":  "2026-11-03T04:19:17.151+00:00"
+                                        },
+                                        {
+                                            "id":  "LOG-1793693818392-6uls",
+                                            "user_id":  "USR-ADMIN01",
+                                            "user_name":  "Administrator Yayasan",
+                                            "action":  "DELETE_PPDB",
+                                            "module":  "ppdb",
+                                            "details":  "Menghapus berkas pendaftaran calon siswa ID: REG-1793679696844 [ID: REG-1793679696844]",
+                                            "ip_address":  null,
+                                            "created_at":  "2026-11-03T08:16:58.392+00:00"
+                                        }
+                                    ],
+                          "Count":  6
+                      },
+    "student_documents":  {
+                              "value":  [
+
+                                        ],
+                              "Count":  0
+                          },
+    "payments":  {
+                     "value":  [
+
+                               ],
+                     "Count":  0
+                 }
+}
