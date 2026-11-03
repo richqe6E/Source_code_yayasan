@@ -77,6 +77,28 @@
     };
   </script>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* PPDB Information Interactive Accordion Styles */
+    .ppdb-acc-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ppdb-acc-body.is-open {
+      grid-template-rows: 1fr;
+    }
+    .ppdb-acc-inner {
+      overflow: hidden;
+    }
+    .ppdb-acc-trigger[aria-expanded="true"] .ppdb-acc-chevron {
+      transform: rotate(180deg);
+      background-color: rgb(224 242 254);
+      color: rgb(2 132 199);
+    }
+    .ppdb-acc-trigger[aria-expanded="true"] {
+      background-color: rgb(248 250 252);
+    }
+  </style>
   <script src="/shared/js/page-transitions.js" onerror="this.onerror=null;this.src='../shared/js/page-transitions.js'"></script>
 
   <!-- Instant PPDB Period Pre-Hydration (Zero-FOUC) -->
@@ -889,27 +911,350 @@
 
     <!-- Persyaratan & Jadwal Penting PPDB -->
     <div id="jadwal-linimasa" class="grid lg:grid-cols-2 gap-6 mb-12 scroll-mt-24">
-      <div class="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm" id="accordion-persyaratan-ppdb">
-        <div class="border-b border-slate-100 pb-4 mb-4">
-          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2.5">
-            <i class="fi fi-rr-document text-primary-600"></i>
-            <span>Persyaratan Berkas PPDB</span>
-          </h3>
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-7 shadow-sm flex flex-col justify-between" id="accordion-persyaratan-ppdb">
+        <div>
+          <!-- Header Bagian Persyaratan & Administrasi -->
+          <div class="border-b border-slate-100 pb-4 mb-4">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center shrink-0">
+                  <i class="fi fi-rr-document-signed text-sm"></i>
+                </span>
+                <span>Ketentuan &amp; Alur Berkas PPDB</span>
+              </h3>
+              <span class="text-[11px] font-semibold text-primary-700 bg-primary-50 border border-primary-200/60 px-2.5 py-1 rounded-full inline-flex items-center gap-1.5">
+                <i class="fi fi-rr-info text-[10px]"></i>
+                <span>Pilih bagian untuk melihat detail</span>
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Panduan dokumen persyaratan pendaftaran calon siswa dan tahapan resmi administrasi pasca-pendaftaran di Yayasan At Tarbiyyah.
+            </p>
+          </div>
+
+          <!-- Container Accordion (1 Bagian Terbuka dalam 1 Waktu) -->
+          <div class="space-y-3" id="ppdb-info-accordion" role="region" aria-label="Persyaratan dan Alur Administrasi PPDB">
+
+            <!-- ================= ACCORDION 1: PERSYARATAN BERKAS SISWA ================= -->
+            <div class="border border-primary-300 ring-2 ring-primary-500/10 rounded-xl overflow-hidden transition-all duration-200" id="acc-card-1">
+              <!-- Trigger / Summary -->
+              <button 
+                type="button" 
+                class="ppdb-acc-trigger w-full text-left p-3.5 sm:p-4 flex items-start sm:items-center justify-between gap-3 transition-colors cursor-pointer select-none focus:outline-hidden focus:ring-2 focus:ring-primary-500/20"
+                id="acc-btn-1"
+                aria-expanded="true"
+                aria-controls="acc-body-1"
+                onclick="togglePpdbAccordion(1)"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePpdbAccordion(1);}"
+              >
+                <div class="flex items-start sm:items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <i class="fi fi-rr-folder text-sm sm:text-base"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">1. Persyaratan Berkas Calon Siswa</span>
+                      <span class="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200/80 px-2 py-0.5 rounded-md">Wajib Disiapkan</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-500 leading-normal line-clamp-1">
+                      Pasfoto ananda, Akta Kelahiran, dan Kartu Keluarga untuk verifikasi data.
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 flex items-center pl-1 pt-1 sm:pt-0">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 ppdb-acc-chevron transition-transform duration-300">
+                    <i class="fi fi-rr-angle-small-down text-sm"></i>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Body / Details -->
+              <div id="acc-body-1" class="ppdb-acc-body is-open" role="region" aria-labelledby="acc-btn-1">
+                <div class="ppdb-acc-inner border-t border-slate-100 bg-slate-50/40 p-3.5 sm:p-5 space-y-3.5">
+                  
+                  <!-- Berkas 1: Pasfoto -->
+                  <div class="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs">
+                    <div class="flex items-start justify-between gap-2 mb-1.5 flex-wrap">
+                      <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center text-[11px] font-bold">1</span>
+                        <h4 class="text-xs font-bold text-slate-900">Pasfoto Formal Ananda</h4>
+                      </div>
+                      <span class="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded">Wajib Diunggah</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-2.5">
+                      Foto resmi ananda terbaru (setengah badan, wajah menghadap ke depan dengan pencahayaan terang dan jelas).
+                    </p>
+                    <div class="flex items-center gap-2 flex-wrap text-[11px] text-slate-500 font-medium">
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-picture text-[10px]"></i> Format JPG / PNG
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-database text-[10px]"></i> Maks. 5 MB
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-primary-50 text-primary-700 px-2 py-0.5 rounded font-semibold">
+                        <i class="fi fi-rr-cloud-upload-alt text-[10px]"></i> Diunggah di Formulir Online (Tahap 4)
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Berkas 2: Akta Kelahiran -->
+                  <div class="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs">
+                    <div class="flex items-start justify-between gap-2 mb-1.5 flex-wrap">
+                      <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center text-[11px] font-bold">2</span>
+                        <h4 class="text-xs font-bold text-slate-900">Akta Kelahiran Calon Siswa</h4>
+                      </div>
+                      <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded">Dokumen Verifikasi</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-2.5">
+                      Scan atau foto dokumen asli yang memperlihatkan nama lengkap anak, tempat &amp; tanggal lahir, serta nama orang tua secara utuh tanpa terpotong.
+                    </p>
+                    <div class="flex items-center gap-2 flex-wrap text-[11px] text-slate-500 font-medium">
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-document text-[10px]"></i> JPG / PNG / PDF
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-database text-[10px]"></i> Maks. 5 MB
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-time-check text-[10px]"></i> Unggah Online atau Susulan Verifikasi Fisik
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Berkas 3: Kartu Keluarga -->
+                  <div class="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs">
+                    <div class="flex items-start justify-between gap-2 mb-1.5 flex-wrap">
+                      <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center text-[11px] font-bold">3</span>
+                        <h4 class="text-xs font-bold text-slate-900">Kartu Keluarga (KK) Resmi</h4>
+                      </div>
+                      <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded">Dokumen Verifikasi</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-2.5">
+                      Scan atau foto asli KK terbaru yang memuat Nomor KK, NIK calon siswa, serta NIK orang tua/wali secara jelas dan valid untuk verifikasi identitas resmi.
+                    </p>
+                    <div class="flex items-center gap-2 flex-wrap text-[11px] text-slate-500 font-medium">
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-address-card text-[10px]"></i> JPG / PNG / PDF
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-database text-[10px]"></i> Maks. 5 MB
+                      </span>
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-time-check text-[10px]"></i> Unggah Online atau Susulan Verifikasi Fisik
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Berkas 4: Dokumen Tambahan -->
+                  <div class="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs">
+                    <div class="flex items-start justify-between gap-2 mb-1.5 flex-wrap">
+                      <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center text-[11px] font-bold">4</span>
+                        <h4 class="text-xs font-bold text-slate-900">Dokumen Tambahan / Pindahan</h4>
+                      </div>
+                      <span class="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">Opsional / Khusus</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-2">
+                      Surat Keterangan Pindah (khusus calon santri/siswa mutasi pindahan) atau Piagam/Sertifikat Prestasi jika tersedia.
+                    </p>
+                    <div class="text-[11px] text-slate-500">
+                      <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                        <i class="fi fi-rr-building text-[10px]"></i> Diserahkan saat Daftar Ulang di Sekretariat
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= ACCORDION 2: KETENTUAN TEKNIS BERKAS ================= -->
+            <div class="border border-slate-200/90 rounded-xl overflow-hidden transition-all duration-200 hover:border-slate-300" id="acc-card-2">
+              <button 
+                type="button" 
+                class="ppdb-acc-trigger w-full text-left p-3.5 sm:p-4 flex items-start sm:items-center justify-between gap-3 transition-colors cursor-pointer select-none focus:outline-hidden focus:ring-2 focus:ring-primary-500/20"
+                id="acc-btn-2"
+                aria-expanded="false"
+                aria-controls="acc-body-2"
+                onclick="togglePpdbAccordion(2)"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePpdbAccordion(2);}"
+              >
+                <div class="flex items-start sm:items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sky-50 text-sky-600 border border-sky-200/70 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <i class="fi fi-rr-settings-sliders text-sm sm:text-base"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">2. Ketentuan Format &amp; Kualitas File</span>
+                      <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200/80 px-2 py-0.5 rounded-md">Panduan Teknis</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-500 leading-normal line-clamp-1">
+                      Format file yang didukung, batas ukuran, dan tips dokumen terbaca jelas.
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 flex items-center pl-1 pt-1 sm:pt-0">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 ppdb-acc-chevron transition-transform duration-300">
+                    <i class="fi fi-rr-angle-small-down text-sm"></i>
+                  </div>
+                </div>
+              </button>
+
+              <div id="acc-body-2" class="ppdb-acc-body" role="region" aria-labelledby="acc-btn-2">
+                <div class="ppdb-acc-inner border-t border-slate-100 bg-slate-50/40 p-3.5 sm:p-5 space-y-3">
+                  <div class="grid sm:grid-cols-3 gap-3">
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs">
+                      <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center mb-2">
+                        <i class="fi fi-rr-file-check text-xs"></i>
+                      </div>
+                      <h5 class="text-xs font-bold text-slate-900 mb-1">Format Resmi</h5>
+                      <p class="text-[11px] text-slate-600 leading-relaxed">
+                        Mendukung ekstensi <strong class="text-slate-800">.JPG, .JPEG, .PNG</strong>, dan dokumen <strong class="text-slate-800">.PDF</strong>.
+                      </p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs">
+                      <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center mb-2">
+                        <i class="fi fi-rr-compress text-xs"></i>
+                      </div>
+                      <h5 class="text-xs font-bold text-slate-900 mb-1">Batas Ukuran</h5>
+                      <p class="text-[11px] text-slate-600 leading-relaxed">
+                        Maksimal <strong class="text-slate-800">5 MB</strong> per file. Sistem otomatis mengompresi gambar demi kelancaran pengunggahan.
+                      </p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs">
+                      <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center mb-2">
+                        <i class="fi fi-rr-eye text-xs"></i>
+                      </div>
+                      <h5 class="text-xs font-bold text-slate-900 mb-1">Keterbacaan Dokumen</h5>
+                      <p class="text-[11px] text-slate-600 leading-relaxed">
+                        Foto tegak lurus, pencahayaan cukup, tidak buram (*blur*), dan seluruh teks nama &amp; NIK terbaca jelas.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 flex items-start gap-2.5 text-xs text-amber-900">
+                    <i class="fi fi-rr-info text-amber-600 mt-0.5 shrink-0"></i>
+                    <p class="leading-relaxed">
+                      <strong>Kendala Teknis Upload?</strong> Jika mengalami hambatan saat mengunggah Akta atau Kartu Keluarga secara online, Anda tetap dapat melanjutkan pendaftaran online dan menyerahkan fotokopi dokumen fisik langsung ke Sekretariat Yayasan saat verifikasi berkas.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= ACCORDION 3: TAHAPAN ADMINISTRASI SETELAH PENDAFTARAN ================= -->
+            <div class="border border-slate-200/90 rounded-xl overflow-hidden transition-all duration-200 hover:border-slate-300" id="acc-card-3">
+              <button 
+                type="button" 
+                class="ppdb-acc-trigger w-full text-left p-3.5 sm:p-4 flex items-start sm:items-center justify-between gap-3 transition-colors cursor-pointer select-none focus:outline-hidden focus:ring-2 focus:ring-primary-500/20"
+                id="acc-btn-3"
+                aria-expanded="false"
+                aria-controls="acc-body-3"
+                onclick="togglePpdbAccordion(3)"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePpdbAccordion(3);}"
+              >
+                <div class="flex items-start sm:items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/70 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <i class="fi fi-rr-workflow text-sm sm:text-base"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span class="text-xs sm:text-sm font-bold text-slate-900 truncate">3. Tahapan Administrasi Setelah Pendaftaran</span>
+                      <span class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md">Proses Panitia Yayasan</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-500 leading-normal line-clamp-1">
+                      Verifikasi berkas, pengumuman seleksi, penerbitan NIS, dan kredensial portal siswa.
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 flex items-center pl-1 pt-1 sm:pt-0">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 ppdb-acc-chevron transition-transform duration-300">
+                    <i class="fi fi-rr-angle-small-down text-sm"></i>
+                  </div>
+                </div>
+              </button>
+
+              <div id="acc-body-3" class="ppdb-acc-body" role="region" aria-labelledby="acc-btn-3">
+                <div class="ppdb-acc-inner border-t border-slate-100 bg-slate-50/40 p-3.5 sm:p-5 space-y-3">
+                  
+                  <div class="bg-blue-50/70 border border-blue-200/70 rounded-xl p-3 flex items-start gap-2.5 text-xs text-blue-900">
+                    <i class="fi fi-rr-shield-check text-blue-600 text-sm mt-0.5 shrink-0"></i>
+                    <p class="leading-relaxed">
+                      <strong>Catatan Alur Operasional:</strong> Tahapan di bawah ini diproses sepenuhnya oleh Tim Tata Usaha Yayasan. Calon siswa <u>tidak perlu mengunggah dokumen baru</u> untuk tahap ini.
+                    </p>
+                  </div>
+
+                  <div class="space-y-2.5">
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        A
+                      </div>
+                      <div class="min-w-0">
+                        <h5 class="text-xs font-bold text-slate-900 mb-0.5">Verifikasi &amp; Validasi oleh Tata Usaha</h5>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                          Panitia PPDB memeriksa data isian formulir dan kesesuaian lampiran secara bertahap pada hari kerja.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        B
+                      </div>
+                      <div class="min-w-0">
+                        <h5 class="text-xs font-bold text-slate-900 mb-0.5">Pengumuman Kelulusan &amp; Cek Status</h5>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                          Hasil seleksi dapat dipantau mandiri melalui menu <strong class="text-slate-800">Cek Status Pendaftaran</strong> menggunakan Nomor Registrasi pendaftaran.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        C
+                      </div>
+                      <div class="min-w-0">
+                        <h5 class="text-xs font-bold text-slate-900 mb-0.5">Daftar Ulang &amp; Penyerahan Berkas Fisik</h5>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                          Wali santri/siswa yang dinyatakan diterima melakukan konfirmasi daftar ulang dan penyerahan salinan berkas di Sekretariat Yayasan.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs flex items-start gap-3">
+                      <div class="w-6 h-6 rounded-md bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        D
+                      </div>
+                      <div class="min-w-0">
+                        <h5 class="text-xs font-bold text-slate-900 mb-0.5">Penerbitan NIS, Penempatan Kelas &amp; Akun Portal Siswa</h5>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                          Nomor Induk Siswa (NIS) resmi, alokasi kelas ananda (PAUD/TK/TPQ), serta akun login ke <strong>Portal Siswa</strong> diterbitkan secara resmi oleh Admin Yayasan setelah tahapan daftar ulang tuntas.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
 
-        <div class="space-y-3 text-xs text-slate-600">
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-            <strong class="text-slate-900 block mb-1">1. Pasfoto Formal Anak (Wajib)</strong>
-            <span>Diunggah langsung saat mengisi formulir pendaftaran PPDB online.</span>
+        <!-- Footer Card Note / Bantuan Kontak -->
+        <div class="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <i class="fi fi-rr-headset text-primary-600 text-sm"></i>
+            <span>Ada pertanyaan seputar persyaratan?</span>
           </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-            <strong class="text-slate-900 block mb-1">2. Akta Kelahiran &amp; Kartu Keluarga (KK)</strong>
-            <span>Scan atau foto dokumen asli yang terbaca jelas untuk verifikasi administrasi oleh Tata Usaha.</span>
-          </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-            <strong class="text-slate-900 block mb-1">3. Penerbitan NIS / No. Induk &amp; Sandi Portal</strong>
-            <span>Nomor Induk / NIS Lokal, pembagian Kelompok/Kelas, serta akun login Portal Siswa diterbitkan resmi oleh Admin Yayasan setelah berkas pendaftaran divalidasi.</span>
-          </div>
+          <a href="https://wa.me/6281347142829?text=Assalamu%27alaikum%20Panitia%20PPDB%2C%20saya%20ingin%20berkonsultasi%20mengenai%20persyaratan%20berkas%20pendaftaran." target="_blank" rel="noopener noreferrer" class="font-bold text-primary-700 hover:text-primary-800 transition inline-flex items-center gap-1">
+            <span>Konsultasi Panitia PPDB</span>
+            <i class="fi fi-rr-arrow-small-right text-sm"></i>
+          </a>
         </div>
       </div>
 
@@ -1010,6 +1355,44 @@
 
   <script>
     injectSiteChrome({ activeKey: 'ppdb', basePath: './' });
+
+    // Accordion Controller untuk Informasi & Persyaratan PPDB
+    function togglePpdbAccordion(index) {
+      const totalItems = 3;
+      for (let i = 1; i <= totalItems; i++) {
+        const btn = document.getElementById('acc-btn-' + i);
+        const body = document.getElementById('acc-body-' + i);
+        const card = document.getElementById('acc-card-' + i);
+        if (!btn || !body) continue;
+
+        if (i === index) {
+          const isCurrentlyOpen = body.classList.contains('is-open');
+          if (isCurrentlyOpen) {
+            body.classList.remove('is-open');
+            btn.setAttribute('aria-expanded', 'false');
+            if (card) {
+              card.classList.remove('border-primary-300', 'ring-2', 'ring-primary-500/10');
+              card.classList.add('border-slate-200/90');
+            }
+          } else {
+            body.classList.add('is-open');
+            btn.setAttribute('aria-expanded', 'true');
+            if (card) {
+              card.classList.remove('border-slate-200/90');
+              card.classList.add('border-primary-300', 'ring-2', 'ring-primary-500/10');
+            }
+          }
+        } else {
+          body.classList.remove('is-open');
+          btn.setAttribute('aria-expanded', 'false');
+          if (card) {
+            card.classList.remove('border-primary-300', 'ring-2', 'ring-primary-500/10');
+            card.classList.add('border-slate-200/90');
+          }
+        }
+      }
+    }
+    window.togglePpdbAccordion = togglePpdbAccordion;
 
     let currentStep = 1;
     let selectedJenjang = 'TPQ Pagi';
