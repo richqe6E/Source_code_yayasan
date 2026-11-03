@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -555,14 +555,17 @@
             window.location.href = redirectUrl;
           }, 800);
         } else {
-          showToast(res.message || 'NIS/Email atau password salah.', 'error');
+          const errMsg = res.message || 'NIS/Email atau password salah.';
+          if (typeof showToast === 'function') { showToast(errMsg, 'error'); } else { alert(errMsg); }
           btn.disabled = false;
-          btnText.textContent = 'Login';
+          btnText.textContent = 'Masuk ke SIAKAD';
         }
       } catch (err) {
-        showToast('Terjadi kesalahan saat masuk: ' + err.message, 'error');
+        console.error('Login submit error:', err);
+        const errMsg = 'Terjadi kesalahan saat masuk: ' + (err.message || 'Gagal terhubung');
+        if (typeof showToast === 'function') { showToast(errMsg, 'error'); } else { alert(errMsg); }
         btn.disabled = false;
-        btnText.textContent = 'Login';
+        btnText.textContent = 'Masuk ke SIAKAD';
       }
     });
 
