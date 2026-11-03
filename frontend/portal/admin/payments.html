@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -87,14 +87,7 @@
           <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           <span>Ekspor Excel SPP</span>
         </button>
-        <button onclick="openBulkInvoiceModal()" class="px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
-          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-          <span>Tagihan Massal per Kelas</span>
-        </button>
-        <button onclick="openSingleInvoiceModal()" class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span>Buat Tagihan Individu</span>
-        </button>
+
       </div>
     </div>
 
@@ -199,117 +192,6 @@
     </div>
   </main>
 
-  <!-- Modal Buat Tagihan Individu -->
-  <div id="single-inv-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
-      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-        <div>
-          <h3 class="text-base font-bold text-gray-900">Buat Tagihan Siswa</h3>
-          <p class="text-xs text-gray-500">Terbitkan tagihan khusus untuk satu siswa</p>
-        </div>
-        <button type="button" onclick="closeSingleInvModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xl font-bold">&times;</button>
-      </div>
-
-      <form id="single-inv-form" class="p-6 space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Pilih Siswa *</label>
-          <select id="single-student" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent"></select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Nama Tagihan / Deskripsi *</label>
-          <input id="single-item" type="text" required placeholder="Contoh: SPP Oktober 2026 atau Biaya Seragam" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Nominal Tagihan (Rp) *</label>
-          <input id="single-amount" type="number" required placeholder="150000" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Jatuh Tempo *</label>
-          <input id="single-due" type="date" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-        </div>
-
-        <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
-          <button type="button" onclick="closeSingleInvModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
-          <button id="btn-save-single-inv" type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl shadow-sm transition">Terbitkan Tagihan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Buat Tagihan Massal per Kelas -->
-  <div id="bulk-inv-modal" class="hidden fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
-      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-        <div>
-          <h3 class="text-base font-bold text-gray-900">Terbitkan Tagihan SPP Massal</h3>
-          <p class="text-xs text-gray-500">Otomatis buatkan invoice SPP untuk semua murid aktif di kelas</p>
-        </div>
-        <button type="button" onclick="closeBulkInvModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-xl font-bold">&times;</button>
-      </div>
-
-      <form id="bulk-inv-form" class="p-6 space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Pilih Kelas *</label>
-          <select id="bulk-class" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-            <option value="">Semua Siswa Aktif Seluruh Kelas</option>
-          </select>
-          <span class="text-[10px] text-gray-500 mt-1 block">Pilih kelas tertentu atau seluruh siswa aktif sekaligus.</span>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Bulan &amp; Tahun SPP *</label>
-            <div class="grid grid-cols-2 gap-2">
-              <select id="bulk-month-select" required class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                <option value="Januari">Januari</option>
-                <option value="Februari">Februari</option>
-                <option value="Maret">Maret</option>
-                <option value="April">April</option>
-                <option value="Mei">Mei</option>
-                <option value="Juni">Juni</option>
-                <option value="Juli">Juli</option>
-                <option value="Agustus">Agustus</option>
-                <option value="September">September</option>
-                <option value="Oktober" selected>Oktober</option>
-                <option value="November">November</option>
-                <option value="Desember">Desember</option>
-              </select>
-              <select id="bulk-year-select" required class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                <option value="2026" selected>2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Skema Nominal SPP *</label>
-            <select id="bulk-fee-mode" onchange="toggleBulkFeeMode()" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500">
-              <option value="student_spp">Sesuai Profil Siswa / Jenjang (Disarankan)</option>
-              <option value="custom">Nominal Seragam Manual (Rp)</option>
-            </select>
-          </div>
-        </div>
-        <div id="bulk-custom-amount-wrap" class="hidden">
-          <label class="block text-xs font-bold text-gray-700 mb-1">Nominal Seragam per Siswa (Rp) *</label>
-          <input id="bulk-amount" type="number" value="150000" oninput="document.getElementById('bulk-amount-preview').textContent = formatIDR(this.value)" class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-          <span id="bulk-amount-preview" class="text-[11px] text-primary-700 font-bold mt-1 block">Rp150.000</span>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Jatuh Tempo *</label>
-          <input id="bulk-due" type="date" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-        </div>
-
-        <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-900">
-          💡 Tagihan akan otomatis masuk ke akun Portal Siswa masing-masing siswa yang bersangkutan tanpa risiko duplikasi.
-        </div>
-
-        <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
-          <button type="button" onclick="closeBulkInvModal()" class="px-4 py-2 border border-gray-200 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-50 transition">Batal</button>
-          <button id="btn-save-bulk-inv" type="submit" class="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold rounded-xl shadow-sm transition">Terbitkan Massal Sekarang</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Modal Tolak Pembayaran & Bukti Transfer -->
   <div id="reject-payment-modal" class="hidden fixed inset-0 z-50 bg-gray-950/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-5 max-w-md w-full shadow-2xl border border-gray-100" onclick="event.stopPropagation()">
@@ -381,7 +263,7 @@
       active: 'payments.html',
       portalLabel: 'Portal Admin',
       title: 'Pembayaran &amp; Rekap SPP',
-      subtitle: 'Kelola tagihan SPP bulanan, invoice massal & validasi bukti transfer siswa',
+      subtitle: 'Kelola tagihan SPP bulanan terpusat & validasi bukti transfer pembayaran siswa',
       showRefresh: true,
       onRefresh: refreshAll
     });
@@ -670,116 +552,6 @@
       document.getElementById('panel-verifications').classList.toggle('hidden', tab !== 'verifications');
       if (tab === 'verifications') loadVerifications();
     }
-
-    // Modal Single Invoice
-    function openSingleInvoiceModal() {
-      document.getElementById('single-inv-modal').classList.remove('hidden');
-      document.getElementById('single-due').value = new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10);
-    }
-    function closeSingleInvModal() {
-      document.getElementById('single-inv-modal').classList.add('hidden');
-    }
-
-    document.getElementById('single-inv-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const studentId = document.getElementById('single-student').value;
-      const s = studentsCache.find(x => x.id === studentId);
-      const studentName = s ? s.full_name : '';
-
-      const data = {
-        student_id: studentId,
-        student_name: studentName,
-        item_name: document.getElementById('single-item').value.trim(),
-        description: document.getElementById('single-item').value.trim(),
-        amount: parseFloat(document.getElementById('single-amount').value),
-        due_date: document.getElementById('single-due').value
-      };
-
-      const btn = document.getElementById('btn-save-single-inv');
-      btn.disabled = true;
-      btn.textContent = 'Menerbitkan...';
-
-      try {
-        const res = await apiCall('invoices', 'create', data);
-        showToast(res.message || 'Tagihan berhasil diterbitkan', res.success ? 'success' : 'error');
-        if (res.success) {
-          closeSingleInvModal();
-          loadInvoices();
-          loadKpis();
-        }
-      } catch (err) {
-        showToast('Gagal membuat tagihan', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Terbitkan Tagihan';
-      }
-    });
-
-    // Modal Bulk Invoice
-    function toggleBulkFeeMode() {
-      const mode = document.getElementById('bulk-fee-mode').value;
-      const wrap = document.getElementById('bulk-custom-amount-wrap');
-      if (mode === 'custom') {
-        wrap.classList.remove('hidden');
-      } else {
-        wrap.classList.add('hidden');
-      }
-    }
-
-    function openBulkInvoiceModal() {
-      document.getElementById('bulk-inv-modal').classList.remove('hidden');
-      document.getElementById('bulk-due').value = new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10);
-      const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-      const curMonth = months[new Date().getMonth()];
-      const curYear = String(new Date().getFullYear());
-      const mSel = document.getElementById('bulk-month-select');
-      const ySel = document.getElementById('bulk-year-select');
-      if (mSel && curMonth) mSel.value = curMonth;
-      if (ySel && curYear) ySel.value = curYear;
-      document.getElementById('bulk-fee-mode').value = 'student_spp';
-      toggleBulkFeeMode();
-    }
-    function closeBulkInvModal() {
-      document.getElementById('bulk-inv-modal').classList.add('hidden');
-    }
-
-    document.getElementById('bulk-inv-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const classId = document.getElementById('bulk-class').value;
-      const mSel = document.getElementById('bulk-month-select');
-      const ySel = document.getElementById('bulk-year-select');
-      const month = mSel && ySel ? `${mSel.value} ${ySel.value}` : 'Oktober 2026';
-      const feeMode = document.getElementById('bulk-fee-mode').value;
-      const customAmount = parseFloat(document.getElementById('bulk-amount').value) || 150000;
-      const dueDate = document.getElementById('bulk-due').value;
-
-      const btn = document.getElementById('btn-save-bulk-inv');
-      btn.disabled = true;
-      btn.textContent = 'Menerbitkan Massal...';
-
-      try {
-        const payload = {
-          class_id: classId,
-          month: month,
-          item_name: `SPP ${month}`,
-          due_date: dueDate,
-          use_student_spp: feeMode === 'student_spp',
-          amount: feeMode === 'student_spp' ? 'auto' : customAmount
-        };
-        const res = await apiCall('invoices', 'create_bulk', payload);
-        showToast(res.message || 'Tagihan massal berhasil diterbitkan', res.success ? 'success' : 'error');
-        if (res.success) {
-          closeBulkInvModal();
-          loadInvoices();
-          loadKpis();
-        }
-      } catch (err) {
-        showToast('Gagal menerbitkan tagihan massal: ' + (err.message || err), 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Terbitkan Massal Sekarang';
-      }
-    });
 
     // Modal Tolak Bukti Transfer
     function openRejectPaymentModal(id) {

@@ -680,6 +680,20 @@ function handleApiRequest(apiPath, params, method) {
       };
     }
 
+    if (action === 'bulk_accept') {
+      return {
+        success: false,
+        message: 'Fitur penerimaan santri massal telah dinonaktifkan. Keputusan penerimaan calon santri dilakukan secara individual melalui verifikasi berkas per pendaftar.'
+      };
+    }
+
+    if (action === 'bulk_convert') {
+      return {
+        success: false,
+        message: 'Fitur aktivasi santri massal telah dinonaktifkan. Konversi santri menjadi siswa aktif dilakukan secara individual melalui formulir aktivasi dengan penomoran NIS dan penetapan kelas terverifikasi.'
+      };
+    }
+
     if (action === 'accept' || action === 'approve') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
       if (deny) return deny;
@@ -1299,40 +1313,10 @@ function handleApiRequest(apiPath, params, method) {
   // 8. PAYMENTS & INVOICES
   if (module === 'invoices') {
       if (action === 'create_bulk') {
-        const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
-        if (deny) return deny;
-        const classId = params.class_id;
-        const month = params.month || 'Oktober 2026';
-        const amount = Number(params.amount) || 150000;
-        const dueDate = params.due_date || new Date().toISOString().split('T')[0];
-        const itemName = params.item_name || ('SPP ' + month);
-
-        let targetStudents = (DB.students || []).filter(s => (s.status || 'active') === 'active');
-        if (classId) {
-          targetStudents = targetStudents.filter(s => s.class_id === classId);
-        }
-        if (targetStudents.length === 0) {
-          return { success: false, message: 'Tidak ada siswa aktif ditemukan pada kelas/filter ini' };
-        }
-
-        const created = [];
-        for (const stu of targetStudents) {
-          const inv = {
-            id: 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-            invoice_number: 'INV/' + new Date().getFullYear() + '/' + String(DB.invoices.length + 1).padStart(3, '0'),
-            student_id: stu.id,
-            student_name: stu.full_name,
-            item_name: itemName,
-            period: month,
-            amount: amount,
-            due_date: dueDate,
-            status: 'unpaid',
-            created_at: new Date().toISOString()
-          };
-          DB.invoices.push(inv);
-          created.push(inv);
-        }
-        return { success: true, message: created.length + ' tagihan massal berhasil diterbitkan', data: { invoices: created } };
+        return {
+          success: false,
+          message: 'Fitur penerbitan tagihan massal manual telah dinonaktifkan sesuai kebijakan yayasan. Sistem mengacu pada nominal SPP resmi terpusat per jenjang/kelas siswa.'
+        };
       }
 
     if (action === 'list') {
@@ -1393,23 +1377,10 @@ function handleApiRequest(apiPath, params, method) {
       return { success: true, data: { items: list, invoices: list, total: list.length, pagination: { page: 1, per_page: list.length, total: list.length } } };
     }
     if (action === 'create') {
-      const deny = rbacDeny(params, ['super_admin', 'admin_tu']);
-      if (deny) return deny;
-      const stu = DB.students.find(s => s.id === params.student_id);
-      const inv = {
-        id: 'INV-' + Date.now(),
-        invoice_number: 'INV/' + new Date().getFullYear() + '/' + String(DB.invoices.length + 1).padStart(3,'0'),
-        student_id: params.student_id,
-        student_name: stu ? stu.full_name : '-',
-        item_name: params.item_name || 'SPP Bulanan',
-        period: params.period || new Date().toLocaleString('id-ID', {month:'long', year:'numeric'}),
-        amount: Number(params.amount) || 150000,
-        due_date: params.due_date || new Date().toISOString().split('T')[0],
-        status: 'unpaid',
-        created_at: new Date().toISOString()
+      return {
+        success: false,
+        message: 'Fitur pembuatan tagihan manual individu telah dinonaktifkan sesuai kebijakan yayasan. Penentuan biaya SPP bulanan dilakukan secara terpusat berdasarkan jenjang pendidikan dan kelas siswa saat aktivasi santri.'
       };
-      DB.invoices.push(inv);
-      return { success: true, message: 'Tagihan berhasil dibuat', data: { message: 'Tagihan berhasil dibuat', invoice: inv } };
     }
     if (action === 'delete') {
       const deny = rbacDeny(params, ['super_admin', 'admin_tu']);

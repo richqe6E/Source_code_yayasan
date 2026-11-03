@@ -1925,131 +1925,15 @@
           return { success: true, data: invoices };
         }
         if (action === 'create') {
-          const targetMonth = params.month || params.item_name || 'September 2026';
-          const targetKey = getInvoiceMonthKey(targetMonth);
-
-          // Cek anti-duplikasi untuk siswa bersangkutan
-          if (params.student_id && targetKey) {
-            const existingInvs = await supabaseRest(`invoices?student_id=eq.${encodeURIComponent(params.student_id)}&select=id,month,period,description,status`);
-            const alreadyHas = (existingInvs || []).some(inv => {
-              const k1 = getInvoiceMonthKey(inv.month);
-              const k2 = getInvoiceMonthKey(inv.period);
-              const k3 = getInvoiceMonthKey(inv.description);
-              return k1 === targetKey || k2 === targetKey || k3 === targetKey;
-            });
-            if (alreadyHas) {
-              return {
-                success: false,
-                message: `Siswa ini sudah memiliki tagihan untuk periode ${targetMonth}. Tagihan ganda dicegah.`
-              };
-            }
-          }
-
-          const id = 'INV-' + Date.now();
-          const invNum = 'INV/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4);
-          let studentName = params.student_name || '';
-          if (!studentName && params.student_id) {
-            const stu = await supabaseRest(`students?id=eq.${encodeURIComponent(params.student_id)}&select=full_name`);
-            if (stu && stu[0]) studentName = stu[0].full_name;
-          }
-          const payload = {
-            id,
-            invoice_number: params.invoice_number || invNum,
-            student_id: params.student_id,
-            student_name: studentName,
-            month: targetMonth,
-            period: params.period || targetMonth,
-            amount: Number(params.amount) || 0,
-            due_date: params.due_date || new Date().toISOString().slice(0, 10),
-            status: 'unpaid',
-            description: params.description || params.item_name || `SPP ${targetMonth}`
+          return {
+            success: false,
+            message: 'Fitur pembuatan tagihan manual individu telah dinonaktifkan sesuai kebijakan yayasan. Penentuan biaya SPP bulanan dilakukan secara terpusat berdasarkan jenjang pendidikan dan kelas siswa saat aktivasi santri.'
           };
-          const res = await supabaseRest('invoices', 'POST', payload);
-          return { success: true, data: res[0] || payload, message: 'Tagihan berhasil dibuat' };
         }
         if (action === 'create_bulk') {
-          const classId = params.class_id;
-          const month = params.month || 'Oktober 2026';
-          const defaultAmount = Number(params.amount) || 150000;
-          const useTiered = params.use_student_spp === true || params.amount === 'auto';
-          const dueDate = params.due_date || new Date().toISOString().slice(0, 10);
-          const itemName = params.item_name || `SPP ${month}`;
-
-          let studentsQuery = 'students?status=eq.active&select=id,full_name,nis,class_id,monthly_spp_amount';
-          if (classId) studentsQuery += `&class_id=eq.${encodeURIComponent(classId)}`;
-          const students = await supabaseRest(studentsQuery);
-
-          if (!students || students.length === 0) {
-            return { success: false, message: 'Tidak ada siswa aktif ditemukan pada kelas/filter ini' };
-          }
-
-          // Cek seluruh invoice yang sudah ada untuk mencegah tagihan ganda
-          const existingInvs = await supabaseRest('invoices?select=id,student_id,month,period,description,status');
-          const targetKey = getInvoiceMonthKey(month);
-
-          const payloadArray = [];
-          const skippedStudents = [];
-          const timestamp = Date.now();
-
-          for (let i = 0; i < students.length; i++) {
-            const stu = students[i];
-
-            // Cek apakah siswa ini sudah memiliki tagihan untuk bulan/periode yang sama
-            const alreadyHasInvoice = (existingInvs || []).some(inv => {
-              if (inv.student_id !== stu.id) return false;
-              const k1 = getInvoiceMonthKey(inv.month);
-              const k2 = getInvoiceMonthKey(inv.period);
-              const k3 = getInvoiceMonthKey(inv.description);
-              return k1 === targetKey || k2 === targetKey || k3 === targetKey;
-            });
-
-            if (alreadyHasInvoice) {
-              skippedStudents.push(stu.full_name);
-              continue;
-            }
-
-            const invId = 'INV-' + timestamp + '-' + i;
-            const invNum = 'INV/' + new Date().getFullYear() + '/' + String(timestamp).slice(-4) + '/' + (payloadArray.length + 1);
-            const stuAmount = useTiered ? (Number(stu.monthly_spp_amount) || defaultAmount) : defaultAmount;
-
-            payloadArray.push({
-              id: invId,
-              invoice_number: invNum,
-              student_id: stu.id,
-              student_name: stu.full_name,
-              month: month,
-              period: month,
-              amount: stuAmount,
-              due_date: dueDate,
-              status: 'unpaid',
-              description: itemName
-            });
-          }
-
-          let createdInvoices = [];
-          if (payloadArray.length > 0) {
-            try {
-              const res = await supabaseRest('invoices', 'POST', payloadArray);
-              createdInvoices = Array.isArray(res) && res.length > 0 ? res : payloadArray;
-            } catch (postErr) {
-              // Fallback per-row jika batch insert tidak didukung konfigurasi tertentu
-              for (const single of payloadArray) {
-                await supabaseRest('invoices', 'POST', single).catch(() => {});
-              }
-              createdInvoices = payloadArray;
-            }
-          }
-
-          let msg = `Berhasil menerbitkan ${createdInvoices.length} tagihan SPP baru untuk ${month}`;
-          if (skippedStudents.length > 0) {
-            msg += `. ${skippedStudents.length} siswa dilewati karena sudah memiliki tagihan (${skippedStudents.slice(0, 2).join(', ')}${skippedStudents.length > 2 ? ' dll.' : ''})`;
-          }
-
           return {
-            success: true,
-            data: createdInvoices,
-            skipped: skippedStudents,
-            message: msg
+            success: false,
+            message: 'Fitur penerbitan tagihan massal manual telah dinonaktifkan sesuai kebijakan yayasan. Sistem mengacu pada nominal SPP resmi terpusat per jenjang/kelas siswa.'
           };
         }
         if (action === 'delete') {
@@ -3054,77 +2938,15 @@
           };
         }
         if (action === 'bulk_accept') {
-          const decisions = params.decisions || []; // [{ id, status: 'approved' | 'rejected' | 'pending', notes: '' }]
-          if (!Array.isArray(decisions) || decisions.length === 0) {
-            return { success: false, message: 'Tidak ada keputusan calon siswa yang dikirimkan' };
-          }
-
-          let approvedCount = 0;
-          let rejectedCount = 0;
-          let pendingCount = 0;
-
-          for (const item of decisions) {
-            const st = item.status || 'approved';
-            const notes = item.notes || '';
-            const patchObj = { status: st };
-            if (notes) patchObj.notes = notes;
-            try {
-              await supabaseRest(`ppdb_registrations?id=eq.${encodeURIComponent(item.id)}`, 'PATCH', patchObj);
-              if (st === 'approved' || st === 'accepted') approvedCount++;
-              else if (st === 'rejected') rejectedCount++;
-              else pendingCount++;
-            } catch (_) {}
-          }
-
-          recordActivityLog('BULK_ACCEPT_PPDB', 'ppdb', `Penerimaan massal: ${approvedCount} diterima, ${rejectedCount} ditolak, ${pendingCount} dipertimbangkan`);
-
           return {
-            success: true,
-            message: `Keputusan massal berhasil disimpan: ${approvedCount} Diterima, ${rejectedCount} Ditolak, ${pendingCount} Dipertimbangkan.`
+            success: false,
+            message: 'Fitur penerimaan santri massal telah dinonaktifkan. Keputusan penerimaan calon santri dilakukan secara individual melalui verifikasi berkas per pendaftar.'
           };
         }
         if (action === 'bulk_convert') {
-          const items = params.items || [];
-          if (!Array.isArray(items) || items.length === 0) {
-            return { success: false, message: 'Tidak ada santri yang dipilih untuk aktivasi massal' };
-          }
-
-          const results = [];
-          const failed = [];
-
-          for (const item of items) {
-            try {
-              const res = await apiCall('ppdb', 'convert', {
-                id: item.id,
-                class_id: item.class_id || params.class_id || 'CLS-001',
-                nis: item.nis || undefined,
-                spp_amount: item.spp_amount || params.spp_amount,
-                portal_password: item.portal_password || params.portal_password,
-                entry_date: item.entry_date || params.entry_date || new Date().toISOString().slice(0, 10),
-                auto_spp: params.auto_spp !== false
-              });
-              if (res && res.success) {
-                results.push(res.data);
-              } else {
-                failed.push({ id: item.id, message: res ? res.message : 'Gagal konversi' });
-              }
-            } catch (err) {
-              failed.push({ id: item.id, message: err.message || 'Terjadi kesalahan sistem' });
-            }
-          }
-
-          recordActivityLog('BULK_CONVERT_PPDB', 'students', `Aktivasi massal ${results.length} santri baru menjadi siswa aktif`);
-
-          let msg = `Berhasil mengaktivasi ${results.length} santri baru menjadi Siswa Aktif.`;
-          if (failed.length > 0) {
-            msg += ` (${failed.length} data gagal: ${failed.map(f => f.message).slice(0, 2).join(', ')})`;
-          }
-
           return {
-            success: true,
-            data: results,
-            failed: failed,
-            message: msg
+            success: false,
+            message: 'Fitur aktivasi santri massal telah dinonaktifkan. Konversi santri menjadi siswa aktif dilakukan secara individual melalui formulir aktivasi dengan penomoran NIS dan penetapan kelas terverifikasi.'
           };
         }
       }
