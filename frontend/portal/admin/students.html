@@ -1010,17 +1010,18 @@
       const studentName = student ? student.full_name : 'santri ini';
       if (!confirm(`PERINGATAN HAPUS PERMANEN:\nApakah Anda yakin ingin menghapus data ${studentName} secara permanen?\n\nPerhatian: Jika santri telah memiliki riwayat tagihan SPP lunas, kuitansi, atau pembayaran resmi kas yayasan, sistem akan MENOLAK penghapusan demi perlindungan audit pembukuan.\n\nLanjutkan penghapusan permanen?`)) return;
 
-      startSpin();
+      const stopSpin = (typeof Shell !== 'undefined' && Shell.startRefresh) ? Shell.startRefresh() : () => {};
       try {
         const res = await apiCall('students', 'delete', { id });
-        if (res.success) {
+        if (res && res.success) {
           showToast(res.message || 'Siswa berhasil dihapus permanen', 'success');
           await loadStudents();
         } else {
-          alert(res.message || 'Penghapusan permanen ditolak oleh sistem.');
-          showToast(res.message || 'Penghapusan ditolak', 'error');
+          alert((res && res.message) || 'Penghapusan permanen ditolak oleh sistem.');
+          showToast((res && res.message) || 'Penghapusan ditolak', 'error');
         }
       } catch (err) {
+        console.error('Error in deleteStudent:', err);
         showToast('Terjadi kesalahan saat memproses penghapusan.', 'error');
       } finally {
         stopSpin();

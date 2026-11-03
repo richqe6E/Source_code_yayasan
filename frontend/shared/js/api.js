@@ -291,7 +291,7 @@
       try {
         sess = JSON.parse(localStorage.getItem('siy_user') || localStorage.getItem('siyayasan_session_v2') || 'null');
       } catch (_) {}
-      supabaseRest('activity_logs', 'POST', {
+      return supabaseRest('activity_logs', 'POST', {
         id: 'LOG-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
         user_id: sess?.id || 'USR-001',
         user_name: sess?.full_name || sess?.name || 'Admin',
@@ -300,7 +300,9 @@
         details: String(detailsText || '') + (entityId ? ` [ID: ${entityId}]` : ''),
         created_at: new Date().toISOString()
       }).catch(() => {});
-    } catch (_) {}
+    } catch (_) {
+      return Promise.resolve();
+    }
   }
 
   /**
@@ -2057,7 +2059,7 @@
 
           // 7. Catat ke Activity Log
           const logMsg = `Siswa ${student.full_name} (${student.nis || studentId}) dinonaktifkan: ${params.reason || 'Nonaktif'}. Dikeluarkan dari rombel ${currentClassName || '-'}.`;
-          await recordActivityLog('STUDENT_DEACTIVATED', 'students', logMsg, studentId).catch(() => {});
+          await recordActivityLog('STUDENT_DEACTIVATED', 'students', logMsg, studentId);
 
           return {
             success: true,
@@ -2178,7 +2180,7 @@
 
           // 7. Catat ke Activity Log
           const logMsg = `Siswa ${student.full_name} (${student.nis || studentId}) diaktifkan kembali ke rombel ${targetClassName}. Tarif SPP: Rp ${Number(sppAmount).toLocaleString('id-ID')}.`;
-          await recordActivityLog('STUDENT_REACTIVATED', 'students', logMsg, studentId).catch(() => {});
+          await recordActivityLog('STUDENT_REACTIVATED', 'students', logMsg, studentId);
 
           return {
             success: true,
@@ -2270,7 +2272,7 @@
           } catch (_) {}
 
           // H. Audit Log
-          await recordActivityLog('STUDENT_PERMANENT_DELETED', 'students', `Siswa ${student.full_name} (${student.nis || studentId}) dihapus permanen dari sistem (0 riwayat pembayaran).`, studentId).catch(() => {});
+          await recordActivityLog('STUDENT_PERMANENT_DELETED', 'students', `Siswa ${student.full_name} (${student.nis || studentId}) dihapus permanen dari sistem (0 riwayat pembayaran).`, studentId);
 
           return { success: true, message: `Data siswa ${student.full_name} berhasil dihapus permanen.` };
         }
