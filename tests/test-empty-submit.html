@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Empty Submit</title></head>
+<body>
+  <div id="output">Running...</div>
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    async function testEmpty() {
+      const results = {};
+      try {
+        const emptyRes = await window.apiCall('ppdb', 'submit', {});
+        results.empty_success = emptyRes.success;
+        results.empty_message = emptyRes.message;
+
+        const partialRes = await window.apiCall('ppdb', 'submit', {
+          student_name: 'Anak Saja'
+        });
+        results.partial_success = partialRes.success;
+        results.partial_message = partialRes.message;
+
+        document.getElementById('output').textContent = JSON.stringify(results);
+        document.title = (!results.empty_success && !results.partial_success) ? 'EMPTY_REJECT_PASS' : 'EMPTY_REJECT_FAIL';
+      } catch (e) {
+        document.getElementById('output').textContent = 'ERROR: ' + e.message;
+        document.title = 'EMPTY_REJECT_ERROR';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testEmpty);
+  </script>
+</body>
+</html>
+

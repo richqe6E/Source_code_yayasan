@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head><title>Admin Auth Test</title></head>
+<body>
+  <div id="output">Running...</div>
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    async function testAuth() {
+      const results = {};
+      try {
+        // 1. Invalid login
+        const bad = await window.apiCall('auth', 'login', {
+          identifier: 'admin@yayasan.sch.id',
+          password: 'wrong_password'
+        });
+        results.invalid_rejected = (!bad.success);
+
+        // 2. Valid admin login
+        const good = await window.apiCall('auth', 'login', {
+          identifier: 'admin@yayasan.sch.id',
+          password: '230400'
+        });
+        results.valid_accepted = (good.success === true);
+        results.user_role = good.data && good.data.user && good.data.user.role && good.data.user.role.code;
+        results.user_name = good.data && good.data.user && good.data.user.full_name;
+        results.token_present = Boolean(good.data && good.data.token);
+
+        document.getElementById('output').textContent = JSON.stringify(results);
+        document.title = (results.invalid_rejected && results.valid_accepted && results.user_role === 'super_admin') 
+          ? 'ADMIN_AUTH_PASS' 
+          : 'ADMIN_AUTH_FAIL';
+      } catch (e) {
+        document.getElementById('output').textContent = 'ERROR: ' + e.message;
+        document.title = 'ADMIN_AUTH_ERROR';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testAuth);
+  </script>
+</body>
+</html>
+

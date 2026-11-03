@@ -673,7 +673,24 @@
 
       const classSel = document.getElementById('bulk-convert-class');
       if (classes.length > 0) {
-        classSel.innerHTML = classes.map(c => `<option value="${c.id}">${c.name} (${c.level || '-'})</option>`).join('');
+        const resolveCanon = window.getCanonicalJenjang || function(v) {
+          if (!v) return 'OTHER';
+          const s = String(v).toUpperCase();
+          if (/\b(PAUD|KB|TK|BERMAIN)\b/.test(s)) return 'PAUD';
+          if (/\b(TAHFIDZ|PTPT)\b/.test(s)) return 'TAHFIDZ';
+          if (/\b(TPQ|TPA|QURAN)\b/.test(s)) return 'TPQ';
+          return 'OTHER';
+        };
+        const paudCls = classes.filter(c => resolveCanon(c.level || c.grade_level || c.name) === 'PAUD');
+        const tpqCls = classes.filter(c => resolveCanon(c.level || c.grade_level || c.name) === 'TPQ');
+        const tahfidzCls = classes.filter(c => resolveCanon(c.level || c.grade_level || c.name) === 'TAHFIDZ');
+        const otherCls = classes.filter(c => !paudCls.includes(c) && !tpqCls.includes(c) && !tahfidzCls.includes(c));
+        let optHtml = '';
+        if (paudCls.length) optHtml += `<optgroup label="Jenjang PAUD / KB Ulinnuha">${paudCls.map(c => `<option value="${c.id}">${c.name} (${c.level || 'PAUD'})</option>`).join('')}</optgroup>`;
+        if (tpqCls.length) optHtml += `<optgroup label="Jenjang TPQ Ulinnuha">${tpqCls.map(c => `<option value="${c.id}">${c.name} (${c.level || 'TPQ'})</option>`).join('')}</optgroup>`;
+        if (tahfidzCls.length) optHtml += `<optgroup label="Jenjang Tahfidz Al-Qur'an">${tahfidzCls.map(c => `<option value="${c.id}">${c.name} (${c.level || 'Tahfidz'})</option>`).join('')}</optgroup>`;
+        if (otherCls.length) optHtml += `<optgroup label="Kelas Lainnya">${otherCls.map(c => `<option value="${c.id}">${c.name} (${c.level || '-'})</option>`).join('')}</optgroup>`;
+        classSel.innerHTML = optHtml || classes.map(c => `<option value="${c.id}">${c.name} (${c.level || '-'})</option>`).join('');
       } else {
         classSel.innerHTML = '<option value="CLS-001">Kelas Standar Santri Baru</option>';
       }
@@ -1126,23 +1143,37 @@
         if (parts.length === 3) defaultPass = `${parts[2]}${parts[1]}${parts[0]}`;
       }
 
-      const normTarget = targetJenjang.replace(/[_\-]/g, ' ').replace(/\s+/g, ' ').trim();
-      const compactTarget = targetJenjang.replace(/[\s_\-]/g, '');
+      const resolveCanon = window.getCanonicalJenjang || function(v) {
+        if (!v) return 'OTHER';
+        const s = String(v).toUpperCase().replace(/[\s_\-]+/g, ' ').trim();
+        if (/\b(PAUD|KB|TK|TAMAN KANAK|BERMAIN|ULINNUHA)\b/.test(s)) return 'PAUD';
+        if (/\b(TAHFIDZ|PTPT|HAFIDZ|TAHFIDZUL)\b/.test(s)) return 'TAHFIDZ';
+        if (/\b(TPQ|TPA|AL QURAN|MENGAJI)\b/.test(s)) return 'TPQ';
+        return 'OTHER';
+      };
 
+      const targetCanonical = resolveCanon(targetJenjang);
+
+      // Saring kelas yang cocok berdasarkan jenjang kanonikal & afinitas jadwal (Pagi/Sore/Pra PTPT)
       const matchingClasses = classes.filter(c => {
-        const rawCLevel = (c.level || c.grade_level || c.name || '').toUpperCase();
-        const normCLevel = rawCLevel.replace(/[_\-]/g, ' ').replace(/\s+/g, ' ').trim();
-        const compactCLevel = rawCLevel.replace(/[\s_\-]/g, '');
-        if (normTarget.includes('PAUD') || normTarget.includes('BERMAIN') || /\bKB\b/.test(normTarget)) {
-          return normCLevel.includes('PAUD') || normCLevel.includes('BERMAIN') || /\bKB\b/.test(normCLevel) || normCLevel.includes('TK');
-        }
-        if (normTarget.includes('TAHFIDZ') || normTarget.includes('PTPT')) {
-          return normCLevel.includes('TAHFIDZ') || normCLevel.includes('PTPT') || normCLevel.includes('TPQ');
-        }
-        if (normTarget.includes('TPQ') || compactTarget.includes('TPQ')) {
-          return normCLevel.includes('TPQ') || compactCLevel.includes('TPQ');
-        }
-        return false;
+        const cLevel = c.level || c.grade_level || '';
+        const cName = c.name || '';
+        const classCanonical = resolveCanon(cLevel) !== 'OTHER' ? resolveCanon(cLevel) : resolveCanon(cName);
+        if (targetCanonical !== 'OTHER' && classCanonical === targetCanonical) return true;
+        const normC = (cLevel + ' ' + cName).toUpperCase().replace(/[\s_\-]+/g, ' ');
+        const normT = targetJenjang.replace(/[\s_\-]+/g, ' ').toUpperCase();
+        return normT && normC.includes(normT);
+      }).sort((a, b) => {
+        // Beri prioritas pada sub-jadwal yang sama persis (misal 'Pagi' atau 'Sore' atau 'Pra PTPT')
+        const tUp = targetJenjang.toUpperCase();
+        let aScore = 0, bScore = 0;
+        ['PAGI', 'SORE', 'PRA PTPT', 'PTPT'].forEach(kw => {
+          if (tUp.includes(kw)) {
+            if ((a.level + ' ' + a.name).toUpperCase().includes(kw)) aScore += 1;
+            if ((b.level + ' ' + b.name).toUpperCase().includes(kw)) bScore += 1;
+          }
+        });
+        return bScore - aScore;
       });
 
       const otherClasses = classes.filter(c => !matchingClasses.includes(c));

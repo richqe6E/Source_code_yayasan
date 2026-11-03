@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head><title>Student Portal Auth and Data Test</title></head>
+<body>
+  <div id="output">Running...</div>
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    async function testStudent() {
+      const results = {};
+      try {
+        // 1. Login with NIS and custom password
+        const customLogin = await window.apiCall('auth', 'login', {
+          identifier: '2026001',
+          password: 'Password123!'
+        });
+        results.nis_custom_pass_login = (customLogin.success === true);
+        results.role = customLogin.data?.user?.role?.code;
+        results.student_name = customLogin.data?.user?.full_name;
+        results.student_id = customLogin.data?.user?.student_id;
+
+        // 2. Login with NIS and Birthdate DDMMYYYY (12052018)
+        const dobLogin = await window.apiCall('auth', 'login', {
+          identifier: '2026001',
+          password: '12052018'
+        });
+        results.dob_ddmmyyyy_login = (dobLogin.success === true);
+
+        // 3. Login with NIS and Birthdate YYYY-MM-DD (2018-05-12)
+        const isoDobLogin = await window.apiCall('auth', 'login', {
+          identifier: '2026001',
+          password: '2018-05-12'
+        });
+        results.dob_iso_login = (isoDobLogin.success === true);
+
+        // 4. Fetch Student Profile
+        const stuProfile = await window.apiCall('students', 'get', { id: results.student_id });
+        results.profile_retrieved = Boolean(stuProfile.success && stuProfile.data);
+        results.profile_nis = stuProfile.data?.nis;
+        results.profile_class = stuProfile.data?.class_name;
+        results.profile_nik = stuProfile.data?.nik;
+
+        // 5. Fetch Student Invoices
+        const stuInvs = await window.apiCall('invoices', 'list', { student_id: results.student_id });
+        const invList = Array.isArray(stuInvs.data) ? stuInvs.data : (stuInvs.data?.invoices || stuInvs.data?.items || []);
+        results.invoices_count = invList.length;
+        results.first_invoice_num = invList[0]?.invoice_number;
+
+        // 6. Fetch Student Documents
+        const stuDocs = await window.apiCall('students', 'documents', { student_id: results.student_id });
+        results.documents_count = Array.isArray(stuDocs.data) ? stuDocs.data.length : 0;
+
+        const allOk = results.nis_custom_pass_login && results.dob_ddmmyyyy_login && results.profile_retrieved && results.invoices_count > 0;
+        document.getElementById('output').textContent = JSON.stringify(results);
+        document.title = allOk ? 'STUDENT_PORTAL_PASS' : 'STUDENT_PORTAL_PARTIAL';
+      } catch (e) {
+        document.getElementById('output').textContent = 'ERROR: ' + e.message;
+        document.title = 'STUDENT_PORTAL_ERROR';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testStudent);
+  </script>
+</body>
+</html>
+

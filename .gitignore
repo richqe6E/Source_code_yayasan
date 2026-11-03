@@ -33,3 +33,8 @@ frontend/backups/*.json
 
 # MCP local credentials
 .mcp.json
+backups/
+tests/*output.html
+tests/current-sim-reg.txt
+tests/public-audit-results.xml
+tests/f1-result.html

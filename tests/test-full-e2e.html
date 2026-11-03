@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulasi Komprehensif E2E SIYAYASAN</title>
+</head>
+<body>
+  <h1>Simulasi Komprehensif E2E SIYAYASAN</h1>
+  <div id="status">Memulai simulasi penuh...</div>
+  <pre id="log" style="white-space: pre-wrap; font-family: monospace;"></pre>
+
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    const testResults = [];
+
+    function record(testId, name, pass, detail) {
+      const icon = pass ? '✅' : '❌';
+      const msg = `${icon} [${testId}] ${name}: ${detail}`;
+      logEl.textContent += msg + '\n';
+      console.log(msg);
+      testResults.push({ testId, name, pass, detail });
+    }
+
+    async function runE2ESimulation() {
+      try {
+        logEl.textContent += '===================================================\n';
+        logEl.textContent += 'SIYAYASAN END-TO-END OPERATIONAL TEST RUNNER\n';
+        logEl.textContent += '===================================================\n\n';
+
+        // -----------------------------------------------------------------
+        // BAGIAN 1: ADMIN PORTAL AUTHENTICATION & SECURITY
+        // -----------------------------------------------------------------
+        logEl.textContent += '--- [BAGIAN 1] ADMIN PORTAL AUTHENTICATION ---\n';
+
+        // Test 1.1: Invalid Admin Password
+        const invalidLogin = await window.apiCall('auth', 'login', {
+          identifier: 'admin@yayasan.sch.id',
+          password: 'wrong_password_999'
+        });
+        record('ADM-01', 'Admin Invalid Login Rejection', !invalidLogin.success, invalidLogin.message || 'Ditolak');
+
+        // Test 1.2: Valid Admin Login
+        const validLogin = await window.apiCall('auth', 'login', {
+          identifier: 'admin@yayasan.sch.id',
+          password: '230400'
+        });
+        const loginOk = validLogin.success && validLogin.data && validLogin.data.user && validLogin.data.user.role.code === 'super_admin';
+        record('ADM-02', 'Admin Valid Login (admin@yayasan.sch.id)', loginOk, 
+          loginOk ? `Role: ${validLogin.data.user.role.code}, Name: ${validLogin.data.user.full_name}` : validLogin.message);
+
+        // Simpan token admin ke localStorage
+        if (validLogin.data && validLogin.data.token) {
+          localStorage.setItem('siy_token', validLogin.data.token);
+          localStorage.setItem('siy_user', JSON.stringify(validLogin.data.user));
+        }
+
+        // -----------------------------------------------------------------
+        // BAGIAN 2: MASTER DATA MANAGEMENT (TEACHERS & CLASSES)
+        // -----------------------------------------------------------------
+        logEl.textContent += '\n--- [BAGIAN 2] MASTER DATA MANAGEMENT ---\n';
+
+        // Test 2.1: Create Teacher
+        let teacherId = null;
+        const teacherRes = await window.apiCall('teachers', 'create', {
+          full_name: '[SIMULASI] Ustadz Ahmad Fauzi, S.Pd.I',
+          name: '[SIMULASI] Ustadz Ahmad Fauzi, S.Pd.I',
+          nip: '198501012010011001',
+          specialization: 'Tahsin & Tahfidz Al-Qur\'an',
+          phone: '081344445555',
+          email: 'ahmad.fauzi@yayasan.sch.id',
+          status: 'active'
+        });
+        if (teacherRes.success && teacherRes.data) {
+          teacherId = teacherRes.data.id;
+        }
+        record('MST-01', 'Master Data Teacher Creation', Boolean(teacherId), 
+          teacherId ? `ID: ${teacherId}, Nama: ${teacherRes.data.full_name}` : teacherRes.message);
+
+        // Test 2.2: Create Class
+        let classId = null;
+        let className = '[SIMULASI] TPQ Al-Hikmah Pagi';
+        const classRes = await window.apiCall('classes', 'create', {
+          name: className,
+          level: 'TPQ',
+          grade_level: 'TPQ',
+          academic_year: '2026/2027',
+          homeroom_teacher_id: teacherId,
+          teacher_id: teacherId,
+          capacity: 25
+        });
+        if (classRes.success && classRes.data) {
+          classId = classRes.data.id;
+        }
+        record('MST-02', 'Master Data Class Creation', Boolean(classId),
+          classId ? `ID: ${classId}, Kelas: ${className}` : classRes.message);
+
+        // -----------------------------------------------------------------
+        // BAGIAN 3: PPDB ADMISSION LIFECYCLE (VERIFY, APPROVE, CONVERT)
+        // -----------------------------------------------------------------
+        logEl.textContent += '\n--- [BAGIAN 3] PPDB ADMISSION LIFECYCLE ---\n';
+
+        // Target simulated registration
+        const targetRegNo = 'REG-2026-6951';
+        const targetRegId = 'REG-1793673254202';
+
+        // Test 3.1: Fetch Registration in Admin PPDB List
+        const ppdbList = await window.apiCall('ppdb', 'list', { status: 'all' });
+        const listItems = Array.isArray(ppdbList.data) ? ppdbList.data : (ppdbList.data && ppdbList.data.items) || [];
+        const foundReg = listItems.find(r => r.id === targetRegId || r.registration_number === targetRegNo);
+        record('PPDB-01', 'Admin PPDB List Query', Boolean(foundReg),
+          foundReg ? `Ditemukan: ${foundReg.registration_number} (${foundReg.student_name || foundReg.full_name}), Status: ${foundReg.status}` : 'Tidak ditemukan');
+
+        // Test 3.2: Inspect Registration Documents
+        let docsComplete = false;
+        if (foundReg) {
+          const hasPhoto = Boolean(foundReg.photo_url || (foundReg.documents_url && foundReg.documents_url.photo));
+          const hasAkta = Boolean(foundReg.birth_certificate_url || (foundReg.documents_url && foundReg.documents_url.birth_certificate));
+          const hasKK = Boolean(foundReg.family_card_url || (foundReg.documents_url && foundReg.documents_url.family_card));
+          docsComplete = hasPhoto && hasAkta && hasKK;
+          record('PPDB-02', 'PPDB Documents Inspection (Pasfoto, Akta, KK)', docsComplete,
+            `Photo: ${hasPhoto ? 'Ada' : 'Kosong'}, Akta: ${hasAkta ? 'Ada' : 'Kosong'}, KK: ${hasKK ? 'Ada' : 'Kosong'}`);
+        }
+
+        // Test 3.3: Approve Registration
+        const approveRes = await window.apiCall('ppdb', 'approve', {
+          id: targetRegId,
+          notes: 'Dokumen lengkap dan terverifikasi oleh Admin TU'
+        });
+        const isApproved = approveRes.success && (approveRes.data?.status === 'accepted' || approveRes.status === 'accepted');
+        record('PPDB-03', 'PPDB Verification & Approval (TU Decision)', isApproved,
+          isApproved ? 'Status menjadi accepted' : approveRes.message);
+
+        // Test 3.4: Convert Registration to Active Student
+        const targetNis = '2026001';
+        const convertRes = await window.apiCall('ppdb', 'convert', {
+          id: targetRegId,
+          nis: targetNis,
+          class_id: classId || 'CLS-001',
+          class_name: className,
+          portal_password: 'Password123!',
+          spp_amount: 150000,
+          entry_date: '2026-07-15'
+        });
+        const convertOk = convertRes.success && convertRes.data && convertRes.data.nis === targetNis;
+        record('PPDB-04', 'PPDB Student Conversion to Active Student', convertOk,
+          convertOk ? `NIS: ${convertRes.data.nis}, Kelas: ${convertRes.data.class_name}` : convertRes.message);
+
+        // Test 3.5: Idempotency Guard (Prevent Duplicate Conversion)
+        const dupConvertRes = await window.apiCall('ppdb', 'convert', {
+          id: targetRegId,
+          nis: targetNis,
+          class_id: classId || 'CLS-001'
+        });
+        record('PPDB-05', 'Conversion Idempotency Guard', !dupConvertRes.success,
+          dupConvertRes.message || 'Cegah konversi ganda berhasil');
+
+        // -----------------------------------------------------------------
+        // BAGIAN 4: PUBLIC STATUS TRACKER VERIFICATION
+        // -----------------------------------------------------------------
+        logEl.textContent += '\n--- [BAGIAN 4] PUBLIC PPDB STATUS TRACKER ---\n';
+
+        const pubStatus = await window.apiCall('ppdb', 'check_status', {
+          registration_number: targetRegNo
+        });
+        const statusData = pubStatus.data || {};
+        const isConvertedStatus = (statusData.status === 'converted' || statusData.status === 'accepted');
+        const showsNis = Boolean(statusData.converted_nis || (statusData.form_metadata && statusData.form_metadata.converted_nis) || statusData.nis);
+        record('PUB-01', 'Public Status Check (PPDB Tracker)', pubStatus.success && isConvertedStatus && showsNis,
+          `Status: ${statusData.status}, NIS Tampil: ${statusData.converted_nis || statusData.nis}, Kelas: ${statusData.class_name || statusData.form_metadata?.class_name}`);
+
+        // -----------------------------------------------------------------
+        // BAGIAN 5: SPP BILLING & PAYMENT VERIFICATION
+        // -----------------------------------------------------------------
+        logEl.textContent += '\n--- [BAGIAN 5] SPP FINANCIAL LIFECYCLE ---\n';
+
+        // Test 5.1: Verify Auto-Generated Initial Invoice
+        const invList = await window.apiCall('invoices', 'list', {
+          student_id: convertRes.data?.student?.id || ''
+        });
+        const invoices = Array.isArray(invList.data) ? invList.data : (invList.data?.invoices || invList.data?.items || []);
+        const activeInv = invoices.find(i => i.status === 'unpaid' || i.amount == 150000);
+        record('SPP-01', 'Initial SPP Invoice Auto-Generation', Boolean(activeInv),
+          activeInv ? `Invoice: ${activeInv.invoice_number}, Nominal: Rp ${Number(activeInv.amount).toLocaleString('id-ID')}, Bulan: ${activeInv.month}` : 'Tidak ditemukan');
+
+        // Test 5.2: Submit Payment Proof (Student or Admin)
+        let paymentId = null;
+        if (activeInv) {
+          const paySubmit = await window.apiCall('payments', 'submit', {
+            invoice_id: activeInv.id,
+            invoice_number: activeInv.invoice_number,
+            student_id: activeInv.student_id,
+            student_name: activeInv.student_name,
+            amount: activeInv.amount,
+            method: 'transfer',
+            payment_date: new Date().toISOString().slice(0, 10),
+            proof_image_url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400',
+            notes: 'Pembayaran SPP Bulan Pertama via BSI'
+          });
+          if (paySubmit.success && paySubmit.data) paymentId = paySubmit.data.id;
+          record('SPP-02', 'Payment Proof Submission', Boolean(paymentId),
+            paymentId ? `Payment ID: ${paymentId}, Status: ${paySubmit.data.status}` : paySubmit.message);
+        }
+
+        // Test 5.3: Admin Verifies Payment
+        if (paymentId) {
+          const payVerify = await window.apiCall('payments', 'verify', { id: paymentId });
+          const isVerified = payVerify.success && payVerify.data?.status === 'verified';
+          record('SPP-03', 'Admin TU Payment Verification', isVerified,
+            isVerified ? `Status Bayar: verified, Verifikator: ${payVerify.data.verified_by}` : payVerify.message);
+
+          // Test 5.4: Verify Invoice Status Transitioned to 'paid'
+          const invCheck = await window.apiCall('invoices', 'get', { id: activeInv.id });
+          const isPaid = invCheck.success && invCheck.data?.status === 'paid';
+          record('SPP-04', 'Invoice Status Transition (unpaid -> paid)', isPaid,
+            isPaid ? `Invoice ${activeInv.invoice_number} lunas pada: ${invCheck.data.paid_at}` : invCheck.message);
+        }
+
+        // Test 5.5: SPP Financial Summary Calculation
+        const finSummary = await window.apiCall('payments', 'summary', {});
+        const summaryOk = finSummary.success && finSummary.data && (finSummary.data.total_lunas >= 150000 || finSummary.data.total_paid >= 150000);
+        record('SPP-05', 'SPP Financial Summary Calculation', summaryOk,
+          summaryOk ? `Total Tagihan: ${finSummary.data.total_tagihan}, Total Lunas: ${finSummary.data.total_lunas}` : finSummary.message);
+
+        // -----------------------------------------------------------------
+        // BAGIAN 6: STUDENT PORTAL AUTHENTICATION & ACCESS
+        // -----------------------------------------------------------------
+        logEl.textContent += '\n--- [BAGIAN 6] STUDENT PORTAL AUTHENTICATION & ACCESS ---\n';
+
+        // Test 6.1: Student Login with NIS and PPDB Password
+        const studentLogin = await window.apiCall('auth', 'login', {
+          identifier: targetNis,
+          password: 'Password123!'
+        });
+        const stuLoginOk = studentLogin.success && studentLogin.data && studentLogin.data.user && studentLogin.data.user.role.code === 'siswa_aktif';
+        record('STU-01', 'Student Portal Login with NIS (2026001)', stuLoginOk,
+          stuLoginOk ? `Role: ${studentLogin.data.user.role.code}, Name: ${studentLogin.data.user.full_name}, NIS: ${studentLogin.data.user.nis}` : studentLogin.message);
+
+        // Test 6.2: Student Fallback Login with Birthdate (12052018)
+        const studentDobLogin = await window.apiCall('auth', 'login', {
+          identifier: targetNis,
+          password: '12052018'
+        });
+        record('STU-02', 'Student Fallback Login (Birthdate DDMMYYYY)', studentDobLogin.success,
+          studentDobLogin.success ? 'Login berhasil via tanggal lahir' : studentDobLogin.message);
+
+        // Test 6.3: Converted Student Profile & Biodata Access
+        const studentProfile = await window.apiCall('students', 'get', {
+          id: convertRes.data?.student?.id || ''
+        });
+        const profileOk = studentProfile.success && studentProfile.data && studentProfile.data.nis === targetNis;
+        record('STU-03', 'Student Profile Biodata Integrity', profileOk,
+          profileOk ? `Nama: ${studentProfile.data.full_name}, Kelas: ${studentProfile.data.class_name}, NIK: ${studentProfile.data.nik}` : studentProfile.message);
+
+        // -----------------------------------------------------------------
+        // BAGIAN 7: AUDIT TRAIL & ACTIVITY LOGS
+        // -----------------------------------------------------------------
+        logEl.textContent += '\n--- [BAGIAN 7] AUDIT TRAIL & ACTIVITY LOGS ---\n';
+
+        const logsRes = await window.apiCall('logs', 'list', { limit: 10 });
+        const logs = Array.isArray(logsRes.data) ? logsRes.data : (logsRes.data?.logs || logsRes.data?.items || []);
+        const hasConvertLog = logs.some(l => (l.action && l.action.includes('CONVERT')) || (l.description && l.description.includes('Muhammad Fahri')));
+        record('LOG-01', 'System Activity Audit Logging', Boolean(logs.length > 0),
+          `Total log diambil: ${logs.length}, Log konversi tercatat: ${hasConvertLog ? 'Ya' : 'Belum'}`);
+
+        // Summary
+        const passedCount = testResults.filter(t => t.pass).length;
+        const totalCount = testResults.length;
+        const allPassed = passedCount === totalCount;
+
+        logEl.textContent += '\n===================================================\n';
+        logEl.textContent += `RINGKASAN PENGUJIAN: ${passedCount}/${totalCount} TES BERHASIL\n`;
+        logEl.textContent += '===================================================\n';
+
+        statusEl.textContent = allPassed ? 'E2E_SIMULATION_ALL_PASS' : 'E2E_SIMULATION_PARTIAL';
+        document.title = allPassed ? 'E2E_PASS' : 'E2E_PARTIAL';
+
+      } catch (fatalErr) {
+        logEl.textContent += '\n[FATAL SYSTEM ERROR]: ' + fatalErr.message + '\n' + (fatalErr.stack || '');
+        statusEl.textContent = 'E2E_SIMULATION_FATAL';
+        document.title = 'E2E_FATAL';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runE2ESimulation);
+  </script>
+</body>
+</html>
+

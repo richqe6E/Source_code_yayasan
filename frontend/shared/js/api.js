@@ -52,6 +52,19 @@
     return 'fallback_' + Math.abs(h);
   }
 
+  // Canonical Education Level Standardizer (BUG-006)
+  function getCanonicalJenjang(val) {
+    if (!val) return 'OTHER';
+    const s = String(val).toUpperCase().replace(/[\s_\-]+/g, ' ').trim();
+    if (/\b(PAUD|KB|TK|TAMAN KANAK|BERMAIN|ULINNUHA)\b/.test(s)) return 'PAUD';
+    if (/\b(TAHFIDZ|PTPT|HAFIDZ|TAHFIDZUL)\b/.test(s)) return 'TAHFIDZ';
+    if (/\b(TPQ|TPA|AL QURAN|MENGAJI)\b/.test(s)) return 'TPQ';
+    return 'OTHER';
+  }
+  if (typeof window !== 'undefined') {
+    window.getCanonicalJenjang = getCanonicalJenjang;
+  }
+
   function normalizeApiResponse(json) {
     if (!json || typeof json !== 'object') return json;
     if (json.success && json.data) {
@@ -1690,6 +1703,8 @@
           });
           const mappedClasses = (classes || []).map(c => ({
             ...c,
+            grade_level: c.grade_level || c.level || '-',
+            canonical_level: getCanonicalJenjang(c.level || c.grade_level || c.name),
             student_count: countMap[c.id] !== undefined ? countMap[c.id] : (Number(c.student_count) || 0)
           }));
           return { success: true, data: mappedClasses };
@@ -2253,9 +2268,9 @@
           };
 
           const res = await supabaseRest('payments', 'POST', payload);
-          // Update invoice status to menunggu_verifikasi
+          // Update invoice status to menunggu_verifikasi (BUG-004 Fix: Awaited & Protected against overwriting 'paid' invoices)
           if (params.invoice_id) {
-            supabaseRest(`invoices?id=eq.${encodeURIComponent(params.invoice_id)}`, 'PATCH', { status: 'menunggu_verifikasi' }).catch(() => {});
+            await supabaseRest(`invoices?id=eq.${encodeURIComponent(params.invoice_id)}&status=neq.paid`, 'PATCH', { status: 'menunggu_verifikasi' }).catch(() => {});
           }
 
           return { success: true, data: res[0] || payload, message: 'Bukti pembayaran berhasil dikirim' };
@@ -2266,7 +2281,7 @@
             verified_by: currentUser ? currentUser.full_name : 'Admin',
             verified_at: new Date().toISOString()
           });
-          const pay = updated[0];
+          const pay = updated && updated[0];
           if (pay && pay.invoice_id) {
             await supabaseRest(`invoices?id=eq.${encodeURIComponent(pay.invoice_id)}`, 'PATCH', {
               status: 'paid',
@@ -2294,7 +2309,8 @@
           }
           const pay = updated && updated[0];
           if (pay && pay.invoice_id) {
-            await supabaseRest(`invoices?id=eq.${encodeURIComponent(pay.invoice_id)}`, 'PATCH', { status: 'unpaid' }).catch(() => {});
+            // Guard: Hanya kembalikan ke unpaid jika status invoice saat ini bukan 'paid'
+            await supabaseRest(`invoices?id=eq.${encodeURIComponent(pay.invoice_id)}&status=neq.paid`, 'PATCH', { status: 'unpaid' }).catch(() => {});
           }
           return { success: true, data: pay, message: 'Pembayaran ditolak' };
         }
@@ -2425,6 +2441,29 @@
           return { success: true, data: regs[0] || null };
         }
         if (action === 'submitPublic' || action === 'submit') {
+          // -------------------------------------------------------------
+          // 1. Validasi Field Wajib (Fail-Fast Schema Guard - BUG-002)
+          // -------------------------------------------------------------
+          const candStudentName = String(params.student_name || params.child_name || params.full_name || params.nama || '').trim();
+          const candParentName = String(params.parent_name || params.father_name || params.mother_name || '').trim();
+          const candPhone = String(params.phone || params.parent_phone || params.father_phone || params.mother_phone || params.whatsapp || '').trim();
+          const candBirthDate = String(params.birth_date || params.student_birth_date || '').trim();
+          const candNik = String(params.nik || (params.form_metadata && params.form_metadata.nik) || '').trim();
+
+          const missingFields = [];
+          if (!candStudentName) missingFields.push('Nama Lengkap Calon Siswa');
+          if (!candParentName) missingFields.push('Nama Orang Tua / Wali');
+          if (!candPhone) missingFields.push('Nomor Kontak / WhatsApp');
+          if (!candBirthDate) missingFields.push('Tanggal Lahir');
+          if (!candNik) missingFields.push('NIK (Nomor Induk Kependudukan)');
+
+          if (missingFields.length > 0) {
+            return {
+              success: false,
+              message: `Pendaftaran tidak dapat diproses. Kolom wajib belum diisi: ${missingFields.join(', ')}.`
+            };
+          }
+
           // Upload documents if provided as File or base64
           let photoUrl = params.photo_url || params.photo_dataurl;
           if (params.photo_file || (photoUrl && typeof photoUrl === 'string' && photoUrl.startsWith('data:') && photoUrl.length > 50)) {
@@ -2442,20 +2481,34 @@
           const id = 'REG-' + Date.now();
           const regNum = 'REG-' + new Date().getFullYear() + '-' + String(Math.floor(1000 + Math.random() * 9000));
           
-          const studentName = params.student_name || params.child_name || params.full_name || params.nama || 'Calon Siswa';
-          const parentName = params.parent_name || params.father_name || params.mother_name || 'Orang Tua';
-          const parentPhone = params.phone || params.parent_phone || params.father_phone || params.mother_phone || '';
-          const parentEmail = params.email || params.parent_email || params.father_email || '';
+          const studentName = candStudentName;
+          const parentName = candParentName;
+          const parentPhone = candPhone;
+          const parentEmail = (params.email || params.parent_email || params.father_email || '').trim();
           const gender = params.gender || params.student_gender || 'L';
           const birthPlace = params.birth_place || params.student_birth_place || 'Samarinda';
-          const birthDate = params.birth_date || params.student_birth_date || '2021-01-01';
+          const birthDate = candBirthDate;
           const level = params.level || (params.form_type === 'tpq' ? 'TPQ Pagi' : (params.form_type === 'tahfidz' ? 'Tahfidz Pra PTPT' : 'KB Ulinnuha (PAUD)'));
           const address = params.address || '';
-          const password = params.password || (typeof birthDate === 'string' ? birthDate.replace(/-/g, '') : '123456');
+          const password = params.password || (typeof birthDate === 'string' ? birthDate.replace(/[^0-9]/g, '') : '123456');
 
           const userId = 'USR-' + Date.now();
           const studentId = 'STU-' + Date.now();
           const emailForLogin = parentEmail || `${regNum.toLowerCase().replace(/[^a-z0-9]/g, '')}@pendaftar.yayasan.sch.id`;
+
+          // Helper: Scrub all sensitive credential keys recursively (BUG-005 Fix)
+          function scrubSensitiveKeys(obj) {
+            if (!obj || typeof obj !== 'object') return obj;
+            const sensitiveKeyRegex = /password|secret|pin|token|initial_password|account_password/i;
+            for (const k of Object.keys(obj)) {
+              if (sensitiveKeyRegex.test(k)) {
+                delete obj[k];
+              } else if (typeof obj[k] === 'object' && obj[k] !== null) {
+                scrubSensitiveKeys(obj[k]);
+              }
+            }
+            return obj;
+          }
 
           const cleanMeta = { ...params };
           delete cleanMeta.photo_file;
@@ -2468,10 +2521,11 @@
           delete cleanMeta.birth_certificate_url;
           delete cleanMeta.family_card_url;
           delete cleanMeta.notes;
-          cleanMeta.password = password;
-          cleanMeta.account_password = password;
+          delete cleanMeta.password;
+          delete cleanMeta.account_password;
           cleanMeta.user_id = userId;
           cleanMeta.student_id = studentId;
+          cleanMeta.portal_password = '[TERENKRIPSI]';
           cleanMeta.uploaded_files = {
             photo_url: photoUrl || '',
             birth_certificate_url: certUrl || '',
@@ -2482,15 +2536,17 @@
           if (typeof safeIncomingNotes === 'string' && safeIncomingNotes.trim().startsWith('{')) {
             try {
               const parsedNotes = JSON.parse(safeIncomingNotes);
-              if (parsedNotes.account && parsedNotes.account.password) {
-                delete parsedNotes.account.password;
-              }
+              scrubSensitiveKeys(parsedNotes);
               Object.assign(cleanMeta, parsedNotes);
-              if (params.form_metadata && typeof params.form_metadata === 'object') Object.assign(cleanMeta, params.form_metadata);
+              if (params.form_metadata && typeof params.form_metadata === 'object') {
+                Object.assign(cleanMeta, scrubSensitiveKeys({ ...params.form_metadata }));
+              }
               delete cleanMeta.form_metadata;
               safeIncomingNotes = JSON.stringify(parsedNotes);
             } catch (_) {}
           }
+          scrubSensitiveKeys(cleanMeta);
+          cleanMeta.portal_password = '[TERENKRIPSI]';
 
           const regPayload = {
             id,
@@ -2558,26 +2614,35 @@
             });
           }
 
-          // Safe local persistence fallback
+          // Safe local persistence fallback (tanpa plaintext password - BUG-005 Fix)
           try {
             const localRegs = JSON.parse(localStorage.getItem('siy_local_ppdb_regs') || '[]');
-            localRegs.unshift({ ...regPayload, password, account_password: password, id, registration_number: regNum, registration_no: regNum, created_at: new Date().toISOString() });
+            localRegs.unshift({ ...regPayload, portal_password: '[TERENKRIPSI]', id, registration_number: regNum, registration_no: regNum, created_at: new Date().toISOString() });
             localStorage.setItem('siy_local_ppdb_regs', JSON.stringify(localRegs));
           } catch (_) {}
 
-          // 2. Buat akun login Portal Siswa untuk Calon Siswa
+          // 2. Buat akun login Portal Siswa untuk Calon Siswa (dengan Salted SHA-256 Hashing - BUG-005 Fix)
+          const userSalt = generateSalt(16);
+          const userHashedPassword = await hashPassword(password, userSalt);
+          let birthDatePassword = (typeof birthDate === 'string' ? birthDate.replace(/[^0-9]/g, '') : '');
+          if (birthDate.includes('-')) {
+            const p = birthDate.split('-');
+            if (p.length === 3) birthDatePassword = `${p[2]}${p[1]}${p[0]}`; // DDMMYYYY
+          }
+
           const newUser = {
             id: userId,
             email: emailForLogin,
             username: regNum,
-            password_hash: password,
+            password_hash: userHashedPassword,
+            password_salt: userSalt,
             full_name: studentName,
             name: studentName,
             phone: parentPhone,
             role: 'calon_siswa',
             role_label: 'Calon Siswa / Pendaftar',
             birth_date: typeof birthDate !== 'undefined' ? birthDate : (params.birth_date || ''),
-            fallback_dob_password: password,
+            fallback_dob_password: birthDatePassword,
             status: 'active',
             student_id: studentId,
             is_password_changed: true,
@@ -2958,13 +3023,26 @@
             return { success: false, message: 'Pendaftar ini sudah pernah dikonversi menjadi siswa aktif.' };
           }
 
-          const targetClassId = params.class_id || 'CLS-001';
-
-          // Ambil nama kelas
-          let targetClassName = 'PAUD / TK Terpadu';
-          if (targetClassId) {
-            const cls = await supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}&select=name`);
-            if (cls && cls[0]) targetClassName = cls[0].name;
+          let targetClassId = params.class_id;
+          let targetClassName = '';
+          if (targetClassId && targetClassId !== 'CLS-001') {
+            const cls = await supabaseRest(`classes?id=eq.${encodeURIComponent(targetClassId)}&select=name,level`).catch(() => []);
+            if (cls && cls[0]) {
+              targetClassName = cls[0].name;
+            }
+          }
+          if (!targetClassName) {
+            const regLevel = reg.level || reg.form_type || '';
+            const canon = getCanonicalJenjang(regLevel);
+            const allClasses = await supabaseRest('classes?select=id,name,level&order=name.asc').catch(() => []);
+            if (allClasses && allClasses.length > 0) {
+              const matched = allClasses.find(c => getCanonicalJenjang(c.level || c.name) === canon) || allClasses[0];
+              targetClassId = matched.id;
+              targetClassName = matched.name;
+            } else {
+              targetClassId = targetClassId || 'CLS-001';
+              targetClassName = canon === 'PAUD' ? 'PAUD / TK Terpadu' : (canon === 'TAHFIDZ' ? 'Tahfidz Al-Qur\'an' : 'TPQ Ulinnuha');
+            }
           }
 
           // 2. Tentukan NIS Siswa (bisa input dari admin atau auto-generate)
@@ -3733,11 +3811,15 @@
           if (params.date_from) q += `&created_at=gte.${encodeURIComponent(params.date_from)}`;
           if (params.search) q += `&or=(details.ilike.*${encodeURIComponent(params.search)}*,user_name.ilike.*${encodeURIComponent(params.search)}*)`;
           const logs = await supabaseRest(q).catch(() => []);
-          const mapped = (logs || []).map(r => ({
-            ...r,
-            module: r.module || r.entity_type || 'sistem',
-            description: r.description || r.details || '-'
-          }));
+          const mapped = (logs || []).map(r => {
+            const text = r.description || r.details || '-';
+            return {
+              ...r,
+              module: r.module || r.entity_type || 'sistem',
+              description: text,
+              details: text
+            };
+          });
           const page = Number(params.page) || 1;
           const perPage = Number(params.per_page) || 50;
           const totalPages = Math.max(1, Math.ceil(mapped.length / perPage));
@@ -3748,6 +3830,20 @@
             raw: { items: pagedItems },
             pagination: { page, per_page: perPage, total: mapped.length, total_pages: totalPages }
           };
+        }
+        if (action === 'create') {
+          const detailText = params.details || params.description || params.detailsText || '';
+          const logPayload = {
+            id: params.id || ('LOG-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6)),
+            user_id: params.user_id || currentUser?.id || 'USR-001',
+            user_name: params.user_name || currentUser?.full_name || currentUser?.name || 'Pengguna',
+            action: String(params.action || 'ACTIVITY'),
+            module: params.module || 'sistem',
+            details: detailText,
+            created_at: params.created_at || new Date().toISOString()
+          };
+          await supabaseRest('activity_logs', 'POST', logPayload).catch(() => {});
+          return { success: true, data: { ...logPayload, description: detailText, details: detailText }, message: 'Log berhasil dicatat' };
         }
         if (action === 'clear') {
           // 1. Role validation: Must be super_admin

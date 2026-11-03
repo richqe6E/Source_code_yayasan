@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head><title>Master Data and PPDB Conversion Test</title></head>
+<body>
+  <div id="output">Running...</div>
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    async function testStep2() {
+      const results = {};
+      try {
+        // 1. Create Teacher
+        const teaRes = await window.apiCall('teachers', 'create', {
+          full_name: '[SIMULASI] Ustadz Ahmad Fauzi, S.Pd.I',
+          name: '[SIMULASI] Ustadz Ahmad Fauzi, S.Pd.I',
+          nip: '198501012010011001',
+          specialization: 'Tahsin & Tahfidz Al-Qur\'an',
+          phone: '081344445555',
+          email: 'ahmad.fauzi@yayasan.sch.id',
+          status: 'active'
+        });
+        results.teacher_created = Boolean(teaRes.success && teaRes.data && teaRes.data.id);
+        const teacherId = teaRes.data ? teaRes.data.id : null;
+        results.teacher_id = teacherId;
+
+        // 2. Create Class
+        const clsRes = await window.apiCall('classes', 'create', {
+          name: '[SIMULASI] TPQ Al-Hikmah Pagi',
+          level: 'TPQ',
+          grade_level: 'TPQ',
+          academic_year: '2026/2027',
+          homeroom_teacher_id: teacherId,
+          teacher_id: teacherId,
+          capacity: 25
+        });
+        results.class_created = Boolean(clsRes.success && clsRes.data && clsRes.data.id);
+        const classId = clsRes.data ? clsRes.data.id : null;
+        results.class_id = classId;
+
+        // 3. Inspect PPDB Registration
+        const targetRegNo = 'REG-2026-6951';
+        const targetRegId = 'REG-1793673254202';
+        const getReg = await window.apiCall('ppdb', 'get', { id: targetRegId });
+        const regData = getReg.data || {};
+        results.reg_found = Boolean(getReg.success && regData.id);
+        results.has_photo = Boolean(regData.photo_url || regData.documents_url?.photo);
+        results.has_akta = Boolean(regData.birth_certificate_url || regData.documents_url?.birth_certificate);
+        results.has_kk = Boolean(regData.family_card_url || regData.documents_url?.family_card);
+
+        // 4. Approve PPDB Registration
+        const appRes = await window.apiCall('ppdb', 'approve', {
+          id: targetRegId,
+          notes: 'Dokumen lengkap dan valid hasil verifikasi TU'
+        });
+        results.approved = Boolean(appRes.success);
+
+        // 5. Convert to Active Student
+        const convRes = await window.apiCall('ppdb', 'convert', {
+          id: targetRegId,
+          nis: '2026001',
+          class_id: classId || 'CLS-001',
+          portal_password: 'Password123!',
+          spp_amount: 150000,
+          entry_date: '2026-07-15'
+        });
+        results.converted = Boolean(convRes.success && convRes.data && convRes.data.nis === '2026001');
+        results.student_id = convRes.data?.student?.id;
+        results.class_name = convRes.data?.class_name;
+
+        // 6. Idempotency test (Prevent duplicate conversion)
+        const dupRes = await window.apiCall('ppdb', 'convert', {
+          id: targetRegId,
+          nis: '2026001',
+          class_id: classId || 'CLS-001'
+        });
+        results.idempotency_guard = (!dupRes.success);
+
+        const allPass = results.teacher_created && results.class_created && results.reg_found && results.approved && results.converted && results.idempotency_guard;
+        document.getElementById('output').textContent = JSON.stringify(results);
+        document.title = allPass ? 'STEP2_PASS' : 'STEP2_PARTIAL';
+      } catch (e) {
+        document.getElementById('output').textContent = 'ERROR: ' + e.message;
+        document.title = 'STEP2_ERROR';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testStep2);
+  </script>
+</body>
+</html>
+

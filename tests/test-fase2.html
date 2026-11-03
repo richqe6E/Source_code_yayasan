@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Verifikasi Fase 2 - BUG-006 & BUG-007</title>
+  <script src="/shared/js/api.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+  <h1>Test Runner Fase 2</h1>
+  <div id="results">Menjalankan pengujian...</div>
+
+  <script>
+    async function runTests() {
+      const logs = [];
+      const report = (name, pass, msg) => {
+        logs.push({ name, pass, msg });
+        console.log(`[${pass ? 'PASS' : 'FAIL'}] ${name}: ${msg}`);
+      };
+
+      try {
+        // --- 1. TEST BUG-006: Canonical Jenjang Resolver ---
+        if (typeof window.getCanonicalJenjang !== 'function') {
+          throw new Error('window.getCanonicalJenjang is not defined');
+        }
+
+        const canonTests = [
+          { in: 'TPQ Pagi', expected: 'TPQ' },
+          { in: 'TPQ Sore', expected: 'TPQ' },
+          { in: 'tpq', expected: 'TPQ' },
+          { in: 'KB Ulinnuha (PAUD)', expected: 'PAUD' },
+          { in: 'PAUD', expected: 'PAUD' },
+          { in: 'KB', expected: 'PAUD' },
+          { in: 'TK A', expected: 'PAUD' },
+          { in: 'TK_B', expected: 'PAUD' },
+          { in: 'Tahfidz Pra PTPT', expected: 'TAHFIDZ' },
+          { in: 'Tahfidz PTPT', expected: 'TAHFIDZ' },
+          { in: 'Tahfidz', expected: 'TAHFIDZ' },
+          { in: 'PTPT', expected: 'TAHFIDZ' }
+        ];
+
+        let canonAllPass = true;
+        for (const t of canonTests) {
+          const res = window.getCanonicalJenjang(t.in);
+          if (res !== t.expected) {
+            canonAllPass = false;
+            report('BUG-006 Canonical Mapping', false, `Input "${t.in}" got "${res}", expected "${t.expected}"`);
+            break;
+          }
+        }
+        if (canonAllPass) {
+          report('BUG-006 Canonical Mapping', true, 'Semua 12 variasi jenjang terpetakan ke kanonikal standar secara presisi.');
+        }
+
+        // --- 2. TEST BUG-006: Filter Kelas Sesuai Jenjang ---
+        const sampleClasses = [
+          { id: 'CLS-TPQ-PAGI', name: 'TPQ Al-Hikmah Pagi', level: 'TPQ Pagi' },
+          { id: 'CLS-TPQ-SORE', name: 'TPQ Al-Hikmah Sore', level: 'TPQ Sore' },
+          { id: 'CLS-PAUD-A', name: 'KB Ulinnuha Bintang', level: 'KB Ulinnuha (PAUD)' },
+          { id: 'CLS-TAHFIDZ', name: 'Tahfidz Al-Qur\'an Utama', level: 'Tahfidz Pra PTPT' }
+        ];
+
+        // Skenario A: Pendaftar TPQ Pagi
+        const resolveCanon = window.getCanonicalJenjang;
+        const targetA = 'TPQ Pagi';
+        const canonA = resolveCanon(targetA);
+        const matchA = sampleClasses.filter(c => resolveCanon(c.level || c.name) === canonA)
+          .sort((a,b) => (b.name.includes('Pagi') ? 1 : 0) - (a.name.includes('Pagi') ? 1 : 0));
+
+        const matchAIds = matchA.map(c => c.id);
+        const tpqPass = matchAIds.length === 2 && matchAIds[0] === 'CLS-TPQ-PAGI' && !matchAIds.includes('CLS-TAHFIDZ');
+        report('BUG-006 TPQ Class Match', tpqPass, `TPQ Pagi menghasilkan [${matchAIds.join(', ')}], TPQ Pagi prioritas 1, Tahfidz tidak bocor`);
+
+        // Skenario B: Pendaftar Tahfidz Pra PTPT (Tidak boleh match TPQ)
+        const targetB = 'Tahfidz Pra PTPT';
+        const canonB = resolveCanon(targetB);
+        const matchB = sampleClasses.filter(c => resolveCanon(c.level || c.name) === canonB);
+        const matchBIds = matchB.map(c => c.id);
+        const tahfidzPass = matchBIds.length === 1 && matchBIds[0] === 'CLS-TAHFIDZ';
+        report('BUG-006 Tahfidz Class Match', tahfidzPass, `Tahfidz menghasilkan [${matchBIds.join(', ')}], tidak ada kelas TPQ yang terikut.`);
+
+        // --- 3. TEST BUG-007: Log Activity Dual-Aliasing ---
+        const logListRes = await window.apiCall('logs', 'list', { per_page: 5 });
+        const items = (logListRes && logListRes.data) || [];
+        let logAliasPass = items.length > 0;
+        for (const item of items) {
+          if (!item.description || !item.details || item.description !== item.details) {
+            logAliasPass = false;
+            report('BUG-007 Log Dual-Aliasing List', false, `Item ${item.id} gagal: description="${item.description}", details="${item.details}"`);
+            break;
+          }
+        }
+        if (logAliasPass) {
+          report('BUG-007 Log Dual-Aliasing List', true, `Seluruh ${items.length} entri log memiliki description === details yang terisi identik.`);
+        }
+
+        // Test creation dual-aliasing
+        const createRes = await window.apiCall('logs', 'create', {
+          action: 'TEST_AUDIT',
+          module: 'testing',
+          details: 'Verifikasi dual-aliasing log aktivitas'
+        });
+        const createPass = createRes && createRes.success && createRes.data &&
+          createRes.data.description === 'Verifikasi dual-aliasing log aktivitas' &&
+          createRes.data.details === 'Verifikasi dual-aliasing log aktivitas';
+        report('BUG-007 Log Creation Aliasing', createPass, `Create log merespons dengan description dan details yang identik.`);
+
+        const allPassed = logs.every(l => l.pass);
+        const div = document.getElementById('results');
+        div.innerHTML = `
+          <h2>Status: ${allPassed ? '<span style="color:green">ALL_FASE2_TESTS_PASS</span>' : '<span style="color:red">FASE2_FAILED</span>'}</h2>
+          <ul>
+            ${logs.map(l => `<li style="color:${l.pass ? 'green' : 'red'}"><strong>[${l.pass ? 'PASS' : 'FAIL'}]</strong> ${l.name}: ${l.msg}</li>`).join('')}
+          </ul>
+        `;
+        window.__FASE2_RESULT__ = { allPassed, logs };
+      } catch (err) {
+        document.getElementById('results').innerHTML = `<h2 style="color:red">ERROR: ${err.message}</h2>`;
+        window.__FASE2_RESULT__ = { allPassed: false, error: err.message };
+      }
+    }
+
+    runTests();
+  </script>
+</body>
+</html>

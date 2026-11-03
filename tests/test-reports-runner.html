@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head><title>Reports and Logs Audit</title></head>
+<body>
+  <div id="output">Running...</div>
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    async function testReports() {
+      const results = {};
+      try {
+        // 1. Report Students
+        const stuRep = await window.apiCall('reports', 'generate', { report_type: 'students' });
+        results.students_report_success = stuRep.success;
+        results.students_rows_count = stuRep.data?.rows?.length || 0;
+        results.students_total = stuRep.data?.summary?.total_students || 0;
+
+        // 2. Report PPDB
+        const ppdbRep = await window.apiCall('reports', 'generate', { report_type: 'ppdb' });
+        results.ppdb_report_success = ppdbRep.success;
+        results.ppdb_rows_count = ppdbRep.data?.rows?.length || 0;
+        results.ppdb_accepted = ppdbRep.data?.summary?.total_accepted || 0;
+
+        // 3. Report SPP / Payments
+        const payRep = await window.apiCall('reports', 'generate', { report_type: 'payments' });
+        results.payments_report_success = payRep.success;
+        results.payments_rows_count = payRep.data?.rows?.length || 0;
+        results.payments_total_paid = payRep.data?.summary?.total_paid || 0;
+
+        // 4. Audit Logs
+        const logsRes = await window.apiCall('logs', 'list', { limit: 20 });
+        results.logs_success = logsRes.success;
+        const logs = Array.isArray(logsRes.data) ? logsRes.data : (logsRes.data?.items || []);
+        results.logs_count = logs.length;
+        results.recent_actions = logs.slice(0, 5).map(l => l.action || l.activity_type);
+
+        document.getElementById('output').textContent = JSON.stringify(results);
+        document.title = (results.students_report_success && results.ppdb_report_success && results.payments_report_success) ? 'REPORTS_PASS' : 'REPORTS_FAIL';
+      } catch (e) {
+        document.getElementById('output').textContent = 'ERROR: ' + e.message;
+        document.title = 'REPORTS_ERROR';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testReports);
+  </script>
+</body>
+</html>
+

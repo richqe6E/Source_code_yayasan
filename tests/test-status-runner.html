@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head><title>Test Status Page</title></head>
+<body>
+  <div id="output">Running...</div>
+  <script src="http://localhost:8080/shared/js/supabase-config.js"></script>
+  <script src="http://localhost:8080/shared/js/api.js"></script>
+  <script>
+    async function testStatus() {
+      try {
+        const res = await window.apiCall('ppdb', 'check_status', {
+          registration_number: 'REG-2026-6951'
+        });
+        document.getElementById('output').textContent = JSON.stringify(res);
+        document.title = res.success ? 'STATUS_CHECK_OK' : 'STATUS_CHECK_FAIL';
+      } catch (e) {
+        document.getElementById('output').textContent = 'ERROR: ' + e.message;
+        document.title = 'STATUS_CHECK_ERROR';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', testStatus);
+  </script>
+</body>
+</html>
