@@ -998,20 +998,32 @@
         return;
       }
 
-      startSpin();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : 'Aktifkan Kembali Santri';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Memproses...';
+      }
+
+      const stopSpin = (typeof Shell !== 'undefined' && Shell.startRefresh) ? Shell.startRefresh() : () => {};
       try {
         const res = await apiCall('students', 'reactivate', { id, class_id, monthly_spp_amount, notes });
-        if (res.success) {
+        if (res && res.success) {
           showToast(res.message || 'Santri berhasil diaktifkan kembali', 'success');
           closeReactivateModal();
           await loadStudents();
         } else {
-          alert(res.message || 'Gagal mengaktifkan santri');
-          showToast(res.message || 'Gagal', 'error');
+          alert((res && res.message) || 'Gagal mengaktifkan santri');
+          showToast((res && res.message) || 'Gagal', 'error');
         }
       } catch (err) {
+        console.error('Error in executeReactivateStudent:', err);
         showToast('Terjadi kesalahan koneksi server.', 'error');
       } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
         stopSpin();
       }
     }
