@@ -38,3 +38,10 @@ tests/*output.html
 tests/current-sim-reg.txt
 tests/public-audit-results.xml
 tests/f1-result.html
+
+backup_snapshots/
+baseline_screenshots/
+verification_screenshots/
+baseline_report.json
+pattern_sweep_findings.json
+verification_crawl_report.json

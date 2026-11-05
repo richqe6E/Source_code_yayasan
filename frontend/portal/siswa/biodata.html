@@ -51,11 +51,17 @@
 
       <!-- Section 1: Data Pribadi Siswa / Santri -->
       <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm space-y-5">
-        <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-sm">1</div>
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Data Pribadi Siswa / Santri</h2>
-            <p class="text-xs text-slate-500">Identitas diri peserta didik sesuai Akta Kelahiran dan Kartu Keluarga.</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-4 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-sm">1</div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Data Pribadi Siswa / Santri</h2>
+              <p class="text-xs text-slate-500">Identitas diri peserta didik sesuai Akta Kelahiran dan Kartu Keluarga.</p>
+            </div>
+          </div>
+          <div id="academic-lock-badge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold">
+            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Arsip Resmi Terkunci (Perubahan melalui Kantor TU)</span>
           </div>
         </div>
 
@@ -451,6 +457,21 @@
           setVal('special_traits', s.special_traits || meta.special_traits || '');
 
           // Data Ayah
+          window._currentStudentProfile = s;
+          if (isSiswaAktif) {
+            const lockedIds = ['level', 'full_name', 'gender', 'birth_place', 'birth_date', 'nik'];
+            lockedIds.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) {
+                el.readOnly = true;
+                if (el.tagName === 'SELECT') el.disabled = true;
+                el.classList.add('bg-slate-100', 'text-slate-600', 'cursor-not-allowed');
+              }
+            });
+            const badgeContainer = document.getElementById('academic-lock-badge');
+            if (badgeContainer) badgeContainer.classList.remove('hidden');
+          }
+
           setVal('father_name', s.father_name || (meta.father && meta.father.name) || '');
           setVal('father_job', s.father_job || (meta.father && meta.father.job) || '');
           setVal('father_education', s.father_education || (meta.father && meta.father.education) || '');
@@ -496,16 +517,17 @@
         return el ? el.value.trim() : '';
       };
 
+            const orig = window._currentStudentProfile || {};
       const payload = {
-        full_name: val('full_name'),
-        name: val('full_name'),
+        full_name: isSiswaAktif && (orig.full_name || orig.name) ? (orig.full_name || orig.name) : val('full_name'),
+        name: isSiswaAktif && (orig.name || orig.full_name) ? (orig.name || orig.full_name) : val('full_name'),
+        gender: isSiswaAktif && orig.gender ? orig.gender : val('gender'),
+        birth_place: isSiswaAktif && orig.birth_place ? orig.birth_place : val('birth_place'),
+        birth_date: isSiswaAktif && orig.birth_date ? orig.birth_date.split('T')[0] : val('birth_date'),
+        level: isSiswaAktif && orig.level ? orig.level : val('level'),
+        nik: isSiswaAktif && orig.nik ? orig.nik : val('nik'),
         nickname: val('nickname'),
-        gender: val('gender'),
-        birth_place: val('birth_place'),
-        birth_date: val('birth_date'),
         address: val('address'),
-        level: val('level'),
-        nik: val('nik'),
         religion: val('religion'),
         citizenship: val('citizenship'),
         child_order: val('child_order'),

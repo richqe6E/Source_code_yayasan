@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -889,9 +889,18 @@
               <select id="cm-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">${optionsHtml}</select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Nominal Iuran SPP Bulanan (Rp) *</label>
-              <input type="number" id="cm-spp-amount" step="5000" value="${defaultSppAmount}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-gray-900 focus:ring-2 focus:ring-primary-500">
-              <span class="text-[11px] text-primary-700 font-semibold block mt-1" id="cm-spp-hint">Nominal: ${typeof formatIDR === 'function' ? formatIDR(defaultSppAmount) : ('Rp' + defaultSppAmount.toLocaleString('id-ID'))}</span>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Nominal Iuran SPP Bulanan (Rp) *</label>
+                <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">Master Tarif Resmi</span>
+              </div>
+              <input type="number" id="cm-spp-amount" readonly value="${defaultSppAmount}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-gray-900 bg-slate-100 cursor-not-allowed">
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-[11px] text-primary-700 font-semibold" id="cm-spp-hint">Nominal: ${typeof formatIDR === 'function' ? formatIDR(defaultSppAmount) : ('Rp' + defaultSppAmount.toLocaleString('id-ID'))}</span>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                  <input type="checkbox" id="cm-is-beasiswa" class="rounded text-primary-600 focus:ring-primary-500">
+                  <span class="text-[11px] text-slate-700 font-bold">Beasiswa Dhuafa (Rp0)</span>
+                </label>
+              </div>
             </div>
             <div>
               <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">${isPaud ? 'Tanggal Diterima Masuk *' : '13.b. Tanggal Masuk Resmi *'}</label>
@@ -927,6 +936,18 @@
         modal.querySelector('#cm-portal-password').value = 'AT' + String(Math.floor(100000 + Math.random() * 900000));
       };
 
+      const isBeasiswaCb = modal.querySelector('#cm-is-beasiswa');
+      if (isBeasiswaCb) {
+        isBeasiswaCb.onchange = () => {
+          if (isBeasiswaCb.checked) {
+            modal.querySelector('#cm-spp-amount').value = 0;
+            modal.querySelector('#cm-spp-hint').textContent = 'Beasiswa Penuh (Rp0 - Status Exempted)';
+          } else {
+            modal.querySelector('#cm-spp-amount').value = defaultSppAmount;
+            modal.querySelector('#cm-spp-hint').textContent = 'Nominal: ' + (typeof formatIDR === 'function' ? formatIDR(defaultSppAmount) : ('Rp' + defaultSppAmount.toLocaleString('id-ID')));
+          }
+        };
+      }
       const sppIn = modal.querySelector('#cm-spp-amount');
       const sppHint = modal.querySelector('#cm-spp-hint');
       if (sppIn && sppHint) {

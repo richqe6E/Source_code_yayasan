@@ -111,11 +111,13 @@
       throw new Error('OfflineMode');
     }
     const url = `${API_URL}/rest/v1/${endpoint}`;
+    const currentToken = getToken();
     const headers = {
       'apikey': API_KEY,
       'Authorization': `Bearer ${API_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
+      ...(currentToken ? { 'X-Session-Token': currentToken } : {}),
       ...extraHeaders
     };
 

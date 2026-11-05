@@ -350,11 +350,11 @@
           <form id="force-pwd-form" class="space-y-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi Baru *</label>
-              <input type="password" id="fp-new" required minlength="6" placeholder="Minimal 6 karakter" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-brand-500">
+              <input type="password" id="fp-new" required minlength="8" placeholder="Minimal 8 karakter (maks 72 byte)" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-brand-500">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Ketik Ulang Kata Sandi Baru *</label>
-              <input type="password" id="fp-confirm" required minlength="6" placeholder="Ulangi kata sandi baru" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-brand-500">
+              <input type="password" id="fp-confirm" required minlength="8" placeholder="Ulangi kata sandi baru" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-brand-500">
             </div>
             <button type="submit" id="btn-save-pwd" class="w-full mt-2 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition">Simpan Kata Sandi Baru &amp; Lanjutkan</button>
           </form>
@@ -366,8 +366,12 @@
         e.preventDefault();
         const p1 = modal.querySelector('#fp-new').value;
         const p2 = modal.querySelector('#fp-confirm').value;
-        if (p1.length < 6) {
-          alert('Kata sandi minimal 6 karakter');
+        if (p1.length < 8) {
+          alert('Kata sandi baru minimal 8 karakter');
+          return;
+        }
+        if (new TextEncoder().encode(p1).length > 72) {
+          alert('Kata sandi baru melebihi batas maksimum 72 byte');
           return;
         }
         if (p1 !== p2) {

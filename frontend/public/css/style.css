@@ -1,4 +1,4 @@
-/* SIYAYASAN - Shared styles (Aligned with jakubkrehel/skills: better-interface, better-ui, better-typography, better-colors) */
+﻿/* SIYAYASAN - Shared styles (Aligned with jakubkrehel/skills: better-interface, better-ui, better-typography, better-colors) */
 
 html {
   scroll-behavior: smooth !important;
@@ -34,9 +34,20 @@ p, .prose p, .lead {
   font-variant-numeric: tabular-nums;
 }
 
-/* Badges and tags: no awkward wrap */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Badges and tags: no awkward wrap on desktop, graceful wrap on mobile */
 .badge, [class*="rounded-full"][class*="text-xs"], [class*="rounded-full"][class*="text-["] {
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .badge, [class*="rounded-full"][class*="text-xs"], [class*="rounded-full"][class*="text-["] {
+    white-space: normal !important;
+  }
 }
 
 /* ======================================================== */
