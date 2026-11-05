@@ -1,3 +1,5 @@
+SET search_path TO "$user", public, extensions;
+
 -- ==============================================================================
 -- SIYAYASAN — STAGE 6 DEFINITIVE ISOLATED STAGING MIGRATION SCRIPT
 -- Scope: Isolated Staging Environment ONLY
@@ -8,9 +10,54 @@
 -- ==============================================================================
 -- PART 1: EXTENSIONS & SCHEMAS
 -- ==============================================================================
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ==============================================================================
+-- SUPABASE RESILIENCY WRAPPERS
+-- Supabase manages extensions in schema "extensions" by default.
+-- Provide public wrapper functions so any legacy or explicit public.* calls succeed.
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.uuid_generate_v4() 
+RETURNS uuid LANGUAGE sql AS 'SELECT gen_random_uuid()';
+
+DO $$
+BEGIN
+    -- Alias for digest in public
+    IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'digest' AND pronargs = 2) THEN
+        IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'extensions' AND p.proname = 'digest') THEN
+            CREATE OR REPLACE FUNCTION public.digest(data text, type text) 
+            RETURNS bytea LANGUAGE sql AS 'SELECT extensions.digest(data, type)';
+            CREATE OR REPLACE FUNCTION public.digest(data bytea, type text) 
+            RETURNS bytea LANGUAGE sql AS 'SELECT extensions.digest(data, type)';
+        END IF;
+    END IF;
+
+    -- Alias for crypt in public
+    IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'crypt') THEN
+        IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'extensions' AND p.proname = 'crypt') THEN
+            CREATE OR REPLACE FUNCTION public.crypt(key text, salt text) 
+            RETURNS text LANGUAGE sql AS 'SELECT extensions.crypt(key, salt)';
+        END IF;
+    END IF;
+
+    -- Alias for gen_salt in public
+    IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'gen_salt') THEN
+        IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'extensions' AND p.proname = 'gen_salt') THEN
+            CREATE OR REPLACE FUNCTION public.gen_salt(type text, iter_count integer) 
+            RETURNS text LANGUAGE sql AS 'SELECT extensions.gen_salt(type, iter_count)';
+        END IF;
+    END IF;
+
+    -- Alias for gen_random_bytes in public
+    IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'gen_random_bytes') THEN
+        IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'extensions' AND p.proname = 'gen_random_bytes') THEN
+            CREATE OR REPLACE FUNCTION public.gen_random_bytes(count integer) 
+            RETURNS bytea LANGUAGE sql AS 'SELECT extensions.gen_random_bytes(count)';
+        END IF;
+    END IF;
+END $$;
 
 -- Internal Private Schema (Isolated from PostgREST Data API)
 CREATE SCHEMA IF NOT EXISTS auth_internal;
@@ -30,7 +77,7 @@ CREATE TABLE IF NOT EXISTS public.student_internal_notes (
 
 -- 2.2 Table: User Sessions (Cryptographic SHA-256 Token Hash Storage Only)
 CREATE TABLE IF NOT EXISTS public.user_sessions (
-    id UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     token_hash VARCHAR(64) UNIQUE NOT NULL, -- SHA-256 hex digest of bearer token
     user_id VARCHAR(50) NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     role VARCHAR(50) NOT NULL,
@@ -65,7 +112,7 @@ ON public.login_rate_limits (attempt_key, locked_until);
 
 -- 2.4 Table: PPDB Status Checking Rate Limits
 CREATE TABLE IF NOT EXISTS public.ppdb_status_attempts (
-    id UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     registration_no TEXT NOT NULL,
     ip_address TEXT,
     attempted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -76,7 +123,7 @@ ON public.ppdb_status_attempts (registration_no, ip_address, attempted_at);
 
 -- 2.5 Table: Educational Fee Plans (Master Perencanaan SPP)
 CREATE TABLE IF NOT EXISTS public.educational_fee_plans (
-    id UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     academic_year VARCHAR(20) NOT NULL,
     level VARCHAR(50) NOT NULL,
     program VARCHAR(100) NOT NULL,
@@ -155,7 +202,7 @@ CREATE OR REPLACE FUNCTION auth_internal.get_trusted_client_ip()
 RETURNS TEXT
 LANGUAGE sql
 STABLE
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
     SELECT COALESCE(
         current_setting('request.headers', true)::jsonb->>'cf-connecting-ip',
@@ -174,13 +221,13 @@ CREATE OR REPLACE FUNCTION auth_internal.log_activity(
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     INSERT INTO public.activity_logs (
         id, user_id, action, details, ip_address, created_at
     ) VALUES (
-        public.uuid_generate_v4()::TEXT,
+        gen_random_uuid()::TEXT,
         p_user_id,
         p_action,
         p_details,
@@ -199,7 +246,7 @@ CREATE OR REPLACE FUNCTION auth_internal.evaluate_rate_limit(
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_record RECORD;
@@ -225,7 +272,7 @@ CREATE OR REPLACE FUNCTION auth_internal.record_rate_limit_failure(
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     INSERT INTO public.login_rate_limits (attempt_key, failed_count, first_failed_at, last_failed_at, locked_until)
@@ -253,7 +300,7 @@ CREATE OR REPLACE FUNCTION auth_internal.reset_rate_limit(p_key TEXT)
 RETURNS VOID
 LANGUAGE sql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
     DELETE FROM public.login_rate_limits WHERE attempt_key = p_key;
 $$;
@@ -267,7 +314,7 @@ CREATE OR REPLACE FUNCTION public.get_current_session_token()
 RETURNS TEXT
 LANGUAGE sql
 STABLE
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
     SELECT COALESCE(
         current_setting('request.headers', true)::jsonb->>'x-session-token',
@@ -281,7 +328,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_token_hash VARCHAR(64);
@@ -293,7 +340,7 @@ BEGIN
     END IF;
 
     -- Compute SHA-256 hash for lookup
-    v_token_hash := encode(public.digest(p_raw_token, 'sha256'), 'hex');
+    v_token_hash := encode(digest(p_raw_token, 'sha256'), 'hex');
 
     SELECT * INTO v_session
     FROM public.user_sessions
@@ -342,7 +389,7 @@ RETURNS BOOLEAN
 LANGUAGE plpgsql
 VOLATILE
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_token_hash VARCHAR(64);
@@ -353,7 +400,7 @@ BEGIN
         RETURN FALSE;
     END IF;
 
-    v_token_hash := encode(public.digest(p_raw_token, 'sha256'), 'hex');
+    v_token_hash := encode(digest(p_raw_token, 'sha256'), 'hex');
 
     SELECT * INTO v_session
     FROM public.user_sessions
@@ -394,7 +441,7 @@ CREATE OR REPLACE FUNCTION public.get_authenticated_user()
 RETURNS JSONB
 LANGUAGE sql
 STABLE
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
     SELECT public.verify_session_token(public.get_current_session_token());
 $$;
@@ -403,7 +450,7 @@ CREATE OR REPLACE FUNCTION public.is_admin_user()
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
     SELECT COALESCE(
         (public.get_authenticated_user()->>'role') IN ('super_admin', 'admin', 'admin_tu', 'admin_ppdb', 'admin_keuangan', 'kepala_sekolah'),
@@ -415,7 +462,7 @@ CREATE OR REPLACE FUNCTION public.get_current_student_id()
 RETURNS VARCHAR(50)
 LANGUAGE sql
 STABLE
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
     SELECT NULLIF(public.get_authenticated_user()->>'student_id', '');
 $$;
@@ -430,7 +477,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 VOLATILE
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_clean_id TEXT;
@@ -488,7 +535,7 @@ BEGIN
     END IF;
 
     -- 5. Bcrypt Password Verification
-    IF v_user.password_hash <> public.crypt(p_password, v_user.password_hash) THEN
+    IF v_user.password_hash <> crypt(p_password, v_user.password_hash) THEN
         PERFORM auth_internal.record_rate_limit_failure(v_attempt_key, 5, 900);
         RETURN jsonb_build_object('success', false, 'error', 'Kredensial login tidak valid.');
     END IF;
@@ -497,9 +544,9 @@ BEGIN
     PERFORM auth_internal.reset_rate_limit(v_attempt_key);
 
     -- 7. Generate Cryptographic Bearer Token & SHA-256 Hash
-    v_raw_token := replace(replace(encode(public.gen_random_bytes(32), 'base64'), '+', '-'), '/', '_');
+    v_raw_token := replace(replace(encode(gen_random_bytes(32), 'base64'), '+', '-'), '/', '_');
     v_raw_token := rtrim(v_raw_token, '=');
-    v_token_hash := encode(public.digest(v_raw_token, 'sha256'), 'hex');
+    v_token_hash := encode(digest(v_raw_token, 'sha256'), 'hex');
 
     -- Insert active session storing ONLY the hash
     INSERT INTO public.user_sessions (
@@ -548,7 +595,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 VOLATILE
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_raw_token TEXT;
@@ -585,12 +632,12 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'error', 'Akun tidak aktif.');
     END IF;
 
-    IF v_user.password_hash <> public.crypt(p_old_password, v_user.password_hash) THEN
+    IF v_user.password_hash <> crypt(p_old_password, v_user.password_hash) THEN
         RETURN jsonb_build_object('success', false, 'error', 'Password lama tidak sesuai.');
     END IF;
 
     -- Hash new password with bcrypt work factor 12
-    v_new_hash := public.crypt(p_new_password, public.gen_salt('bf', 12));
+    v_new_hash := crypt(p_new_password, gen_salt('bf', 12));
 
     UPDATE public.users
     SET password_hash = v_new_hash,
@@ -606,9 +653,9 @@ BEGIN
     WHERE user_id = v_user.id;
 
     -- Issue fresh session token
-    v_fresh_token := replace(replace(encode(public.gen_random_bytes(32), 'base64'), '+', '-'), '/', '_');
+    v_fresh_token := replace(replace(encode(gen_random_bytes(32), 'base64'), '+', '-'), '/', '_');
     v_fresh_token := rtrim(v_fresh_token, '=');
-    v_fresh_hash := encode(public.digest(v_fresh_token, 'sha256'), 'hex');
+    v_fresh_hash := encode(digest(v_fresh_token, 'sha256'), 'hex');
 
     INSERT INTO public.user_sessions (
         token_hash, user_id, role, student_id, expires_at, absolute_expires_at
@@ -631,7 +678,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 VOLATILE
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_raw_token TEXT;
@@ -640,7 +687,7 @@ BEGIN
     v_raw_token := public.get_current_session_token();
 
     IF v_raw_token IS NOT NULL AND LENGTH(TRIM(v_raw_token)) > 0 THEN
-        v_token_hash := encode(public.digest(v_raw_token, 'sha256'), 'hex');
+        v_token_hash := encode(digest(v_raw_token, 'sha256'), 'hex');
         UPDATE public.user_sessions
         SET is_revoked = TRUE, revocation_reason = 'USER_LOGOUT'
         WHERE token_hash = v_token_hash;
@@ -659,7 +706,7 @@ CREATE OR REPLACE FUNCTION public.protect_users_credentials_and_roles()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     IF NOT public.is_admin_user() THEN
@@ -687,7 +734,7 @@ CREATE OR REPLACE FUNCTION public.protect_student_academic_fields()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     IF NOT public.is_admin_user() THEN
@@ -722,7 +769,7 @@ CREATE OR REPLACE FUNCTION public.protect_student_documents_verification()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     IF NOT public.is_admin_user() THEN
@@ -747,7 +794,7 @@ CREATE OR REPLACE FUNCTION public.validate_ppdb_public_insert()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     IF NOT public.is_admin_user() THEN
@@ -775,7 +822,7 @@ CREATE OR REPLACE FUNCTION public.prevent_payment_on_exempted_invoice()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_invoice RECORD;
@@ -807,7 +854,7 @@ CREATE OR REPLACE FUNCTION public.prevent_exempted_invoice_status_tamper()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 BEGIN
     IF OLD.status = 'exempted' AND NEW.status <> 'exempted' THEN
@@ -843,7 +890,7 @@ RETURNS JSONB
 LANGUAGE plpgsql
 VOLATILE
 SECURITY DEFINER
-SET search_path = ''
+SET search_path = auth_internal, public, extensions, pg_catalog, pg_temp
 AS $$
 DECLARE
     v_auth JSONB;
@@ -878,7 +925,7 @@ BEGIN
         RETURN jsonb_build_object('success', false, 'error', 'Tagihan ini telah lunas.');
     END IF;
 
-    v_payment_id := 'PAY/' || TO_CHAR(NOW(), 'YYYYMMDD') || '/' || SUBSTRING(public.uuid_generate_v4()::TEXT, 1, 8);
+    v_payment_id := 'PAY/' || TO_CHAR(NOW(), 'YYYYMMDD') || '/' || SUBSTRING(gen_random_uuid()::TEXT, 1, 8);
 
     INSERT INTO public.payments (
         id, invoice_id, invoice_number, student_id, student_name,
@@ -1122,5 +1169,8 @@ GRANT EXECUTE ON FUNCTION public.auth_change_password(TEXT, TEXT) TO anon, authe
 GRANT EXECUTE ON FUNCTION public.auth_logout() TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_current_session_token() TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_authenticated_user() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.is_admin_user() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.get_current_student_id() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.uuid_generate_v4() TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.submit_payment_proof(VARCHAR, VARCHAR, TEXT, TEXT) TO anon, authenticated;
 
